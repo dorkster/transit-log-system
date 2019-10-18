@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h2>Delete Trip</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <p>Are you sure you wish to delete the following trip? This CAN NOT be undone!</p>
+        <p><strong>{{ trip }}</strong></p>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-4">
+                <input class="btn btn-secondary btn-lg" type="submit" name="cancel" value="Cancel Changes">
+            </div>
+            <div>
+                <input class="btn btn-danger btn-lg" type="submit" name="delete" value="Delete Trip">
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

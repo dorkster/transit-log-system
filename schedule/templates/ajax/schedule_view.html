@@ -1,0 +1,49 @@
+<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}">Add new</a></h3>
+{% if shifts %}
+    {% for shift in shifts %}
+    <div class="card mb-2" style="background: {{ shift.get_driver_color }};">
+        <div class="card-body p-0">
+            <div class="d-flex flex-wrap">
+                <div class="p-1">
+                    <a href="{% url 'shift-edit' 'view' shift.id %}" class="btn btn-outline-dark btn-sm">Edit</a>
+                </div>
+                <div class="p-1">
+                    <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
+                </div>
+                <div class="ml-auto p-1">
+                    <a href="{% url 'shift-start' shift.id %}" class="btn btn-lg {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>
+                    <a href="{% url 'shift-end' shift.id %}" class="btn btn-lg {% if not shift.start_miles or shift.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                    <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info btn-lg">Fuel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}">Add new</a></h3>
+{% if trips %}
+    {% for trip in trips %}
+    <div class="card mb-2" style="background: {{ trip.get_driver_color }};">
+        <div class="card-body p-0">
+            <a id="trip_{{ trip.id }}"></a>
+            <div class="d-flex flex-wrap">
+                <div class="p-1">
+                    <a href="{% url 'trip-edit' 'view' trip.id %}" class="btn btn-outline-dark btn-sm">Edit</a>
+                </div>
+                <div class="p-1 mr-3">
+                    <h4 class="card-title">{{ trip.name }}</h4>
+                </div>
+                <div class="p-1">
+                    <p class="card-text">From: <strong>{{ trip.address }}</strong>{% if trip.pick_up_time %} | (Pickup: <strong>{{ trip.pick_up_time }}</strong>){% endif %}
+                    <br>To: <strong>{{ trip.destination }}</strong>{% if trip.appointment_time %} | (Appointment: <strong>{{ trip.appointment_time }}</strong>){% endif %}</p>
+                </div>
+                <div class="ml-auto p-1">
+                    <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
+                    <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
+                    {% if trip.phone %}<a href="tel:{{ trip.get_phone_number }}" class="btn btn-info btn-lg">Call</a>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,57 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4 mb-3">
+    <div class="row">
+        <div class="col p-1">
+            <h5><strong>{{ date_str }}</strong> [<a href="{% url 'schedule' 'view' date.year date.month date.day %}">View</a>]</h5>
+        </div>
+        <div class="col-sm-auto p-1">
+            <div class="btn-group" role="group">
+                <a class="btn btn-secondary" href="{{ date_prev }}">&lt;&lt; Previous Day</a><a class="btn btn-secondary" href="{{ date_next }}">Next Day &gt;&gt;</a>
+            </div>
+        </div>
+        <div class="col-sm-auto p-1">
+            <form action="" method="post" class="date-picker">
+                {% csrf_token %}
+                {{ date_picker }}
+                <input type="submit" value="Go" class="btn btn-secondary align-top">
+            </form>
+        </div>
+    </div>
+</div>
+<div id="schedule-edit">
+</div>
+
+{% block javascript %}
+<script type="text/javascript">
+    function ajaxScheduleEdit(trip_id="", trip_action="", trip_data="") {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'ajax-schedule-edit' %}",
+            data: {
+                "year":{{ date.year }}, 
+                "month":{{ date.month }}, 
+                "day":{{ date.day }},
+                "trip_id":trip_id,
+                "trip_action": trip_action,
+                "trip_data": trip_data,
+            }
+        })
+        .done(function(response) {
+            $("#schedule-edit").html("")
+            $("#schedule-edit").append(response);
+            var hash = window.location.hash.substr(1);
+            if (hash)
+                document.getElementById(hash).scrollIntoView();
+        });
+    }
+
+    // Fetch the initial data
+    ajaxScheduleEdit();
+
+    // Refresh every 10 seconds
+    setInterval(ajaxScheduleEdit, 10000);
+</script>
+{% endblock %}
+{% endblock %}

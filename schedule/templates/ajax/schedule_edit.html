@@ -1,0 +1,80 @@
+<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'edit' date.year date.month date.day %}">Add new</a></h3>
+{% if shifts %}
+<table class="mytable">
+    <thead>
+        <td></td>
+        <td>Driver</td>
+        <td>Vehicle</td>
+        <td>Start Miles</td>
+        <td>Start Time</td>
+        <td>End Miles</td>
+        <td>End Time</td>
+        <td>Fuel (gal)</td>
+    </thead>
+    {% for shift in shifts %}
+    <tr style="background: {{ shift.get_driver_color }};">
+        <td class="mytable-col-xs"><a class="btn btn-outline-dark btn-sm" href="{% url 'shift-edit' 'edit' shift.id %}">Edit</a></td>
+        <td class="mytable-col-md">{{ shift.driver }}</td>
+        <td class="mytable-col-md">{{ shift.vehicle }}</td>
+        <td class="mytable-col-md">{{ shift.start_miles }}</td>
+        <td class="mytable-col-sm">{{ shift.start_time }}</td>
+        <td class="mytable-col-md">{{ shift.end_miles }}</td>
+        <td class="mytable-col-sm">{{ shift.end_time }}</td>
+        <td class="mytable-col-sm">{{ shift.fuel }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}">Add new</a></h3>
+{% if trips %}
+<table class="mytable">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Pick up</td>
+        <td>Appt. time</td>
+        <td>Name</td>
+        <td>Address</td>
+        <td>Phone #</td>
+        <td>Destination</td>
+        <td>Trip Type</td>
+        <td>Driver</td>
+        <td>Vehicle</td>
+        <td>Start Miles</td>
+        <td>Start Time</td>
+        <td>End Miles</td>
+        <td>End Time</td>
+        <td>Notes</td>
+    </thead>
+    {% for trip in trips %}
+    <tr style="background: {{ trip.get_driver_color }};">
+        <td class="mytable-col-arrows">
+            <a id="trip_{{ trip.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxScheduleEdit('{{ trip.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxScheduleEdit('{{ trip.id }}', 'mv', 'd')">&#11015;</button>
+            </div>
+        </td>
+        <td class="mytable-col-xs"><a class="btn btn-outline-dark btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+        <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
+        <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
+        <td class="mytable-col-md">{{ trip.name }}</td>
+        <td class="mytable-col-lg">{{ trip.address }}</td>
+        <td class="mytable-col-md">{{ trip.phone }}</td>
+        <td class="mytable-col-lg">{{ trip.destination }}</td>
+        <td class="mytable-col-md">{% if trip.trip_type %}{{ trip.trip_type }}{% endif %}</td>
+        <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
+        <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
+        <td class="mytable-col-sm">{{ trip.start_miles }}</td>
+        <td class="mytable-col-sm">{{ trip.start_time }}</td>
+        <td class="mytable-col-sm">{{ trip.end_miles }}</td>
+        <td class="mytable-col-sm">{{ trip.end_time }}</td>
+        <td class="mytable-col-xs">
+            {% if trip.note %}
+            <abbr class="emoji" title="{{ trip.note }}">&#8505;</abbr>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

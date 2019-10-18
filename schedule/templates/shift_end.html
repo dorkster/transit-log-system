@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load static %}
+<h2>End Shift</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend><span class="small">{{ shift.date }} | {{ shift.driver }} ({{ shift.vehicle }})</span></legend>
+                    <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
+                    <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label><br/>{{ form.time }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{% endblock %}
+{% endblock %}

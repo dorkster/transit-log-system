@@ -1,0 +1,75 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load static %}
+<h2>Drop Off</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend><span class="small">{{ trip.str_pretty }}</span></legend>
+                    <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
+                    <div id="full_miles_desc"></div>
+                    <div id="full_miles" class="full-miles"></div>
+                    <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label><br/>{{ form.time }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript">
+    var start_miles = {};
+    {% for key,val in start_miles.items %}
+    start_miles["{{ key }}"] = "{{ val }}";
+    {% endfor %}
+
+    function showFullMiles(input) {
+        var shift_start_miles = start_miles["{{ trip.vehicle }}"];
+
+        $("#full_miles_desc").html("");
+
+        var new_miles = validateMilesString(input.value, false);
+        var prefix_miles = "";
+        if (new_miles != "") {
+            prefix_miles = shift_start_miles.substring(0, shift_start_miles.length - new_miles.length);
+            $("#full_miles_desc").append('<span class="text-info">Match to the odometer:</span>');
+        }
+        var combined_miles = prefix_miles + new_miles;
+
+        $("#full_miles").html("");
+        $("#full_miles").append('<span class="text-muted">' + prefix_miles + '</span><strong>' + new_miles + '</strong>');
+
+        var error = false;
+        if (shift_start_miles != "" && combined_miles != "") {
+            var combined_miles_start = shift_start_miles.substring(0, shift_start_miles.length - "{{ trip.start_miles }}".length) + "{{ trip.start_miles }}";
+
+            if (parseFloat(combined_miles) < parseFloat(shift_start_miles))
+                error = true;
+            else if (parseFloat(combined_miles) < parseFloat(combined_miles_start))
+                error = true;
+        }
+
+        if (error) {
+            $("#full_miles").append(' <span class="text-danger"><strong>!</strong></span>');
+        }
+    }
+
+    var mile_input = document.getElementById("id_miles");
+    mile_input.addEventListener("change", function() { showFullMiles(mile_input); });
+
+    showFullMiles(mile_input);
+</script>
+{% endblock %}
+{% endblock %}

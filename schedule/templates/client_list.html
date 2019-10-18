@@ -1,0 +1,35 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div id="client_list">
+</div>
+
+{% block javascript %}
+<script type="text/javascript">
+    function ajaxScheduleEdit(client_id="", client_action="", client_data="") {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'ajax-client-list' %}",
+            data: {
+                "client_id":client_id,
+                "client_action": client_action,
+                "client_data": client_data,
+            }
+        })
+        .done(function(response) {
+            $("#client_list").html("");
+            $("#client_list").append(response);
+            var hash = window.location.hash.substr(1);
+            if (hash)
+                document.getElementById(hash).scrollIntoView();
+        });
+    }
+
+    // Fetch the initial data
+    ajaxScheduleEdit();
+
+    // Refresh every 10 seconds
+    setInterval(ajaxScheduleEdit, 10000);
+</script>
+{% endblock %}
+{% endblock %}

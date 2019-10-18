@@ -1,0 +1,10 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h2>Stow, MA Council on Aging<br>Transportation Department</h2>
+<h3>Common Tasks:</h3>
+<ul>
+    <li><a href="{% url 'schedule-today' 'edit' %}">Edit today's schedule</a></li>
+    <li><a href="{% url 'trip-create-today' 'edit' %}">Add a trip to the schedule</a></li>
+</ul>
+{% endblock %}

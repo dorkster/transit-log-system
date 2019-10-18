@@ -1,0 +1,74 @@
+@font-face {
+    font-family: "Noto Emoji";
+    src: url("../font/Noto Emoji.ttf")
+}
+
+.emoji {
+    font-family: "Noto Emoji";
+}
+
+.mytable {
+    font-size: 10pt;
+}
+
+.mytable thead {
+    font-weight: bold;
+}
+
+.mytable td {
+    padding: 0.25em;
+    border: 1px solid #999 !important;
+}
+
+.mytable td abbr {
+    text-decoration: none;
+    font-size: 16pt;
+    cursor: default;
+}
+
+.mytable-col-xs {
+    text-align: center !important;
+    width: 4em;
+}
+
+.mytable-col-sm {
+    text-align: center !important;
+    width: 6em;
+}
+
+.mytable-col-md {
+    width: 8em;
+}
+
+.mytable-col-lg {
+    width: 16em;
+}
+
+.mytable-col-arrows {
+    text-align: center !important;
+    width: 3em;
+}
+
+.mytable-striped thead {
+    background: rgba(0,0,0,0.08);
+}
+
+.mytable-striped tr:nth-child(even) {
+    background: rgba(0,0,0,0.04);
+}
+
+.date-picker {
+    margin-bottom: 1em;
+}
+.date-picker * {
+    display: inline;
+}
+
+.form-control-width-fix {
+    width: auto !important;
+    display: inline !important;
+}
+
+.full-miles * {
+    font-size: 24pt;
+}

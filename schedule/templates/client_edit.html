@@ -1,0 +1,48 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load static %}
+<h2>
+    {% if is_new %}
+    New Client
+    {% else %}
+    Client Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
+                    <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label><br/>{{ form.address }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.phone_home.id_for_label }}"><strong>{{ form.phone_home.label }}</strong></label><br/>{{ form.phone_home }}</div>
+                    <div class="mb-2"><label for="{{ form.phone_mobile.id_for_label }}"><strong>{{ form.phone_mobile.label }}</strong></label><br/>{{ form.phone_mobile }}</div>
+                    <div class="mb-2"><label for="{{ form.phone_default.id_for_label }}"><strong>{{ form.phone_default.label }}</strong></label><br/>{{ form.phone_default }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
+                    <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+            {% if not is_new %}
+            <div>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Client" formnovalidate>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{% endblock %}
+{% endblock %}

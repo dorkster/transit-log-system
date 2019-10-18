@@ -1,0 +1,57 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load static %}
+<h2>
+    {% if is_new %}
+    New Shift
+    {% else %}
+    Shift Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1">
+                <fieldset class="form-group">
+                    <legend>{{ form.date.label }}</legend>
+                    <div>{{ form.date }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
+                    <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.start_miles.id_for_label }}"><strong>{{ form.start_miles.label }}</strong></label><br/>{{ form.start_miles }}</div>
+                    <div class="mb-2"><label for="{{ form.start_time.id_for_label }}"><strong>{{ form.start_time.label }}</strong></label><br/>{{ form.start_time }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.end_miles.id_for_label }}"><strong>{{ form.end_miles.label }}</strong></label><br/>{{ form.end_miles }}</div>
+                    <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label><br/>{{ form.end_time }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.fuel.id_for_label }}"><strong>{{ form.fuel.label }}</strong></label><br/>{{ form.fuel }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+            {% if not is_new %}
+            <div>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Shift" formnovalidate>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{% endblock %}
+{% endblock %}

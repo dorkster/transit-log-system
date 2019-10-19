@@ -1,4 +1,4 @@
-"""coa_bus URL Configuration
+"""stow_coa URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('schedule/', include('schedule.urls')),
     path('', RedirectView.as_view(url='/schedule/', permanent=True)),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
     
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
 
-{% block content %}
+{% block auth_content %}
 <h2>Delete {{ model.get_class_name }}</h2>
 <form class="mb-4" action="" method="post">
     {% csrf_token %}
@@ -20,4 +20,8 @@
         </div>
     </div>
 </form>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
 {% endblock %}

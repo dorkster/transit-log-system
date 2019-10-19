@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
 
-{% block content %}
+{% block auth_content %}
 {% load static %}
 <h2>
     {% if is_new %}
@@ -45,4 +45,8 @@
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
 {% endblock %}

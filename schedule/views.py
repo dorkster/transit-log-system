@@ -14,6 +14,8 @@ from django.urls import reverse_lazy
 
 from django.core import serializers
 
+# from django.contrib.auth.decorators import login_required
+
 from schedule.models import Driver, Vehicle, Trip, Shift, Client
 from schedule.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm
 

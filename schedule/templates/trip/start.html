@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
 
-{% block content %}
+{% block auth_content %}
 {% load static %}
 <h2>Pick Up</h2>
 <form class="mb-4" action="" method="post">
@@ -74,4 +74,8 @@
     showFullMiles(mile_input);
 </script>
 {% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
 {% endblock %}

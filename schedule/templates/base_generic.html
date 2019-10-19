@@ -23,6 +23,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 {% block sidebar %}
                 <ul class="nav navbar-nav mr-auto">
+                    {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
                         <div class="dropdown-menu">
@@ -55,13 +56,39 @@
                             <a class="dropdown-item" href="#">View this month's report</a>
                         </div>
                     </li>
-                    <li class="nav_item"><a class="nav-link" href="/admin">Admin</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light btn btn-info" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="emoji">&#x1f464;</span> {{ user.get_username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% if user.is_superuser %}
+                            <a class="dropdown-item" href="/admin">View Admin Control Panel</a>
+                            <hr/>
+                            {% endif %}
+                            <a class="dropdown-item" href="{% url 'logout' %}?next={{ request.path }}">Logout</a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-light btn btn-secondary" href="{% url 'login' %}?next={{ request.path }}">
+                            <span class="emoji">&#x1f464;</span> Login
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 {% endblock %}
             </div>
         </nav>
         <div class="container-fluid">
+            {% if user.is_authenticated %}
+            <div>{% block auth_content %}{% endblock %}</div>
+            {% else %}
             <div>{% block content %}{% endblock %}</div>
+            {% endif %}
         </div>
     </body>
 </html>

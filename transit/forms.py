@@ -1,6 +1,6 @@
 from django import forms
 
-from schedule.models import Driver, Vehicle, TripType, Client
+from transit.models import Driver, Vehicle, TripType, Client
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _

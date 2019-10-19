@@ -16,8 +16,8 @@ from django.core import serializers
 
 # from django.contrib.auth.decorators import login_required
 
-from schedule.models import Driver, Vehicle, Trip, Shift, Client
-from schedule.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm
+from transit.models import Driver, Vehicle, Trip, Shift, Client
+from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm
 
 # Create your views here.
 

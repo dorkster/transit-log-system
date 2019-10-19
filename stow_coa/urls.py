@@ -22,8 +22,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('schedule/', include('schedule.urls')),
-    path('', RedirectView.as_view(url='/schedule/', permanent=True)),
+    path('transit/', include('transit.urls')),
+    path('', RedirectView.as_view(url='/transit/', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
     

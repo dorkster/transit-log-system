@@ -83,6 +83,9 @@ class Trip(models.Model):
             num_only += i
         return num_only
 
+    def get_class_name(self):
+        return 'Trip'
+
 class Driver(models.Model):
     name = models.CharField(max_length=32)
     def __str__(self):
@@ -115,6 +118,9 @@ class Shift(models.Model):
     def get_driver_color(self):
         return get_driver_color(self.driver)
 
+    def get_class_name(self):
+        return 'Shift'
+
 class Client(models.Model):
     PHONE_HOME = 'home'
     PHONE_MOBILE = 'mobi'
@@ -138,4 +144,7 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_class_name(self):
+        return 'Client'
 

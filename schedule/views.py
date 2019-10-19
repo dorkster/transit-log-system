@@ -50,9 +50,9 @@ def schedule(request, mode, year, month, day):
         'date_next': reverse('schedule', kwargs={'mode':mode, 'year':day_date_next.year, 'month':day_date_next.month, 'day':day_date_next.day}),
     }
     if mode == 'view':
-        return render(request, 'schedule_view.html', context=context)
+        return render(request, 'schedule/view.html', context=context)
     else:
-        return render(request, 'schedule_edit.html', context=context)
+        return render(request, 'schedule/edit.html', context=context)
 
 def scheduleToday(request, mode):
     today = datetime.datetime.now().date()
@@ -151,7 +151,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         'is_new': is_new,
     }
 
-    return render(request, 'trip_edit.html', context)
+    return render(request, 'trip/edit.html', context)
 
 def tripDelete(request, mode, id):
     trip = get_object_or_404(Trip, id=id)
@@ -171,10 +171,10 @@ def tripDelete(request, mode, id):
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':date.year, 'month':date.month, 'day':date.day}))
 
     context = {
-        'trip': trip,
+        'model': trip,
     }
 
-    return render(request, 'trip_delete.html', context)
+    return render(request, 'model_delete.html', context)
 
 
 
@@ -236,7 +236,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
         'is_new': is_new,
     }
 
-    return render(request, 'shift_edit.html', context)
+    return render(request, 'shift/edit.html', context)
 
 def shiftDelete(request, mode, id):
     shift = get_object_or_404(Shift, id=id)
@@ -250,10 +250,10 @@ def shiftDelete(request, mode, id):
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':date.year, 'month':date.month, 'day':date.day}))
 
     context = {
-        'shift': shift,
+        'model': shift,
     }
 
-    return render(request, 'shift_delete.html', context)
+    return render(request, 'model_delete.html', context)
 
 def shiftStart(request, id):
     shift = get_object_or_404(Shift, id=id)
@@ -287,7 +287,7 @@ def shiftStart(request, id):
         'shift': shift,
     }
 
-    return render(request, 'shift_start.html', context)
+    return render(request, 'shift/start.html', context)
 
 def shiftEnd(request, id):
     shift = get_object_or_404(Shift, id=id)
@@ -321,7 +321,7 @@ def shiftEnd(request, id):
         'shift': shift,
     }
 
-    return render(request, 'shift_end.html', context)
+    return render(request, 'shift/end.html', context)
 
 def shiftFuel(request, id):
     shift = get_object_or_404(Shift, id=id)
@@ -349,7 +349,7 @@ def shiftFuel(request, id):
         'shift': shift,
     }
 
-    return render(request, 'shift_fuel.html', context)
+    return render(request, 'shift/fuel.html', context)
 
 def tripStart(request, id):
     trip = get_object_or_404(Trip, id=id)
@@ -397,7 +397,7 @@ def tripStart(request, id):
         'start_miles': start_miles,
     }
 
-    return render(request, 'trip_start.html', context)
+    return render(request, 'trip/start.html', context)
 
 def tripEnd(request, id):
     trip = get_object_or_404(Trip, id=id)
@@ -441,7 +441,7 @@ def tripEnd(request, id):
         'start_miles': start_miles,
     }
 
-    return render(request, 'trip_end.html', context)
+    return render(request, 'trip/end.html', context)
 
 
 
@@ -450,7 +450,7 @@ def clientList(request):
     context = {
         'clients': Client.objects.all(),
     }
-    return render(request, 'client_list.html', context=context)
+    return render(request, 'client/list.html', context=context)
 
 def clientCreate(request):
     client = Client()
@@ -498,7 +498,7 @@ def clientCreateEditCommon(request, client, is_new):
         'is_new': is_new,
     }
 
-    return render(request, 'client_edit.html', context)
+    return render(request, 'client/edit.html', context)
 
 def clientDelete(request, id):
     client = get_object_or_404(Client, id=id)
@@ -511,19 +511,19 @@ def clientDelete(request, id):
         return HttpResponseRedirect(reverse('clients'))
 
     context = {
-        'client': client,
+        'model': client,
     }
 
-    return render(request, 'client_delete.html', context)
+    return render(request, 'model_delete.html', context)
 
 
 
 
 def ajaxScheduleEdit(request):
-    return ajaxScheduleCommon(request, 'ajax/schedule_edit.html')
+    return ajaxScheduleCommon(request, 'schedule/ajax/edit.html')
 
 def ajaxScheduleView(request):
-    return ajaxScheduleCommon(request, 'ajax/schedule_view.html')
+    return ajaxScheduleCommon(request, 'schedule/ajax/view.html')
 
 def ajaxScheduleCommon(request, template):
     request_id = ''
@@ -578,4 +578,4 @@ def ajaxClientList(request):
     request_data = request.GET['client_data']
 
     clients = Client.objects.all()
-    return render(request, 'ajax/client_list.html', {'clients': clients})
+    return render(request, 'client/ajax/list.html', {'clients': clients})

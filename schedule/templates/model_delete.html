@@ -1,19 +1,19 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<h2>Delete Shift</h2>
+<h2>Delete {{ model.get_class_name }}</h2>
 <form class="mb-4" action="" method="post">
     {% csrf_token %}
     <div class="container ml-0">
-        <p>Are you sure you wish to delete the following shift? This CAN NOT be undone!</p>
-        <p><strong>{{ shift }}</strong></p>
+        <p>Are you sure you wish to delete the following item? This CAN NOT be undone!</p>
+        <p><strong>{{ model }}</strong></p>
         <hr>
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-4">
                 <input class="btn btn-secondary btn-lg" type="submit" name="cancel" value="Cancel Changes">
             </div>
             <div>
-                <input class="btn btn-danger btn-lg" type="submit" name="delete" value="Delete Shift">
+                <input class="btn btn-danger btn-lg" type="submit" name="delete" value="Delete {{ model.get_class_name }}">
             </div>
             <div>
             </div>

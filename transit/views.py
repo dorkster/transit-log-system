@@ -17,7 +17,7 @@ from django.core import serializers
 # from django.contrib.auth.decorators import login_required
 
 from transit.models import Driver, Vehicle, Trip, Shift, Client
-from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm
+from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm, EditDriverForm
 
 # Create your views here.
 
@@ -521,6 +521,83 @@ def clientDelete(request, id):
 
 
 
+def driverList(request):
+    context = {
+        'driver': Driver.objects.all(),
+    }
+    return render(request, 'driver/list.html', context=context)
+
+def driverCreate(request):
+    driver = Driver()
+    return driverCreateEditCommon(request, driver, is_new=True)
+
+def driverEdit(request, id):
+    driver = get_object_or_404(Driver, id=id)
+    return driverCreateEditCommon(request, driver, is_new=False)
+
+def driverCreateEditCommon(request, driver, is_new):
+    if is_new == True:
+        query_drivers = Trip.objects.all().order_by('-sort_index')
+        if len(query_drivers) > 0:
+            last_driver = query_drivers[0]
+            driver.sort_index = last_driver.sort_index + 1
+        else:
+            driver.sort_index = 0
+
+    if request.method == 'POST':
+        form = EditDriverForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('drivers') + "#driver_" + str(driver.id))
+        elif 'delete' in request.POST:
+            return HttpResponseRedirect(reverse('driver-delete', kwargs={'id':driver.id}))
+
+        if form.is_valid():
+            driver.name = form.cleaned_data['name']
+            driver.color = form.cleaned_data['color']
+            driver.save()
+
+            return HttpResponseRedirect(reverse('drivers') + "#driver_" + str(driver.id))
+    else:
+        initial = {
+            'name': driver.name,
+            'color': driver.color,
+        }
+        form = EditDriverForm(initial=initial)
+
+    context = {
+        'form': form,
+        'driver': driver,
+        'is_new': is_new,
+    }
+
+    return render(request, 'driver/edit.html', context)
+
+def driverDelete(request, id):
+    driver = get_object_or_404(Driver, id=id)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('driver-edit', kwargs={'id':id}))
+
+        query_drivers = Driver.objects.all()
+        for i in query_drivers:
+            if i.sort_index > driver.sort_index:
+                i.sort_index -= 1;
+                i.save()
+
+        driver.delete()
+        return HttpResponseRedirect(reverse('drivers'))
+
+    context = {
+        'model': driver,
+    }
+
+    return render(request, 'model_delete.html', context)
+
+
+
+
 def ajaxScheduleEdit(request):
     return ajaxScheduleCommon(request, 'schedule/ajax/edit.html')
 
@@ -581,3 +658,33 @@ def ajaxClientList(request):
 
     clients = Client.objects.all()
     return render(request, 'client/ajax/list.html', {'clients': clients})
+
+def ajaxDriverList(request):
+    request_id = ''
+    if request.GET['driver_id'] != '':
+        request_id = uuid.UUID(request.GET['driver_id'])
+
+    request_action = request.GET['driver_action']
+    request_data = request.GET['driver_data']
+
+    if request_action == 'mv':
+        driver = get_object_or_404(Driver, id=request_id)
+
+        do_sort = False
+        if request_data == 'u':
+            query_drivers = Driver.objects.filter(sort_index=driver.sort_index-1)
+            do_sort = True
+        elif request_data == 'd':
+            query_drivers = Driver.objects.filter(sort_index=driver.sort_index+1)
+            do_sort = True
+
+        if do_sort and len(query_drivers) > 0:
+            swap_index = query_drivers[0].sort_index
+            query_drivers[0].sort_index = driver.sort_index
+            driver.sort_index = swap_index
+            query_drivers[0].save()
+            driver.save()
+
+    drivers = Driver.objects.all()
+    return render(request, 'driver/ajax/list.html', {'drivers': drivers})
+

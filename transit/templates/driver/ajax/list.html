@@ -1,0 +1,26 @@
+<h3>Drivers <a class="btn btn-secondary" href="{% url 'driver-create' %}">Add new</a></h3>
+{% if drivers %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+    </thead>
+    {% for driver in drivers %}
+    <tr style="background: {{ driver.color }};">
+        <td class="mytable-col-arrows">
+            <a id="driver_{{ driver.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxDriverList('{{ driver.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxDriverList('{{ driver.id }}', 'mv', 'd')">&#11015;</button>
+            </div>
+        </td>
+        <td class="mytable-col-xs">
+            <a id="driver_{{ driver.id }}"></a>
+            <a class="btn btn-outline-dark btn-sm" href="{% url 'driver-edit' driver.id %}">Edit</a>
+        </td>
+        <td class="mytable-col-lg">{{ driver.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

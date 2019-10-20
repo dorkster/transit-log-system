@@ -3,29 +3,7 @@ from django.db import models
 
 # Create your models here.
 
-def get_driver_color(driver_name):
-    color = 'none'
-    driver = str(driver_name)
-    if driver == 'Dave':
-        color = '#FFFFFF'
-    elif driver == 'Chet':
-        color = '#D9EAD3'
-    elif driver == 'Chris':
-        color = '#EAD1DC'
-    elif driver == 'Jamie':
-        color = '#B0CEEA'
-    elif driver == 'Gigi':
-        color = '#FFD966'
-    elif driver == 'Volunteer':
-        color = '#FFF2CC'
-    
-    return color
-
 class Trip(models.Model):
-    """A single entry in the schedule."""
-
-    # pick up, apt time, name, address, phone, destination, start mi, start time, end mi, end time, note, driver, vehicle,
-    # trip type, elderly, ambulatory
     # TODO event? (i.e. Mealsite)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -74,7 +52,7 @@ class Trip(models.Model):
         if self.is_canceled:
             return "#BBBBBB"
         else:
-            return get_driver_color(self.driver)
+            return Driver.get_color(self.driver)
 
     def get_phone_number(self):
         num_only = ''
@@ -87,9 +65,27 @@ class Trip(models.Model):
         return 'Trip'
 
 class Driver(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=32)
+    color = models.CharField(max_length=9, blank=True)
+
+    class Meta:
+        ordering = ['sort_index']
+
     def __str__(self):
         return self.name
+
+    def get_class_name(self):
+        return 'Driver'
+
+    def get_color(self):
+        color = 'none'
+        if self and self.color != "":
+            color = self.color
+        
+        return color
+
 
 class Vehicle(models.Model):
     name = models.CharField(max_length=32)
@@ -116,7 +112,7 @@ class Shift(models.Model):
         return '[' + str(self.date) + '] - ' + str(self.driver) + ' / ' + str(self.vehicle)
 
     def get_driver_color(self):
-        return get_driver_color(self.driver)
+        return Driver.get_color(self.driver)
 
     def get_class_name(self):
         return 'Shift'

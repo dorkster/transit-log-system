@@ -1,24 +1,24 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
-<div id="client_list">
+<div id="driver_list">
 </div>
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxClientList(client_id="", client_action="", client_data="") {
+    function ajaxDriverList(driver_id="", driver_action="", driver_data="") {
         $.ajax({
             type: "GET",
-            url: "{% url 'ajax-client-list' %}",
+            url: "{% url 'ajax-driver-list' %}",
             data: {
-                "client_id":client_id,
-                "client_action": client_action,
-                "client_data": client_data,
+                "driver_id":driver_id,
+                "driver_action": driver_action,
+                "driver_data": driver_data,
             }
         })
         .done(function(response) {
-            $("#client_list").html("");
-            $("#client_list").append(response);
+            $("#driver_list").html("");
+            $("#driver_list").append(response);
             var hash = window.location.hash.substr(1);
             if (hash)
                 document.getElementById(hash).scrollIntoView();
@@ -26,10 +26,10 @@
     }
 
     // Fetch the initial data
-    ajaxClientList();
+    ajaxDriverList();
 
     // Refresh every 10 seconds
-    setInterval(ajaxClientList, 10000);
+    setInterval(ajaxDriverList, 10000);
 </script>
 {% endblock %}
 {% endblock %}

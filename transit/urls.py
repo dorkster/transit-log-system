@@ -32,8 +32,14 @@ urlpatterns = [
     path('clients/<uuid:id>/edit', views.clientEdit, name='client-edit'),
     path('clients/<uuid:id>/delete', views.clientDelete, name='client-delete'),
 
+    path('drivers/', views.driverList, name='drivers'),
+    path('driver/create', views.driverCreate, name='driver-create'),
+    path('drivers/<uuid:id>/edit', views.driverEdit, name='driver-edit'),
+    path('drivers/<uuid:id>/delete', views.driverDelete, name='driver-delete'),
+
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
+    path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
 ]

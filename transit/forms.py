@@ -107,3 +107,7 @@ class EditClientForm(forms.Form):
     phone_default = forms.ChoiceField(label='Default Phone Number', choices=Client.DEFAULT_PHONE, widget=forms.Select(attrs=formWidgetAttrs.default))
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
+
+class EditDriverForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))

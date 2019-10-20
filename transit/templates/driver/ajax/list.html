@@ -1,10 +1,11 @@
 <h3>Drivers <a class="btn btn-secondary" href="{% url 'driver-create' %}">Add new</a></h3>
 {% if drivers %}
-<table class="mytable mytable-striped">
+<table class="mytable">
     <thead>
         <td></td>
         <td></td>
         <td>Name</td>
+        <td>Is logged?</td>
     </thead>
     {% for driver in drivers %}
     <tr style="background: {{ driver.color }};">
@@ -16,10 +17,10 @@
             </div>
         </td>
         <td class="mytable-col-xs">
-            <a id="driver_{{ driver.id }}"></a>
             <a class="btn btn-outline-dark btn-sm" href="{% url 'driver-edit' driver.id %}">Edit</a>
         </td>
         <td class="mytable-col-lg">{{ driver.name }}</td>
+        <td class="mytable-col-sm"><span class="emoji">{% if driver.is_logged %}&#x2714;{% elif driver.is_logged is False %}&#x2716;{% endif %}</span></td>
     </tr>
     {% endfor %}
 </table>

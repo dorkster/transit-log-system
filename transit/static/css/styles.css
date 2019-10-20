@@ -49,8 +49,8 @@
     width: 3em;
 }
 
-.mytable-striped thead {
-    background: rgba(0,0,0,0.08);
+.mytable thead {
+    background: rgba(0,0,0,0.1);
 }
 
 .mytable-striped tr:nth-child(even) {

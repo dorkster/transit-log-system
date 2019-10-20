@@ -69,6 +69,7 @@ class Driver(models.Model):
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=32)
     color = models.CharField(max_length=9, blank=True)
+    is_logged = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['sort_index']
@@ -88,9 +89,19 @@ class Driver(models.Model):
 
 
 class Vehicle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=32)
+    is_logged = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['sort_index']
+
     def __str__(self):
         return self.name
+
+    def get_class_name(self):
+        return 'Vehicle'
 
 class TripType(models.Model):
     name = models.CharField(max_length=32)

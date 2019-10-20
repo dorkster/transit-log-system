@@ -111,3 +111,8 @@ class EditClientForm(forms.Form):
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())
+
+class EditVehicleForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())

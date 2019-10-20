@@ -4,9 +4,9 @@
 {% load static %}
 <h2>
     {% if is_new %}
-    New Driver
+    New Vehicle
     {% else %}
-    Driver Edit
+    Vehicle Edit
     {% endif %}
 </h2>
 <form class="mb-4" action="" method="post">
@@ -16,7 +16,6 @@
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
-                    <div class="mb-2"><label for="{{ form.color.id_for_label }}"><strong>{{ form.color.label }}</strong></label><br/>{{ form.color }}</div>
                     <div class="mb-2"><label for="{{ form.is_logged.id_for_label }}"><strong>{{ form.is_logged.label }}</strong></label><br/>{{ form.is_logged }}</div>
                 </fieldset>
             </div>
@@ -29,7 +28,7 @@
             </div>
             {% if not is_new %}
             <div>
-                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Driver" formnovalidate>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Vehicle" formnovalidate>
             </div>
             {% endif %}
         </div>

@@ -1,0 +1,27 @@
+<h3>Vehicles <a class="btn btn-secondary" href="{% url 'vehicle-create' %}">Add new</a></h3>
+{% if vehicles %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+        <td>Is logged?</td>
+    </thead>
+    {% for vehicle in vehicles %}
+    <tr>
+        <td class="mytable-col-arrows">
+            <a id="vehicle_{{ vehicle_.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxVehicleList('{{ vehicle.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxVehicleList('{{ vehicle.id }}', 'mv', 'd')">&#11015;</button>
+            </div>
+        </td>
+        <td class="mytable-col-xs">
+            <a class="btn btn-outline-dark btn-sm" href="{% url 'vehicle-edit' vehicle.id %}">Edit</a>
+        </td>
+        <td class="mytable-col-lg">{{ vehicle.name }}</td>
+        <td class="mytable-col-sm"><span class="emoji">{% if vehicle.is_logged %}&#x2714;{% elif vehicle.is_logged is False %}&#x2716;{% endif %}</span></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

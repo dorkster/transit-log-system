@@ -1,0 +1,39 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<div id="vehicle_list">
+</div>
+
+{% block javascript %}
+<script type="text/javascript">
+    function ajaxVehicleList(vehicle_id="", vehicle_action="", vehicle_data="") {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'ajax-vehicle-list' %}",
+            data: {
+                "vehicle_id":vehicle_id,
+                "vehicle_action": vehicle_action,
+                "vehicle_data": vehicle_data,
+            }
+        })
+        .done(function(response) {
+            $("#vehicle_list").html("");
+            $("#vehicle_list").append(response);
+            var hash = window.location.hash.substr(1);
+            if (hash)
+                document.getElementById(hash).scrollIntoView();
+        });
+    }
+
+    // Fetch the initial data
+    ajaxVehicleList();
+
+    // Refresh every 10 seconds
+    setInterval(ajaxVehicleList, 10000);
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

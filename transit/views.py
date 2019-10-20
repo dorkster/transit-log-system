@@ -17,7 +17,7 @@ from django.core import serializers
 # from django.contrib.auth.decorators import login_required
 
 from transit.models import Driver, Vehicle, Trip, Shift, Client
-from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm, EditDriverForm
+from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm, EditDriverForm, EditVehicleForm
 
 # Create your views here.
 
@@ -85,9 +85,9 @@ def tripEdit(request, mode, id):
 
 def tripCreateEditCommon(request, mode, trip, is_new):
     if is_new == True:
-        query_trips = Trip.objects.filter(date=trip.date).order_by('-sort_index')
-        if len(query_trips) > 0:
-            last_trip = query_trips[0]
+        query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
+        if len(query) > 0:
+            last_trip = query[0]
             trip.sort_index = last_trip.sort_index + 1
         else:
             trip.sort_index = 0
@@ -163,8 +163,8 @@ def tripDelete(request, mode, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('trip-edit', kwargs={'mode':mode, 'id':id}))
 
-        query_trips = Trip.objects.filter(date=trip.date)
-        for i in query_trips:
+        query = Trip.objects.filter(date=trip.date)
+        for i in query:
             if i.sort_index > trip.sort_index:
                 i.sort_index -= 1;
                 i.save()
@@ -231,6 +231,8 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             'fuel': shift.fuel
         }
         form = EditShiftForm(initial=initial)
+        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
+        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     context = {
         'form': form,
@@ -383,13 +385,15 @@ def tripStart(request, id):
             'vehicle': trip.vehicle,
         }
         form = tripStartForm(initial=initial)
+        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
+        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():
         start_miles[str(vehicle)] = ""
 
-    query_shifts = Shift.objects.filter(date=trip.date)
-    for shift in query_shifts:
+    query = Shift.objects.filter(date=trip.date)
+    for shift in query:
         if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
@@ -427,13 +431,15 @@ def tripEnd(request, id):
             'time': auto_time,
         }
         form = tripEndForm(initial=initial)
+        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
+        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():
         start_miles[str(vehicle)] = ""
 
-    query_shifts = Shift.objects.filter(date=trip.date)
-    for shift in query_shifts:
+    query = Shift.objects.filter(date=trip.date)
+    for shift in query:
         if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
@@ -537,9 +543,9 @@ def driverEdit(request, id):
 
 def driverCreateEditCommon(request, driver, is_new):
     if is_new == True:
-        query_drivers = Trip.objects.all().order_by('-sort_index')
-        if len(query_drivers) > 0:
-            last_driver = query_drivers[0]
+        query = Driver.objects.all().order_by('-sort_index')
+        if len(query) > 0:
+            last_driver = query[0]
             driver.sort_index = last_driver.sort_index + 1
         else:
             driver.sort_index = 0
@@ -555,6 +561,7 @@ def driverCreateEditCommon(request, driver, is_new):
         if form.is_valid():
             driver.name = form.cleaned_data['name']
             driver.color = form.cleaned_data['color']
+            driver.is_logged = form.cleaned_data['is_logged']
             driver.save()
 
             return HttpResponseRedirect(reverse('drivers') + "#driver_" + str(driver.id))
@@ -562,6 +569,7 @@ def driverCreateEditCommon(request, driver, is_new):
         initial = {
             'name': driver.name,
             'color': driver.color,
+            'is_logged': driver.is_logged,
         }
         form = EditDriverForm(initial=initial)
 
@@ -580,8 +588,8 @@ def driverDelete(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('driver-edit', kwargs={'id':id}))
 
-        query_drivers = Driver.objects.all()
-        for i in query_drivers:
+        query = Driver.objects.all()
+        for i in query:
             if i.sort_index > driver.sort_index:
                 i.sort_index -= 1;
                 i.save()
@@ -591,6 +599,83 @@ def driverDelete(request, id):
 
     context = {
         'model': driver,
+    }
+
+    return render(request, 'model_delete.html', context)
+
+
+
+
+def vehicleList(request):
+    context = {
+        'vehicle': Vehicle.objects.all(),
+    }
+    return render(request, 'vehicle/list.html', context=context)
+
+def vehicleCreate(request):
+    vehicle = Vehicle()
+    return vehicleCreateEditCommon(request, vehicle, is_new=True)
+
+def vehicleEdit(request, id):
+    vehicle = get_object_or_404(Vehicle, id=id)
+    return vehicleCreateEditCommon(request, vehicle, is_new=False)
+
+def vehicleCreateEditCommon(request, vehicle, is_new):
+    if is_new == True:
+        query = Vehicle.objects.all().order_by('-sort_index')
+        if len(query) > 0:
+            last_vehicle = query[0]
+            vehicle.sort_index = last_vehicle.sort_index + 1
+        else:
+            vehicle.sort_index = 0
+
+    if request.method == 'POST':
+        form = EditVehicleForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('vehicles') + "#vehicle" + str(vehicle.id))
+        elif 'delete' in request.POST:
+            return HttpResponseRedirect(reverse('vehicle-delete', kwargs={'id':vehicle.id}))
+
+        if form.is_valid():
+            vehicle.name = form.cleaned_data['name']
+            vehicle.is_logged = form.cleaned_data['is_logged']
+            vehicle.save()
+
+            return HttpResponseRedirect(reverse('vehicles') + "#vehicle" + str(vehicle.id))
+    else:
+        initial = {
+            'name': vehicle.name,
+            'is_logged': vehicle.is_logged,
+        }
+        form = EditVehicleForm(initial=initial)
+
+    context = {
+        'form': form,
+        'vehicle': vehicle,
+        'is_new': is_new,
+    }
+
+    return render(request, 'vehicle/edit.html', context)
+
+def vehicleDelete(request, id):
+    vehicle = get_object_or_404(Vehicle, id=id)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('vehicle-edit', kwargs={'id':id}))
+
+        query = Vehicle.objects.all()
+        for i in query:
+            if i.sort_index > vehicle.sort_index:
+                i.sort_index -= 1;
+                i.save()
+
+        vehicle.delete()
+        return HttpResponseRedirect(reverse('vehicles'))
+
+    context = {
+        'model': vehicle,
     }
 
     return render(request, 'model_delete.html', context)
@@ -617,17 +702,17 @@ def ajaxScheduleCommon(request, template):
 
         do_sort = False
         if request_data == 'u':
-            query_trips = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index-1)
+            query = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index-1)
             do_sort = True
         elif request_data == 'd':
-            query_trips = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index+1)
+            query = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index+1)
             do_sort = True
 
-        if do_sort and len(query_trips) > 0:
-            swap_index = query_trips[0].sort_index
-            query_trips[0].sort_index = trip.sort_index
+        if do_sort and len(query) > 0:
+            swap_index = query[0].sort_index
+            query[0].sort_index = trip.sort_index
             trip.sort_index = swap_index
-            query_trips[0].save()
+            query[0].save()
             trip.save()
 
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
@@ -672,19 +757,48 @@ def ajaxDriverList(request):
 
         do_sort = False
         if request_data == 'u':
-            query_drivers = Driver.objects.filter(sort_index=driver.sort_index-1)
+            query = Driver.objects.filter(sort_index=driver.sort_index-1)
             do_sort = True
         elif request_data == 'd':
-            query_drivers = Driver.objects.filter(sort_index=driver.sort_index+1)
+            query = Driver.objects.filter(sort_index=driver.sort_index+1)
             do_sort = True
 
-        if do_sort and len(query_drivers) > 0:
-            swap_index = query_drivers[0].sort_index
-            query_drivers[0].sort_index = driver.sort_index
+        if do_sort and len(query) > 0:
+            swap_index = query[0].sort_index
+            query[0].sort_index = driver.sort_index
             driver.sort_index = swap_index
-            query_drivers[0].save()
+            query[0].save()
             driver.save()
 
     drivers = Driver.objects.all()
     return render(request, 'driver/ajax/list.html', {'drivers': drivers})
+
+def ajaxVehicleList(request):
+    request_id = ''
+    if request.GET['vehicle_id'] != '':
+        request_id = uuid.UUID(request.GET['vehicle_id'])
+
+    request_action = request.GET['vehicle_action']
+    request_data = request.GET['vehicle_data']
+
+    if request_action == 'mv':
+        vehicle = get_object_or_404(Vehicle, id=request_id)
+
+        do_sort = False
+        if request_data == 'u':
+            query = Vehicle.objects.filter(sort_index=vehicle.sort_index-1)
+            do_sort = True
+        elif request_data == 'd':
+            query = Vehicle.objects.filter(sort_index=vehicle.sort_index+1)
+            do_sort = True
+
+        if do_sort and len(query) > 0:
+            swap_index = query[0].sort_index
+            query[0].sort_index = vehicle.sort_index
+            vehicle.sort_index = swap_index
+            query[0].save()
+            vehicle.save()
+
+    vehicles = Vehicle.objects.all()
+    return render(request, 'vehicle/ajax/list.html', {'vehicles': vehicles})
 

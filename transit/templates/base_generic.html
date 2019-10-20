@@ -35,10 +35,6 @@
                             <hr>
                             <a class="dropdown-item" href="{% url 'trip-create-today' 'edit' %}">Add a new trip</a>
                             <a class="dropdown-item" href="{% url 'shift-create-today' 'edit' %}">Add a new shift</a>
-                            <hr>
-                            <a class="dropdown-item" href="{% url 'clients' %}">Edit Clients</a>
-                            <a class="dropdown-item" href="{% url 'drivers' %}">Edit Drivers</a>
-                            <a class="dropdown-item" href="#">Edit Trip Types</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -46,8 +42,6 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">Pre-Trip Logs</a>
                             <a class="dropdown-item" href="#">Report an Issue</a>
-                            <hr>
-                            <a class="dropdown-item" href="#">Edit Vehicles</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -55,6 +49,16 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">View last month's report</a>
                             <a class="dropdown-item" href="#">View this month's report</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Edit</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'clients' %}">Clients</a>
+                            <hr>
+                            <a class="dropdown-item" href="{% url 'drivers' %}">Drivers</a>
+                            <a class="dropdown-item" href="#">Vehicles</a>
+                            <a class="dropdown-item" href="#">Trip Types</a>
                         </div>
                     </li>
                     {% endif %}

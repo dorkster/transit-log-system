@@ -116,3 +116,6 @@ class EditDriverForm(forms.Form):
 class EditVehicleForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())
+
+class EditTripTypeForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

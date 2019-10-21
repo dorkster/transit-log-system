@@ -1,4 +1,4 @@
-import uuid, re
+import uuid, re, datetime
 from django.db import models
 
 # Create your models here.
@@ -64,6 +64,25 @@ class Trip(models.Model):
     def get_class_name(self):
         return 'Trip'
 
+    class LogData():
+        def __init__(self):
+            self.start_miles = None
+            self.start_time = None
+            self.end_miles = None
+            self.end_time = None
+
+    def get_parsed_log_data(self, shift_miles):
+        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
+            return None
+
+        data = self.LogData()
+        data.start_miles = float(shift_miles[0:len(shift_miles)-len(self.start_miles)] + self.start_miles)
+        data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
+        data.end_miles = float(shift_miles[0:len(shift_miles)-len(self.end_miles)] + self.end_miles)
+        data.end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
+
+        return data
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -104,9 +123,18 @@ class Vehicle(models.Model):
         return 'Vehicle'
 
 class TripType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=32)
+
+    class Meta:
+        ordering = ['sort_index']
+
     def __str__(self):
         return self.name
+
+    def get_class_name(self):
+        return 'Trip Type'
 
 class Shift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -127,6 +155,33 @@ class Shift(models.Model):
 
     def get_class_name(self):
         return 'Shift'
+
+    class LogData():
+        def __init__(self):
+            self.start_miles = None
+            self.start_time = None
+            self.end_miles = None
+            self.end_time = None
+            self.fuel = 0
+
+            # string used for parsing Trip log data
+            self.start_miles_str = None
+
+    def get_parsed_log_data(self):
+        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
+            return None
+
+        data = self.LogData()
+        data.start_miles = float(self.start_miles)
+        data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
+        data.end_miles = float(self.end_miles)
+        data.end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
+        if self.fuel != "":
+            data.fuel = float(self.fuel)
+
+        data.start_miles_str = self.start_miles
+
+        return data
 
 class Client(models.Model):
     PHONE_HOME = 'home'

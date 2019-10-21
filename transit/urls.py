@@ -42,10 +42,20 @@ urlpatterns = [
     path('vehicles/<uuid:id>/edit', views.vehicleEdit, name='vehicle-edit'),
     path('vehicles/<uuid:id>/delete', views.vehicleDelete, name='vehicle-delete'),
 
+    path('triptypes/', views.triptypeList, name='triptypes'),
+    path('triptypes/create', views.triptypeCreate, name='triptype-create'),
+    path('triptypes/<uuid:id>/edit', views.triptypeEdit, name='triptype-edit'),
+    path('triptypes/<uuid:id>/delete', views.triptypeDelete, name='triptype-delete'),
+
+    path('report/<int:year>/<int:month>', views.report, name='report'),
+    path('report/this-month', views.reportThisMonth, name='report-this-month'),
+    path('report/last-month', views.reportLastMonth, name='report-last-month'),
+
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
     path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),
+    path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),
 ]

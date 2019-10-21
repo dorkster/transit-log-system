@@ -1,0 +1,39 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<div id="triptype_list">
+</div>
+
+{% block javascript %}
+<script type="text/javascript">
+    function ajaxTripTypeList(triptype_id="", triptype_action="", triptype_data="") {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'ajax-triptype-list' %}",
+            data: {
+                "triptype_id":triptype_id,
+                "triptype_action": triptype_action,
+                "triptype_data": triptype_data,
+            }
+        })
+        .done(function(response) {
+            $("#triptype_list").html("");
+            $("#triptype_list").append(response);
+            var hash = window.location.hash.substr(1);
+            if (hash)
+                document.getElementById(hash).scrollIntoView();
+        });
+    }
+
+    // Fetch the initial data
+    ajaxTripTypeList();
+
+    // Refresh every 10 seconds
+    setInterval(ajaxTripTypeList, 10000);
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

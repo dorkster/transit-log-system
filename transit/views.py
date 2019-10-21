@@ -16,8 +16,8 @@ from django.core import serializers
 
 # from django.contrib.auth.decorators import login_required
 
-from transit.models import Driver, Vehicle, Trip, Shift, Client
-from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm, EditDriverForm, EditVehicleForm
+from transit.models import Driver, Vehicle, Trip, Shift, Client, TripType
+from transit.forms import DatePickerForm, EditTripForm, EditShiftForm, shiftStartEndForm, shiftFuelForm, tripStartForm, tripEndForm, EditClientForm, EditDriverForm, EditVehicleForm, EditTripTypeForm
 
 # Create your views here.
 
@@ -101,6 +101,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         form = EditTripForm(request.POST)
 
         if form.is_valid():
+            old_date = trip.date
+
             trip.date = form.cleaned_data['date']
             trip.name = form.cleaned_data['name']
             trip.address = form.cleaned_data['address']
@@ -119,6 +121,19 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             trip.end_time = form.cleaned_data['end_time']
             trip.note = form.cleaned_data['notes']
             trip.is_canceled = form.cleaned_data['is_canceled']
+
+            # trip date changed, which means sort indexes need to be updated
+            if old_date != trip.date:
+                trips_below = Trip.objects.filter(date=old_date, sort_index__gt=trip.sort_index)
+                for i in trips_below:
+                    i.sort_index -= 1
+                    i.save()
+                query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
+                if len(query) > 0:
+                    trip.sort_index = query[0].sort_index + 1
+                else:
+                    trip.sort_index = 0
+
             trip.save()
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
@@ -431,8 +446,6 @@ def tripEnd(request, id):
             'time': auto_time,
         }
         form = tripEndForm(initial=initial)
-        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
-        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():
@@ -683,6 +696,216 @@ def vehicleDelete(request, id):
 
 
 
+def triptypeList(request):
+    context = {
+        'triptype': TripType.objects.all(),
+    }
+    return render(request, 'triptype/list.html', context=context)
+
+def triptypeCreate(request):
+    triptype = TripType()
+    return triptypeCreateEditCommon(request, triptype, is_new=True)
+
+def triptypeEdit(request, id):
+    triptype = get_object_or_404(TripType, id=id)
+    return triptypeCreateEditCommon(request, triptype, is_new=False)
+
+def triptypeCreateEditCommon(request, triptype, is_new):
+    if is_new == True:
+        query = TripType.objects.all().order_by('-sort_index')
+        if len(query) > 0:
+            last_triptype = query[0]
+            triptype.sort_index = last_triptype.sort_index + 1
+        else:
+            triptype.sort_index = 0
+
+    if request.method == 'POST':
+        form = EditTripTypeForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('triptypes') + "#triptype" + str(triptype.id))
+        elif 'delete' in request.POST:
+            return HttpResponseRedirect(reverse('triptype-delete', kwargs={'id':triptype.id}))
+
+        if form.is_valid():
+            triptype.name = form.cleaned_data['name']
+            triptype.save()
+
+            return HttpResponseRedirect(reverse('triptypes') + "#triptype" + str(triptype.id))
+    else:
+        initial = {
+            'name': triptype.name,
+        }
+        form = EditTripTypeForm(initial=initial)
+
+    context = {
+        'form': form,
+        'triptype': triptype,
+        'is_new': is_new,
+    }
+
+    return render(request, 'triptype/edit.html', context)
+
+def triptypeDelete(request, id):
+    triptype = get_object_or_404(TripType, id=id)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('triptype-edit', kwargs={'id':id}))
+
+        query = TripType.objects.all()
+        for i in query:
+            if i.sort_index > triptype.sort_index:
+                i.sort_index -= 1;
+                i.save()
+
+        triptype.delete()
+        return HttpResponseRedirect(reverse('triptypes'))
+
+    context = {
+        'model': triptype,
+    }
+
+    return render(request, 'model_delete.html', context)
+
+
+
+
+def report(request, year, month):
+    class ReportVehicle():
+        class Day():
+            def __init__(self):
+                self.date = None
+                self.service_miles = ""
+                self.service_hours = ""
+                self.deadhead_miles = ""
+                self.deadhead_hours = ""
+                self.pmt = ""
+                self.fuel = ""
+
+        def __init__(self):
+            self.vehicle = Vehicle()
+            self.days = []
+            self.total = self.Day()
+
+    date_start = datetime.date(year, month, 1)
+    date_end = date_start
+    if date_end.month == 12:
+        date_end.replace(day=31)
+    else:
+        date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+
+    vehicles = Vehicle.objects.filter(is_logged=True)
+
+    vehicle_list = []
+    for vehicle in vehicles:
+        rv = ReportVehicle()
+        rv.vehicle = vehicle
+
+        total_service_miles = 0
+        total_service_hours = 0
+        total_deadhead_miles = 0
+        total_deadhead_hours = 0
+        total_pmt = 0
+        total_fuel = 0
+
+        for day in range(date_start.day, date_end.day+1):
+            day_date = datetime.date(year, month, day)
+            # day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle).exclude(start_miles="").exclude(end_miles="").exclude(start_time="").exclude(end_time="")
+            day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle)
+            day_trips = Trip.objects.filter(date=day_date, vehicle=vehicle, is_canceled=False)
+
+            shift_start = 0
+            shift_end = 0
+            shift_fuel = 0
+            shift_data_list = []
+            for shift in day_shifts:
+                shift_data = shift.get_parsed_log_data()
+                if shift_data is not None:
+                    shift_data_list.append(shift_data)
+
+                    last_index = len(shift_data_list)-1
+                    if shift_data.start_miles < shift_data_list[shift_start].start_miles:
+                        shift_start = last_index
+                    if shift_data.end_miles > shift_data_list[shift_end].end_miles:
+                        shift_end = last_index
+
+                    shift_fuel += shift_data.fuel
+
+            if len(shift_data_list) == 0:
+                continue
+
+            trip_start = 0
+            trip_end = 0
+            trip_pmt = 0
+            trip_data_list = []
+            for trip in day_trips:
+                trip_data = trip.get_parsed_log_data(shift_data_list[shift_start].start_miles_str)
+                if trip_data is not None:
+                    trip_data_list.append(trip_data)
+
+                    last_index = len(trip_data_list)-1
+                    if trip_data.start_miles < trip_data_list[trip_start].start_miles:
+                        trip_start = last_index
+                    if trip_data.end_miles > trip_data_list[trip_end].end_miles:
+                        trip_end = last_index
+
+                    trip_pmt += (trip_data.end_miles - trip_data.start_miles)
+
+            if len(trip_data_list) == 0:
+                continue
+
+            rv_day = ReportVehicle.Day()
+            rv_day.date = day_date
+
+            service_miles = shift_data_list[shift_end].end_miles - shift_data_list[shift_start].start_miles
+            service_hours = (shift_data_list[shift_end].end_time - shift_data_list[shift_start].start_time).seconds / 60 / 60
+            deadhead_miles = (trip_data_list[trip_start].start_miles - shift_data_list[shift_start].start_miles) + (shift_data_list[shift_end].end_miles - trip_data_list[trip_end].end_miles)
+            deadhead_hours = ((trip_data_list[trip_start].start_time - shift_data_list[shift_start].start_time).seconds + (shift_data_list[shift_end].end_time - trip_data_list[trip_end].end_time).seconds) / 60 / 60
+
+            rv_day.service_miles = '{:.1f}'.format(service_miles)
+            rv_day.service_hours = '{:.2f}'.format(service_hours).rstrip('0').rstrip('.')
+            rv_day.deadhead_miles = '{:.1f}'.format(deadhead_miles)
+            rv_day.deadhead_hours = '{:.2f}'.format(deadhead_hours).rstrip('0').rstrip('.')
+            rv_day.pmt = '{:.1f}'.format(trip_pmt)
+            rv_day.fuel = '{:.1f}'.format(shift_fuel)
+
+            total_service_miles += service_miles
+            total_service_hours += service_hours
+            total_deadhead_miles += deadhead_miles
+            total_deadhead_hours += deadhead_hours
+            total_pmt += trip_pmt
+            total_fuel += shift_fuel
+
+            rv.days.append(rv_day)
+
+        rv.total.service_miles = '{:.1f}'.format(total_service_miles)
+        rv.total.service_hours = '{:.2f}'.format(total_service_hours).rstrip('0').rstrip('.')
+        rv.total.deadhead_miles = '{:.1f}'.format(total_deadhead_miles)
+        rv.total.deadhead_hours = '{:.2f}'.format(total_deadhead_hours).rstrip('0').rstrip('.')
+        rv.total.pmt = '{:.1f}'.format(total_pmt)
+        rv.total.fuel = '{:.1f}'.format(total_fuel)
+        vehicle_list.append(rv)
+
+    context = {
+        'date_start': date_start,
+        'date_end': date_end,
+        'vehicles': vehicle_list,
+    }
+    return render(request, 'report/view.html', context)
+
+def reportThisMonth(request):
+    date = datetime.datetime.now().date()
+    return report(request, date.year, date.month)
+
+def reportLastMonth(request):
+    date = (datetime.datetime.now().date()).replace(day=1) # first day of this month 
+    date = date + datetime.timedelta(days=-1) # last day of the previous month
+    return report(request, date.year, date.month)
+
+
+
+
 def ajaxScheduleEdit(request):
     return ajaxScheduleCommon(request, 'schedule/ajax/edit.html')
 
@@ -801,4 +1024,33 @@ def ajaxVehicleList(request):
 
     vehicles = Vehicle.objects.all()
     return render(request, 'vehicle/ajax/list.html', {'vehicles': vehicles})
+
+def ajaxTripTypeList(request):
+    request_id = ''
+    if request.GET['triptype_id'] != '':
+        request_id = uuid.UUID(request.GET['triptype_id'])
+
+    request_action = request.GET['triptype_action']
+    request_data = request.GET['triptype_data']
+
+    if request_action == 'mv':
+        triptype = get_object_or_404(TripType, id=request_id)
+
+        do_sort = False
+        if request_data == 'u':
+            query = TripType.objects.filter(sort_index=triptype.sort_index-1)
+            do_sort = True
+        elif request_data == 'd':
+            query = TripType.objects.filter(sort_index=triptype.sort_index+1)
+            do_sort = True
+
+        if do_sort and len(query) > 0:
+            swap_index = query[0].sort_index
+            query[0].sort_index = triptype.sort_index
+            triptype.sort_index = swap_index
+            query[0].save()
+            triptype.save()
+
+    triptypes = TripType.objects.all()
+    return render(request, 'triptype/ajax/list.html', {'triptypes': triptypes})
 

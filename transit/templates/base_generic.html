@@ -47,8 +47,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">View last month's report</a>
-                            <a class="dropdown-item" href="#">View this month's report</a>
+                            <a class="dropdown-item" href="{% url 'report-last-month' %}">View last month's report</a>
+                            <a class="dropdown-item" href="{% url 'report-this-month' %}">View this month's report</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -58,7 +58,7 @@
                             <hr>
                             <a class="dropdown-item" href="{% url 'drivers' %}">Drivers</a>
                             <a class="dropdown-item" href="{% url 'vehicles' %}">Vehicles</a>
-                            <a class="dropdown-item" href="#">Trip Types</a>
+                            <a class="dropdown-item" href="{% url 'triptypes' %}">Trip Types</a>
                         </div>
                     </li>
                     {% endif %}

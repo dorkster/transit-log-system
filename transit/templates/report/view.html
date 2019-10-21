@@ -1,0 +1,46 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h2>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h2>
+<hr/>
+{% for v in vehicles %}
+{% if v.days %}
+<h3>{{ v.vehicle }}</h3>
+<table class="mytable mytable-striped">
+    <thead>
+        <td>Date</td>
+        <td>Service Miles</td>
+        <td>Service Hours</td>
+        <td>Deadhead Miles</td>
+        <td>Deadhead Hours</td>
+        <td>Passenger Miles Traveled (PMT)</td>
+        <td>Fuel (gal)</td>
+    </thead>
+    {% for day in v.days %}
+    <tr>
+        <td>{{ day.date }}</td>
+        <td>{{ day.service_miles }}</td>
+        <td>{{ day.service_hours }}</td>
+        <td>{{ day.deadhead_miles }}</td>
+        <td>{{ day.deadhead_hours }}</td>
+        <td>{{ day.pmt }}</td>
+        <td>{{ day.fuel }}</td>
+    </tr>
+    {% endfor %}
+    <tr style="background: #D9EAD3; font-weight: bold;">
+        <td>Total</td>
+        <td>{{ v.total.service_miles }}</td>
+        <td>{{ v.total.service_hours }}</td>
+        <td>{{ v.total.deadhead_miles }}</td>
+        <td>{{ v.total.deadhead_hours }}</td>
+        <td>{{ v.total.pmt }}</td>
+        <td>{{ v.total.fuel }}</td>
+    </tr>
+</table>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

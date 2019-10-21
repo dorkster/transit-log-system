@@ -1,0 +1,25 @@
+<h3>Trip Types <a class="btn btn-secondary" href="{% url 'triptype-create' %}">Add new</a></h3>
+{% if triptypes %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+    </thead>
+    {% for triptype in triptypes %}
+    <tr style="background: {{ triptype.color }};">
+        <td class="mytable-col-arrows">
+            <a id="triptype_{{ triptype.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxTripTypeList('{{ triptype.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxTripTypeList('{{ triptype.id }}', 'mv', 'd')">&#11015;</button>
+            </div>
+        </td>
+        <td class="mytable-col-xs">
+            <a class="btn btn-outline-dark btn-sm" href="{% url 'triptype-edit' triptype.id %}">Edit</a>
+        </td>
+        <td class="mytable-col-lg">{{ triptype.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

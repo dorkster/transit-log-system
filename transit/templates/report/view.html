@@ -4,8 +4,12 @@
 <h2>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h2>
 <hr/>
 {% for v in vehicles %}
-{% if v.days %}
+<div class="row mb-3">
+    <div class="col">
+{% if v.days or v.errors %}
 <h3>{{ v.vehicle }}</h3>
+{% endif %}
+{% if v.days %}
 <table class="mytable mytable-striped">
     <thead>
         <td>Date</td>
@@ -13,8 +17,11 @@
         <td>Service Hours</td>
         <td>Deadhead Miles</td>
         <td>Deadhead Hours</td>
-        <td>Passenger Miles Traveled (PMT)</td>
+        <td>Passenger Miles (PMT)</td>
         <td>Fuel (gal)</td>
+        {% for type in triptypes %}
+        <td>Type: {{ type }}</td>
+        {% endfor %}
     </thead>
     {% for day in v.days %}
     <tr>
@@ -25,8 +32,23 @@
         <td>{{ day.deadhead_hours }}</td>
         <td>{{ day.pmt }}</td>
         <td>{{ day.fuel }}</td>
+        {% for k,v in day.trip_types.items %}
+        <td>{{ v }}</td>
+        {% endfor %}
     </tr>
     {% endfor %}
+    <thead>
+        <td>Date</td>
+        <td>Service Miles</td>
+        <td>Service Hours</td>
+        <td>Deadhead Miles</td>
+        <td>Deadhead Hours</td>
+        <td>Passenger Miles (PMT)</td>
+        <td>Fuel (gal)</td>
+        {% for type in triptypes %}
+        <td>Type: {{ type }}</td>
+        {% endfor %}
+    </thead>
     <tr style="background: #D9EAD3; font-weight: bold;">
         <td>Total</td>
         <td>{{ v.total.service_miles }}</td>
@@ -35,10 +57,31 @@
         <td>{{ v.total.deadhead_hours }}</td>
         <td>{{ v.total.pmt }}</td>
         <td>{{ v.total.fuel }}</td>
+        {% for k,v in v.total.trip_types.items %}
+        <td>{{ v }}</td>
+        {% endfor %}
     </tr>
 </table>
 {% endif %}
+{% if v.errors %}
+<ul class="list-group mt-2 mb-2">
+{% for error in v.errors %}
+<li class="list-group-item">{{ error |safe }}</li>
 {% endfor %}
+</ul>
+{% endif %}
+    </div>
+</div>
+{% endfor %}
+{% if no_vehicle_errors %}
+<hr/>
+<h3>Shifts &amp; trips without an assigned vehicle</h3>
+<ul class="list-group">
+{% for error in no_vehicle_errors %}
+<li class="list-group-item">{{ error |safe }}</li>
+{% endfor %}
+</ul>
+{% endif %}
 {% endblock %}
 
 {% block content %}

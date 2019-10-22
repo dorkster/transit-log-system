@@ -59,8 +59,10 @@ def report(request, year, month):
             for i in triptypes:
                 rv_day.trip_types[str(i)] = 0
 
-            shift_start = 0
-            shift_end = 0
+            shift_miles_start = 0
+            shift_miles_end = 0
+            shift_time_start = 0
+            shift_time_end = 0
             shift_fuel = 0
             shift_data_list = []
             for shift in day_shifts:
@@ -73,15 +75,21 @@ def report(request, year, month):
                     shift_data_list.append(shift_data)
 
                     last_index = len(shift_data_list)-1
-                    if shift_data.start_miles < shift_data_list[shift_start].start_miles:
-                        shift_start = last_index
-                    if shift_data.end_miles > shift_data_list[shift_end].end_miles:
-                        shift_end = last_index
+                    if shift_data.start_miles < shift_data_list[shift_miles_start].start_miles:
+                        shift_miles_start = last_index
+                    if shift_data.end_miles > shift_data_list[shift_miles_end].end_miles:
+                        shift_miles_end = last_index
+                    if shift_data.start_time < shift_data_list[shift_time_start].start_time:
+                        shift_time_start = last_index
+                    if shift_data.end_time > shift_data_list[shift_time_end].end_time:
+                        shift_time_end = last_index
 
                     shift_fuel += shift_data.fuel
 
-            trip_start = 0
-            trip_end = 0
+            trip_miles_start = 0
+            trip_miles_end = 0
+            trip_time_start = 0
+            trip_time_end = 0
             trip_pmt = 0
             trip_data_list = []
             for trip in day_trips:
@@ -92,15 +100,19 @@ def report(request, year, month):
                 if not shift_data_list:
                     continue
 
-                trip_data = trip.get_parsed_log_data(shift_data_list[shift_start].start_miles_str)
+                trip_data = trip.get_parsed_log_data(shift_data_list[shift_miles_start].start_miles_str)
                 if trip_data is not None:
                     trip_data_list.append(trip_data)
 
                     last_index = len(trip_data_list)-1
-                    if trip_data.start_miles < trip_data_list[trip_start].start_miles:
-                        trip_start = last_index
-                    if trip_data.end_miles > trip_data_list[trip_end].end_miles:
-                        trip_end = last_index
+                    if trip_data.start_miles < trip_data_list[trip_miles_start].start_miles:
+                        trip_miles_start = last_index
+                    if trip_data.end_miles > trip_data_list[trip_miles_end].end_miles:
+                        trip_miles_end = last_index
+                    if trip_data.start_time < trip_data_list[trip_time_start].start_time:
+                        trip_time_start = last_index
+                    if trip_data.end_time > trip_data_list[trip_time_end].end_time:
+                        trip_time_end = last_index
 
                     trip_pmt += (trip_data.end_miles - trip_data.start_miles)
                     if trip.trip_type != None:
@@ -109,10 +121,10 @@ def report(request, year, month):
             if not shift_data_list or not trip_data_list:
                 continue
 
-            service_miles = shift_data_list[shift_end].end_miles - shift_data_list[shift_start].start_miles
-            service_hours = (shift_data_list[shift_end].end_time - shift_data_list[shift_start].start_time).seconds / 60 / 60
-            deadhead_miles = (trip_data_list[trip_start].start_miles - shift_data_list[shift_start].start_miles) + (shift_data_list[shift_end].end_miles - trip_data_list[trip_end].end_miles)
-            deadhead_hours = ((trip_data_list[trip_start].start_time - shift_data_list[shift_start].start_time).seconds + (shift_data_list[shift_end].end_time - trip_data_list[trip_end].end_time).seconds) / 60 / 60
+            service_miles = shift_data_list[shift_miles_end].end_miles - shift_data_list[shift_miles_start].start_miles
+            service_hours = (shift_data_list[shift_time_end].end_time - shift_data_list[shift_time_start].start_time).seconds / 60 / 60
+            deadhead_miles = (trip_data_list[trip_miles_start].start_miles - shift_data_list[shift_miles_start].start_miles) + (shift_data_list[shift_miles_end].end_miles - trip_data_list[trip_miles_end].end_miles)
+            deadhead_hours = ((trip_data_list[trip_time_start].start_time - shift_data_list[shift_time_start].start_time).seconds + (shift_data_list[shift_time_end].end_time - trip_data_list[trip_time_end].end_time).seconds) / 60 / 60
 
             rv_day.service_miles = '{:.1f}'.format(service_miles)
             rv_day.service_hours = '{:.2f}'.format(service_hours).rstrip('0').rstrip('.')

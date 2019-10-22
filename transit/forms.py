@@ -122,4 +122,5 @@ class EditTripTypeForm(forms.Form):
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
+    log_data_only = forms.BooleanField(label='Only include rows with full log data?', required=False, initial=False, widget=forms.CheckboxInput())
 

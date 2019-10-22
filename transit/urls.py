@@ -51,6 +51,8 @@ urlpatterns = [
     path('report/this-month', views.reportThisMonth, name='report-this-month'),
     path('report/last-month', views.reportLastMonth, name='report-last-month'),
 
+    path('import/', views.excelImport, name='excel-import'),
+
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),

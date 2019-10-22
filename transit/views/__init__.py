@@ -7,3 +7,4 @@ from .driver import *
 from .vehicle import *
 from .triptype import *
 from .report import *
+from .excel_import import *

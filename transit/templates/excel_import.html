@@ -1,0 +1,29 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h2>Import Excel (xlsx) files</h2>
+<form class="mb-4" action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <hr>
+    <div class="d-flex flex-wrap mt-2">
+        <div class="mr-auto mb-4">
+            <input class="btn btn-success btn-lg" type="submit" value="Upload">
+        </div>
+    </div>
+</form>
+{% if trips  or shifts%}
+<ul class="list-group">
+    {% for shift in shifts %}
+    <li class="list-group-item">Imported shift: <strong>{{ shift }}</strong></li>
+    {% endfor %}
+    {% for trip in trips %}
+    <li class="list-group-item">Imported trip: <strong>{{ trip }}</strong></li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

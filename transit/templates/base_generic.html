@@ -72,6 +72,7 @@
                         <div class="dropdown-menu dropdown-menu-right">
                             {% if user.is_superuser %}
                             <a class="dropdown-item" href="/admin">View Admin Control Panel</a>
+                            <a class="dropdown-item" href="{% url 'excel-import' %}">Import Excel Files</a>
                             <hr/>
                             {% endif %}
                             <a class="dropdown-item" href="{% url 'logout' %}?next={{ request.path }}">Logout</a>

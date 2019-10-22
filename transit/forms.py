@@ -119,3 +119,7 @@ class EditVehicleForm(forms.Form):
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+
+class UploadFileForm(forms.Form):
+    file = forms.FileField()
+

@@ -121,5 +121,5 @@ class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class UploadFileForm(forms.Form):
-    file = forms.FileField()
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
 

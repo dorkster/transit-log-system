@@ -1,7 +1,19 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
-<h2>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h2>
+<div class="container-fluid mt-4 mb-3">
+    <div class="row">
+        <div class="col p-1">
+            <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
+        </div>
+        <div class="col-sm-auto p-1">
+            <div class="btn-group" role="group">
+                <a class="btn btn-secondary" href="{{ month_prev }}">&lt;&lt; Previous Month</a><a class="btn btn-secondary" href="{{ month_next }}">Next Month &gt;&gt;</a>
+
+            </div>
+        </div>
+    </div>
+</div>
 <hr/>
 {% for v in vehicles %}
 <div class="row mb-3">

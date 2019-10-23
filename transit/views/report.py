@@ -1,6 +1,7 @@
 import datetime
 
 from django.shortcuts import render
+from django.urls import reverse
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType
 
@@ -26,9 +27,13 @@ def report(request, year, month):
     date_start = datetime.date(year, month, 1)
     date_end = date_start
     if date_end.month == 12:
-        date_end.replace(day=31)
+        date_end = date_end.replace(day=31)
     else:
         date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+
+    month_prev = date_start + datetime.timedelta(days=-1)
+    month_prev.replace(day=1)
+    month_next = date_end + datetime.timedelta(days=1)
 
     triptypes = TripType.objects.all()
 
@@ -164,6 +169,8 @@ def report(request, year, month):
     context = {
         'date_start': date_start,
         'date_end': date_end,
+        'month_prev': reverse('report', kwargs={'year':month_prev.year, 'month':month_prev.month}),
+        'month_next': reverse('report', kwargs={'year':month_next.year, 'month':month_next.month}),
         'vehicles': vehicle_list,
         'no_vehicle_errors': no_vehicle_errors,
         'triptypes': triptypes,

@@ -80,7 +80,7 @@ class EditShiftForm(forms.Form):
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     end_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile_shift))
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    fuel = forms.CharField(label='Fuel (gal)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    fuel = forms.CharField(label='Fuel (gal)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.fuel))
 
 class shiftStartEndForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_shift))

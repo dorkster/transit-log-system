@@ -6,30 +6,11 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxTripTypeList(triptype_id="", triptype_action="", triptype_data="") {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-triptype-list' %}",
-            data: {
-                "triptype_id":triptype_id,
-                "triptype_action": triptype_action,
-                "triptype_data": triptype_data,
-            }
-        })
-        .done(function(response) {
-            $("#triptype_list").html("");
-            $("#triptype_list").append(response);
-            var hash = window.location.hash.substr(1);
-            if (hash)
-                document.getElementById(hash).scrollIntoView();
-        });
-    }
+    var ajax_loader = new AjaxLoader("{%url 'ajax-triptype-list' %}", "#triptype_list");
 
-    // Fetch the initial data
-    ajaxTripTypeList();
-
-    // Refresh every 10 seconds
-    setInterval(ajaxTripTypeList, 10000);
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
 </script>
 {% endblock %}
 {% endblock %}

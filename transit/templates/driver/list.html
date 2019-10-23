@@ -6,30 +6,11 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxDriverList(driver_id="", driver_action="", driver_data="") {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-driver-list' %}",
-            data: {
-                "driver_id":driver_id,
-                "driver_action": driver_action,
-                "driver_data": driver_data,
-            }
-        })
-        .done(function(response) {
-            $("#driver_list").html("");
-            $("#driver_list").append(response);
-            var hash = window.location.hash.substr(1);
-            if (hash)
-                document.getElementById(hash).scrollIntoView();
-        });
-    }
+    var ajax_loader = new AjaxLoader("{%url 'ajax-driver-list' %}", "#driver_list");
 
-    // Fetch the initial data
-    ajaxDriverList();
-
-    // Refresh every 10 seconds
-    setInterval(ajaxDriverList, 10000);
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
 </script>
 {% endblock %}
 {% endblock %}

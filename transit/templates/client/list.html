@@ -6,30 +6,11 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxClientList(client_id="", client_action="", client_data="") {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-client-list' %}",
-            data: {
-                "client_id":client_id,
-                "client_action": client_action,
-                "client_data": client_data,
-            }
-        })
-        .done(function(response) {
-            $("#client_list").html("");
-            $("#client_list").append(response);
-            var hash = window.location.hash.substr(1);
-            if (hash)
-                document.getElementById(hash).scrollIntoView();
-        });
-    }
+    var ajax_loader = new AjaxLoader("{%url 'ajax-client-list' %}", "#client_list");
 
-    // Fetch the initial data
-    ajaxClientList();
-
-    // Refresh every 10 seconds
-    setInterval(ajaxClientList, 10000);
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
 </script>
 {% endblock %}
 {% endblock %}

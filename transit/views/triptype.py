@@ -81,11 +81,11 @@ def triptypeDelete(request, id):
 
 def ajaxTripTypeList(request):
     request_id = ''
-    if request.GET['triptype_id'] != '':
-        request_id = uuid.UUID(request.GET['triptype_id'])
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
 
-    request_action = request.GET['triptype_action']
-    request_data = request.GET['triptype_data']
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
 
     if request_action == 'mv':
         triptype = get_object_or_404(TripType, id=request_id)

@@ -12,8 +12,8 @@
         <td class="mytable-col-arrows">
             <a id="driver_{{ driver.id }}"></a>
             <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxDriverList('{{ driver.id }}', 'mv', 'u')">&#11014;</button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxDriverList('{{ driver.id }}', 'mv', 'd')">&#11015;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ driver.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ driver.id }}', 'mv', 'd')">&#11015;</button>
             </div>
         </td>
         <td class="mytable-col-xs">

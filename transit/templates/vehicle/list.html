@@ -6,30 +6,11 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxVehicleList(vehicle_id="", vehicle_action="", vehicle_data="") {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-vehicle-list' %}",
-            data: {
-                "vehicle_id":vehicle_id,
-                "vehicle_action": vehicle_action,
-                "vehicle_data": vehicle_data,
-            }
-        })
-        .done(function(response) {
-            $("#vehicle_list").html("");
-            $("#vehicle_list").append(response);
-            var hash = window.location.hash.substr(1);
-            if (hash)
-                document.getElementById(hash).scrollIntoView();
-        });
-    }
+    var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-list' %}", "#vehicle_list");
 
-    // Fetch the initial data
-    ajaxVehicleList();
-
-    // Refresh every 10 seconds
-    setInterval(ajaxVehicleList, 10000);
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
 </script>
 {% endblock %}
 {% endblock %}

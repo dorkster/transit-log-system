@@ -25,33 +25,14 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function ajaxScheduleEdit(trip_id="", trip_action="", trip_data="") {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-schedule-edit' %}",
-            data: {
-                "year":{{ date.year }}, 
-                "month":{{ date.month }}, 
-                "day":{{ date.day }},
-                "trip_id":trip_id,
-                "trip_action": trip_action,
-                "trip_data": trip_data,
-            }
-        })
-        .done(function(response) {
-            $("#schedule-edit").html("")
-            $("#schedule-edit").append(response);
-            var hash = window.location.hash.substr(1);
-            if (hash)
-                document.getElementById(hash).scrollIntoView();
-        });
-    }
+    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-edit' %}", "#schedule-edit");
+    ajax_loader.extra_data["year"] = {{date.year}};
+    ajax_loader.extra_data["month"] = {{date.month}};
+    ajax_loader.extra_data["day"] = {{date.day}};
 
-    // Fetch the initial data
-    ajaxScheduleEdit();
-
-    // Refresh every 10 seconds
-    setInterval(ajaxScheduleEdit, 10000);
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
 </script>
 {% endblock %}
 {% endblock %}

@@ -78,13 +78,6 @@ def clientDelete(request, id):
     return render(request, 'model_delete.html', context)
 
 def ajaxClientList(request):
-    request_id = ''
-    if request.GET['client_id'] != '':
-        request_id = uuid.UUID(request.GET['trip_id'])
-
-    request_action = request.GET['client_action']
-    request_data = request.GET['client_data']
-
     clients = Client.objects.all()
     return render(request, 'client/ajax/list.html', {'clients': clients})
 

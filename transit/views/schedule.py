@@ -53,11 +53,11 @@ def ajaxScheduleView(request):
 
 def ajaxScheduleCommon(request, template):
     request_id = ''
-    if request.GET['trip_id'] != '':
-        request_id = uuid.UUID(request.GET['trip_id'])
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
 
-    request_action = request.GET['trip_action']
-    request_data = request.GET['trip_data']
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
 
     if request_action == 'mv':
         trip = get_object_or_404(Trip, id=request_id)

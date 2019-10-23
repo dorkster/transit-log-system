@@ -85,11 +85,11 @@ def driverDelete(request, id):
 
 def ajaxDriverList(request):
     request_id = ''
-    if request.GET['driver_id'] != '':
-        request_id = uuid.UUID(request.GET['driver_id'])
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
 
-    request_action = request.GET['driver_action']
-    request_data = request.GET['driver_data']
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
 
     if request_action == 'mv':
         driver = get_object_or_404(Driver, id=request_id)

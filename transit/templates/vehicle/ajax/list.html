@@ -12,8 +12,8 @@
         <td class="mytable-col-arrows">
             <a id="vehicle_{{ vehicle_.id }}"></a>
             <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxVehicleList('{{ vehicle.id }}', 'mv', 'u')">&#11014;</button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxVehicleList('{{ vehicle.id }}', 'mv', 'd')">&#11015;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ vehicle.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ vehicle.id }}', 'mv', 'd')">&#11015;</button>
             </div>
         </td>
         <td class="mytable-col-xs">

@@ -51,8 +51,8 @@
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxScheduleEdit('{{ trip.id }}', 'mv', 'u')">&#11014;</button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajaxScheduleEdit('{{ trip.id }}', 'mv', 'd')">&#11015;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'u')">&#11014;</button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 emoji" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'd')">&#11015;</button>
             </div>
         </td>
         <td class="mytable-col-xs"><a class="btn btn-outline-dark btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>

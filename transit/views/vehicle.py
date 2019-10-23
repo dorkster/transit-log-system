@@ -83,11 +83,11 @@ def vehicleDelete(request, id):
 
 def ajaxVehicleList(request):
     request_id = ''
-    if request.GET['vehicle_id'] != '':
-        request_id = uuid.UUID(request.GET['vehicle_id'])
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
 
-    request_action = request.GET['vehicle_action']
-    request_data = request.GET['vehicle_data']
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
 
     if request_action == 'mv':
         vehicle = get_object_or_404(Vehicle, id=request_id)

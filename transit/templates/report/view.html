@@ -37,7 +37,7 @@
     </thead>
     {% for day in v.days %}
     <tr>
-        <td>{{ day.date }}</td>
+        <td><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{ day.date }}</a></td>
         <td>{{ day.service_miles }}</td>
         <td>{{ day.service_hours }}</td>
         <td>{{ day.deadhead_miles }}</td>

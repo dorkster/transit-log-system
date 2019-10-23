@@ -123,7 +123,7 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
             trip.end_time = sheet['J' + str(i)].value.strftime('%_I:%M %p').strip()
 
         if sheet['K' + str(i)].value != None:
-            trip.notes = str(sheet['K' + str(i)].value).strip()
+            trip.note = str(sheet['K' + str(i)].value).strip()
 
         if sheet['L' + str(i)].value != None:
             query = Driver.objects.filter(name=str(sheet['L' + str(i)].value).strip())

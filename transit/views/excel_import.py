@@ -72,9 +72,9 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
         shifts.append(shift)
         shift.save()
 
-    query = Trip.objects.filter(date=date).order_by('-sort_index')
-    if query:
-        sort_index = query[0]
+    trip_query = Trip.objects.filter(date=date).order_by('-sort_index')
+    if trip_query:
+        sort_index = trip_query[0]
     else:
         sort_index = 0
 
@@ -126,9 +126,13 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
             trip.note = str(sheet['K' + str(i)].value).strip()
 
         if sheet['L' + str(i)].value != None:
-            query = Driver.objects.filter(name=str(sheet['L' + str(i)].value).strip())
-            if query:
-                trip.driver = query[0]
+            driver_name = str(sheet['L' + str(i)].value).strip()
+            if driver_name == "Canceled":
+                trip.is_canceled = True
+            else:
+                query = Driver.objects.filter(name=driver_name)
+                if query:
+                    trip.driver = query[0]
 
         if sheet['M' + str(i)].value != None:
             query = Vehicle.objects.filter(name=str(sheet['M' + str(i)].value).strip())

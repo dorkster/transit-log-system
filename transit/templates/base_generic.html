@@ -27,14 +27,13 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}">Edit Today</a>
-                            <a class="dropdown-item" href="{% url 'schedule-tomorrow' 'edit' %}">Edit Tomorrow</a>
-                            <hr>
-                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}">View Today</a>
-                            <a class="dropdown-item" href="{% url 'schedule-tomorrow' 'view' %}">View Tomorrow</a>
-                            <hr>
-                            <a class="dropdown-item" href="{% url 'trip-create-today' 'edit' %}">Add a new trip</a>
-                            <a class="dropdown-item" href="{% url 'shift-create-today' 'edit' %}">Add a new shift</a>
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}">Edit Schedule</a>
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}">View Schedule</a>
+                            <hr/>
+                            <a class="dropdown-item" href="{% url 'clients' %}">Edit Clients</a>
+                            <hr/>
+                            <a class="dropdown-item" href="{% url 'drivers' %}">Edit Drivers</a>
+                            <a class="dropdown-item" href="{% url 'triptypes' %}">Edit Trip Types</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -42,6 +41,8 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'vehicle-status' %}">Vehicle Status</a>
                             <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}">Report an Issue</a>
+                            <hr/>
+                            <a class="dropdown-item" href="{% url 'vehicles' %}">Edit Vehicles</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -49,16 +50,6 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'report-last-month' %}">View last month's report</a>
                             <a class="dropdown-item" href="{% url 'report-this-month' %}">View this month's report</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Edit</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'clients' %}">Clients</a>
-                            <hr>
-                            <a class="dropdown-item" href="{% url 'drivers' %}">Drivers</a>
-                            <a class="dropdown-item" href="{% url 'vehicles' %}">Vehicles</a>
-                            <a class="dropdown-item" href="{% url 'triptypes' %}">Trip Types</a>
                         </div>
                     </li>
                     {% endif %}

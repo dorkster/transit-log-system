@@ -12,6 +12,7 @@
 <form class="mb-4" action="" method="post">
     {% csrf_token %}
     <div class="container ml-0">
+        {% if not is_new %}
         <div class="row">
             <div id="resolved_box" class="col border m-1 pt-1">
                 <fieldset class="form-group">
@@ -20,6 +21,7 @@
                 </fieldset>
             </div>
         </div>
+        {% endif %}
         <div class="row">
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
@@ -65,8 +67,10 @@
             resolved_box.className = default_classname;
         }
     }
-    resolved_checkbox.addEventListener("change", setResolvedBoxColor);
-    setResolvedBoxColor();
+    if (resolved_checkbox) {
+        resolved_checkbox.addEventListener("change", setResolvedBoxColor);
+        setResolvedBoxColor();
+    }
 
     var priority_select = document.getElementById("id_priority");
     function setPrioritySelectColor() {
@@ -78,8 +82,10 @@
         else
             priority_select.className = default_classname;
     }
-    priority_select.addEventListener("change", setPrioritySelectColor);
-    setPrioritySelectColor();
+    if (priority_select) {
+        priority_select.addEventListener("change", setPrioritySelectColor);
+        setPrioritySelectColor();
+    }
 </script>
 {% endblock %}
 {% endblock %}

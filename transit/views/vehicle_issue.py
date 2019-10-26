@@ -32,7 +32,8 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             vehicle_issue.vehicle = form.cleaned_data['vehicle']
             vehicle_issue.description = form.cleaned_data['description']
             vehicle_issue.priority = form.cleaned_data['priority']
-            vehicle_issue.is_resolved = form.cleaned_data['is_resolved']
+            if not is_new:
+                vehicle_issue.is_resolved = form.cleaned_data['is_resolved']
             vehicle_issue.save()
 
             return HttpResponseRedirect(reverse('vehicle-status'))

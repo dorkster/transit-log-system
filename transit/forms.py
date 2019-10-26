@@ -49,6 +49,10 @@ class formWidgetAttrs():
     fuel['inputmode'] = 'numeric'
     fuel['pattern'] = '[0-9]*\.[0-9]*'
 
+    text_area = default.copy()
+    text_area['rows'] = '6'
+    text_area['cols'] = '20'
+
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
 
@@ -128,6 +132,6 @@ class EditVehicleIssueForm(forms.Form):
     # date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
-    description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.default))
+    description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     is_resolved = forms.BooleanField(required=False, widget=forms.CheckboxInput())

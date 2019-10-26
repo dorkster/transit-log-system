@@ -46,10 +46,10 @@ def scheduleTomorrow(request, mode):
     return schedule(request, mode, tomorrow.year, tomorrow.month, tomorrow.day)
 
 def ajaxScheduleEdit(request):
-    return ajaxScheduleCommon(request, 'schedule/ajax/edit.html')
+    return ajaxScheduleCommon(request, 'schedule/ajax_edit.html')
 
 def ajaxScheduleView(request):
-    return ajaxScheduleCommon(request, 'schedule/ajax/view.html')
+    return ajaxScheduleCommon(request, 'schedule/ajax_view.html')
 
 def ajaxScheduleCommon(request, template):
     request_id = ''

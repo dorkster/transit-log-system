@@ -108,5 +108,5 @@ def ajaxVehicleList(request):
             vehicle.save()
 
     vehicles = Vehicle.objects.all()
-    return render(request, 'vehicle/ajax/list.html', {'vehicles': vehicles})
+    return render(request, 'vehicle/ajax_list.html', {'vehicles': vehicles})
 

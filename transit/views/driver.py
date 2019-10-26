@@ -110,5 +110,5 @@ def ajaxDriverList(request):
             driver.save()
 
     drivers = Driver.objects.all()
-    return render(request, 'driver/ajax/list.html', {'drivers': drivers})
+    return render(request, 'driver/ajax_list.html', {'drivers': drivers})
 

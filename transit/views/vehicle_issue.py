@@ -52,7 +52,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
         'is_new': is_new,
     }
 
-    return render(request, 'vehicle_status/issue_edit.html', context)
+    return render(request, 'vehicle/issues/edit.html', context)
 
 def vehicleIssueDelete(request, id):
     vehicle_issue = get_object_or_404(VehicleIssue, id=id)

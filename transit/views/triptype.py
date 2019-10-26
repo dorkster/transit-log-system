@@ -106,5 +106,5 @@ def ajaxTripTypeList(request):
             triptype.save()
 
     triptypes = TripType.objects.all()
-    return render(request, 'triptype/ajax/list.html', {'triptypes': triptypes})
+    return render(request, 'triptype/ajax_list.html', {'triptypes': triptypes})
 

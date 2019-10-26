@@ -79,5 +79,5 @@ def clientDelete(request, id):
 
 def ajaxClientList(request):
     clients = Client.objects.all()
-    return render(request, 'client/ajax/list.html', {'clients': clients})
+    return render(request, 'client/ajax_list.html', {'clients': clients})
 

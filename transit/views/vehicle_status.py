@@ -6,9 +6,9 @@ def vehicleStatus(request):
     # context = {
     #     'vehicle_issues': VehicleIssue.objects.all(),
     # }
-    return render(request, 'vehicle_status/view.html', context={})
+    return render(request, 'vehicle/status/view.html', context={})
 
 def ajaxVehicleStatus(request):
     vehicle_issues = VehicleIssue.objects.all()
-    return render(request, 'vehicle_status/ajax/view.html', {'vehicle_issues': vehicle_issues})
+    return render(request, 'vehicle/status/ajax_view.html', {'vehicle_issues': vehicle_issues})
 

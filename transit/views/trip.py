@@ -166,8 +166,6 @@ def tripStart(request, id):
             'vehicle': trip.vehicle,
         }
         form = tripStartForm(initial=initial)
-        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
-        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():

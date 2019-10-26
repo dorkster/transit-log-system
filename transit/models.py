@@ -249,3 +249,28 @@ class Client(models.Model):
     def get_class_name(self):
         return 'Client'
 
+class VehicleIssue(models.Model):
+    PRIORITY_HIGH = 2
+    PRIORITY_MEDIUM = 1
+    PRIORITY_LOW = 0
+
+    PRIORITY_LEVELS = [
+        (PRIORITY_HIGH, 'High'),
+        (PRIORITY_MEDIUM, 'Medium'),
+        (PRIORITY_LOW, 'Low'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField()
+    driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
+    description = models.TextField(max_length=4096, blank=True)
+    priority = models.IntegerField(choices=PRIORITY_LEVELS, default=PRIORITY_MEDIUM)
+    is_resolved = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-priority', '-date']
+
+    def __str__(self):
+        return '[' + str(self.date) + '] ' + str(self.vehicle) + ': ' + self.description
+

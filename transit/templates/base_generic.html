@@ -40,8 +40,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Vehicles</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Pre-Trip Logs</a>
-                            <a class="dropdown-item" href="#">Report an Issue</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-status' %}">Vehicle Status</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}">Report an Issue</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">

@@ -1,6 +1,6 @@
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -74,8 +74,8 @@ class EditTripForm(forms.Form):
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
-    driver = forms.ModelChoiceField(Driver.objects, widget=forms.Select(attrs=formWidgetAttrs.default))
-    vehicle = forms.ModelChoiceField(Vehicle.objects, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     start_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile_shift))
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     end_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile_shift))
@@ -92,8 +92,8 @@ class shiftFuelForm(forms.Form):
 class tripStartForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    driver = forms.ModelChoiceField(Driver.objects, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    vehicle = forms.ModelChoiceField(Vehicle.objects, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class tripEndForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
@@ -124,3 +124,10 @@ class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
     log_data_only = forms.BooleanField(label='Only include rows with full log data?', required=False, initial=False, widget=forms.CheckboxInput())
 
+class EditVehicleIssueForm(forms.Form):
+    # date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
+    description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.default))
+    priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_resolved = forms.BooleanField(required=False, widget=forms.CheckboxInput())

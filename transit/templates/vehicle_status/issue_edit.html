@@ -1,0 +1,89 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+{% load static %}
+<h2>
+    {% if is_new %}
+    New Vehicle Issue
+    {% else %}
+    Vehicle Issue Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div id="resolved_box" class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>{{ form.is_resolved.label }}</legend>
+                    <div class="mb-2">{{ form.is_resolved }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Log Information</legend>
+                    <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                    <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
+                </fieldset>
+            </div>
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Report Details</legend>
+                    <div class="mb-2"><label for="{{ form.priority.id_for_label }}"><strong>{{ form.priority.label }}</strong></label><br/>{{ form.priority }}</div>
+                    <div class="mb-2"><label for="{{ form.description.id_for_label }}"><strong>{{ form.description.label }}</strong></label><br/>{{ form.description }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+            {% if not is_new %}
+            <div>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Vehicle Issue" formnovalidate>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{{ clients_json|json_script:"clients-tag" }}
+<script type="text/javascript">
+    var resolved_checkbox = document.getElementById("id_is_resolved");
+    function setResolvedBoxColor() {
+        var resolved_box = document.getElementById("resolved_box")
+        var default_classname = "col border m-1 pt-1";
+        if (resolved_checkbox.checked) {
+            resolved_box.className = default_classname + " bg-success text-light";
+        }
+        else {
+            resolved_box.className = default_classname;
+        }
+    }
+    resolved_checkbox.addEventListener("change", setResolvedBoxColor);
+    setResolvedBoxColor();
+
+    var priority_select = document.getElementById("id_priority");
+    function setPrioritySelectColor() {
+        var default_classname = "form-control form-control-width-fix";
+        if (priority_select.value == "2")
+            priority_select.className = default_classname + " bg-danger text-light";
+        else if (priority_select.value == "1")
+            priority_select.className = default_classname + " bg-warning";
+        else
+            priority_select.className = default_classname;
+    }
+    priority_select.addEventListener("change", setPrioritySelectColor);
+    setPrioritySelectColor();
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

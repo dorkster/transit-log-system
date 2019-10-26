@@ -44,6 +44,10 @@
     width: 16em;
 }
 
+.mytable-col-xl {
+    width: 48em;
+}
+
 .mytable-col-arrows {
     text-align: center !important;
     width: 3em;

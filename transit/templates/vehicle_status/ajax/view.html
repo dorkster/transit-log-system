@@ -1,0 +1,31 @@
+<h3>Reported Vehicle Issues</h3>
+{% if vehicle_issues %}
+<table class="mytable">
+    <thead>
+        <td></td>
+        <td>Date</td>
+        <td>Vehicle</td>
+        <td>Driver</td>
+        <td>Description</td>
+    </thead>
+    {% for issue in vehicle_issues %}
+    {% if issue.priority == 2 %}
+    <tr class="bg-danger text-light">
+    {% elif issue.priority == 1 %}
+    <tr class="bg-warning">
+    {% else %}
+    <tr>
+    {% endif %}
+        <td class="mytable-col-xs">
+            <a class="btn btn-outline-dark btn-sm" href="{% url 'vehicle-issue-edit' issue.id %}">Edit</a>
+        </td>
+        <td class="mytable-col-md">{{ issue.date }}</td>
+        <td class="mytable-col-md">{{ issue.vehicle }}</td>
+        <td class="mytable-col-md">{{ issue.driver }}</td>
+        <td class="mytable-col-xl">{{ issue.description }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>There are no reported vehicle issues.</p>
+{% endif %}

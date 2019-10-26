@@ -51,6 +51,11 @@ urlpatterns = [
     path('report/this-month', views.reportThisMonth, name='report-this-month'),
     path('report/last-month', views.reportLastMonth, name='report-last-month'),
 
+    path('vehicle-status/', views.vehicleStatus, name='vehicle-status'),
+    path('vehicle-status/issues/create', views.vehicleIssueCreate, name='vehicle-issue-create'),
+    path('vehicle-status/issues/<uuid:id>/edit', views.vehicleIssueEdit, name='vehicle-issue-edit'),
+    path('vehicle-status/issues/<uuid:id>/delete', views.vehicleIssueDelete, name='vehicle-issue-delete'),
+
     path('import/', views.excelImport, name='excel-import'),
 
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
@@ -60,4 +65,5 @@ urlpatterns = [
     path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),
     path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),
+    path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
 ]

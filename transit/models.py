@@ -269,7 +269,7 @@ class VehicleIssue(models.Model):
     is_resolved = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-priority', '-date']
+        ordering = ['is_resolved', '-priority', '-date']
 
     def __str__(self):
         return '[' + str(self.date) + '] ' + str(self.vehicle) + ': ' + self.description

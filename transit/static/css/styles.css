@@ -1,12 +1,3 @@
-@font-face {
-    font-family: "Noto Emoji";
-    src: url("../font/Noto Emoji.ttf")
-}
-
-.emoji {
-    font-family: "Noto Emoji";
-}
-
 .mytable {
     font-size: 10pt;
 }

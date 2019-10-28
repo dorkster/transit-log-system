@@ -12,10 +12,11 @@
         <!-- Add additional CSS in static file -->
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'css/open-iconic-bootstrap.min.css' %}">
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
     </head>
     <body class="bg-light">
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <a class="navbar-brand" href="{% url 'index' %}">Stow COA Transit Dept.</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -58,7 +59,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-light btn btn-info" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            <span class="emoji">&#x1f464;</span> {{ user.get_username }}
+                            <span class="oi oi-person"></span> {{ user.get_username }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             {% if user.is_superuser %}
@@ -72,7 +73,7 @@
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link text-light btn btn-secondary" href="{% url 'login' %}?next={{ request.path }}">
-                            <span class="emoji">&#x1f464;</span> Login
+                            <span class="oi oi-person"></span> Login
                         </a>
                     </li>
                     {% endif %}
@@ -80,7 +81,14 @@
                 {% endblock %}
             </div>
         </nav>
-        <div class="container-fluid">
+        {% if notify_vehicle_issues %}
+                <div class="list-group list-group-flush">
+                {% for issue in notify_vehicle_issues %}
+                <a href="#" class="list-group-item list-group-item-action {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a>
+                {% endfor %}
+                </div>
+        {% endif %}
+        <div class="container-fluid mt-3">
             {% if user.is_authenticated %}
             <div>{% block auth_content %}{% endblock %}</div>
             {% else %}

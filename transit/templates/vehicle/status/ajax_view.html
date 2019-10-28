@@ -1,7 +1,19 @@
 <h3>Reported Issues <a class="btn btn-secondary" href="{% url 'vehicle-issue-create' %}">Add new</a></h3>
 {% if vehicle_issues %}
+<div class="container-fluid border p-2 mb-3">
+    <div class="row">
+        <div class="col">
+            <h4>Filter</h4>
+        </div>
+        <div class="col">
+            <label for="filter_show_resolved">Show Resolved</label>
+            <input type="checkbox" value="" name="filter_show_resolved" checked>
+        </div>
+    </div>
+</div>
 <table class="mytable">
     <thead>
+        <td></td>
         <td></td>
         <td>Date</td>
         <td>Vehicle</td>
@@ -9,16 +21,19 @@
         <td>Description</td>
     </thead>
     {% for issue in vehicle_issues %}
-    {% if issue.priority == 2 %}
+    {% if issue.priority == 2 and not issue.is_resolved %}
     <tr class="bg-danger text-light">
-    {% elif issue.priority == 1 %}
-    <tr class="bg-warning">
+    {% elif issue.priority == 1 and not issue.is_resolved %}
+    <tr class="bg-warning text-dark">
+    {% elif issue.is_resolved %}
+    <tr class="text-muted">
     {% else %}
     <tr>
     {% endif %}
         <td class="mytable-col-xs">
-            <a class="btn btn-outline-dark btn-sm" href="{% url 'vehicle-issue-edit' issue.id %}">Edit</a>
+            <a class="btn {% if issue.priority is 2 %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm" href="{% url 'vehicle-issue-edit' issue.id %}">Edit</a>
         </td>
+        <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>
         <td class="mytable-col-md">{{ issue.date }}</td>
         <td class="mytable-col-md">{{ issue.vehicle }}</td>
         <td class="mytable-col-md">{{ issue.driver }}</td>

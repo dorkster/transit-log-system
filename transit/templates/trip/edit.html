@@ -38,7 +38,7 @@
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
                     <div class="mb-2"><label for="{{ form.phone.id_for_label }}"><strong>{{ form.phone.label }}</strong></label>
                         <div class="dropdown show" style="display: inline;">
-                            <a class="btn btn-secondary btn-sm emoji ml-2 dropdown-toggle" title="Get the client's phone number" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&#x260E;</a>
+                            <a class="btn btn-secondary btn-sm ml-2 dropdown-toggle" title="Get the client's phone number" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="oi oi-phone"></span></a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'home')">Home Phone</a>
                                 <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'mobile')">Mobile Phone</a>
@@ -56,12 +56,12 @@
                 <fieldset class="form-group">
                     <legend>Trip Information</legend>
                     <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2 emoji" title="Get the client's home address" onclick="getClientAddress('id_address')">&#x1F3E0;</a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address')"><span class="oi oi-home"></span></a>
                         <br/>{{ form.address }}</div>
                     <div class="md-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2 emoji" title="Get the client's home address" onclick="getClientAddress('id_destination')">&#x1F3E0;</a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination')"><span class="oi oi-home"></span></a>
                         <br/>{{ form.destination }}</div>
                     <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
                     <hr/>

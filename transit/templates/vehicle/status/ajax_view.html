@@ -1,13 +1,13 @@
 <h3>Reported Issues <a class="btn btn-secondary" href="{% url 'vehicle-issue-create' %}">Add new</a></h3>
 {% if vehicle_issues %}
-<div class="container-fluid border p-2 mb-3">
+<div class="container-fluid border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
-            <h4>Filter</h4>
+            <h5>Filter</h5>
         </div>
-        <div class="col">
+        <div class="col-auto">
             <label for="filter_show_resolved">Show Resolved</label>
-            <input type="checkbox" value="" name="filter_show_resolved" checked>
+            <input type="checkbox" value="" name="filter_show_resolved" id="id_filter_show_resolved" {% if filter_show_resolved %}checked{% endif %}>
         </div>
     </div>
 </div>
@@ -41,6 +41,18 @@
     </tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var filter_show_resolved = document.getElementById("id_filter_show_resolved");
+    function updateFilter() {
+        if (filter_show_resolved) {
+            ajax_loader.extra_data["filter_show_resolved"] = filter_show_resolved.checked;
+        }
+        ajax_loader.run();
+    }
+    if (filter_show_resolved) {
+        filter_show_resolved.addEventListener("change", updateFilter);
+    }
+</script>
 {% else %}
 <p>There are no reported vehicle issues.</p>
 {% endif %}

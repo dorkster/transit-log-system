@@ -1,5 +1,4 @@
 <h3>Reported Issues <a class="btn btn-secondary" href="{% url 'vehicle-issue-create' %}">Add new</a></h3>
-{% if vehicle_issues %}
 <div class="container-fluid border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
@@ -11,6 +10,7 @@
         </div>
     </div>
 </div>
+{% if vehicle_issues %}
 <table class="mytable">
     <thead>
         <td></td>
@@ -31,7 +31,7 @@
     <tr>
     {% endif %}
         <td class="mytable-col-xs">
-            <a class="btn {% if issue.priority is 2 %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm" href="{% url 'vehicle-issue-edit' issue.id %}">Edit</a>
+            <a class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm" href="{% url 'vehicle-issue-edit' issue.id %}">Edit</a>
         </td>
         <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>
         <td class="mytable-col-md">{{ issue.date }}</td>
@@ -41,6 +41,9 @@
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<p>There are no reported vehicle issues.</p>
+{% endif %}
 <script type="text/javascript">
     var filter_show_resolved = document.getElementById("id_filter_show_resolved");
     function updateFilter() {
@@ -53,6 +56,3 @@
         filter_show_resolved.addEventListener("change", updateFilter);
     }
 </script>
-{% else %}
-<p>There are no reported vehicle issues.</p>
-{% endif %}

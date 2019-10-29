@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from transit.models import Trip, Shift
+from transit.models import Trip, Shift, Driver, Vehicle
 from transit.forms import DatePickerForm
 
 def schedule(request, mode, year, month, day):
@@ -76,9 +76,47 @@ def ajaxScheduleCommon(request, template):
             trip.sort_index = swap_index
             query[0].save()
             trip.save()
+    elif request_action == 'set_driver':
+        trip = get_object_or_404(Trip, id=request_id)
+
+        prev_vehicle = trip.vehicle
+        prev_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
+        prev_shift_vehicle = None
+        if len(prev_query) > 0:
+            prev_shift_vehicle = prev_query[0].vehicle
+
+        if request_data == '---------':
+            trip.driver = None;
+            trip.vehicle = None;
+            trip.save()
+        else:
+            driver = get_object_or_404(Driver, id=uuid.UUID(request_data))
+            trip.driver = driver
+            trip.save()
+
+        # attempt to set vehicle from Shift data
+        if prev_vehicle == None or prev_vehicle == prev_shift_vehicle:
+            new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
+            if len(new_query) > 0:
+                trip.vehicle = new_query[0].vehicle
+                trip.save()
+            else:
+                trip.vehicle = None
+                trip.save()
+
+    elif request_action == 'set_vehicle':
+        trip = get_object_or_404(Trip, id=request_id)
+        if request_data == '---------':
+            trip.vehicle = None;
+        else:
+            vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
+            trip.vehicle = vehicle
+        trip.save()
 
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
     shifts = Shift.objects.filter(date=date)
     trips = Trip.objects.filter(date=date)
-    return render(request, template, {'shifts': shifts, 'trips':trips, 'date':date})
+    drivers = Driver.objects.all()
+    vehicles = Vehicle.objects.all()
+    return render(request, template, {'shifts': shifts, 'trips':trips, 'date':date, 'drivers':drivers, 'vehicles': vehicles})
 

@@ -63,8 +63,40 @@
         <td class="mytable-col-md">{{ trip.phone }}</td>
         <td class="mytable-col-lg">{{ trip.destination }}</td>
         <td class="mytable-col-md">{% if trip.trip_type %}{{ trip.trip_type }}{% endif %}</td>
-        <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
-        <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
+        <td class="mytable-col-md">
+            <div class="dropdown" id="select_driver_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if trip.driver is None %}---------{% else %}{% for driver in drivers %}{% if trip.driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item {% if trip.driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '---------')">---------</a>
+                    {% for driver in drivers %}
+                    <a class="dropdown-item {% if trip.driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '{{driver.id}}')">{{driver}}</a>
+                    {% endfor %}
+                </div>
+                <script type="text/javascript">
+                    $('#select_driver_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#select_driver_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
+        <td class="mytable-col-md">
+            <div class="dropdown" id="select_vehicle_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if trip.vehicle is None %}---------{% else %}{% for vehicle in vehicles %}{% if trip.vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item {% if trip.vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_vehicle', '---------')">---------</a>
+                    {% for vehicle in vehicles %}
+                    <a class="dropdown-item {% if trip.vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                    {% endfor %}
+                </div>
+                <script type="text/javascript">
+                    $('#select_vehicle_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#select_vehicle_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
         <td class="mytable-col-sm">{{ trip.start_miles }}</td>
         <td class="mytable-col-sm">{{ trip.start_time }}</td>
         <td class="mytable-col-sm">{{ trip.end_miles }}</td>

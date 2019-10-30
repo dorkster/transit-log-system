@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Shift, Driver, Vehicle
+from transit.models import Shift, Driver, Vehicle, Trip
 from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
 
 def shiftCreate(request, mode, year, month, day):
@@ -34,6 +34,11 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             return HttpResponseRedirect(reverse('shift-delete', kwargs={'mode':mode, 'id':shift.id}))
 
         if form.is_valid():
+            prev = {
+                'driver': shift.driver,
+                'vehicle': shift.vehicle
+            }
+
             shift.date = form.cleaned_data['date']
             shift.driver = form.cleaned_data['driver']
             shift.vehicle = form.cleaned_data['vehicle']
@@ -43,6 +48,21 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             shift.end_time = form.cleaned_data['end_time']
             shift.fuel = form.cleaned_data['fuel']
             shift.save()
+
+            new_day_trips = Trip.objects.filter(date=shift.date)
+            for trip in new_day_trips:
+                if trip.driver is None and trip.vehicle is None:
+                    continue
+
+                if trip.driver == prev['driver'] and trip.vehicle == prev['vehicle']:
+                    trip.driver = shift.driver
+                    trip.vehicle = shift.vehicle
+                elif trip.driver is None and trip.vehicle == shift.vehicle:
+                    trip.driver = shift.driver
+                elif trip.vehicle is None and trip.driver == shift.driver:
+                    trip.vehicle = shift.vehicle
+
+                trip.save()
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:

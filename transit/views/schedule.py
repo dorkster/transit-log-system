@@ -78,31 +78,30 @@ def ajaxScheduleCommon(request, template):
             trip.save()
     elif request_action == 'set_driver':
         trip = get_object_or_404(Trip, id=request_id)
-
-        prev_vehicle = trip.vehicle
-        prev_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
-        prev_shift_vehicle = None
-        if len(prev_query) > 0:
-            prev_shift_vehicle = prev_query[0].vehicle
+        prev_driver = trip.driver
 
         if request_data == '---------':
             trip.driver = None;
             trip.vehicle = None;
-            trip.save()
         else:
             driver = get_object_or_404(Driver, id=uuid.UUID(request_data))
             trip.driver = driver
-            trip.save()
+
+            # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
+            if not driver.is_logged:
+                nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+                if len(nonlogged_vehicles) == 1:
+                    trip.vehicle = nonlogged_vehicles[0]
 
         # attempt to set vehicle from Shift data
-        if prev_vehicle == None or prev_vehicle == prev_shift_vehicle:
+        if prev_driver != trip.driver:
             new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
             if len(new_query) > 0:
                 trip.vehicle = new_query[0].vehicle
-                trip.save()
-            else:
+            elif trip.driver is None or trip.driver.is_logged == True:
                 trip.vehicle = None
-                trip.save()
+
+        trip.save()
 
     elif request_action == 'set_vehicle':
         trip = get_object_or_404(Trip, id=request_id)

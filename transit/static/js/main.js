@@ -45,7 +45,7 @@ function AjaxLoader(url, div_id) {
             if (!self.first_response) {
                 self.first_response = true;
                 var hash = window.location.hash.substr(1);
-                if (hash)
+                if (hash && hash != '_')
                     document.getElementById(hash).scrollIntoView();
             }
         });

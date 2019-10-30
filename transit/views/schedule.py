@@ -111,6 +111,10 @@ def ajaxScheduleCommon(request, template):
             vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
             trip.vehicle = vehicle
         trip.save()
+    elif request_action == 'toggle_canceled':
+        trip = get_object_or_404(Trip, id=request_id)
+        trip.is_canceled = not trip.is_canceled
+        trip.save()
 
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
     shifts = Shift.objects.filter(date=date)

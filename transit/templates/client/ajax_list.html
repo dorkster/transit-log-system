@@ -14,7 +14,20 @@
     <tr style="background: {{ client.get_driver_color }};">
         <td class="mytable-col-xs">
             <a id="client_{{ client.id }}"></a>
-            <a class="btn btn-outline-dark btn-sm" href="{% url 'client-edit' client.id %}">Edit</a>
+            <div class="dropdown" id="edit_client_{{client.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'client-edit' client.id %}" class="dropdown-item">Edit client</a>
+                    <hr/>
+                    <a href="{% url 'client-delete' client.id %}" class="dropdown-item text-danger">Delete client</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_client_{{client.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_client_{{client.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
         </td>
         <td class="mytable-col-lg">{{ client.name }}</td>
         <td class="mytable-col-lg">{{ client.address }}</td>

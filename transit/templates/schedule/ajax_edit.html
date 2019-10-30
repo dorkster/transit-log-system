@@ -13,7 +13,22 @@
     </thead>
     {% for shift in shifts %}
     <tr style="background: {{ shift.get_driver_color }};">
-        <td class="mytable-col-xs"><a class="btn btn-outline-dark btn-sm" href="{% url 'shift-edit' 'edit' shift.id %}">Edit</a></td>
+        <td class="mytable-col-xs">
+            <div class="dropdown" id="edit_shift_{{shift.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'shift-edit' 'edit' shift.id %}" class="dropdown-item">Edit shift</a>
+                    <hr/>
+                    <a href="{% url 'shift-delete' 'edit' shift.id %}" class="dropdown-item text-danger">Delete shift</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_shift_{{shift.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_shift_{{shift.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
         <td class="mytable-col-md">{{ shift.driver }}</td>
         <td class="mytable-col-md">{{ shift.vehicle }}</td>
         <td class="mytable-col-md">{{ shift.start_miles }}</td>
@@ -55,7 +70,23 @@
                 <button class="btn btn-outline-dark btn-sm pt-0 pb-0" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'd')"><span class="oi oi-chevron-bottom"></span></button>
             </div>
         </td>
-        <td class="mytable-col-xs"><a class="btn btn-outline-dark btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+        <td class="mytable-col-xs">
+            <div class="dropdown" id="edit_trip_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'trip-edit' 'edit' trip.id %}" class="dropdown-item">Edit trip</a>
+                    <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '')" class="dropdown-item">{% if trip.is_canceled %}Set as not canceled{% else %}Set as canceled{% endif %}</a>
+                    <hr/>
+                    <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_trip_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_trip_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
         <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
         <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
         <td class="mytable-col-md">{{ trip.name }}</td>

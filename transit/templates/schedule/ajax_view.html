@@ -5,7 +5,20 @@
         <div class="card-body p-0">
             <div class="d-flex flex-wrap">
                 <div class="p-1">
-                    <a href="{% url 'shift-edit' 'view' shift.id %}" class="btn btn-outline-dark btn-sm">Edit</a>
+                    <div class="dropdown" id="edit_shift_{{shift.id}}">
+                        <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item">Edit Shift</a>
+                            <hr/>
+                            <a href="{% url 'shift-delete' 'view' shift.id %}" class="dropdown-item text-danger">Delete Shift</a>
+                        </div>
+                        <script type="text/javascript">
+                            $('#edit_shift_{{shift.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                            $('#edit_shift_{{shift.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                        </script>
+                    </div>
                 </div>
                 <div class="p-1">
                     <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
@@ -28,7 +41,21 @@
             <a id="trip_{{ trip.id }}"></a>
             <div class="d-flex flex-wrap">
                 <div class="p-1">
-                    <a href="{% url 'trip-edit' 'view' trip.id %}" class="btn btn-outline-dark btn-sm">Edit</a>
+                    <div class="dropdown" id="edit_trip_{{trip.id}}">
+                        <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item">Edit trip</a>
+                            <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '')" class="dropdown-item">{% if trip.is_canceled %}Set as not canceled{% else %}Set as canceled{% endif %}</a>
+                            <hr/>
+                            <a href="{% url 'trip-delete' 'view' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                        </div>
+                        <script type="text/javascript">
+                            $('#edit_trip_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                            $('#edit_trip_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                        </script>
+                    </div>
                 </div>
                 <div class="p-1 mr-3">
                     <h4 class="card-title">{{ trip.name }}</h4>

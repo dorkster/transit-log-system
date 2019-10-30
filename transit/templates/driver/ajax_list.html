@@ -17,7 +17,20 @@
             </div>
         </td>
         <td class="mytable-col-xs">
-            <a class="btn btn-outline-dark btn-sm" href="{% url 'driver-edit' driver.id %}">Edit</a>
+            <div class="dropdown" id="edit_driver_{{driver.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'driver-edit' driver.id %}" class="dropdown-item">Edit driver</a>
+                    <hr/>
+                    <a href="{% url 'driver-delete' driver.id %}" class="dropdown-item text-danger">Delete driver</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_driver_{{driver.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_driver_{{driver.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
         </td>
         <td class="mytable-col-lg">{{ driver.name }}</td>
         <td class="mytable-col-sm"><span class="oi {% if driver.is_logged %}oi-check{% elif driver.is_logged is False %}oi-x{% endif %}"></span></td>

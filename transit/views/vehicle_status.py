@@ -1,4 +1,6 @@
-from django.shortcuts import render
+import uuid
+
+from django.shortcuts import render, get_object_or_404
 
 from transit.models import VehicleIssue
 
@@ -6,6 +8,18 @@ def vehicleStatus(request):
     return render(request, 'vehicle/status/view.html', context={})
 
 def ajaxVehicleStatus(request):
+    request_id = ''
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
+
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
+
+    if request_action == 'toggle_resolved':
+        issue = get_object_or_404(VehicleIssue, id=request_id)
+        issue.is_resolved = not issue.is_resolved
+        issue.save()
+
     filter_show_resolved_str = request.GET.get('filter_show_resolved', None)
 
     if filter_show_resolved_str is not None:

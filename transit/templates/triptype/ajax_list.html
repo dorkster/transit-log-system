@@ -16,7 +16,20 @@
             </div>
         </td>
         <td class="mytable-col-xs">
-            <a class="btn btn-outline-dark btn-sm" href="{% url 'triptype-edit' triptype.id %}">Edit</a>
+            <div class="dropdown" id="edit_triptype_{{triptype.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'triptype-edit' triptype.id %}" class="dropdown-item">Edit Trip Type</a>
+                    <hr/>
+                    <a href="{% url 'triptype-delete' triptype.id %}" class="dropdown-item text-danger">Delete Trip Type</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_triptype_{{triptype.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_triptype_{{triptype.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
         </td>
         <td class="mytable-col-lg">{{ triptype.name }}</td>
     </tr>

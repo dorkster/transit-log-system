@@ -108,13 +108,13 @@
                 "year":$("#id_date_year").val(),
                 "month":$("#id_date_month").val(),
                 "day":$("#id_date_day").val(),
-                "driver":$("#id_driver option:selected").text(), 
+                "driver":$("#id_driver option:selected").val(),
             }
         })
         .done(function(response) {
             if (response.vehicle != "") {
                 $("#id_vehicle option").filter(function() {
-                    return $(this).text() == response.vehicle;
+                    return $(this).val() == response.vehicle;
                 }).prop("selected", true);
             }
             else {
@@ -140,7 +140,6 @@
     setCanceledBoxColor();
 
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
-    console.log(clients);
 
     var name_input = document.getElementById("id_name");
     function onNameChanged() {

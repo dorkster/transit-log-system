@@ -72,6 +72,32 @@
     vehicle_input.addEventListener("change", function() { showFullMiles(mile_input); });
 
     showFullMiles(mile_input);
+
+    function ajaxSetVehicleFromDriver() {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'ajax-set-vehicle-from-driver' %}",
+            data: {
+                "year":"{{ trip.date.year }}",
+                "month":"{{ trip.date.month }}",
+                "day":"{{ trip.date.day }}",
+                "driver":$("#id_driver option:selected").val(),
+            }
+        })
+        .done(function(response) {
+            if (response.vehicle != "") {
+                $("#id_vehicle option").filter(function() {
+                    return $(this).val() == response.vehicle;
+                }).prop("selected", true);
+            }
+            else {
+                $("#id_vehicle").prop("selectedIndex", 0);
+            }
+            showFullMiles(mile_input);
+        });
+    }
+
+    $("#id_driver").change(ajaxSetVehicleFromDriver);
 </script>
 {% endblock %}
 {% endblock %}

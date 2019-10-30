@@ -1,4 +1,4 @@
-import datetime
+import datetime, uuid
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -230,14 +230,24 @@ def tripEnd(request, id):
 
 def ajaxSetVehicleFromDriver(request):
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
-    shifts = Shift.objects.filter(date=date, driver__name=request.GET['driver'])
 
     data = {}
 
-    if len(shifts) > 0:
-        data['vehicle'] = str(shifts[0].vehicle)
-    else:
+    if request.GET['driver'] == '':
         data['vehicle'] = ''
+    else:
+        driver = Driver.objects.filter(id=uuid.UUID(request.GET['driver']))[0]
+        shifts = Shift.objects.filter(date=date, driver=driver)
+        if len(shifts) > 0:
+            data['vehicle'] = str(shifts[0].vehicle.id)
+        else:
+            data['vehicle'] = ''
+
+            # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
+            if not driver.is_logged:
+                nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+                if len(nonlogged_vehicles) == 1:
+                    data['vehicle'] = str(nonlogged_vehicles[0].id)
 
     return JsonResponse(data)
 

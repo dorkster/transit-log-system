@@ -2,24 +2,46 @@
 
 {% block auth_content %}
 <div class="container-fluid mt-4 mb-3">
-    <div class="row">
-        <div class="col p-1">
-            <h5><strong>{{ date_str }}</strong> [<a href="{% url 'schedule' 'edit' date.year date.month date.day %}">Edit</a>]</h5>
+    <div class="row justify-content-between">
+        <div class="col-md p-1">
+            <h5><strong>{{ date_str }}</strong></h5>
         </div>
-        <div class="col-sm-auto p-1">
+        <div class="col-auto p-1">
             <div class="btn-group" role="group">
-                <a class="btn btn-secondary" href="{{ date_prev }}">&lt;&lt; Previous Day</a><a class="btn btn-secondary" href="{{ date_next }}">Next Day &gt;&gt;</a>
+                <a title="Previous day" class="btn btn-secondary" href="{{ date_prev }}">
+                    <span class="oi oi-chevron-left"></span>
+                </a>
+                <div class="btn-group" role="group" id="date_dropdown">
+                    <button title="Select a date" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="oi oi-calendar"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                {{ date_picker }}
+                                <input type="submit" value="Go" class="btn btn-secondary align-top">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <a title="Next day" class="btn btn-secondary" href="{{ date_next }}">
+                    <span class="oi oi-chevron-right"></span></span>
+                </a>
             </div>
+            <script type="text/javascript">
+                // Keep the dropdown from closing when picking a date
+                $('#date_dropdown option, #date_dropdown select').click(function(e) {
+                    e.stopPropagation();
+                })
+            </script>
         </div>
-        <div class="col-sm-auto p-1">
-            <form action="" method="post" class="date-picker">
-                {% csrf_token %}
-                {{ date_picker }}
-                <input type="submit" value="Go" class="btn btn-secondary align-top">
-            </form>
+        <div class="col-auto p-1">
+            <a href="{% url 'schedule' 'edit' date.year date.month date.day %}" class="btn btn-info"><span class="oi oi-spreadsheet mr-2"></span>Edit</a>
         </div>
     </div>
 </div>
+<hr/>
 <div id="schedule-view">
 </div>
 

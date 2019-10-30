@@ -1,4 +1,4 @@
-<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}">Add new</a></h3>
+<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
     {% for shift in shifts %}
     <div class="card mb-2" style="background: {{ shift.get_driver_color }};">
@@ -32,8 +32,11 @@
         </div>
     </div>
     {% endfor %}
+{% else %}
+<p>There are no shifts for this day.</p>
 {% endif %}
-<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}">Add new</a></h3>
+<hr/>
+<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if trips %}
     {% for trip in trips %}
     <div class="card mb-2" style="background: {{ trip.get_driver_color }};">
@@ -73,4 +76,6 @@
         </div>
     </div>
     {% endfor %}
+{% else %}
+<p>There are no trips for this day.</p>
 {% endif %}

@@ -1,4 +1,4 @@
-<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'edit' date.year date.month date.day %}">Add new</a></h3>
+<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
 <table class="mytable">
     <thead>
@@ -39,8 +39,11 @@
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<p>There are no shifts for this day.</p>
 {% endif %}
-<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}">Add new</a></h3>
+<hr/>
+<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if trips %}
 <table class="mytable">
     <thead>
@@ -140,4 +143,6 @@
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<p>There are no trips for this day.</p>
 {% endif %}

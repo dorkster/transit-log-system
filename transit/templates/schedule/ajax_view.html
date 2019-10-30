@@ -38,8 +38,8 @@
                     <br>To: <strong>{{ trip.destination }}</strong>{% if trip.appointment_time %} | (Appointment: <strong>{{ trip.appointment_time }}</strong>){% endif %}</p>
                 </div>
                 <div class="ml-auto p-1">
-                    <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
-                    <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
+                    <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.is_canceled or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
+                    <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if itrip.is_canceled or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
                     {% if trip.phone %}<a href="tel:{{ trip.get_phone_number }}" class="btn btn-info btn-lg">Call</a>{% endif %}
                 </div>
             </div>

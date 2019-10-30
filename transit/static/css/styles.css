@@ -11,12 +11,6 @@
     border: 1px solid #777 !important;
 }
 
-.mytable td abbr {
-    text-decoration: none;
-    font-size: 16pt;
-    cursor: default;
-}
-
 .mytable-col-xs {
     text-align: center !important;
     width: 4em;
@@ -63,4 +57,8 @@
 
 .full-miles * {
     font-size: 24pt;
+}
+
+.lg-icon {
+    font-size: 16pt;
 }

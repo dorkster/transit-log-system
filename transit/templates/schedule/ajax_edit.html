@@ -31,10 +31,34 @@
         </td>
         <td class="mytable-col-md">{{ shift.driver }}</td>
         <td class="mytable-col-md">{{ shift.vehicle }}</td>
-        <td class="mytable-col-md">{{ shift.start_miles }}</td>
-        <td class="mytable-col-sm">{{ shift.start_time }}</td>
-        <td class="mytable-col-md">{{ shift.end_miles }}</td>
-        <td class="mytable-col-sm">{{ shift.end_time }}</td>
+        <td class="mytable-col-sm">
+            {% if shift.check_start_miles %}
+                {{ shift.start_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if shift.check_start_time %}
+                {{ shift.start_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if shift.check_end_miles %}
+                {{ shift.end_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if shift.check_end_time %}
+                {{ shift.end_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
         <td class="mytable-col-sm">{{ shift.fuel }}</td>
     </tr>
     {% endfor %}
@@ -131,13 +155,37 @@
                 </script>
             </div>
         </td>
-        <td class="mytable-col-sm">{{ trip.start_miles }}</td>
-        <td class="mytable-col-sm">{{ trip.start_time }}</td>
-        <td class="mytable-col-sm">{{ trip.end_miles }}</td>
-        <td class="mytable-col-sm">{{ trip.end_time }}</td>
+        <td class="mytable-col-sm">
+            {% if trip.check_start_miles %}
+                {{ trip.start_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_start_time %}
+                {{ trip.start_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_end_miles %}
+                {{ trip.end_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_end_time %}
+                {{ trip.end_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
         <td class="mytable-col-xs">
             {% if trip.note %}
-            <abbr class="oi oi-document" title="{{ trip.note }}"></abbr>
+            <span class="oi oi-document lg-icon" title="{{ trip.note }}"></span>
             {% endif %}
         </td>
     </tr>

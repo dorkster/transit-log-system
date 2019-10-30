@@ -85,11 +85,6 @@ class Trip(models.Model):
         return data
 
     def get_error_str(self):
-        missing_start_miles = self.start_miles == ""
-        missing_start_time = self.start_time == ""
-        missing_end_miles = self.end_miles == ""
-        missing_end_time = self.end_time == ""
-
         if self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
             return "" # Empty; can be safely ignored
         if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
@@ -105,6 +100,26 @@ class Trip(models.Model):
                 return error_msg + error_ref
         else:
             return ""
+
+    def check_blank(self, field):
+        if field != "":
+            return True
+        elif self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
+            return True
+        else:
+            return False
+
+    def check_start_miles(self):
+        return self.check_blank(self.start_miles)
+
+    def check_start_time(self):
+        return self.check_blank(self.start_time)
+
+    def check_end_miles(self):
+        return self.check_blank(self.end_miles)
+
+    def check_end_time(self):
+        return self.check_blank(self.end_time)
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -207,11 +222,6 @@ class Shift(models.Model):
         return data
 
     def get_error_str(self):
-        missing_start_miles = self.start_miles == ""
-        missing_start_time = self.start_time == ""
-        missing_end_miles = self.end_miles == ""
-        missing_end_time = self.end_time == ""
-
         if self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
             return "" # Empty; can be safely ignored
         if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
@@ -221,6 +231,27 @@ class Shift(models.Model):
             return error_msg + error_ref
         else:
             return ""
+
+    def check_blank(self, field):
+        if field != "":
+            return True
+        elif self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
+            return True
+        else:
+            return False
+
+    def check_start_miles(self):
+        return self.check_blank(self.start_miles)
+
+    def check_start_time(self):
+        return self.check_blank(self.start_time)
+
+    def check_end_miles(self):
+        return self.check_blank(self.end_miles)
+
+    def check_end_time(self):
+        return self.check_blank(self.end_time)
+
 
 class Client(models.Model):
     PHONE_HOME = 'home'

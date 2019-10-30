@@ -2,10 +2,40 @@
 
 {% block auth_content %}
 <h2>Welcome, {{ user }}!</h2>
-<ul>
-    <li><a href="{% url 'schedule-today' 'edit' %}">Edit today's schedule</a></li>
-    <li><a href="{% url 'trip-create-today' 'edit' %}">Add a trip to the schedule</a></li>
-</ul>
+<div class="card-group">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">Drivers</h3>
+            <div class="list-group">
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'schedule-today' 'view' %}">
+                    <span class="oi oi-task mr-2"></span><strong>View schedule</strong>
+                </a>
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'vehicle-status' %}">
+                    <span class="oi oi-wrench mr-2"></span>View vehicle status
+                </a>
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'vehicle-issue-create' %}">
+                    <span class="oi oi-warning mr-2"></span>Report a vehicle issue
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">Administrative Staff</h3>
+            <div class="list-group">
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'schedule-today' 'edit' %}">
+                    <span class="oi oi-spreadsheet mr-2"></span><strong>Edit schedule</strong>
+                </a>
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'report-this-month' %}">
+                    <span class="oi oi-graph mr-2"></span>View latest report
+                </a>
+                <a class="list-group-item list-group-item-action text-primary" href="{% url 'clients' %}">
+                    <span class="oi oi-people mr-2"></span>Edit clients
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}

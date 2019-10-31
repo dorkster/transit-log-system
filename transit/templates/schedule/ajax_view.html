@@ -37,6 +37,21 @@
 {% endif %}
 <hr/>
 <h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<div class="container-fluid border p-2 mb-3" style="background: #eee;">
+    <div class="row">
+        <div class="col">
+            <h5>Filter</h5>
+        </div>
+        <div class="col-auto">
+            <label for="filter_hide_completed">Hide completed</label>
+            <input type="checkbox" value="" name="filter_hide_completed" id="id_filter_hide_completed" {% if filter_hide_completed %}checked{% endif %}>
+        </div>
+        <div class="col-auto">
+            <label for="filter_hide_canceled">Hide canceled</label>
+            <input type="checkbox" value="" name="filter_hide_canceled" id="id_filter_hide_canceled" {% if filter_hide_canceled %}checked{% endif %}>
+        </div>
+    </div>
+</div>
 {% if trips %}
     {% for trip in trips %}
     <div class="card mb-2" style="background: {{ trip.get_driver_color }}; max-width: 960px;">
@@ -115,5 +130,25 @@
     </div>
     {% endfor %}
 {% else %}
-<p>There are no trips for this day.</p>
+<p>There are no trips for this day. Check the <strong>Filter</strong> settings if this is incorrect.</p>
 {% endif %}
+<script type="text/javascript">
+    var filter_hide_canceled = document.getElementById("id_filter_hide_canceled");
+    var filter_hide_completed = document.getElementById("id_filter_hide_completed");
+
+    function updateFilter() {
+        if (filter_hide_canceled) {
+            ajax_loader.extra_data["filter_hide_canceled"] = filter_hide_canceled.checked;
+        }
+        if (filter_hide_completed) {
+            ajax_loader.extra_data["filter_hide_completed"] = filter_hide_completed.checked;
+        }
+        ajax_loader.run();
+    }
+    if (filter_hide_canceled) {
+        filter_hide_canceled.addEventListener("change", updateFilter);
+    }
+    if (filter_hide_completed) {
+        filter_hide_completed.addEventListener("change", updateFilter);
+    }
+</script>

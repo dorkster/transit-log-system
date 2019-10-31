@@ -3,6 +3,7 @@ import datetime, uuid
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.db.models import Q
 
 from transit.models import Trip, Shift, Driver, Vehicle
 from transit.forms import DatePickerForm
@@ -117,9 +118,45 @@ def ajaxScheduleCommon(request, template):
         trip.save()
 
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
-    shifts = Shift.objects.filter(date=date)
+
+    filter_hide_canceled_str = request.GET.get('filter_hide_canceled', None)
+
+    if filter_hide_canceled_str is not None:
+        filter_hide_canceled_str = filter_hide_canceled_str.lower()
+        request.session['schedule_view_hide_canceled'] = True if filter_hide_canceled_str == "true" else False
+
+    filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
+
+    filter_hide_completed_str = request.GET.get('filter_hide_completed', None)
+
+    if filter_hide_completed_str is not None:
+        filter_hide_completed_str = filter_hide_completed_str.lower()
+        request.session['schedule_view_hide_completed'] = True if filter_hide_completed_str == "true" else False
+
+    filter_hide_completed = request.session.get('schedule_view_hide_completed', False)
+
     trips = Trip.objects.filter(date=date)
+
+    # TODO don't use template filename to check if we're on the View page!!!
+    if template == 'schedule/ajax_view.html':
+        if filter_hide_canceled:
+            trips = trips.filter(is_canceled=False)
+
+        if filter_hide_completed:
+            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))
+
+    shifts = Shift.objects.filter(date=date)
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
-    return render(request, template, {'shifts': shifts, 'trips':trips, 'date':date, 'drivers':drivers, 'vehicles': vehicles})
+
+    context = {
+        'shifts': shifts,
+        'trips': trips,
+        'date': date,
+        'drivers': drivers,
+        'vehicles': vehicles,
+        'filter_hide_canceled': filter_hide_canceled,
+        'filter_hide_completed': filter_hide_completed,
+    }
+    return render(request, template, context=context)
 

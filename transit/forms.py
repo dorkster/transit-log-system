@@ -98,10 +98,12 @@ class tripStartForm(forms.Form):
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    adjacent_trips = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class tripEndForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    adjacent_trips = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class EditClientForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

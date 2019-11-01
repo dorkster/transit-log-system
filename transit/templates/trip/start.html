@@ -16,10 +16,43 @@
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label><br/>{{ form.time }}</div>
                     <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
                     <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                    {{form.adjacent_trips}}
                 </fieldset>
             </div>
         </div>
-        <hr>
+        {% if adjacent_trips %}
+        <hr/>
+        <h3>Select additional pick-ups at this stop:</h3>
+        <div class="list-group">
+            {% for adjacent_trip in adjacent_trips %}
+            <a href="#_" class="list-group-item list-group-item-action" id="adjacent_trip_{{ adjacent_trip.id }}" onclick="toggleAdjacentTrip('adjacent_trip_{{ adjacent_trip.id }}')" data-id="{{ adjacent_trip.id }}">{{ adjacent_trip }}</a>
+            {% endfor %}
+        </div>
+        <script type="text/javascript">
+            function toggleAdjacentTrip(item_id) {
+                var list_item = document.getElementById(item_id);
+                if (list_item) {
+                    var adjacent_trips = {};
+                    var json_field = document.getElementById("id_adjacent_trips");
+                    if (json_field && json_field.value)
+                        adjacent_trips = JSON.parse(json_field.value);
+
+                    if (list_item.classList.contains("active")) {
+                        list_item.classList.remove("active");
+                        adjacent_trips[list_item.dataset.id] = false;
+                    }
+                    else {
+                        list_item.classList.add("active");
+                        adjacent_trips[list_item.dataset.id] = true;
+                    }
+
+                    if (json_field)
+                        json_field.value = JSON.stringify(adjacent_trips);
+                }
+            }
+        </script>
+        {% endif %}
+        <hr/>
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-3">
                 <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">

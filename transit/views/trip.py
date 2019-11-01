@@ -1,4 +1,5 @@
 import datetime, uuid
+import json
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -153,6 +154,17 @@ def tripStart(request, id):
             trip.vehicle = form.cleaned_data['vehicle']
             trip.save()
 
+            if form.cleaned_data['adjacent_trips'] != '':
+                adjacent_trips = json.loads(form.cleaned_data['adjacent_trips'])
+                for key in adjacent_trips:
+                    if adjacent_trips[key] is True:
+                        a_trip = Trip.objects.get(id=uuid.UUID(key))
+                        a_trip.start_miles = form.cleaned_data['miles']
+                        a_trip.start_time = form.cleaned_data['time']
+                        a_trip.driver = form.cleaned_data['driver']
+                        a_trip.vehicle = form.cleaned_data['vehicle']
+                        a_trip.save()
+
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
     else:
         auto_time = trip.start_time
@@ -176,10 +188,26 @@ def tripStart(request, id):
         if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
+    all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)
+    adjacent_trips = []
+    found_this_trip = False
+    for i in all_trips:
+        if i.id == trip.id:
+            found_this_trip = True
+            continue
+
+        if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
+            adjacent_trips.append(i)
+        elif not found_this_trip:
+            adjacent_trips.clear()
+        elif found_this_trip:
+            break
+
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
+        'adjacent_trips': adjacent_trips,
     }
 
     return render(request, 'trip/start.html', context)
@@ -198,6 +226,15 @@ def tripEnd(request, id):
             trip.end_miles = form.cleaned_data['miles']
             trip.end_time = form.cleaned_data['time']
             trip.save()
+
+            if form.cleaned_data['adjacent_trips'] != '':
+                adjacent_trips = json.loads(form.cleaned_data['adjacent_trips'])
+                for key in adjacent_trips:
+                    if adjacent_trips[key] is True:
+                        a_trip = Trip.objects.get(id=uuid.UUID(key))
+                        a_trip.end_miles = form.cleaned_data['miles']
+                        a_trip.end_time = form.cleaned_data['time']
+                        a_trip.save()
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
     else:
@@ -220,10 +257,26 @@ def tripEnd(request, id):
         if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
+    all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)
+    adjacent_trips = []
+    found_this_trip = False
+    for i in all_trips:
+        if i.id == trip.id:
+            found_this_trip = True
+            continue
+
+        if i.address == trip.address and (i.end_miles == '' and i.end_time == ''):
+            adjacent_trips.append(i)
+        elif not found_this_trip:
+            adjacent_trips.clear()
+        elif found_this_trip:
+            break
+
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
+        'adjacent_trips': adjacent_trips,
     }
 
     return render(request, 'trip/end.html', context)

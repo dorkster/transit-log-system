@@ -46,10 +46,6 @@
     background: rgba(0,0,0,0.04);
 }
 
-.date-picker * {
-    display: inline;
-}
-
 .form-control-width-fix {
     width: auto !important;
     display: inline !important;

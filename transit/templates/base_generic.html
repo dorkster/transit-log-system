@@ -82,7 +82,7 @@
             </div>
         </nav>
         {% if notify_vehicle_issues %}
-                <div class="list-group list-group-flush">
+                <div class="list-group list-group-flush" id="notify_vehicle_issues">
                 {% for issue in notify_vehicle_issues %}
                 <a href="{% url 'vehicle-issue-edit' issue.id %}" class="list-group-item list-group-item-action p-1 {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a>
                 {% endfor %}

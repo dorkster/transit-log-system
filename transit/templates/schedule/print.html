@@ -1,0 +1,172 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<style type="text/css">
+@media print {
+    @page {
+        size: landscape;
+    }
+    #print-print, #print-close {
+        display: none;
+    }
+}
+body.bg-light {
+    background: none !important;
+}
+nav {
+    display: none !important;
+}
+#notify_vehicle_issues {
+    display: none;
+}
+.mytable {
+    font-size: 8pt;
+}
+.mytable tr td {
+    height: 3.5em;
+}
+.mytable thead td {
+    height: auto;
+}
+</style>
+<div class="container-fluid">
+    <div class="row justify-content-between">
+        <div class="col-md p-1">
+            <h5><strong>{{ date_str }}</strong></h5>
+        </div>
+        <div class="col-auto p-1" id="print-print">
+            <a href="#_" class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</a>
+        </div>
+        <div class="col-auto p-1" id="print-close">
+            <a href="#_" class="btn btn-secondary" onclick="window.close()"><span class="oi oi-x mr-2"></span>Close</a>
+        </div>
+    </div>
+</div>
+<hr class="mt-0" />
+<div>
+    <h5>Shifts</h5>
+    {% if shifts %}
+    <table class="mytable">
+        <thead>
+            <td>Driver</td>
+            <td>Vehicle</td>
+            <td>Start Miles</td>
+            <td>Start Time</td>
+            <td>End Miles</td>
+            <td>End Time</td>
+            <td>Fuel (gal)</td>
+        </thead>
+        {% for shift in shifts %}
+        <tr style="background: {{ shift.get_driver_color }};">
+            <td class="mytable-col-md">{{ shift.driver }}</td>
+            <td class="mytable-col-md">{{ shift.vehicle }}</td>
+            <td class="mytable-col-sm">
+                {% if shift.check_start_miles %}
+                {{ shift.start_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if shift.check_start_time %}
+                {{ shift.start_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if shift.check_end_miles %}
+                {{ shift.end_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if shift.check_end_time %}
+                {{ shift.end_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">{{ shift.fuel }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>There are no shifts for this day.</p>
+    {% endif %}
+    <hr/>
+    <h5>Trips</h5>
+    {% if trips %}
+    <table class="mytable">
+        <thead>
+            <td>Pick up</td>
+            <td>Appt. time</td>
+            <td>Name</td>
+            <td>Address</td>
+            <td>Phone #</td>
+            <td>Destination</td>
+            <td>Driver</td>
+            <td>Vehicle</td>
+            <td>Start Miles</td>
+            <td>Start Time</td>
+            <td>End Miles</td>
+            <td>End Time</td>
+            <td>Notes</td>
+        </thead>
+        {% for trip in trips %}
+        <tr style="background: {{ trip.get_driver_color }};">
+            <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
+            <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
+            <td class="mytable-col-md">{{ trip.name }}</td>
+            <td class="mytable-col-lg">{{ trip.address }}</td>
+            <td class="mytable-col-md">{{ trip.phone }}</td>
+            <td class="mytable-col-lg">{{ trip.destination }}</td>
+            <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
+            <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
+            <td class="mytable-col-sm">
+                {% if trip.check_start_miles %}
+                {{ trip.start_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_start_time %}
+                {{ trip.start_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_end_miles %}
+                {{ trip.end_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_end_time %}
+                {{ trip.end_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-md">
+                {% if trip.note %}{{ trip.note }}{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>There are no trips for this day.</p>
+    {% endif %}
+</div>
+<script type="text/javascript">
+    window.print();
+</script>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

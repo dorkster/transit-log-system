@@ -7,6 +7,7 @@ urlpatterns = [
     path('schedule/<slug:mode>/<int:year>/<int:month>/<int:day>', views.schedule, name='schedule'),
     path('schedule/<slug:mode>/today', views.scheduleToday, name='schedule-today'),
     path('schedule/<slug:mode>/tomorrow', views.scheduleTomorrow, name='schedule-tomorrow'),
+    path('schedule/edit/print/<int:year>/<int:month>/<int:day>', views.schedulePrint, name='schedule-print'),
 
     path('schedule/<slug:mode>/trips/create/<int:year>/<int:month>/<int:day>', views.tripCreate, name='trip-create'),
     path('schedule/<slug:mode>/trips/create/today', views.tripCreateToday, name='trip-create-today'),

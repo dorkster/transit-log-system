@@ -7,6 +7,9 @@
             <h5><strong>{{ date_str }}</strong></h5>
         </div>
         <div class="col-auto p-1">
+            <a href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank" class="btn btn-info"><span class="oi oi-print mr-2"></span>Print</a>
+        </div>
+        <div class="col-auto p-1">
             <div class="btn-group" role="group">
                 <a title="Previous day" class="btn btn-secondary" href="{{ date_prev }}">
                     <span class="oi oi-chevron-left"></span>

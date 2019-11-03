@@ -38,6 +38,20 @@ def schedule(request, mode, year, month, day):
     else:
         return render(request, 'schedule/edit.html', context=context)
 
+def schedulePrint(request, year, month, day):
+    day_date = datetime.date(year, month, day)
+
+    query_trips = Trip.objects.filter(date=day_date)
+    query_shifts = Shift.objects.filter(date=day_date)
+
+    context = {
+        'date': day_date,
+        'date_str': day_date.strftime('%A, %B %d, %Y'),
+        'trips': query_trips,
+        'shifts': query_shifts,
+    }
+    return render(request, 'schedule/print.html', context=context)
+
 def scheduleToday(request, mode):
     today = datetime.datetime.now().date()
     return schedule(request, mode, today.year, today.month, today.day)

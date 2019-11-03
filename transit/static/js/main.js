@@ -52,3 +52,17 @@ function AjaxLoader(url, div_id) {
     }
 }
 
+function getCurrentTime(input) {
+    var time = new Date();
+    var hour = time.getHours();
+    var minute = time.getMinutes();
+
+    var time_str = '' + ((hour > 12) ? hour - 12 : hour);
+    if (hour == 0)
+        time_str = '12';
+    time_str += ((minute < 10) ? ':0' : ':') + minute;
+    time_str += (hour >= 12) ? ' PM' : ' AM';
+
+    $("#" + input).val(time_str);
+}
+

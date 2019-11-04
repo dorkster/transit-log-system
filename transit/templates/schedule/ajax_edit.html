@@ -185,7 +185,18 @@
         </td>
         <td class="mytable-col-xs">
             {% if trip.note %}
-            <span class="oi oi-document lg-icon" title="{{ trip.note }}"></span>
+            <div class="dropdown" id="note_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-document"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right p-2">
+                    {{ trip.note }}
+                </div>
+                <script type="text/javascript">
+                    $('#note_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#note_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
             {% endif %}
         </td>
     </tr>

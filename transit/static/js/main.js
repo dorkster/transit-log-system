@@ -1,4 +1,7 @@
 function inputScrollToView(target) {
+    if (!target)
+        return;
+
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         target.scrollIntoView();
         window.scrollBy(0, -50);
@@ -46,7 +49,9 @@ function AjaxLoader(url, div_id) {
                 self.first_response = true;
                 var hash = window.location.hash.substr(1);
                 if (hash && hash != '_')
-                    document.getElementById(hash).scrollIntoView();
+                    var hash_element = document.getElementById(hash);
+                    if (hash_element)
+                        hash_element.scrollIntoView();
             }
         });
     }

@@ -1,0 +1,42 @@
+<h3>Templates <a class="btn btn-secondary" href="{% url 'template-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+{% if templates %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+        <td></td>
+    </thead>
+    {% for template in templates %}
+    <tr>
+        <td class="mytable-col-arrows">
+            <a id="template_{{ template.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0" onclick="ajax_loader.run('{{ template.id }}', 'mv', 'u')"><span class="oi oi-chevron-top"></span></button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0" onclick="ajax_loader.run('{{ template.id }}', 'mv', 'd')"><span class="oi oi-chevron-bottom"></span></button>
+            </div>
+        </td>
+        <td class="mytable-col-xs">
+            <div class="dropdown" id="edit_template_{{template.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'template-edit' template.id %}" class="dropdown-item">Edit template</a>
+                    <hr/>
+                    <a href="{% url 'template-delete' template.id %}" class="dropdown-item text-danger">Delete template</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_template_{{template.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_template_{{template.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ template.name }}</td>
+        <td class="mytable-col-lg">
+            <a href="{% url 'template-trips' template.id %}" class="btn btn-secondary w-100">View/Edit Trips</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

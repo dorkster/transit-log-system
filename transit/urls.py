@@ -48,6 +48,16 @@ urlpatterns = [
     path('triptypes/<uuid:id>/edit', views.triptypeEdit, name='triptype-edit'),
     path('triptypes/<uuid:id>/delete', views.triptypeDelete, name='triptype-delete'),
 
+    path('templates/', views.templateList, name='templates'),
+    path('templates/create', views.templateCreate, name='template-create'),
+    path('templates/<uuid:id>/edit', views.templateEdit, name='template-edit'),
+    path('templates/<uuid:id>/delete', views.templateDelete, name='template-delete'),
+
+    path('templates/<uuid:parent>/trips/', views.templateTripList, name='template-trips'),
+    path('templates/<uuid:parent>/trips/create', views.templateTripCreate, name='template-trip-create'),
+    path('templates/<uuid:parent>/trips/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit'),
+    path('templates/<uuid:parent>/trips/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete'),
+
     path('report/<int:year>/<int:month>', views.report, name='report'),
     path('report/this-month', views.reportThisMonth, name='report-this-month'),
     path('report/last-month', views.reportLastMonth, name='report-last-month'),
@@ -67,4 +77,6 @@ urlpatterns = [
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),
     path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),
     path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
+    path('ajax/template-list/', views.ajaxTemplateList, name='ajax-template-list'),
+    path('ajax/template-trip-list/<uuid:parent>/', views.ajaxTemplateTripList, name='ajax-template-trip-list'),
 ]

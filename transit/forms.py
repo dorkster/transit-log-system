@@ -137,3 +137,19 @@ class EditVehicleIssueForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     is_resolved = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+
+class EditTemplateForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+
+class EditTemplateTripForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
+    address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
+    trip_type = forms.ModelChoiceField(TripType.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
+    ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
+

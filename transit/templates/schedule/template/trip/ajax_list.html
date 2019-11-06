@@ -1,0 +1,79 @@
+<div class="row">
+    <div class="col">
+<h3>
+    <a href="{% url 'templates' %}" class="btn btn-secondary"><span class="oi oi-chevron-left"></span></a>
+    Trips for {{ template.name }} template <a class="btn btn-secondary" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+    </div>
+    <div class="col-auto">
+    </div>
+</div>
+{% if trips %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Pick up</td>
+        <td>Appt. time</td>
+        <td>Name</td>
+        <td>Address</td>
+        <td>Phone #</td>
+        <td>Destination</td>
+        <td>Trip Type</td>
+        <td>Elderly?</td>
+        <td>Ambulatory?</td>
+        <td>Notes</td>
+    </thead>
+    {% for trip in trips %}
+    <tr>
+        <td class="mytable-col-arrows">
+            <a id="trip_{{ trip.id }}"></a>
+            <div class="btn-group-vertical">
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'u')"><span class="oi oi-chevron-top"></span></button>
+                <button class="btn btn-outline-dark btn-sm pt-0 pb-0" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'd')"><span class="oi oi-chevron-bottom"></span></button>
+            </div>
+        </td>
+        <td class="mytable-col-xs">
+            <div class="dropdown" id="edit_trip_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item">Edit trip</a>
+                    <hr/>
+                    <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                </div>
+                <script type="text/javascript">
+                    $('#edit_trip_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#edit_trip_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+        </td>
+        <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
+        <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
+        <td class="mytable-col-md">{{ trip.name }}</td>
+        <td class="mytable-col-lg">{{ trip.address }}</td>
+        <td class="mytable-col-md">{{ trip.phone }}</td>
+        <td class="mytable-col-lg">{{ trip.destination }}</td>
+        <td class="mytable-col-md">{% if trip.trip_type %}{{ trip.trip_type }}{% endif %}</td>
+        <td class="mytable-col-sm"><span class="oi {% if trip.elderly %}oi-check{% elif trip.elderly is False %}oi-x{% endif %}"></span></td>
+        <td class="mytable-col-sm"><span class="oi {% if trip.ambulatory %}oi-check{% elif trip.ambulatory is False %}oi-x{% endif %}"></span></td>
+        <td class="mytable-col-xs">
+            {% if trip.note %}
+            <div class="dropdown" id="note_{{trip.id}}">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-document"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right p-2">
+                    {{ trip.note }}
+                </div>
+                <script type="text/javascript">
+                    $('#note_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                    $('#note_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                </script>
+            </div>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

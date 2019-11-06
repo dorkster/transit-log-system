@@ -30,9 +30,6 @@ class Trip(models.Model):
     class Meta:
         ordering = ['-date', 'sort_index']
 
-    def get_absolute_url(self):
-        return reverse('model-detail-view', args=[str(self.id)])
-
     def __str__(self):
         output = '[' + str(self.date) + '] - ' + self.name
         if self.address is not None and self.address is not "":
@@ -304,4 +301,50 @@ class VehicleIssue(models.Model):
 
     def __str__(self):
         return '[' + str(self.date) + '] ' + str(self.vehicle) + ': ' + self.description
+
+    def get_class_name(self):
+        return 'Vehicle Issue'
+
+class Template(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        ordering = ['sort_index']
+
+    def __str__(self):
+        return self.name
+
+    def get_class_name(self):
+        return 'Template'
+
+class TemplateTrip(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey('Template', on_delete=models.CASCADE)
+    sort_index = models.IntegerField(default=0, editable=False)
+    name = models.CharField(max_length=256)
+    address = models.CharField(max_length=256, blank=True)
+    phone = models.CharField(max_length=32, blank=True)
+    destination = models.CharField(max_length=256, blank=True)
+    pick_up_time = models.CharField(max_length=16, blank=True)
+    appointment_time = models.CharField(max_length=16, blank=True)
+    trip_type = models.ForeignKey('TripType', on_delete=models.SET_NULL, null=True, blank=True)
+    elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
+    ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
+    note = models.TextField(max_length=1024, blank=True)
+
+    class Meta:
+        ordering = ['parent', 'sort_index']
+
+    def __str__(self):
+        output = '[' + self.parent.name + '] - ' + self.name
+        if self.address is not None and self.address is not "":
+            output += ' from ' + self.address
+            if self.destination is not None and self.destination is not "":
+                output += ' to ' + self.destination
+        return output
+
+    def get_class_name(self):
+        return 'Trip Template'
 

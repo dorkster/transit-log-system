@@ -67,7 +67,25 @@
 <p>There are no shifts for this day.</p>
 {% endif %}
 <hr/>
-<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<h3>
+    Trips
+    <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
+        <span class="dropdown" id="templates">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="oi oi-list mr-2"></span>Templates
+            </button>
+            <div class="dropdown-menu">
+                {% for template in templates %}
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'load_template', '{{template.id}}')">{{template}}</a>
+                {% endfor %}
+            </div>
+            <script type="text/javascript">
+                $('#templates').on('show.bs.dropdown', ajax_loader.stop);
+                $('#templates').on('hide.bs.dropdown', ajax_loader.restart);
+            </script>
+        </span>
+</h3>
+</div>
 {% if trips %}
 <table class="mytable">
     <thead>

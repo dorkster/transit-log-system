@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Trip, Shift, Driver, Vehicle
+from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip
 from transit.forms import DatePickerForm
 
 def schedule(request, mode, year, month, day):
@@ -67,6 +67,8 @@ def ajaxScheduleView(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_view.html')
 
 def ajaxScheduleCommon(request, template):
+    date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])
@@ -130,8 +132,30 @@ def ajaxScheduleCommon(request, template):
         trip = get_object_or_404(Trip, id=request_id)
         trip.is_canceled = not trip.is_canceled
         trip.save()
+    elif request_action == 'load_template':
+        parent_template = Template.objects.get(id=uuid.UUID(request_data))
+        template_trips = TemplateTrip.objects.filter(parent=parent_template)
 
-    date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
+        sort_index = 0
+        query = Trip.objects.filter(date=date)
+        if (len(query) > 0):
+            sort_index = query[len(query)-1].sort_index + 1
+
+        for temp_trip in template_trips:
+            trip = Trip()
+            trip.date = date
+            trip.sort_index = sort_index
+            trip.name = temp_trip.name
+            trip.address = temp_trip.address
+            trip.phone = temp_trip.phone
+            trip.destination = temp_trip.destination
+            trip.pick_up_time = temp_trip.pick_up_time
+            trip.appointment_time = temp_trip.appointment_time
+            trip.trip_type = temp_trip.trip_type
+            trip.elderly = temp_trip.elderly
+            trip.ambulatory = temp_trip.ambulatory
+            trip.note = temp_trip.note
+            trip.save()
 
     filter_hide_canceled_str = request.GET.get('filter_hide_canceled', None)
 
@@ -171,6 +195,7 @@ def ajaxScheduleCommon(request, template):
         'vehicles': vehicles,
         'filter_hide_canceled': filter_hide_canceled,
         'filter_hide_completed': filter_hide_completed,
+        'templates': Template.objects.all(),
     }
     return render(request, template, context=context)
 

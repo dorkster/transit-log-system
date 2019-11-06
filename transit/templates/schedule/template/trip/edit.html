@@ -1,0 +1,140 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+{% load static %}
+<h2>
+    {% if is_new %}
+    New Trip Template
+    {% else %}
+    Trip Template Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <datalist id='client-names'>
+        {% for client in clients %}
+        <option value="{{ client.name }}">
+        {% endfor %}
+    </datalist>
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Client Information</legend>
+                    <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
+                    <div class="mb-2"><label for="{{ form.phone.id_for_label }}"><strong>{{ form.phone.label }}</strong></label>
+                        <div class="dropdown show" style="display: inline;">
+                            <a class="btn btn-secondary btn-sm ml-2 dropdown-toggle" title="Get the client's phone number" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="oi oi-phone"></span></a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'home')">Home Phone</a>
+                                <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'mobile')">Mobile Phone</a>
+                            </div>
+                        </div>
+                        <br/>{{ form.phone }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
+                    <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }}</strong></label><br/>{{ form.notes }}</div>
+                </fieldset>
+            </div>
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Trip Information</legend>
+                    <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address')"><span class="oi oi-home"></span></a>
+                        <br/>{{ form.address }}</div>
+                    <div class="md-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination')"><span class="oi oi-home"></span></a>
+                        <br/>{{ form.destination }}</div>
+                    <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.trip_type.id_for_label }}"><strong>{{ form.trip_type.label }}</strong></label><br/>{{ form.trip_type }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+            {% if not is_new %}
+            <div>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Trip Template" formnovalidate>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{{ clients_json|json_script:"clients-tag" }}
+<script type="text/javascript">
+    var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
+
+    var name_input = document.getElementById("id_name");
+    function onNameChanged() {
+        for (i in clients) {
+            if (clients[i].fields.name == name_input.value) {
+                var phone_input = document.getElementById("id_phone");
+                phone_input.value = "";
+                if (clients[i].fields.phone_default == "home")
+                    phone_input.value = clients[i].fields.phone_home;
+                else if (clients[i].fields.phone_default == "mobi")
+                    phone_input.value = clients[i].fields.phone_mobile;
+
+                var elderly_input = document.getElementById("id_elderly");
+                if (clients[i].fields.elderly == null)
+                    elderly_input.selectedIndex = 0;
+                else if (clients[i].fields.elderly == true)
+                    elderly_input.selectedIndex = 1;
+                else if (clients[i].fields.elderly == false)
+                    elderly_input.selectedIndex = 2;
+
+                var ambulatory_input = document.getElementById("id_ambulatory");
+                if (clients[i].fields.ambulatory == null)
+                    ambulatory_input.selectedIndex = 0;
+                else if (clients[i].fields.ambulatory == true)
+                    ambulatory_input.selectedIndex = 1;
+                else if (clients[i].fields.ambulatory == false)
+                    ambulatory_input.selectedIndex = 2;
+            }
+        }
+    }
+    name_input.addEventListener("change", onNameChanged);
+
+    function getClientDefaultPhone(client_id) {
+    }
+
+    function getClientPhone(input, phone_type) {
+        $("#" + input).val("");
+        for (i in clients) {
+            if (clients[i].fields.name == name_input.value) {
+                if (phone_type == "home")
+                    $("#" + input).val(clients[i].fields.phone_home);
+                else if (phone_type == "mobile")
+                    $("#" + input).val(clients[i].fields.phone_mobile);
+
+                break;
+            }
+        }
+    }
+
+    function getClientAddress(input) {
+        $("#" + input).val("");
+        for (i in clients) {
+            if (clients[i].fields.name == name_input.value) {
+                $("#" + input).val(clients[i].fields.address);
+            }
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

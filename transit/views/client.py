@@ -26,7 +26,8 @@ def clientCreateEditCommon(request, client, is_new):
         form = EditClientForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('clients') + "#client_" + str(client.id))
+            url_hash = '' if is_new else '#client_' + str(client.id)
+            return HttpResponseRedirect(reverse('clients') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
@@ -40,7 +41,7 @@ def clientCreateEditCommon(request, client, is_new):
             client.ambulatory = form.cleaned_data['ambulatory']
             client.save()
 
-            return HttpResponseRedirect(reverse('clients') + "#client_" + str(client.id))
+            return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
     else:
         initial = {
             'name': client.name,

@@ -32,29 +32,29 @@ class Trip(models.Model):
 
     def __str__(self):
         output = '[' + str(self.date) + '] - ' + self.name
-        if self.address is not None and self.address is not "":
+        if self.address is not None and self.address is not '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not "":
+            if self.destination is not None and self.destination is not '':
                 output += ' to ' + self.destination
         return output
 
     def str_pretty(self):
-        output = self.date.strftime("%b %d, %Y") + ' | ' + self.name
-        if self.address is not None and self.address is not "":
+        output = self.date.strftime('%b %d, %Y') + ' | ' + self.name
+        if self.address is not None and self.address is not '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not "":
+            if self.destination is not None and self.destination is not '':
                 output += ' to ' + self.destination
         return output
 
     def get_driver_color(self):
         if self.is_canceled:
-            return "#BBBBBB"
+            return '#BBBBBB'
         else:
             return Driver.get_color(self.driver)
 
     def get_phone_number(self):
         num_only = ''
-        matches = re.findall("\d*", self.phone)
+        matches = re.findall('\d*', self.phone)
         for i in matches:
             num_only += i
         return num_only
@@ -70,7 +70,7 @@ class Trip(models.Model):
             self.end_time = None
 
     def get_parsed_log_data(self, shift_miles):
-        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
+        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
             return None
 
         data = self.LogData()
@@ -82,26 +82,26 @@ class Trip(models.Model):
         return data
 
     def get_error_str(self):
-        if self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
-            return "" # Empty; can be safely ignored
-        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
-            error_msg = ""
+        if self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
+            return '' # Empty; can be safely ignored
+        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
+            error_msg = ''
 
             if self.vehicle == None:
                 error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Trip contains log data, but has no vehicle assigned.</span><br/>'
             else:
                 error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Trip contains partial log data.</span><br/>'
 
-            if error_msg != "":
+            if error_msg != '':
                 error_ref = str(self) + '<br/><a href="' + reverse('schedule', kwargs={'mode':'edit', 'year':self.date.year, 'month':self.date.month, 'day':self.date.day}) + '#trip_' + str(self.id) + '">View Schedule</a> | <a href="' + reverse('trip-edit', kwargs={'mode':'edit', 'id':self.id}) + '">Edit</a>'
                 return error_msg + error_ref
         else:
-            return ""
+            return ''
 
     def check_blank(self, field):
-        if field != "":
+        if field != '':
             return True
-        elif self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
+        elif self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
             return True
         else:
             return False
@@ -136,7 +136,7 @@ class Driver(models.Model):
 
     def get_color(self):
         color = 'none'
-        if self and self.color != "":
+        if self and self.color != '':
             color = self.color
         
         return color
@@ -203,7 +203,7 @@ class Shift(models.Model):
             self.start_miles_str = None
 
     def get_parsed_log_data(self):
-        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
+        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
             return None
 
         data = self.LogData()
@@ -211,7 +211,7 @@ class Shift(models.Model):
         data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
         data.end_miles = float(self.end_miles)
         data.end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
-        if self.fuel != "":
+        if self.fuel != '':
             data.fuel = float(self.fuel)
 
         data.start_miles_str = self.start_miles
@@ -219,20 +219,20 @@ class Shift(models.Model):
         return data
 
     def get_error_str(self):
-        if self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
-            return "" # Empty; can be safely ignored
-        if self.start_miles == "" or self.start_time == "" or self.end_miles == "" or self.end_time == "":
+        if self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
+            return '' # Empty; can be safely ignored
+        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
             # vehicle can not be None due to form validation, so no need to check for it here
             error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Shift contains partial log data.</span><br/>'
             error_ref = str(self) + '<br/><a href="' + reverse('schedule', kwargs={'mode':'edit', 'year':self.date.year, 'month':self.date.month, 'day':self.date.day}) + '">View Schedule</a> | <a href="' + reverse('shift-edit', kwargs={'mode':'edit', 'id':self.id}) + '">Edit</a>'
             return error_msg + error_ref
         else:
-            return ""
+            return ''
 
     def check_blank(self, field):
-        if field != "":
+        if field != '':
             return True
-        elif self.start_miles == "" and self.start_time == "" and self.end_miles == "" and self.end_time == "":
+        elif self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
             return True
         else:
             return False
@@ -339,9 +339,9 @@ class TemplateTrip(models.Model):
 
     def __str__(self):
         output = '[' + self.parent.name + '] - ' + self.name
-        if self.address is not None and self.address is not "":
+        if self.address is not None and self.address is not '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not "":
+            if self.destination is not None and self.destination is not '':
                 output += ' to ' + self.destination
         return output
 

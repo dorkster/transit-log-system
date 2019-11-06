@@ -34,7 +34,8 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
         form = EditVehicleForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('vehicles') + "#vehicle" + str(vehicle.id))
+            url_hash = '' if is_new else '#vehicle_' + str(vehicle.id)
+            return HttpResponseRedirect(reverse('vehicles') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('vehicle-delete', kwargs={'id':vehicle.id}))
 
@@ -43,7 +44,7 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
             vehicle.is_logged = form.cleaned_data['is_logged']
             vehicle.save()
 
-            return HttpResponseRedirect(reverse('vehicles') + "#vehicle" + str(vehicle.id))
+            return HttpResponseRedirect(reverse('vehicles') + '#vehicle' + str(vehicle.id))
     else:
         initial = {
             'name': vehicle.name,

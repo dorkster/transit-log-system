@@ -35,7 +35,7 @@ class formWidgetAttrs():
     mile_shift['onchange'] = 'validateMiles(this, true)'
 
     big_mile = mile.copy()
-    big_mile['class'] += " form-control-lg"
+    big_mile['class'] += ' form-control-lg'
     big_mile['size'] = '15'
 
     big_mile_trip = big_mile.copy()

@@ -38,7 +38,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
         form = EditTemplateTripForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + "#trip_" + str(trip.id))
+            url_hash = '' if is_new else '#trip_' + str(trip.id)
+            return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('template-trip-delete', kwargs={'parent':trip.parent.id, 'id':trip.id}))
 
@@ -55,7 +56,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
             trip.note = form.cleaned_data['notes']
             trip.save()
 
-            return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + '#trip_' + str(trip.id))
     else:
         initial = {
             'name': trip.name,
@@ -75,7 +76,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         'form': form,
         'trip': trip,
         'clients': Client.objects.all(),
-        'clients_json': serializers.serialize("json", Client.objects.all()),
+        'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
     }
 

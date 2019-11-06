@@ -161,7 +161,7 @@ def ajaxScheduleCommon(request, template):
 
     if filter_hide_canceled_str is not None:
         filter_hide_canceled_str = filter_hide_canceled_str.lower()
-        request.session['schedule_view_hide_canceled'] = True if filter_hide_canceled_str == "true" else False
+        request.session['schedule_view_hide_canceled'] = True if filter_hide_canceled_str == 'true' else False
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
 
@@ -169,7 +169,7 @@ def ajaxScheduleCommon(request, template):
 
     if filter_hide_completed_str is not None:
         filter_hide_completed_str = filter_hide_completed_str.lower()
-        request.session['schedule_view_hide_completed'] = True if filter_hide_completed_str == "true" else False
+        request.session['schedule_view_hide_completed'] = True if filter_hide_completed_str == 'true' else False
 
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)
 

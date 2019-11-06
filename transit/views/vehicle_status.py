@@ -24,7 +24,7 @@ def ajaxVehicleStatus(request):
 
     if filter_show_resolved_str is not None:
         filter_show_resolved_str = filter_show_resolved_str.lower()
-        request.session['vehicle_status_filter_show_resolved'] = True if filter_show_resolved_str == "true" else False
+        request.session['vehicle_status_filter_show_resolved'] = True if filter_show_resolved_str == 'true' else False
 
     filter_show_resolved = request.session.get('vehicle_status_filter_show_resolved', False)
 

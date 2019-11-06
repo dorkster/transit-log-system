@@ -34,7 +34,8 @@ def driverCreateEditCommon(request, driver, is_new):
         form = EditDriverForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('drivers') + "#driver_" + str(driver.id))
+            url_hash = '' if is_new else '#driver_' + str(driver.id)
+            return HttpResponseRedirect(reverse('drivers') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('driver-delete', kwargs={'id':driver.id}))
 
@@ -44,7 +45,7 @@ def driverCreateEditCommon(request, driver, is_new):
             driver.is_logged = form.cleaned_data['is_logged']
             driver.save()
 
-            return HttpResponseRedirect(reverse('drivers') + "#driver_" + str(driver.id))
+            return HttpResponseRedirect(reverse('drivers') + '#driver_' + str(driver.id))
     else:
         initial = {
             'name': driver.name,

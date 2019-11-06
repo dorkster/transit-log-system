@@ -29,7 +29,7 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
     sheet = workbook['Schedule']
 
     date_str = sheet['C1'].value
-    date = datetime.datetime.strptime(date_str, "%B %d. %Y").date()
+    date = datetime.datetime.strptime(date_str, '%B %d. %Y').date()
 
     shift_range = range(98,101)
     for i in shift_range:
@@ -127,7 +127,7 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
 
         if sheet['L' + str(i)].value != None:
             driver_name = str(sheet['L' + str(i)].value).strip()
-            if driver_name == "Canceled":
+            if driver_name == 'Canceled':
                 trip.is_canceled = True
             else:
                 query = Driver.objects.filter(name=driver_name)

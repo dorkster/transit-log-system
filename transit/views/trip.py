@@ -37,7 +37,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             trip.sort_index = 0
 
     if 'cancel' in request.POST:
-        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+        url_hash = '' if is_new else '#trip_' + str(trip.id)
+        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + url_hash)
     elif 'delete' in request.POST:
         return HttpResponseRedirect(reverse('trip-delete', kwargs={'mode':mode, 'id':trip.id}))
 
@@ -80,7 +81,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
             trip.save()
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         initial = {
             'date': trip.date,
@@ -108,7 +109,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         'form': form,
         'trip': trip,
         'clients': Client.objects.all(),
-        'clients_json': serializers.serialize("json", Client.objects.all()),
+        'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
     }
 
@@ -145,7 +146,7 @@ def tripStart(request, id):
         form = tripStartForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
 
         if form.is_valid():
             trip.start_miles = form.cleaned_data['miles']
@@ -165,11 +166,11 @@ def tripStart(request, id):
                         a_trip.vehicle = form.cleaned_data['vehicle']
                         a_trip.save()
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         auto_time = trip.start_time
-        if auto_time == "":
-            auto_time = datetime.datetime.now().strftime("%_I:%M %p")
+        if auto_time == '':
+            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
 
         initial = {
             'miles': trip.start_miles,
@@ -181,11 +182,11 @@ def tripStart(request, id):
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():
-        start_miles[str(vehicle)] = ""
+        start_miles[str(vehicle)] = ''
 
     query = Shift.objects.filter(date=trip.date)
     for shift in query:
-        if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
+        if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
     all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)
@@ -220,7 +221,7 @@ def tripEnd(request, id):
         form = tripEndForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
 
         if form.is_valid():
             trip.end_miles = form.cleaned_data['miles']
@@ -236,11 +237,11 @@ def tripEnd(request, id):
                         a_trip.end_time = form.cleaned_data['time']
                         a_trip.save()
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + "#trip_" + str(trip.id))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         auto_time = trip.end_time
-        if auto_time == "":
-            auto_time = datetime.datetime.now().strftime("%_I:%M %p")
+        if auto_time == '':
+            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
 
         initial = {
             'miles': trip.end_miles,
@@ -250,11 +251,11 @@ def tripEnd(request, id):
 
     start_miles = dict()
     for vehicle in Vehicle.objects.all():
-        start_miles[str(vehicle)] = ""
+        start_miles[str(vehicle)] = ''
 
     query = Shift.objects.filter(date=trip.date)
     for shift in query:
-        if start_miles[str(shift.vehicle)] == "" or (shift.start_miles != "" and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
+        if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
     all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)

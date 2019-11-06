@@ -123,8 +123,8 @@ def shiftStart(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
         auto_time = shift.start_time
-        if auto_time == "":
-            auto_time = datetime.datetime.now().strftime("%_I:%M %p")
+        if auto_time == '':
+            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
 
         initial = {
             'miles': shift.start_miles,
@@ -157,8 +157,8 @@ def shiftEnd(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
         auto_time = shift.end_time
-        if auto_time == "":
-            auto_time = datetime.datetime.now().strftime("%_I:%M %p")
+        if auto_time == '':
+            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
 
         initial = {
             'miles': shift.end_miles,

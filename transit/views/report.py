@@ -10,12 +10,12 @@ def report(request, year, month):
         class Day():
             def __init__(self):
                 self.date = None
-                self.service_miles = ""
-                self.service_hours = ""
-                self.deadhead_miles = ""
-                self.deadhead_hours = ""
-                self.pmt = ""
-                self.fuel = ""
+                self.service_miles = ''
+                self.service_hours = ''
+                self.deadhead_miles = ''
+                self.deadhead_hours = ''
+                self.pmt = ''
+                self.fuel = ''
                 self.trip_types = {}
 
         def __init__(self):
@@ -55,7 +55,6 @@ def report(request, year, month):
 
         for day in range(date_start.day, date_end.day+1):
             day_date = datetime.date(year, month, day)
-            # day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle).exclude(start_miles="").exclude(end_miles="").exclude(start_time="").exclude(end_time="")
             day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle)
             day_trips = Trip.objects.filter(date=day_date, vehicle=vehicle, is_canceled=False)
 
@@ -72,7 +71,7 @@ def report(request, year, month):
             shift_data_list = []
             for shift in day_shifts:
                 error_str = shift.get_error_str()
-                if error_str != "":
+                if error_str != '':
                     rv.errors.append(error_str)
 
                 shift_data = shift.get_parsed_log_data()
@@ -99,7 +98,7 @@ def report(request, year, month):
             trip_data_list = []
             for trip in day_trips:
                 error_str = trip.get_error_str()
-                if error_str != "":
+                if error_str != '':
                     rv.errors.append(error_str)
 
                 if not shift_data_list:
@@ -163,7 +162,7 @@ def report(request, year, month):
         no_vehicle_trips = Trip.objects.filter(date=day_date, vehicle=None, is_canceled=False)
         for trip in no_vehicle_trips:
             error_str = trip.get_error_str()
-            if error_str != "":
+            if error_str != '':
                 no_vehicle_errors.append(error_str)
 
     context = {

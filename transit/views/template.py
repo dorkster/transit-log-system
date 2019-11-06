@@ -34,7 +34,8 @@ def templateCreateEditCommon(request, template, is_new):
         form = EditTemplateForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('templates') + "#template_" + str(template.id))
+            url_hash = '' if is_new else '#template_' + str(template.id)
+            return HttpResponseRedirect(reverse('templates') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('template-delete', kwargs={'id':template.id}))
 
@@ -42,7 +43,7 @@ def templateCreateEditCommon(request, template, is_new):
             template.name = form.cleaned_data['name']
             template.save()
 
-            return HttpResponseRedirect(reverse('templates') + "#template_" + str(template.id))
+            return HttpResponseRedirect(reverse('templates') + '#template_' + str(template.id))
     else:
         initial = {
             'name': template.name,

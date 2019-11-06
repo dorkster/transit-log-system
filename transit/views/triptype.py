@@ -34,7 +34,8 @@ def triptypeCreateEditCommon(request, triptype, is_new):
         form = EditTripTypeForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('triptypes') + "#triptype" + str(triptype.id))
+            url_hash = '' if is_new else '#triptype_' + str(triptype.id)
+            return HttpResponseRedirect(reverse('triptypes') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('triptype-delete', kwargs={'id':triptype.id}))
 
@@ -42,7 +43,7 @@ def triptypeCreateEditCommon(request, triptype, is_new):
             triptype.name = form.cleaned_data['name']
             triptype.save()
 
-            return HttpResponseRedirect(reverse('triptypes') + "#triptype" + str(triptype.id))
+            return HttpResponseRedirect(reverse('triptypes') + '#triptype_' + str(triptype.id))
     else:
         initial = {
             'name': triptype.name,

@@ -195,6 +195,7 @@ def ajaxScheduleCommon(request, template):
             trip = Trip()
             trip.date = date
             trip.sort_index = sort_index
+            sort_index += 1
             trip.name = temp_trip.name
             trip.address = temp_trip.address
             trip.phone = temp_trip.phone

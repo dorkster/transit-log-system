@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Client
+from transit.models import Client, Trip
 from transit.forms import EditClientForm
 
 def clientList(request):
@@ -77,6 +77,18 @@ def clientDelete(request, id):
     }
 
     return render(request, 'model_delete.html', context)
+
+def clientCreateFromTrip(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+
+    # TODO search for existing client?
+    client = Client()
+    client.name = trip.name
+    client.address = trip.address
+    client.phone_home = trip.phone
+    client.elderly = trip.elderly
+    client.ambulatory = trip.ambulatory
+    return clientCreateEditCommon(request, client, is_new=True)
 
 def ajaxClientList(request):
     clients = Client.objects.all()

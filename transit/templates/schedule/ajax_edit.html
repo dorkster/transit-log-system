@@ -135,6 +135,8 @@
                     <a href="{% url 'trip-edit' 'edit' trip.id %}" class="dropdown-item">Edit trip</a>
                     <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '')" class="dropdown-item">{% if trip.is_canceled %}Set as not canceled{% else %}Set as canceled{% endif %}</a>
                     <hr/>
+                    <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item">Create Client</a>
+                    <hr/>
                     <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
                 </div>
                 <script type="text/javascript">

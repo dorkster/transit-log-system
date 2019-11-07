@@ -33,6 +33,7 @@ urlpatterns = [
     path('clients/create', views.clientCreate, name='client-create'),
     path('clients/<uuid:id>/edit', views.clientEdit, name='client-edit'),
     path('clients/<uuid:id>/delete', views.clientDelete, name='client-delete'),
+    path('clients/create-from-trip/<uuid:trip_id>', views.clientCreateFromTrip, name='client-create-from-trip'),
 
     path('drivers/', views.driverList, name='drivers'),
     path('drivers/create', views.driverCreate, name='driver-create'),

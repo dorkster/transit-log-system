@@ -1,3 +1,13 @@
+{% if message %}
+<div class="alert alert-info p-1">
+    <div class="row">
+        <div class="col">
+            <strong style="font-size: 1.3em">{{ message }}</strong>
+        </div>
+    </div>
+</div>
+<hr/>
+{% endif %}
 <h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
     {% for shift in shifts %}

@@ -5,8 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip
-from transit.forms import DatePickerForm
+from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage
+from transit.forms import DatePickerForm, EditScheduleMessageForm
 
 def schedule(request, mode, year, month, day):
     day_date = datetime.date(year, month, day)
@@ -44,13 +44,63 @@ def schedulePrint(request, year, month, day):
     query_trips = Trip.objects.filter(date=day_date)
     query_shifts = Shift.objects.filter(date=day_date)
 
+    messages = ScheduleMessage.objects.filter(date=day_date)
+    if len(messages) > 0:
+        message = messages[0].message
+    else:
+        message = ''
+
     context = {
         'date': day_date,
         'date_str': day_date.strftime('%A, %B %d, %Y'),
         'trips': query_trips,
         'shifts': query_shifts,
+        'message': message,
     }
     return render(request, 'schedule/print.html', context=context)
+
+def scheduleMessage(request, year, month, day):
+    date = datetime.date(year, month, day)
+
+    is_new = True
+    messages = ScheduleMessage.objects.filter(date=date)
+    if len(messages) > 0:
+        is_new = False
+        message = messages[0]
+    else:
+        message = ScheduleMessage()
+        message.date = date
+
+    if request.method == 'POST':
+        form = EditScheduleMessageForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':date.year, 'month':date.month, 'day':date.day}))
+        elif 'delete' in request.POST:
+            if not is_new:
+                message.delete()
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':date.year, 'month':date.month, 'day':date.day}))
+
+        if form.is_valid():
+            message.message = form.cleaned_data['message']
+
+            if not is_new and message.message == '':
+                message.delete()
+            else:
+                message.save()
+
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':date.year, 'month':date.month, 'day':date.day}))
+    else:
+        initial = {
+            'message': message.message,
+        }
+        form = EditScheduleMessageForm(initial=initial)
+    context = {
+        'date': date,
+        'date_str': date.strftime('%A, %B %d, %Y'),
+        'form': form,
+    }
+    return render(request, 'schedule/message_edit.html', context=context)
 
 def scheduleToday(request, mode):
     today = datetime.datetime.now().date()
@@ -187,6 +237,12 @@ def ajaxScheduleCommon(request, template):
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
 
+    messages = ScheduleMessage.objects.filter(date=date)
+    if len(messages) > 0:
+        message = messages[0].message
+    else:
+        message = ''
+
     context = {
         'shifts': shifts,
         'trips': trips,
@@ -196,6 +252,7 @@ def ajaxScheduleCommon(request, template):
         'filter_hide_canceled': filter_hide_canceled,
         'filter_hide_completed': filter_hide_completed,
         'templates': Template.objects.all(),
+        'message': message,
     }
     return render(request, template, context=context)
 

@@ -348,3 +348,7 @@ class TemplateTrip(models.Model):
     def get_class_name(self):
         return 'Trip Template'
 
+class ScheduleMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField()
+    message = models.CharField(max_length=1024, blank=True)

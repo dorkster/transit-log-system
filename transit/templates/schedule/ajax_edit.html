@@ -1,3 +1,14 @@
+<div class="alert {% if message %}alert-info{% else %}alert-secondary{% endif %} p-1">
+    <div class="row">
+        <div class="col-auto pr-0">
+            <a href="{% url 'schedule-message' date.year date.month date.day %}" class="btn btn-outline-dark btn-sm"><span class="oi oi-comment-square mr-2"></span>Edit</a>
+        </div>
+        <div class="col">
+            <strong style="font-size: 1.3em">{{ message }}</strong>
+        </div>
+    </div>
+</div>
+<hr/>
 <h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
 <table class="mytable">

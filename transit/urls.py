@@ -15,6 +15,7 @@ urlpatterns = [
     path('schedule/<slug:mode>/trips/create/tomorrow', views.tripCreateTomorrow, name='trip-create-tomorrow'),
     path('schedule/<slug:mode>/trips/<uuid:id>/edit/', views.tripEdit, name='trip-edit'),
     path('schedule/<slug:mode>/trips/<uuid:id>/delete/', views.tripDelete, name='trip-delete'),
+    path('schedule/<slug:mode>/trips/create-return/<uuid:id>', views.tripCreateReturn, name='trip-create-return'),
 
     path('schedule/<slug:mode>/shifts/create/<int:year>/<int:month>/<int:day>', views.shiftCreate, name='shift-create'),
     path('schedule/<slug:mode>/shifts/create/today', views.shiftCreateToday, name='shift-create-today'),

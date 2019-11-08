@@ -27,6 +27,22 @@ def tripEdit(request, mode, id):
     trip = get_object_or_404(Trip, id=id)
     return tripCreateEditCommon(request, mode, trip, is_new=False)
 
+def tripCreateReturn(request, mode, id):
+    origin_trip = get_object_or_404(Trip, id=id)
+    trip = Trip()
+    trip.date = origin_trip.date
+    trip.name = origin_trip.name
+    trip.address = origin_trip.destination
+    trip.phone = origin_trip.phone
+    trip.destination = origin_trip.address
+    trip.trip_type = origin_trip.trip_type
+    trip.elderly = origin_trip.elderly
+    trip.ambulatory = origin_trip.ambulatory
+    trip.driver = origin_trip.driver
+    trip.vehicle = origin_trip.vehicle
+
+    return tripCreateEditCommon(request, mode, trip, is_new=True)
+
 def tripCreateEditCommon(request, mode, trip, is_new):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')

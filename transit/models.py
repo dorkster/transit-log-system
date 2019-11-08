@@ -2,7 +2,18 @@ import uuid, re, datetime
 from django.db import models
 from django.urls import reverse
 
-# Create your models here.
+class FieldSizes():
+    # generic sizes
+    SM = 64
+    MD = 128
+    LG = 256
+    XL = 512
+
+    PHONE = 16
+    MILES = 8
+    TIME = 8
+    FUEL = 4
+    COLOR = 9 # TODO change this to 8 by dropping the required hash symbol
 
 class Trip(models.Model):
     # TODO event? (i.e. Mealsite)
@@ -11,20 +22,20 @@ class Trip(models.Model):
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
-    name = models.CharField(max_length=256)
-    address = models.CharField(max_length=256, blank=True)
-    phone = models.CharField(max_length=32, blank=True)
-    destination = models.CharField(max_length=256, blank=True)
-    pick_up_time = models.CharField(max_length=16, blank=True)
-    appointment_time = models.CharField(max_length=16, blank=True)
+    name = models.CharField(max_length=FieldSizes.MD)
+    address = models.CharField(max_length=FieldSizes.MD, blank=True)
+    phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+    destination = models.CharField(max_length=FieldSizes.MD, blank=True)
+    pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
+    appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     trip_type = models.ForeignKey('TripType', on_delete=models.SET_NULL, null=True, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
-    note = models.TextField(max_length=1024, blank=True)
-    start_miles = models.CharField(max_length=32, blank=True)
-    start_time = models.CharField(max_length=16, blank=True)
-    end_miles = models.CharField(max_length=32, blank=True)
-    end_time = models.CharField(max_length=16, blank=True)
+    note = models.TextField(max_length=FieldSizes.LG, blank=True)
+    start_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
+    start_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
+    end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
+    end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     is_canceled = models.BooleanField(verbose_name='Canceled', default=False)
 
     class Meta:
@@ -121,8 +132,8 @@ class Trip(models.Model):
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
-    name = models.CharField(max_length=32)
-    color = models.CharField(max_length=9, blank=True)
+    name = models.CharField(max_length=FieldSizes.SM)
+    color = models.CharField(max_length=FieldSizes.COLOR, blank=True)
     is_logged = models.BooleanField(default=True)
 
     class Meta:
@@ -145,7 +156,7 @@ class Driver(models.Model):
 class Vehicle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=FieldSizes.SM)
     is_logged = models.BooleanField(default=True)
 
     class Meta:
@@ -160,7 +171,7 @@ class Vehicle(models.Model):
 class TripType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=FieldSizes.SM)
 
     class Meta:
         ordering = ['sort_index']
@@ -176,11 +187,11 @@ class Shift(models.Model):
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True)
-    start_miles = models.CharField(max_length=32, blank=True)
-    start_time = models.CharField(max_length=16, blank=True)
-    end_miles = models.CharField(max_length=32, blank=True)
-    end_time = models.CharField(max_length=16, blank=True)
-    fuel = models.CharField('Fuel (gallons)', max_length=16, blank=True)
+    start_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
+    start_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
+    end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
+    end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
+    fuel = models.CharField('Fuel (gallons)', max_length=FieldSizes.FUEL, blank=True)
 
     def __str__(self):
         return '[' + str(self.date) + '] - ' + str(self.driver) + ' / ' + str(self.vehicle)
@@ -260,10 +271,10 @@ class Client(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=256)
-    address = models.CharField(max_length=256, blank=True)
-    phone_home = models.CharField('Phone (Home)', max_length=32, blank=True)
-    phone_mobile = models.CharField('Phone (Mobile)', max_length=32, blank=True)
+    name = models.CharField(max_length=FieldSizes.MD)
+    address = models.CharField(max_length=FieldSizes.MD, blank=True)
+    phone_home = models.CharField('Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
+    phone_mobile = models.CharField('Phone (Mobile)', max_length=FieldSizes.PHONE, blank=True)
     phone_default = models.CharField('Default Phone Number', max_length=4, choices=DEFAULT_PHONE, default=PHONE_HOME)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
@@ -292,7 +303,7 @@ class VehicleIssue(models.Model):
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
-    description = models.TextField(max_length=4096, blank=True)
+    description = models.TextField(max_length=FieldSizes.XL, blank=True)
     priority = models.IntegerField(choices=PRIORITY_LEVELS, default=PRIORITY_MEDIUM)
     is_resolved = models.BooleanField(default=False)
 
@@ -323,16 +334,16 @@ class TemplateTrip(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('Template', on_delete=models.CASCADE)
     sort_index = models.IntegerField(default=0, editable=False)
-    name = models.CharField(max_length=256)
-    address = models.CharField(max_length=256, blank=True)
-    phone = models.CharField(max_length=32, blank=True)
-    destination = models.CharField(max_length=256, blank=True)
-    pick_up_time = models.CharField(max_length=16, blank=True)
-    appointment_time = models.CharField(max_length=16, blank=True)
+    name = models.CharField(max_length=FieldSizes.MD)
+    address = models.CharField(max_length=FieldSizes.MD, blank=True)
+    phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+    destination = models.CharField(max_length=FieldSizes.MD, blank=True)
+    pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
+    appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     trip_type = models.ForeignKey('TripType', on_delete=models.SET_NULL, null=True, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
-    note = models.TextField(max_length=1024, blank=True)
+    note = models.TextField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['parent', 'sort_index']
@@ -351,4 +362,4 @@ class TemplateTrip(models.Model):
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField()
-    message = models.CharField(max_length=1024, blank=True)
+    message = models.CharField(max_length=FieldSizes.LG, blank=True)

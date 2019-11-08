@@ -11,6 +11,8 @@
                 <fieldset class="form-group">
                     <legend><span class="small">{{ shift.date }} | {{ shift.driver }} ({{ shift.vehicle }})</span></legend>
                     <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
+                    <div id="miles_error">
+                    </div>
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
                         <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_time')"><span class="oi oi-clock"></span></a>
                         <br/>{{ form.time }}</div>
@@ -29,6 +31,22 @@
 
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript">
+    function checkMilesError(input) {
+        var start_miles = parseFloat("{{ shift.start_miles }}");
+        var end_miles = parseFloat(validateMilesString(input.value, false));
+        if (start_miles > end_miles)
+            $("#miles_error").html('<p class="text-danger"><strong>Warning: End mileage should be greater than the start mileage.</strng></p>');
+        else
+            $("#miles_error").html('');
+    }
+
+    var mile_input = document.getElementById("id_miles");
+    mile_input.addEventListener("change", function() { checkMilesError(mile_input); });
+    mile_input.addEventListener("input", function() { checkMilesError(mile_input); });
+
+    checkMilesError(mile_input);
+</script>
 {% endblock %}
 {% endblock %}
 

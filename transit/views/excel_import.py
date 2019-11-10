@@ -105,7 +105,7 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
 
         # TODO actually validate phone number formatting
         if sheet['E' + str(i)].value != None:
-            trip.phone = str(sheet['E' + str(i)].value).split(' ')[0].strip()
+            trip.phone_home = str(sheet['E' + str(i)].value).split(' ')[0].strip()
 
         if sheet['F' + str(i)].value != None:
             trip.destination = str(sheet['F' + str(i)].value).strip()

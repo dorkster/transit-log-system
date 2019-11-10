@@ -129,6 +129,16 @@
                                 {% endif %}
                             </div>
                             {% endif %}
+                            {% if trip.trip_type.name == 'Medical' or trip.is_canceled %}
+                            <div class="list-group-item bg-transparent p-1">
+                                {% if trip.trip_type.name == 'Medical' %}
+                                <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>Medical</span>
+                                {% endif %}
+                                {% if trip.is_canceled %}
+                                <span class="badge badge-secondary">Canceled</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="ml-auto align-self-end p-1">

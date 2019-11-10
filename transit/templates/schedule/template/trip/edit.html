@@ -22,15 +22,14 @@
                 <fieldset class="form-group">
                     <legend>Client Information</legend>
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
-                    <div class="mb-2"><label for="{{ form.phone.id_for_label }}"><strong>{{ form.phone.label }}</strong></label>
-                        <div class="dropdown show" style="display: inline;">
-                            <a class="btn btn-secondary btn-sm ml-2 dropdown-toggle" title="Get the client's phone number" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="oi oi-phone"></span></a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'home')">Home Phone</a>
-                                <a href="#_" class="dropdown-item" onclick="getClientPhone('id_phone', 'mobile')">Mobile Phone</a>
-                            </div>
-                        </div>
-                        <br/>{{ form.phone }}</div>
+                    <div class="mb-2"><label for="{{ form.phone_home.id_for_label }}"><strong>{{ form.phone_home.label }}</strong></label>
+                        <a title="Get the client's home phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_home', 'home')"><span class="oi oi-phone"></span></a>
+                        <br/>{{ form.phone_home }}
+                    </div>
+                    <div class="mb-2"><label for="{{ form.phone_cell.id_for_label }}"><strong>{{ form.phone_cell.label }}</strong></label>
+                        <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_cell', 'cell')"><span class="oi oi-phone"></span></a>
+                        <br/>{{ form.phone_cell }}
+                    </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
                     <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
@@ -79,12 +78,10 @@
     function onNameChanged() {
         for (i in clients) {
             if (clients[i].fields.name == name_input.value) {
-                var phone_input = document.getElementById("id_phone");
-                phone_input.value = "";
-                if (clients[i].fields.phone_default == "home")
-                    phone_input.value = clients[i].fields.phone_home;
-                else if (clients[i].fields.phone_default == "mobi")
-                    phone_input.value = clients[i].fields.phone_mobile;
+                var phone_home_input = document.getElementById("id_phone_home");
+                phone_home_input.value = clients[i].fields.phone_home;
+                var phone_cell_input = document.getElementById("id_phone_cell");
+                phone_cell_input.value = clients[i].fields.phone_cell;
 
                 var elderly_input = document.getElementById("id_elderly");
                 if (clients[i].fields.elderly == null)
@@ -115,8 +112,8 @@
             if (clients[i].fields.name == name_input.value) {
                 if (phone_type == "home")
                     $("#" + input).val(clients[i].fields.phone_home);
-                else if (phone_type == "mobile")
-                    $("#" + input).val(clients[i].fields.phone_mobile);
+                else if (phone_type == "cell")
+                    $("#" + input).val(clients[i].fields.phone_cell);
 
                 break;
             }

@@ -60,7 +60,8 @@ class EditTripForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    phone_home = forms.CharField(label='Phone (Home)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    phone_cell = forms.CharField(label='Phone (Cell)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
@@ -108,9 +109,8 @@ class tripEndForm(forms.Form):
 class EditClientForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    phone_home = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
-    phone_mobile = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
-    phone_default = forms.ChoiceField(label='Default Phone Number', choices=Client.DEFAULT_PHONE, widget=forms.Select(attrs=formWidgetAttrs.default))
+    phone_home = forms.CharField(label='Phone (Home)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    phone_cell = forms.CharField(label='Phone (Cell)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
 
@@ -144,7 +144,8 @@ class EditTemplateForm(forms.Form):
 class EditTemplateTripForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    phone_home = forms.CharField(label='Phone (Home)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    phone_cell = forms.CharField(label='Phone (Cell)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))

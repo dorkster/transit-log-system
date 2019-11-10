@@ -130,7 +130,15 @@ nav {
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
             <td class="mytable-col-md">{{ trip.name }}</td>
             <td class="mytable-col-lg">{{ trip.address }}</td>
-            <td class="mytable-col-md">{{ trip.phone }}</td>
+            <td class="mytable-col-md" style="white-space: nowrap;">
+                {% if trip.phone_home and trip.phone_cell %}
+                {{ trip.phone_home }}<br/>{{ trip.phone_cell }}
+                {% elif not trip.phone_home and trip.phone_cell %}
+                {{ trip.phone_cell }}
+                {% elif trip.phone_home and not trip.phone_cell %}
+                {{ trip.phone_home }}
+                {% endif %}
+            </td>
             <td class="mytable-col-lg">{{ trip.destination }}</td>
             <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
             <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>

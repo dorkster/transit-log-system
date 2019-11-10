@@ -46,7 +46,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
         if form.is_valid():
             trip.name = form.cleaned_data['name']
             trip.address = form.cleaned_data['address']
-            trip.phone = form.cleaned_data['phone']
+            trip.phone_home = form.cleaned_data['phone_home']
+            trip.phone_cell = form.cleaned_data['phone_cell']
             trip.destination = form.cleaned_data['destination']
             trip.pick_up_time = form.cleaned_data['pick_up_time']
             trip.appointment_time = form.cleaned_data['appointment_time']
@@ -61,7 +62,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
         initial = {
             'name': trip.name,
             'address': trip.address,
-            'phone': trip.phone,
+            'phone_home': trip.phone_home,
+            'phone_cell': trip.phone_cell,
             'destination': trip.destination,
             'pick_up_time': trip.pick_up_time,
             'appointment_time': trip.appointment_time,

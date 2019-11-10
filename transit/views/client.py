@@ -35,8 +35,7 @@ def clientCreateEditCommon(request, client, is_new):
             client.name = form.cleaned_data['name']
             client.address = form.cleaned_data['address']
             client.phone_home = form.cleaned_data['phone_home']
-            client.phone_mobile = form.cleaned_data['phone_mobile']
-            client.phone_default = form.cleaned_data['phone_default']
+            client.phone_cell = form.cleaned_data['phone_cell']
             client.elderly = form.cleaned_data['elderly']
             client.ambulatory = form.cleaned_data['ambulatory']
             client.save()
@@ -47,8 +46,7 @@ def clientCreateEditCommon(request, client, is_new):
             'name': client.name,
             'address': client.address,
             'phone_home': client.phone_home,
-            'phone_mobile': client.phone_mobile,
-            'phone_default': client.phone_default,
+            'phone_cell': client.phone_cell,
             'elderly': client.elderly,
             'ambulatory': client.ambulatory,
         }
@@ -85,7 +83,8 @@ def clientCreateFromTrip(request, trip_id):
     client = Client()
     client.name = trip.name
     client.address = trip.address
-    client.phone_home = trip.phone
+    client.phone_home = trip.phone_home
+    client.phone_cell = trip.phone_cell
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True)

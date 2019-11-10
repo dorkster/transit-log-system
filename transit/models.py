@@ -24,7 +24,8 @@ class Trip(models.Model):
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=FieldSizes.MD)
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
-    phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+    phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
+    phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
     pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
@@ -63,12 +64,22 @@ class Trip(models.Model):
         else:
             return Driver.get_color(self.driver)
 
-    def get_phone_number(self):
+    def get_phone_number(self, phone_type):
         num_only = ''
-        matches = re.findall('\d*', self.phone)
+        num_regex = '\d*'
+        if phone_type == 'cell':
+            matches = re.findall(num_regex, self.phone_cell)
+        else:
+            matches = re.findall(num_regex, self.phone_home)
         for i in matches:
             num_only += i
         return num_only
+
+    def get_phone_home_number(self):
+        return self.get_phone_number('') # default is home number
+
+    def get_phone_cell_number(self):
+        return self.get_phone_number('cell')
 
     def get_class_name(self):
         return 'Trip'
@@ -262,20 +273,11 @@ class Shift(models.Model):
 
 
 class Client(models.Model):
-    PHONE_HOME = 'home'
-    PHONE_MOBILE = 'mobi'
-
-    DEFAULT_PHONE = [
-        (PHONE_HOME, 'Home'),
-        (PHONE_MOBILE, 'Mobile'),
-    ]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=FieldSizes.MD)
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField('Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
-    phone_mobile = models.CharField('Phone (Mobile)', max_length=FieldSizes.PHONE, blank=True)
-    phone_default = models.CharField('Default Phone Number', max_length=4, choices=DEFAULT_PHONE, default=PHONE_HOME)
+    phone_cell = models.CharField('Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
 
@@ -336,7 +338,8 @@ class TemplateTrip(models.Model):
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.MD)
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
-    phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+    phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
+    phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
     pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)

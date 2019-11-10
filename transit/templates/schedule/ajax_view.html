@@ -134,7 +134,27 @@
                     <div class="ml-auto align-self-end p-1">
                         <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.is_canceled or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
                         <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if trip.is_canceled or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
-                        <a href="{% if trip.phone %}tel:{{ trip.get_phone_number }}{% else %}#_{% endif %}" class="btn btn-lg {% if trip.phone %}btn-info{% else %}btn-secondary disabled{% endif %}">Call</a>
+                        {% if trip.phone_home and trip.phone_cell %}
+                        <span class="dropdown" id="call_{{trip.id}}">
+                            <button class="btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Call
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="tel:{{ trip.get_phone_home_number }}" class="dropdown-item">Home Phone <span class="text-muted">({{trip.phone_home}})</span></a>
+                                <a href="tel:{{ trip.get_phone_cell_number }}" class="dropdown-item">Cell Phone <span class="text-muted">({{trip.phone_cell}})</span></a>
+                            </div>
+                            <script type="text/javascript">
+                                $('#call_{{trip.id}}').on('show.bs.dropdown', ajax_loader.stop);
+                                $('#call_{{trip.id}}').on('hide.bs.dropdown', ajax_loader.restart);
+                            </script>
+                        </span>
+                        {% elif trip.phone_home %}
+                        <a href="tel:{{ trip.get_phone_home_number }}" class="btn btn-info btn-lg">Call</a>
+                        {% elif trip.phone_cell %}
+                        <a href="tel:{{ trip.get_phone_cell_number }}" class="btn btn-info btn-lg">Call</a>
+                        {% else %}
+                        <a href="#_" class="btn btn-secondary btn-lg disabled">Call</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

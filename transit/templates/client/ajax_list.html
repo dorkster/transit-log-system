@@ -6,7 +6,7 @@
         <td>Name</td>
         <td>Address</td>
         <td>Phone (Home)</td>
-        <td>Phone (Mobile)</td>
+        <td>Phone (Cell)</td>
         <td>Elderly?</td>
         <td>Ambulatory?</td>
     </thead>
@@ -31,8 +31,8 @@
         </td>
         <td class="mytable-col-lg">{{ client.name }}</td>
         <td class="mytable-col-lg">{{ client.address }}</td>
-        <td class="mytable-col-md"><span class="{% if client.phone_default == 'home' %}border-bottom border-success{% endif %}">{{ client.phone_home }}</span></td>
-        <td class="mytable-col-md"><span class="{% if client.phone_default == 'mobi' %}border-bottom border-success{% endif %}">{{ client.phone_mobile }}</span></td>
+        <td class="mytable-col-md">{{ client.phone_home }}</td>
+        <td class="mytable-col-md">{{ client.phone_cell }}</td>
         <td class="mytable-col-sm"><span class="oi {% if client.elderly %}oi-check{% elif client.elderly is False %}oi-x{% endif %}"></span></td>
         <td class="mytable-col-sm"><span class="oi {% if client.ambulatory %}oi-check{% elif client.ambulatory is False %}oi-x{% endif %}"></span></td>
     </tr>

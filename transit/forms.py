@@ -53,6 +53,9 @@ class formWidgetAttrs():
     text_area['rows'] = '6'
     text_area['cols'] = '20'
 
+    color = default.copy()
+    color['onchange'] = 'validateColor(this)'
+
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
 
@@ -116,7 +119,7 @@ class EditClientForm(forms.Form):
 
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
     is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())
 
 class EditVehicleForm(forms.Form):

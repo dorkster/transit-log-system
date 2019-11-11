@@ -13,7 +13,7 @@ class FieldSizes():
     MILES = 8
     TIME = 8
     FUEL = 4
-    COLOR = 9 # TODO change this to 8 by dropping the required hash symbol
+    COLOR = 8
 
 class Trip(models.Model):
     STATUS_NORMAL = 0
@@ -70,7 +70,7 @@ class Trip(models.Model):
 
     def get_driver_color(self):
         if self.status > 0:
-            return '#BBBBBB'
+            return 'BBBBBB'
         else:
             return Driver.get_color(self.driver)
 
@@ -167,7 +167,7 @@ class Driver(models.Model):
         return 'Driver'
 
     def get_color(self):
-        color = 'none'
+        color = '00000000'
         if self and self.color != '':
             color = self.color
         

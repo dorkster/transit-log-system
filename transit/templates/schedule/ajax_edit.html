@@ -23,7 +23,7 @@
         <td>Fuel (gal)</td>
     </thead>
     {% for shift in shifts %}
-    <tr style="background: {{ shift.get_driver_color }};">
+    <tr style="background: #{{ shift.get_driver_color }};">
         <td class="mytable-col-xs">
             <div class="dropdown" id="edit_shift_{{shift.id}}">
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -117,7 +117,7 @@
         <td></td>
     </thead>
     {% for trip in trips %}
-    <tr style="background: {{ trip.get_driver_color }};">
+    <tr style="background: #{{ trip.get_driver_color }};">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">

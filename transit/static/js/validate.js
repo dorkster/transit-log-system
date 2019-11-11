@@ -158,3 +158,23 @@ function validatePhone(input) {
 
     input.value = val_new;
 }
+
+function validateColor(input) {
+    if (input.value == "")
+        return;
+
+    var val_upper = input.value.toUpperCase();
+    var val_stripped = val_upper.replace(/[^0-9A-F]/g, '');
+
+    if (val_stripped.length < 3)
+        input.value = "";
+    if (val_stripped.length == 3)
+        input.value = val_stripped + val_stripped;
+    else if (val_stripped.length > 3 && val_stripped.length < 6)
+        input.value = val_stripped.substring(0,3) + val_stripped.substring(0,3);
+    else if (val_stripped.length == 6 || val_stripped.length == 7)
+        input.value = val_stripped.substring(0,6);
+    else if (val_stripped.length >= 8)
+        input.value = val_stripped.substring(0,8);
+}
+

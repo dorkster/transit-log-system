@@ -11,7 +11,7 @@
 <h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
     {% for shift in shifts %}
-    <div class="card mb-2" style="background: {{ shift.get_driver_color }}; max-width: 960px;">
+    <div class="card mb-2" style="background: #{{ shift.get_driver_color }}; max-width: 960px;">
         <div class="card-body p-0">
             <div class="d-flex flex-wrap">
                 <div class="p-1">
@@ -64,7 +64,7 @@
 </div>
 {% if trips %}
     {% for trip in trips %}
-    <div class="card mb-2" style="background: {{ trip.get_driver_color }}; max-width: 960px;">
+    <div class="card mb-2" style="background: #{{ trip.get_driver_color }}; max-width: 960px;">
         <div class="card-body p-0">
             <a id="trip_{{ trip.id }}"></a>
             <div>

@@ -67,7 +67,7 @@ nav {
             <td>Fuel (gal)</td>
         </thead>
         {% for shift in shifts %}
-        <tr style="background: {{ shift.get_driver_color }};">
+        <tr style="background: #{{ shift.get_driver_color }};">
             <td class="mytable-col-md">{{ shift.driver }}</td>
             <td class="mytable-col-md">{{ shift.vehicle }}</td>
             <td class="mytable-col-sm">
@@ -125,7 +125,7 @@ nav {
             <td>Notes</td>
         </thead>
         {% for trip in trips %}
-        <tr style="background: {{ trip.get_driver_color }};">
+        <tr style="background: #{{ trip.get_driver_color }};">
             <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
             <td class="mytable-col-md">{{ trip.name }}</td>

@@ -11,7 +11,7 @@
         <td>Ambulatory?</td>
     </thead>
     {% for client in clients %}
-    <tr style="background: {{ client.get_driver_color }};">
+    <tr>
         <td class="mytable-col-xs">
             <a id="client_{{ client.id }}"></a>
             <div class="dropdown" id="edit_client_{{client.id}}">

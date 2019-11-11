@@ -8,7 +8,7 @@
         <td>Is logged?</td>
     </thead>
     {% for driver in drivers %}
-    <tr style="background: {{ driver.color }};">
+    <tr style="background: #{{ driver.get_color }};">
         <td class="mytable-col-arrows">
             <a id="driver_{{ driver.id }}"></a>
             <div class="btn-group-vertical">

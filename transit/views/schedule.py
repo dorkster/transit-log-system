@@ -213,22 +213,32 @@ def ajaxScheduleCommon(request, template):
             trip.ambulatory = temp_trip.ambulatory
             trip.note = temp_trip.note
             trip.save()
-
-    filter_hide_canceled_str = request.GET.get('filter_hide_canceled', None)
-
-    if filter_hide_canceled_str is not None:
-        filter_hide_canceled_str = filter_hide_canceled_str.lower()
-        request.session['schedule_view_hide_canceled'] = True if filter_hide_canceled_str == 'true' else False
+    elif request_action == 'filter_toggle_completed':
+        request.session['schedule_view_hide_completed'] = not request.session.get('schedule_view_hide_completed', False)
+    elif request_action == 'filter_toggle_canceled':
+        request.session['schedule_view_hide_canceled'] = not request.session.get('schedule_view_hide_canceled', False)
+    elif request_action == 'filter_toggle_nolog':
+        request.session['schedule_view_hide_nolog'] = not request.session.get('schedule_view_hide_nolog', False)
+    elif request_action == 'filter_search':
+        request.session['schedule_view_search'] = request_data
+    elif request_action == 'filter_driver':
+        request.session['schedule_view_driver'] = request_data
+    elif request_action == 'filter_vehicle':
+        request.session['schedule_view_vehicle'] = request_data
+    elif request_action == 'filter_reset':
+        request.session['schedule_view_hide_completed'] = False
+        request.session['schedule_view_hide_canceled'] = False
+        request.session['schedule_view_hide_nolog'] = False
+        request.session['schedule_view_search'] = ''
+        request.session['schedule_view_driver'] = ''
+        request.session['schedule_view_vehicle'] = ''
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
-
-    filter_hide_completed_str = request.GET.get('filter_hide_completed', None)
-
-    if filter_hide_completed_str is not None:
-        filter_hide_completed_str = filter_hide_completed_str.lower()
-        request.session['schedule_view_hide_completed'] = True if filter_hide_completed_str == 'true' else False
-
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)
+    filter_hide_nolog = request.session.get('schedule_view_hide_nolog', False)
+    filter_search = request.session.get('schedule_view_search', '')
+    filter_driver = request.session.get('schedule_view_driver', '')
+    filter_vehicle = request.session.get('schedule_view_vehicle', '')
 
     trips = Trip.objects.filter(date=date)
 
@@ -239,6 +249,18 @@ def ajaxScheduleCommon(request, template):
 
         if filter_hide_completed:
             trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))
+
+        if filter_hide_nolog:
+            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True))
+
+        if filter_search != '':
+            trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search))
+
+        if filter_driver != '':
+            trips = trips.filter(driver__id=filter_driver)
+
+        if filter_vehicle != '':
+            trips = trips.filter(vehicle__id=filter_vehicle)
 
     shifts = Shift.objects.filter(date=date)
     drivers = Driver.objects.all()
@@ -256,8 +278,13 @@ def ajaxScheduleCommon(request, template):
         'date': date,
         'drivers': drivers,
         'vehicles': vehicles,
+        'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
         'filter_hide_canceled': filter_hide_canceled,
         'filter_hide_completed': filter_hide_completed,
+        'filter_hide_nolog': filter_hide_nolog,
+        'filter_search': filter_search,
+        'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
+        'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'templates': Template.objects.all(),
         'message': message,
     }

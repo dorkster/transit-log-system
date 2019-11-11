@@ -52,14 +52,105 @@
         <div class="col">
             <h5>Filter</h5>
         </div>
+        {% if is_filtered %}
         <div class="col-auto">
-            <label for="filter_hide_completed">Hide completed</label>
-            <input type="checkbox" value="" name="filter_hide_completed" id="id_filter_hide_completed" {% if filter_hide_completed %}checked{% endif %}>
+            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Clear All Filters</button>
         </div>
-        <div class="col-auto">
-            <label for="filter_hide_canceled">Hide canceled</label>
-            <input type="checkbox" value="" name="filter_hide_canceled" id="id_filter_hide_canceled" {% if filter_hide_canceled %}checked{% endif %}>
-        </div>
+        {% endif %}
+    </div>
+    <div class="mt-2">
+        <span class="dropdown" id="filter_driver">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
+                {% for driver in drivers %}
+                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
+                {% endfor %}
+            </div>
+            <script type="text/javascript">
+                $('#filter_driver').on('show.bs.dropdown', ajax_loader.stop);
+                $('#filter_driver').on('hide.bs.dropdown', ajax_loader.restart);
+            </script>
+        </span>
+        <span class="dropdown" id="filter_vehicle">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                {% for vehicle in vehicles %}
+                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                {% endfor %}
+            </div>
+            <script type="text/javascript">
+                $('#filter_vehicle').on('show.bs.dropdown', ajax_loader.stop);
+                $('#filter_vehicle').on('hide.bs.dropdown', ajax_loader.restart);
+            </script>
+        </span>
+    </div>
+    <div class="mt-2">
+        <button class="btn {% if filter_hide_completed %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_completed', '')">
+            Completed
+        </button>
+        <button class="btn {% if filter_hide_canceled %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')">
+            Canceled
+        </button>
+        <button class="btn {% if filter_hide_nolog %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')">
+            Non-logged
+        </button>
+    </div>
+    <div class="mt-2">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
+                <span class="oi oi-magnifying-glass mr-2"></span>Search
+            </button>
+
+            <!-- Modal -->
+            <div class="modal" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="filter_search_form">
+                            <div class="modal-body">
+                                <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="oi oi-magnifying-glass mr-2"></span>Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $('#filter_search_form').on('submit', function(e){
+                    e.preventDefault();
+                    $('#modal_filter_search').modal('hide');
+                    ajax_loader.run('', 'filter_search', $('#filter_search').val());
+                    console.log('submit');
+                });
+                $('#modal_filter_search').on('show.bs.modal', function(){
+                    ajax_loader.stop();
+                    $('#filter_search').val('{{filter_search}}');
+                });
+                $('#modal_filter_search').on('shown.bs.modal', function(){ 
+                    $('#filter_search').focus();
+                    $('#filter_search').select();
+                });
+                $('#modal_filter_search').on('hide.bs.modal', ajax_loader.restart);
+            </script>
+    {% if filter_search %}
+    <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
+    {% endif %}
     </div>
 </div>
 {% if trips %}
@@ -178,23 +269,3 @@
 {% else %}
 <p>There are no trips for this day. Check the <strong>Filter</strong> settings if this is incorrect.</p>
 {% endif %}
-<script type="text/javascript">
-    var filter_hide_canceled = document.getElementById("id_filter_hide_canceled");
-    var filter_hide_completed = document.getElementById("id_filter_hide_completed");
-
-    function updateFilter() {
-        if (filter_hide_canceled) {
-            ajax_loader.extra_data["filter_hide_canceled"] = filter_hide_canceled.checked;
-        }
-        if (filter_hide_completed) {
-            ajax_loader.extra_data["filter_hide_completed"] = filter_hide_completed.checked;
-        }
-        ajax_loader.run();
-    }
-    if (filter_hide_canceled) {
-        filter_hide_canceled.addEventListener("change", updateFilter);
-    }
-    if (filter_hide_completed) {
-        filter_hide_completed.addEventListener("change", updateFilter);
-    }
-</script>

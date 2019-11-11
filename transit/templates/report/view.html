@@ -23,70 +23,136 @@
 {% for v in vehicles %}
 <div class="row mb-3">
     <div class="col">
-{% if v.days or v.errors %}
-<h3>{{ v.vehicle }}</h3>
-{% endif %}
-{% if v.days %}
-<table class="mytable mytable-striped">
-    <thead>
-        <td>Date</td>
-        <td>Service Miles</td>
-        <td>Service Hours</td>
-        <td>Deadhead Miles</td>
-        <td>Deadhead Hours</td>
-        <td>Passenger Miles (PMT)</td>
-        <td>Fuel (gal)</td>
-        {% for type in triptypes %}
-        <td>Type: {{ type }}</td>
-        {% endfor %}
-    </thead>
-    {% for day in v.days %}
-    <tr>
-        <td><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{ day.date }}</a></td>
-        <td>{{ day.service_miles }}</td>
-        <td>{{ day.service_hours }}</td>
-        <td>{{ day.deadhead_miles }}</td>
-        <td>{{ day.deadhead_hours }}</td>
-        <td>{{ day.pmt }}</td>
-        <td>{{ day.fuel }}</td>
-        {% for k,v in day.trip_types.items %}
-        <td>{{ v }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-    <thead>
-        <td>Date</td>
-        <td>Service Miles</td>
-        <td>Service Hours</td>
-        <td>Deadhead Miles</td>
-        <td>Deadhead Hours</td>
-        <td>Passenger Miles (PMT)</td>
-        <td>Fuel (gal)</td>
-        {% for type in triptypes %}
-        <td>Type: {{ type }}</td>
-        {% endfor %}
-    </thead>
-    <tr style="background: #D9EAD3; font-weight: bold;">
-        <td>Total</td>
-        <td>{{ v.total.service_miles }}</td>
-        <td>{{ v.total.service_hours }}</td>
-        <td>{{ v.total.deadhead_miles }}</td>
-        <td>{{ v.total.deadhead_hours }}</td>
-        <td>{{ v.total.pmt }}</td>
-        <td>{{ v.total.fuel }}</td>
-        {% for k,v in v.total.trip_types.items %}
-        <td>{{ v }}</td>
-        {% endfor %}
-    </tr>
-</table>
-{% endif %}
-{% if v.errors %}
-<ul class="list-group mt-2 mb-2">
-{% for error in v.errors %}
-<li class="list-group-item">{{ error |safe }}</li>
-{% endfor %}
-</ul>
-{% endif %}
+        {% if v.days or v.errors %}
+        <h3>{{ v.vehicle }}</h3>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab_summary_{{v.vehicle.id}}" data-toggle="tab" href="#summary_{{v.vehicle.id}}" role="tab" aria-controls="log" aria-selected="true">Summary</a>
+            </li>
+            {% if v.days %}
+            <li class="nav-item">
+                <a class="nav-link" id="tab_log_{{v.vehicle.id}}" data-toggle="tab" href="#log_{{v.vehicle.id}}" role="tab" aria-controls="log" aria-selected="true">Log</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tab_triptypes_{{v.vehicle.id}}" data-toggle="tab" href="#triptypes_{{v.vehicle.id}}" role="tab" aria-controls="triptypes" aria-selected="false">Trip Types</a>
+            </li>
+            {% endif %}
+            {% if v.errors %}
+            <li class="nav-item">
+                <a class="nav-link text-danger" id="tab_errors_{{v.vehicle.id}}" data-toggle="tab" href="#errors_{{v.vehicle.id}}" role="tab" aria-controls="errors" aria-selected="false">Errors ({{v.errors|length}})</a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="tab-content border border-top-0 p-1 bg-white" id="myTabContent">
+            <div class="tab-pane fade show active" id="summary_{{v.vehicle.id}}" role="tabpanel" aria-labelledby="summary-tab">
+                <div>
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Service Miles</div>
+                                <div class="col-auto">{{v.total.service_miles}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Service Hours</div>
+                                <div class="col-auto">{{v.total.service_hours}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Deadhead Miles</div>
+                                <div class="col-auto">{{v.total.deadhead_miles}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Deadhead Hours</div>
+                                <div class="col-auto">{{v.total.deadhead_hours}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Passenger Miles (PMT)</div>
+                                <div class="col-auto">{{v.total.pmt}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Fuel (gal)</div>
+                                <div class="col-auto">{{v.total.fuel}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        {% for key,value in v.total.trip_types.items %}
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">{{key}} Trips</div>
+                                <div class="col-auto">{{value}}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% if v.days %}
+            <div class="tab-pane fade" id="log_{{v.vehicle.id}}" role="tabpanel" aria-labelledby="log-tab">
+                <table class="mytable mytable-striped">
+                    <thead>
+                        <td>Date</td>
+                        <td>Service Miles</td>
+                        <td>Service Hours</td>
+                        <td>Deadhead Miles</td>
+                        <td>Deadhead Hours</td>
+                        <td>Passenger Miles (PMT)</td>
+                        <td>Fuel (gal)</td>
+                    </thead>
+                    {% for day in v.days %}
+                    <tr>
+                        <td><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{ day.date }}</a></td>
+                        <td>{{ day.service_miles }}</td>
+                        <td>{{ day.service_hours }}</td>
+                        <td>{{ day.deadhead_miles }}</td>
+                        <td>{{ day.deadhead_hours }}</td>
+                        <td>{{ day.pmt }}</td>
+                        <td>{{ day.fuel }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="tab-pane fade" id="triptypes_{{v.vehicle.id}}" role="tabpanel" aria-labelledby="triptypes-tab">
+                <table class="mytable mytable-striped">
+                    <thead>
+                        <td>Date</td>
+                        {% for type in triptypes %}
+                        <td>Type: {{ type }}</td>
+                        {% endfor %}
+                    </thead>
+                    {% for day in v.days %}
+                    <tr>
+                        <td><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{ day.date }}</a></td>
+                        {% for k,v in day.trip_types.items %}
+                        <td>{{ v }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endif %}
+            {% if v.errors %}
+            <div class="tab-pane fade" id="errors_{{v.vehicle.id}}" role="tabpanel" aria-labelledby="errors-tab">
+                <ul class="list-group list-group-flush">
+                    {% for error in v.errors %}
+                    <li class="list-group-item">{{ error |safe }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endfor %}
@@ -94,9 +160,9 @@
 <hr/>
 <h3>Shifts &amp; trips without an assigned vehicle</h3>
 <ul class="list-group">
-{% for error in no_vehicle_errors %}
-<li class="list-group-item">{{ error |safe }}</li>
-{% endfor %}
+    {% for error in no_vehicle_errors %}
+    <li class="list-group-item">{{ error |safe }}</li>
+    {% endfor %}
 </ul>
 {% endif %}
 {% endblock %}

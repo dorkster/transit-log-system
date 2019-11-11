@@ -16,6 +16,16 @@ class FieldSizes():
     COLOR = 9 # TODO change this to 8 by dropping the required hash symbol
 
 class Trip(models.Model):
+    STATUS_NORMAL = 0
+    STATUS_CANCELED = 1
+    STATUS_NO_SHOW = 2
+
+    STATUS_LEVELS = [
+        (STATUS_NORMAL, '---------'),
+        (STATUS_CANCELED, 'Canceled'),
+        (STATUS_NO_SHOW, 'No Show'),
+    ]
+
     # TODO event? (i.e. Mealsite)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -37,7 +47,7 @@ class Trip(models.Model):
     start_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
-    is_canceled = models.BooleanField(verbose_name='Canceled', default=False)
+    status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -59,7 +69,7 @@ class Trip(models.Model):
         return output
 
     def get_driver_color(self):
-        if self.is_canceled:
+        if self.status > 0:
             return '#BBBBBB'
         else:
             return Driver.get_color(self.driver)

@@ -1,6 +1,6 @@
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -75,7 +75,7 @@ class EditTripForm(forms.Form):
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     end_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    is_canceled = forms.BooleanField(label='Canceled', required=False, widget=forms.CheckboxInput())
+    status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))

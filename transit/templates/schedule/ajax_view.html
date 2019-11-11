@@ -76,7 +76,9 @@
                             </button>
                             <div class="dropdown-menu">
                                 <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item">Edit trip</a>
-                                <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '')" class="dropdown-item">{% if trip.is_canceled %}Set as not canceled{% else %}Set as canceled{% endif %}</a>
+                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
+                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
+                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item">Set as no show</a>{% endif %}
                                 <hr/>
                                 <a href="{% url 'trip-create-return' 'view' trip.id %}" class="dropdown-item">Create Return Trip</a>
                                 <hr/>
@@ -129,21 +131,23 @@
                                 {% endif %}
                             </div>
                             {% endif %}
-                            {% if trip.trip_type.name == 'Medical' or trip.is_canceled %}
+                            {% if trip.trip_type.name == 'Medical' or trip.status > 0 %}
                             <div class="list-group-item bg-transparent p-1">
                                 {% if trip.trip_type.name == 'Medical' %}
                                 <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>Medical</span>
                                 {% endif %}
-                                {% if trip.is_canceled %}
+                                {% if trip.status == 1 %}
                                 <span class="badge badge-secondary">Canceled</span>
+                                {% elif trip.status == 2 %}
+                                <span class="badge badge-secondary">No Show</span>
                                 {% endif %}
                             </div>
                             {% endif %}
                         </div>
                     </div>
                     <div class="ml-auto align-self-end p-1">
-                        <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.is_canceled or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
-                        <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if trip.is_canceled or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
+                        <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
+                        <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
                         {% if trip.phone_home and trip.phone_cell %}
                         <span class="dropdown" id="call_{{trip.id}}">
                             <button class="btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

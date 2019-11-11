@@ -132,7 +132,9 @@
                 </button>
                 <div class="dropdown-menu">
                     <a href="{% url 'trip-edit' 'edit' trip.id %}" class="dropdown-item">Edit trip</a>
-                    <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '')" class="dropdown-item">{% if trip.is_canceled %}Set as not canceled{% else %}Set as canceled{% endif %}</a>
+                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
+                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
+                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item">Set as no show</a>{% endif %}
                     <hr/>
                     <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item">Create Client</a>
                     <a href="{% url 'trip-create-return' 'edit' trip.id %}" class="dropdown-item">Create Return Trip</a>
@@ -276,10 +278,12 @@
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
                             </div>
                         </div>
-                        {% if trip.is_canceled %}
+                        {% if trip.status > 0 %}
                         <div class="list-group-item p-1">
-                            {% if trip.is_canceled %}
+                            {% if trip.status == 1 %}
                             <span class="badge badge-secondary">Canceled</span>
+                            {% elif trip.status == 2 %}
+                            <span class="badge badge-secondary">No Show</span>
                             {% endif %}
                         </div>
                         {% endif %}
@@ -292,10 +296,6 @@
             </div>
         </td>
     </tr>
-    <script type="text/javascript">
-        $('#modal_details_{{trip.id}}').on('show.bs.modal', ajax_loader.stop);
-        $('#modal_details_{{trip.id}}').on('hide.bs.modal', ajax_loader.restart);
-    </script>
     {% endfor %}
 </table>
 {% else %}

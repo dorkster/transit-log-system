@@ -83,7 +83,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             trip.end_miles = form.cleaned_data['end_miles']
             trip.end_time = form.cleaned_data['end_time']
             trip.note = form.cleaned_data['notes']
-            trip.is_canceled = form.cleaned_data['is_canceled']
+            trip.status = form.cleaned_data['status']
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -120,7 +120,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             'end_miles': trip.end_miles,
             'end_time': trip.end_time,
             'notes': trip.note,
-            'is_canceled': trip.is_canceled,
+            'status': trip.status,
         }
         form = EditTripForm(initial=initial)
 
@@ -208,7 +208,7 @@ def tripStart(request, id):
         if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
-    all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)
+    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     adjacent_trips = []
     found_this_trip = False
     for i in all_trips:
@@ -277,7 +277,7 @@ def tripEnd(request, id):
         if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
-    all_trips = Trip.objects.filter(date=trip.date, is_canceled=False)
+    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     adjacent_trips = []
     found_this_trip = False
     for i in all_trips:

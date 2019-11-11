@@ -56,7 +56,7 @@ def report(request, year, month):
         for day in range(date_start.day, date_end.day+1):
             day_date = datetime.date(year, month, day)
             day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle)
-            day_trips = Trip.objects.filter(date=day_date, vehicle=vehicle, is_canceled=False)
+            day_trips = Trip.objects.filter(date=day_date, vehicle=vehicle, status=Trip.STATUS_NORMAL)
 
             rv_day = ReportVehicle.Day()
             rv_day.date = day_date
@@ -159,7 +159,7 @@ def report(request, year, month):
     no_vehicle_errors = []
     for day in range(date_start.day, date_end.day+1):
         day_date = datetime.date(year, month, day)
-        no_vehicle_trips = Trip.objects.filter(date=day_date, vehicle=None, is_canceled=False)
+        no_vehicle_trips = Trip.objects.filter(date=day_date, vehicle=None, status=Trip.STATUS_NORMAL)
         for trip in no_vehicle_trips:
             error_str = trip.get_error_str()
             if error_str != '':

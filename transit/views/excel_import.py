@@ -128,7 +128,7 @@ def excelParseFile(file_obj, shifts, trips, log_data_only):
         if sheet['L' + str(i)].value != None:
             driver_name = str(sheet['L' + str(i)].value).strip()
             if driver_name == 'Canceled':
-                trip.is_canceled = True
+                trip.status = Trip.STATUS_CANCELED
             else:
                 query = Driver.objects.filter(name=driver_name)
                 if query:

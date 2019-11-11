@@ -24,10 +24,10 @@
                     <div>{{ form.date }}</div>
                 </fieldset>
             </div>
-            <div id="canceled_box" class="col border m-1 pt-1">
+            <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
-                    <legend>{{ form.is_canceled.label }}</legend>
-                    <div class="mb-2">{{ form.is_canceled }}</div>
+                    <legend>{{ form.status.label }}</legend>
+                    <div class="mb-2">{{ form.status }}</div>
                 </fieldset>
             </div>
         </div>
@@ -124,19 +124,17 @@
 
     $("#id_driver").change(ajaxSetVehicleFromDriver);
 
-    var cancel_checkbox = document.getElementById("id_is_canceled")
-    function setCanceledBoxColor() {
-        var canceled_box = document.getElementById("canceled_box")
-        var default_classname = "col border m-1 pt-1";
-        if (cancel_checkbox.checked) {
-            canceled_box.className = default_classname + " bg-danger text-light";
+    var status_input = document.getElementById("id_status")
+    function setStatusColor() {
+        if (status_input.value > 0) {
+            status_input.classList.add("bg-danger", "text-light");
         }
         else {
-            canceled_box.className = default_classname;
+            status_input.classList.remove("bg-danger", "text-light");
         }
     }
-    cancel_checkbox.addEventListener("change", setCanceledBoxColor);
-    setCanceledBoxColor();
+    status_input.addEventListener("change", setStatusColor);
+    setStatusColor();
 
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
 

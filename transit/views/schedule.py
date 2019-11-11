@@ -180,7 +180,12 @@ def ajaxScheduleCommon(request, template):
         trip.save()
     elif request_action == 'toggle_canceled':
         trip = get_object_or_404(Trip, id=request_id)
-        trip.is_canceled = not trip.is_canceled
+        if request_data == '0':
+            trip.status = Trip.STATUS_NORMAL
+        elif request_data == '1':
+            trip.status = Trip.STATUS_CANCELED
+        elif request_data == '2':
+            trip.status = Trip.STATUS_NO_SHOW
         trip.save()
     elif request_action == 'load_template':
         parent_template = Template.objects.get(id=uuid.UUID(request_data))
@@ -230,7 +235,7 @@ def ajaxScheduleCommon(request, template):
     # TODO don't use template filename to check if we're on the View page!!!
     if template == 'schedule/ajax_view.html':
         if filter_hide_canceled:
-            trips = trips.filter(is_canceled=False)
+            trips = trips.filter(status=Trip.STATUS_NORMAL)
 
         if filter_hide_completed:
             trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))

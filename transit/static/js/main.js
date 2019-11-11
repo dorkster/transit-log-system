@@ -50,8 +50,10 @@ function AjaxLoader(url, div_id) {
                 var hash = window.location.hash.substr(1);
                 if (hash && hash != '_')
                     var hash_element = document.getElementById(hash);
-                    if (hash_element)
+                    if (hash_element) {
                         hash_element.scrollIntoView();
+                        window.scrollBy(0, -25);
+                    }
             }
         });
     }

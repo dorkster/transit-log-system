@@ -46,7 +46,7 @@
 <div class="container-fluid border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
-            <h5>Filter</h5>
+            <h5>Filter{% if filter_hidden_count > 0 %} ({{filter_hidden_count}} hidden){% endif %}</h5>
         </div>
         {% if is_filtered %}
         <div class="col-auto">
@@ -244,5 +244,5 @@
     </div>
     {% endfor %}
 {% else %}
-<p>There are no trips for this day. Check the <strong>Filter</strong> settings if this is incorrect.</p>
+<p>There are no trips for this day. {% if filter_hidden_count > 0 %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all trips.{% endif %}</p>
 {% endif %}

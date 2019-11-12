@@ -18,10 +18,7 @@
         <td>Address</td>
         <td>Phone #</td>
         <td>Destination</td>
-        <td>Trip Type</td>
-        <td>Elderly?</td>
-        <td>Ambulatory?</td>
-        <td>Notes</td>
+        <td></td>
     </thead>
     {% for trip in trips %}
     <tr>
@@ -58,20 +55,64 @@
             {% endif %}
         </td>
         <td class="mytable-col-lg">{{ trip.destination }}</td>
-        <td class="mytable-col-md">{% if trip.trip_type %}{{ trip.trip_type }}{% endif %}</td>
-        <td class="mytable-col-sm"><span class="oi {% if trip.elderly %}oi-check{% elif trip.elderly is False %}oi-x{% endif %}"></span></td>
-        <td class="mytable-col-sm"><span class="oi {% if trip.ambulatory %}oi-check{% elif trip.ambulatory is False %}oi-x{% endif %}"></span></td>
         <td class="mytable-col-xs">
-            {% if trip.note %}
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if trip.note %}
                     <span class="oi oi-document"></span>
+                    {% else %}
+                    <span class="oi oi-ellipses"></span>
+                    {% endif %}
                 </button>
                 <div class="dropdown-menu dropdown-menu-right p-2">
-                    {{ trip.note }}
+                    <div class="list-group list-group-flush" style="width: 300px">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Trip Type</div>
+                                <div class="col-auto">
+                                    {% if trip.trip_type %}
+                                    {% if trip.trip_type.name == 'Medical' %}
+                                    <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
+                                    {% else %}
+                                    <span class="badge badge-primary">{{trip.trip_type}}</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Elderly?</div>
+                                <div class="col-auto">
+                                    {% if trip.elderly %}
+                                    <span class="oi oi-check"></span>
+                                    {% elif trip.elderly is False %}
+                                    <span class="oi oi-x"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Ambulatory?</div>
+                                <div class="col-auto">
+                                    {% if trip.ambulatory %}
+                                    <span class="oi oi-check"></span>
+                                    {% elif trip.ambulatory is False %}
+                                    <span class="oi oi-x"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1 {% if trip.note %}list-group-item-warning{% endif %}">
+                            <div class="row">
+                                <div class="col text-muted">Notes</div>
+                                <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% endif %}
         </td>
     </tr>
     {% endfor %}

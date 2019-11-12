@@ -43,17 +43,25 @@ function AjaxLoader(url, div_id) {
             }, self.extra_data)
         })
         .done(function(response) {
-            $(self.div_id).html("")
-            $(self.div_id).append(response);
-            if (!self.first_response) {
-                self.first_response = true;
-                var hash = window.location.hash.substr(1);
-                if (hash && hash != '_')
-                    var hash_element = document.getElementById(hash);
-                    if (hash_element) {
-                        hash_element.scrollIntoView();
-                        window.scrollBy(0, -25);
-                    }
+            if ( $('.ajax-blocker.show').length == 0 ) {
+                $(self.div_id).html("")
+                $(self.div_id).append(response);
+                if (!self.first_response) {
+                    self.first_response = true;
+                    var hash = window.location.hash.substr(1);
+                    if (hash && hash != '_')
+                        var hash_element = document.getElementById(hash);
+                        if (hash_element) {
+                            hash_element.scrollIntoView();
+                            window.scrollBy(0, -25);
+                        }
+                }
+            }
+            else {
+                self.stop();
+                // when the ajax blocker is hidden, fire a new ajax request
+                $('.modal.ajax-blocker.show').one('hidden.bs.modal', function(){ self.restart(); })
+                $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', function(){ self.restart(); })
             }
         });
     }

@@ -31,7 +31,7 @@
     <tr>
     {% endif %}
         <td class="mytable-col-xs">
-            <div class="dropdown" id="edit_issue_{{issue.id}}">
+            <div class="dropdown ajax-blocker">
                 <button class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
@@ -41,10 +41,6 @@
                     <hr/>
                     <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger">Delete issue</a>
                 </div>
-                <script type="text/javascript">
-                    $('#edit_issue_{{issue.id}}').on('show.bs.dropdown', ajax_loader.stop);
-                    $('#edit_issue_{{issue.id}}').on('hide.bs.dropdown', ajax_loader.restart);
-                </script>
             </div>
         </td>
         <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>

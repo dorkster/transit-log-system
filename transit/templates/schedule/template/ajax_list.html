@@ -17,7 +17,7 @@
             </div>
         </td>
         <td class="mytable-col-xs">
-            <div class="dropdown" id="edit_template_{{template.id}}">
+            <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
@@ -26,10 +26,6 @@
                     <hr/>
                     <a href="{% url 'template-delete' template.id %}" class="dropdown-item text-danger">Delete template</a>
                 </div>
-                <script type="text/javascript">
-                    $('#edit_template_{{template.id}}').on('show.bs.dropdown', ajax_loader.stop);
-                    $('#edit_template_{{template.id}}').on('hide.bs.dropdown', ajax_loader.restart);
-                </script>
             </div>
         </td>
         <td class="mytable-col-lg">{{ template.name }}</td>

@@ -4,10 +4,16 @@
         <div class="col">
             <h5>Filter</h5>
         </div>
+        {% if is_filtered %}
         <div class="col-auto">
-            <label for="filter_show_resolved">Show Resolved</label>
-            <input type="checkbox" value="" name="filter_show_resolved" id="id_filter_show_resolved" {% if filter_show_resolved %}checked{% endif %}>
+            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
         </div>
+        {% endif %}
+    </div>
+    <div class="mt-2">
+        <button class="btn {% if filter_show_resolved %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')">
+            Hide Resolved
+        </button>
     </div>
 </div>
 {% if vehicle_issues %}
@@ -54,15 +60,3 @@
 {% else %}
 <p>There are no reported vehicle issues.</p>
 {% endif %}
-<script type="text/javascript">
-    var filter_show_resolved = document.getElementById("id_filter_show_resolved");
-    function updateFilter() {
-        if (filter_show_resolved) {
-            ajax_loader.extra_data["filter_show_resolved"] = filter_show_resolved.checked;
-        }
-        ajax_loader.run();
-    }
-    if (filter_show_resolved) {
-        filter_show_resolved.addEventListener("change", updateFilter);
-    }
-</script>

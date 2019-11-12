@@ -56,20 +56,16 @@
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
 <script type="text/javascript">
-    var resolved_checkbox = document.getElementById("id_is_resolved");
-    function setResolvedBoxColor() {
-        var resolved_box = document.getElementById("resolved_box")
-        var default_classname = "col border m-1 pt-1";
-        if (resolved_checkbox.checked) {
-            resolved_box.className = default_classname + " bg-success text-light";
-        }
-        else {
-            resolved_box.className = default_classname;
-        }
+    var resolved_input = document.getElementById("id_is_resolved");
+    function setResolvedColor() {
+        if (resolved_input.value == "True")
+            resolved_input.classList.add("bg-success", "text-light");
+        else
+            resolved_input.classList.remove("bg-success", "text-light");
     }
-    if (resolved_checkbox) {
-        resolved_checkbox.addEventListener("change", setResolvedBoxColor);
-        setResolvedBoxColor();
+    if (resolved_input) {
+        resolved_input.addEventListener("change", setResolvedColor);
+        setResolvedColor();
     }
 
     var priority_select = document.getElementById("id_priority");

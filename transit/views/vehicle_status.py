@@ -19,12 +19,10 @@ def ajaxVehicleStatus(request):
         issue = get_object_or_404(VehicleIssue, id=request_id)
         issue.is_resolved = not issue.is_resolved
         issue.save()
-
-    filter_show_resolved_str = request.GET.get('filter_show_resolved', None)
-
-    if filter_show_resolved_str is not None:
-        filter_show_resolved_str = filter_show_resolved_str.lower()
-        request.session['vehicle_status_filter_show_resolved'] = True if filter_show_resolved_str == 'true' else False
+    elif request_action == 'filter_toggle_resolved':
+        request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
+    elif request_action == 'filter_reset':
+        request.session['vehicle_status_filter_show_resolved'] = False;
 
     filter_show_resolved = request.session.get('vehicle_status_filter_show_resolved', False)
 
@@ -35,7 +33,8 @@ def ajaxVehicleStatus(request):
 
     context = {
         'vehicle_issues': vehicle_issues,
-        'filter_show_resolved': filter_show_resolved
+        'filter_show_resolved': filter_show_resolved,
+        'is_filtered': (filter_show_resolved)
     }
     return render(request, 'vehicle/status/ajax_view.html', context=context)
 

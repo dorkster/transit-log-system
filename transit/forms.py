@@ -5,6 +5,11 @@ from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
 
+BOOL_CHOICES = (
+    (True, 'Yes'),
+    (False, 'No')
+)
+
 class formWidgetAttrs():
     default = {'class': 'form-control form-control-width-fix'}
     default['onfocus'] = 'inputScrollToView(this)'
@@ -120,18 +125,18 @@ class EditClientForm(forms.Form):
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
-    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())
+    is_logged = forms.ChoiceField(choices=BOOL_CHOICES, label='Is logged?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditVehicleForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.CheckboxInput())
+    is_logged = forms.ChoiceField(choices=BOOL_CHOICES, label='Is logged?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
-    log_data_only = forms.BooleanField(label='Only include rows with full log data?', required=False, initial=False, widget=forms.CheckboxInput())
+    log_data_only = forms.ChoiceField(choices=BOOL_CHOICES, label='Only include rows with full log data?', required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditVehicleIssueForm(forms.Form):
     # date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
@@ -139,7 +144,7 @@ class EditVehicleIssueForm(forms.Form):
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    is_resolved = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    is_resolved = forms.ChoiceField(choices=BOOL_CHOICES, label='Is Resolved?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditTemplateForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

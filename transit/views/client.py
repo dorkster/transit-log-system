@@ -3,6 +3,7 @@ import uuid
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from transit.models import Client, Trip
 from transit.forms import EditClientForm
@@ -90,6 +91,53 @@ def clientCreateFromTrip(request, trip_id):
     return clientCreateEditCommon(request, client, is_new=True)
 
 def ajaxClientList(request):
+    request_id = ''
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
+
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
+
+    if request_action == 'filter_elderly':
+        request.session['clients_elderly'] = int(request_data)
+    elif request_action == 'filter_ambulatory':
+        request.session['clients_ambulatory'] = int(request_data)
+    elif request_action == 'filter_search':
+        request.session['clients_search'] = request_data
+    elif request_action == 'filter_reset':
+        request.session['clients_elderly'] = 0
+        request.session['clients_ambulatory'] = 0
+        request.session['clients_search'] = ''
+
+    filter_elderly = request.session.get('clients_elderly', 0)
+    filter_ambulatory = request.session.get('clients_ambulatory', 0)
+    filter_search = request.session.get('clients_search', '')
+
     clients = Client.objects.all()
-    return render(request, 'client/ajax_list.html', {'clients': clients})
+    hidden_count = len(clients)
+
+    if filter_elderly == 1:
+        clients = clients.filter(elderly=True)
+    elif filter_elderly == 2:
+        clients = clients.filter(elderly=False)
+
+    if filter_ambulatory == 1:
+        clients = clients.filter(ambulatory=True)
+    elif filter_ambulatory == 2:
+        clients = clients.filter(ambulatory=False)
+
+    if filter_search != '':
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
+
+    hidden_count = hidden_count - len(clients)
+
+    context = {
+        'clients': clients,
+        'filter_hidden_count': hidden_count,
+        'filter_elderly': filter_elderly,
+        'filter_ambulatory': filter_ambulatory,
+        'filter_search': filter_search,
+        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_search != '')
+    }
+    return render(request, 'client/ajax_list.html', context=context)
 

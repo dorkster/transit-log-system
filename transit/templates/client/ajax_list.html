@@ -1,4 +1,86 @@
 <h3>Clients <a class="btn btn-secondary" href="{% url 'client-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<div class="container-fluid border p-2 mb-3" style="background: #eee;">
+    <div class="row">
+        <div class="col">
+            <h5>Filter{% if filter_hidden_count > 0 %} ({{filter_hidden_count}} hidden){% endif %}</h5>
+        </div>
+        {% if is_filtered %}
+        <div class="col-auto">
+            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_elderly == 1 %}Elderly{% elif filter_elderly == 2 %}Non-Elderly{% else %}---------{% endif %}
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item {% if filter_elderly == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '0')">---------</a>
+                <a class="dropdown-item {% if filter_elderly == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '1')">Elderly</a>
+                <a class="dropdown-item {% if filter_elderly == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '2')">Non-Elderly</a>
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_ambulatory == 1 %}Ambulatory{% elif filter_ambulatory == 2 %}Non-Ambulatory{% else %}---------{% endif %}
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item {% if filter_ambulatory == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '0')">---------</a>
+                <a class="dropdown-item {% if filter_ambulatory == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '1')">Ambulatory</a>
+                <a class="dropdown-item {% if filter_ambulatory == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '2')">Non-Ambulatory</a>
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
+                <span class="oi oi-magnifying-glass mr-2"></span>Search
+            </button>
+
+            <!-- Modal -->
+            <div class="modal ajax-blocker" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_filter_search_title">Filter clients by name/address</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="filter_search_form">
+                            <div class="modal-body">
+                                <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="oi oi-magnifying-glass mr-2"></span>Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $('#filter_search_form').on('submit', function(e){
+                    e.preventDefault();
+                    $('#modal_filter_search').modal('hide');
+                    ajax_loader.run('', 'filter_search', $('#filter_search').val());
+                });
+                $('#modal_filter_search').on('show.bs.modal', function(){
+                    $('#filter_search').val('{{filter_search}}');
+                });
+                $('#modal_filter_search').on('shown.bs.modal', function(){ 
+                    $('#filter_search').focus();
+                    $('#filter_search').select();
+                });
+            </script>
+    {% if filter_search %}
+    <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
+    {% endif %}
+    </div>
+</div>
 {% if clients %}
 <table class="mytable mytable-striped">
     <thead>
@@ -34,4 +116,6 @@
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<p>There are no clients. {% if filter_hidden_count > 0 %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all clients.{% endif %}</p>
 {% endif %}

@@ -261,10 +261,17 @@
                         {% if trip.status > 0 %}
                         <div class="list-group-item p-1">
                             {% if trip.status == 1 %}
-                            <span class="badge badge-secondary">Canceled</span>
+                            <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
                             {% elif trip.status == 2 %}
-                            <span class="badge badge-secondary">No Show</span>
+                            <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                             {% endif %}
+                        </div>
+                        {% endif %}
+                        {% if trip.tags %}
+                        <div class="list-group-item p-1">
+                        {% for tag in trip.get_tag_list %}
+                        <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                        {% endfor %}
                         </div>
                         {% endif %}
                     </div>

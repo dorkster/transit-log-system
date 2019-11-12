@@ -40,6 +40,7 @@ class Trip(models.Model):
     pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     trip_type = models.ForeignKey('TripType', on_delete=models.SET_NULL, null=True, blank=True)
+    tags = models.CharField(max_length=FieldSizes.XL, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
@@ -149,6 +150,12 @@ class Trip(models.Model):
 
     def check_end_time(self):
         return self.check_blank(self.end_time)
+
+    def get_tag_list(self):
+        tags = self.tags.split(',')
+        for i in tags:
+            i = i.strip()
+        return tags
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

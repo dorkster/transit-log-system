@@ -203,15 +203,20 @@
                                 {% endif %}
                             </div>
                             {% endif %}
-                            {% if trip.trip_type.name == 'Medical' or trip.status > 0 %}
+                            {% if trip.trip_type.name == 'Medical' or trip.status > 0 or trip.tags%}
                             <div class="list-group-item bg-transparent p-1">
                                 {% if trip.trip_type.name == 'Medical' %}
                                 <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>Medical</span>
                                 {% endif %}
+                                {% if trip.tags %}
+                                {% for tag in trip.get_tag_list %}
+                                <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                                {% endfor %}
+                                {% endif %}
                                 {% if trip.status == 1 %}
-                                <span class="badge badge-secondary">Canceled</span>
+                                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
                                 {% elif trip.status == 2 %}
-                                <span class="badge badge-secondary">No Show</span>
+                                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                                 {% endif %}
                             </div>
                             {% endif %}

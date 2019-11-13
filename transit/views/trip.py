@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Trip, Driver, Vehicle, Client, Shift
+from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag
 from transit.forms import EditTripForm, tripStartForm, tripEndForm
 
 def tripCreate(request, mode, year, month, day):
@@ -65,6 +65,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
         if form.is_valid():
             old_date = trip.date
+            FrequentTag.removeTags(trip.get_tag_list())
 
             trip.date = form.cleaned_data['date']
             trip.name = form.cleaned_data['name']
@@ -98,6 +99,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
                     trip.sort_index = query[0].sort_index + 1
                 else:
                     trip.sort_index = 0
+
+            FrequentTag.addTags(trip.get_tag_list())
 
             trip.save()
 
@@ -133,6 +136,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         'clients': Client.objects.all(),
         'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
+        'frequent_tags': FrequentTag.objects.all()[:10],
     }
 
     return render(request, 'trip/edit.html', context)
@@ -144,6 +148,8 @@ def tripDelete(request, mode, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('trip-edit', kwargs={'mode':mode, 'id':id}))
+
+        FrequentTag.removeTags(trip.get_tag_list())
 
         query = Trip.objects.filter(date=trip.date)
         for i in query:

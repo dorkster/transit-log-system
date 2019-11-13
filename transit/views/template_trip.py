@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Template, TemplateTrip, Client
+from transit.models import Template, TemplateTrip, Client, FrequentTag
 from transit.forms import EditTemplateTripForm
 
 def templateTripList(request, parent):
@@ -44,6 +44,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
             return HttpResponseRedirect(reverse('template-trip-delete', kwargs={'parent':trip.parent.id, 'id':trip.id}))
 
         if form.is_valid():
+            FrequentTag.removeTags(trip.get_tag_list())
+
             trip.name = form.cleaned_data['name']
             trip.address = form.cleaned_data['address']
             trip.phone_home = form.cleaned_data['phone_home']
@@ -56,6 +58,9 @@ def templateTripCreateEditCommon(request, trip, is_new):
             trip.elderly = form.cleaned_data['elderly']
             trip.ambulatory = form.cleaned_data['ambulatory']
             trip.note = form.cleaned_data['notes']
+
+            FrequentTag.addTags(trip.get_tag_list())
+
             trip.save()
 
             return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + '#trip_' + str(trip.id))
@@ -82,6 +87,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         'clients': Client.objects.all(),
         'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
+        'frequent_tags': FrequentTag.objects.all()[:10],
     }
 
     return render(request, 'schedule/template/trip/edit.html', context)
@@ -92,6 +98,8 @@ def templateTripDelete(request, parent, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('template-trip-edit', kwargs={'parent':trip.parent.id, 'id':id}))
+
+        FrequentTag.removeTags(trip.get_tag_list())
 
         query = TemplateTrip.objects.filter(parent=trip.parent)
         for i in query:

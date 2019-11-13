@@ -153,8 +153,9 @@ class Trip(models.Model):
 
     def get_tag_list(self):
         tags = self.tags.split(',')
-        for i in tags:
-            i = i.strip()
+        for i in range(0, len(tags)):
+            tags[i] = tags[i].strip()
+        print(tags)
         return tags
 
 class Driver(models.Model):
@@ -382,11 +383,50 @@ class TemplateTrip(models.Model):
 
     def get_tag_list(self):
         tags = self.tags.split(',')
-        for i in tags:
-            i = i.strip()
+        for i in range(0, len(tags)):
+            tags[i] = tags[i].strip()
         return tags
 
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField()
     message = models.CharField(max_length=FieldSizes.LG, blank=True)
+
+class FrequentTag(models.Model):
+    tag = models.CharField(primary_key=True, max_length=FieldSizes.SM)
+    count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['-count']
+
+    def addTags(tag_list):
+        for i in tag_list:
+            i_tag = i.strip()
+            if i_tag == '':
+                continue
+
+            try:
+                f_tag = FrequentTag.objects.get(tag=i_tag)
+                f_tag.count += 1
+                f_tag.save()
+            except:
+                f_tag = FrequentTag()
+                f_tag.tag = i_tag
+                f_tag.count = 1
+                f_tag.save()
+
+    def removeTags(tag_list):
+        for i in tag_list:
+            i_tag = i.strip()
+            if i_tag == '':
+                continue
+
+            try:
+                f_tag = FrequentTag.objects.get(tag=i_tag)
+                f_tag.count -= 1
+                if f_tag.count <= 0:
+                    f_tag.delete()
+                else:
+                    f_tag.save()
+            except:
+                pass

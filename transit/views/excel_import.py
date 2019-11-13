@@ -19,7 +19,7 @@ def excelImport(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             options = {}
-            options['log_data_only'] = form.cleaned_data['log_data_only']
+            options['log_data_only'] = True if form.cleaned_data['log_data_only'] == 'True' else False
             options['dry_run'] = True if form.cleaned_data['dry_run'] == 'True' else False
             shifts = []
             trips = []

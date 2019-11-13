@@ -138,6 +138,7 @@ class EditTripTypeForm(forms.Form):
 class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
     log_data_only = forms.ChoiceField(choices=BOOL_CHOICES, label='Only include rows with full log data?', required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    dry_run = forms.ChoiceField(choices=BOOL_CHOICES, label="Dry run? (i.e. don't write to database)", required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditVehicleIssueForm(forms.Form):
     # date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))

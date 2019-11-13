@@ -12,7 +12,7 @@
         </div>
     </div>
 </form>
-{% if trips  or shifts%}
+{% if trips or shifts%}
 <ul class="list-group">
     {% for shift in shifts %}
     <li class="list-group-item">Imported shift: <strong>{{ shift }}</strong></li>
@@ -20,6 +20,15 @@
     {% for trip in trips %}
     <li class="list-group-item">Imported trip: <strong>{{ trip }}</strong></li>
     {% endfor %}
+</ul>
+{% endif %}
+{% if errors %}
+<hr/>
+<h3>Errors</h3>
+<ul class="list-group">
+{% for error in errors %}
+    <li class="list-group-item list-group-item-danger">{{ error }}</li>
+{% endfor %}
 </ul>
 {% endif %}
 {% endblock %}

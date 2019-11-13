@@ -52,6 +52,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
             trip.pick_up_time = form.cleaned_data['pick_up_time']
             trip.appointment_time = form.cleaned_data['appointment_time']
             trip.trip_type = form.cleaned_data['trip_type']
+            trip.tags = form.cleaned_data['tags']
             trip.elderly = form.cleaned_data['elderly']
             trip.ambulatory = form.cleaned_data['ambulatory']
             trip.note = form.cleaned_data['notes']
@@ -68,6 +69,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
             'pick_up_time': trip.pick_up_time,
             'appointment_time': trip.appointment_time,
             'trip_type': trip.trip_type,
+            'tags': trip.tags,
             'elderly': trip.elderly,
             'ambulatory': trip.ambulatory,
             'notes': trip.note,

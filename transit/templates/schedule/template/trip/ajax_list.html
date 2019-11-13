@@ -110,6 +110,13 @@
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
                             </div>
                         </div>
+                        {% if trip.tags %}
+                        <div class="list-group-item p-1">
+                        {% for tag in trip.get_tag_list %}
+                        <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                        {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

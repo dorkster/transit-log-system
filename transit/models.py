@@ -55,17 +55,17 @@ class Trip(models.Model):
 
     def __str__(self):
         output = '[' + str(self.date) + '] - ' + self.name
-        if self.address is not None and self.address is not '':
+        if self.address is not None and self.address != '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not '':
+            if self.destination is not None and self.destination != '':
                 output += ' to ' + self.destination
         return output
 
     def str_pretty(self):
         output = self.date.strftime('%b %d, %Y') + ' | ' + self.name
-        if self.address is not None and self.address is not '':
+        if self.address is not None and self.address != '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not '':
+            if self.destination is not None and self.destination != '':
                 output += ' to ' + self.destination
         return output
 
@@ -372,9 +372,9 @@ class TemplateTrip(models.Model):
 
     def __str__(self):
         output = '[' + self.parent.name + '] - ' + self.name
-        if self.address is not None and self.address is not '':
+        if self.address is not None and self.address != '':
             output += ' from ' + self.address
-            if self.destination is not None and self.destination is not '':
+            if self.destination is not None and self.destination != '':
                 output += ' to ' + self.destination
         return output
 

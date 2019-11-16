@@ -11,7 +11,7 @@ def templateList(request):
     context = {
         'template': Template.objects.all(),
     }
-    return render(request, 'schedule/template/list.html', context=context)
+    return render(request, 'template/list.html', context=context)
 
 def templateCreate(request):
     template = Template()
@@ -56,7 +56,7 @@ def templateCreateEditCommon(request, template, is_new):
         'is_new': is_new,
     }
 
-    return render(request, 'schedule/template/edit.html', context)
+    return render(request, 'template/edit.html', context)
 
 def templateDelete(request, id):
     template = get_object_or_404(Template, id=id)
@@ -107,5 +107,5 @@ def ajaxTemplateList(request):
             template.save()
 
     templates = Template.objects.all()
-    return render(request, 'schedule/template/ajax_list.html', {'templates': templates})
+    return render(request, 'template/ajax_list.html', {'templates': templates})
 

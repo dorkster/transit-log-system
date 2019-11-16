@@ -14,7 +14,7 @@ def templateTripList(request, parent):
         'parent':parent,
         'template_trips': TemplateTrip.objects.filter(parent=parent),
     }
-    return render(request, 'schedule/template/trip/list.html', context=context)
+    return render(request, 'template/trip/list.html', context=context)
 
 def templateTripCreate(request, parent):
     trip = TemplateTrip()
@@ -90,7 +90,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         'frequent_tags': FrequentTag.objects.all()[:10],
     }
 
-    return render(request, 'schedule/template/trip/edit.html', context)
+    return render(request, 'template/trip/edit.html', context)
 
 def templateTripDelete(request, parent, id):
     trip = get_object_or_404(TemplateTrip, id=id)
@@ -149,5 +149,5 @@ def ajaxTemplateTripList(request, parent):
         'trips': trips,
         'template': Template.objects.get(id=parent),
     }
-    return render(request, 'schedule/template/trip/ajax_list.html', context=context)
+    return render(request, 'template/trip/ajax_list.html', context=context)
 

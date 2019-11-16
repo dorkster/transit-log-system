@@ -23,8 +23,10 @@
                 </button>
                 <div class="dropdown-menu">
                     <a href="{% url 'vehicle-edit' vehicle.id %}" class="dropdown-item">Edit vehicle</a>
+                    {% if perms.transit.can_delete_vehicle %}
                     <hr/>
                     <a href="{% url 'vehicle-delete' vehicle.id %}" class="dropdown-item text-danger">Delete vehicle</a>
+                    {% endif %}
                 </div>
             </div>
         </td>

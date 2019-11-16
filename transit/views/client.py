@@ -114,7 +114,7 @@ def ajaxClientList(request):
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
-    hidden_count = len(clients)
+    unfiltered_count = len(clients)
 
     if filter_elderly == 1:
         clients = clients.filter(elderly=True)
@@ -129,15 +129,16 @@ def ajaxClientList(request):
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
 
-    hidden_count = hidden_count - len(clients)
+    filtered_count = len(clients)
 
     context = {
         'clients': clients,
-        'filter_hidden_count': hidden_count,
         'filter_elderly': filter_elderly,
         'filter_ambulatory': filter_ambulatory,
         'filter_search': filter_search,
-        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_search != '')
+        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_search != ''),
+        'filtered_count': filtered_count,
+        'unfiltered_count': unfiltered_count,
     }
     return render(request, 'client/ajax_list.html', context=context)
 

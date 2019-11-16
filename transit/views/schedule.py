@@ -243,7 +243,7 @@ def ajaxScheduleCommon(request, template):
 
     trips = Trip.objects.filter(date=date)
 
-    hidden_count = len(trips)
+    unfiltered_count = len(trips)
 
     # TODO don't use template filename to check if we're on the View page!!!
     if template == 'schedule/ajax_view.html':
@@ -265,7 +265,7 @@ def ajaxScheduleCommon(request, template):
         if filter_vehicle != '':
             trips = trips.filter(vehicle__id=filter_vehicle)
 
-    hidden_count = hidden_count - len(trips)
+    filtered_count = len(trips)
 
     shifts = Shift.objects.filter(date=date)
     drivers = Driver.objects.all()
@@ -284,7 +284,8 @@ def ajaxScheduleCommon(request, template):
         'drivers': drivers,
         'vehicles': vehicles,
         'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
-        'filter_hidden_count': hidden_count,
+        'filtered_count': filtered_count,
+        'unfiltered_count': unfiltered_count,
         'filter_hide_canceled': filter_hide_canceled,
         'filter_hide_completed': filter_hide_completed,
         'filter_hide_nolog': filter_hide_nolog,

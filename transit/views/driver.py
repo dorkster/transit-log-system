@@ -7,6 +7,8 @@ from django.urls import reverse
 from transit.models import Driver
 from transit.forms import EditDriverForm
 
+from django.contrib.auth.decorators import permission_required
+
 def driverList(request):
     context = {
         'driver': Driver.objects.all(),
@@ -62,6 +64,7 @@ def driverCreateEditCommon(request, driver, is_new):
 
     return render(request, 'driver/edit.html', context)
 
+@permission_required('transit.can_delete_driver')
 def driverDelete(request, id):
     driver = get_object_or_404(Driver, id=id)
 

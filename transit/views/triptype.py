@@ -7,6 +7,8 @@ from django.urls import reverse
 from transit.models import TripType
 from transit.forms import EditTripTypeForm
 
+from django.contrib.auth.decorators import permission_required
+
 def triptypeList(request):
     context = {
         'triptype': TripType.objects.all(),
@@ -58,6 +60,7 @@ def triptypeCreateEditCommon(request, triptype, is_new):
 
     return render(request, 'triptype/edit.html', context)
 
+@permission_required('transit.can_delete_triptype')
 def triptypeDelete(request, id):
     triptype = get_object_or_404(TripType, id=id)
 

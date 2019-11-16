@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Client, Trip
+from transit.models import Client, Trip, FrequentTag
 from transit.forms import EditClientForm
 
 def clientList(request):
@@ -33,12 +33,18 @@ def clientCreateEditCommon(request, client, is_new):
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
         if form.is_valid():
+            FrequentTag.removeTags(client.get_tag_list())
+
             client.name = form.cleaned_data['name']
             client.address = form.cleaned_data['address']
             client.phone_home = form.cleaned_data['phone_home']
             client.phone_cell = form.cleaned_data['phone_cell']
             client.elderly = form.cleaned_data['elderly']
             client.ambulatory = form.cleaned_data['ambulatory']
+            client.tags = form.cleaned_data['tags']
+
+            FrequentTag.addTags(client.get_tag_list())
+
             client.save()
 
             return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
@@ -50,6 +56,7 @@ def clientCreateEditCommon(request, client, is_new):
             'phone_cell': client.phone_cell,
             'elderly': client.elderly,
             'ambulatory': client.ambulatory,
+            'tags': client.tags,
         }
         form = EditClientForm(initial=initial)
 
@@ -57,6 +64,7 @@ def clientCreateEditCommon(request, client, is_new):
         'form': form,
         'client': client,
         'is_new': is_new,
+        'frequent_tags': FrequentTag.objects.all()[:10]
     }
 
     return render(request, 'client/edit.html', context)

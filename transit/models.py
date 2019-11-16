@@ -298,6 +298,7 @@ class Client(models.Model):
     phone_cell = models.CharField('Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
+    tags = models.CharField(max_length=FieldSizes.XL, blank=True)
 
     class Meta:
         ordering = ['name']
@@ -307,6 +308,12 @@ class Client(models.Model):
 
     def get_class_name(self):
         return 'Client'
+
+    def get_tag_list(self):
+        tags = self.tags.split(',')
+        for i in range(0, len(tags)):
+            tags[i] = tags[i].strip()
+        return tags
 
 class VehicleIssue(models.Model):
     PRIORITY_HIGH = 2

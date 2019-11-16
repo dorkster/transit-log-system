@@ -89,8 +89,7 @@
         <td>Address</td>
         <td>Phone (Home)</td>
         <td>Phone (Cell)</td>
-        <td>Elderly?</td>
-        <td>Ambulatory?</td>
+        <td></td>
     </thead>
     {% for client in clients %}
     <tr>
@@ -111,8 +110,48 @@
         <td class="mytable-col-lg">{{ client.address }}</td>
         <td class="mytable-col-md">{{ client.phone_home }}</td>
         <td class="mytable-col-md">{{ client.phone_cell }}</td>
-        <td class="mytable-col-sm"><span class="oi {% if client.elderly %}oi-check{% elif client.elderly is False %}oi-x{% endif %}"></span></td>
-        <td class="mytable-col-sm"><span class="oi {% if client.ambulatory %}oi-check{% elif client.ambulatory is False %}oi-x{% endif %}"></span></td>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-ellipses"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right p-2">
+                    <div class="list-group list-group-flush" style="width: 300px">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Elderly?</div>
+                                <div class="col-auto">
+                                    {% if client.elderly %}
+                                    <span class="oi oi-check"></span>
+                                    {% elif client.elderly is False %}
+                                    <span class="oi oi-x"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Ambulatory?</div>
+                                <div class="col-auto">
+                                    {% if client.ambulatory %}
+                                    <span class="oi oi-check"></span>
+                                    {% elif client.ambulatory is False %}
+                                    <span class="oi oi-x"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if client.tags %}
+                        <div class="list-group-item p-1">
+                        {% for tag in client.get_tag_list %}
+                        <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                        {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </td>
     </tr>
     {% endfor %}
 </table>

@@ -186,6 +186,9 @@
                     ambulatory_input.selectedIndex = 1;
                 else if (clients[i].fields.ambulatory == false)
                     ambulatory_input.selectedIndex = 2;
+
+                var tags_input = document.getElementById("id_tags");
+                tags_input.value = clients[i].fields.tags;
             }
         }
     }

@@ -27,7 +27,7 @@
         <h3>{{ v.vehicle }}</h3>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="tab_summary_{{v.vehicle.id}}" data-toggle="tab" href="#summary_{{v.vehicle.id}}" role="tab" aria-controls="log" aria-selected="true">Summary</a>
+                <a class="nav-link active" id="tab_summary_{{v.vehicle.id}}" data-toggle="tab" href="#summary_{{v.vehicle.id}}" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
             </li>
             {% if v.days %}
             <li class="nav-item">
@@ -156,6 +156,77 @@
     </div>
 </div>
 {% endfor %}
+{% if unique_riders %}
+<div class="row mb-3">
+    <div class="col">
+        <h3>Elderly/Ambulatory Rider Summary</h3>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab_summary_unique_riders" data-toggle="tab" href="#summary_unique_riders" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tab_list_unique_riders" data-toggle="tab" href="#list_unique_riders" role="tab" aria-controls="list" aria-selected="false">List of Riders</a>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-1 bg-white" id="myTabContent">
+            <div class="tab-pane fade show active" id="summary_unique_riders" role="tabpanel" aria-labelledby="summary-tab">
+                <div>
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Elderly Ambulatory riders</div>
+                                <div class="col-auto">{{ ur_elderly_ambulatory}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Elderly Non-Ambulatory riders</div>
+                                <div class="col-auto">{{ ur_elderly_nonambulatory}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Non-Elderly Ambulatory riders</div>
+                                <div class="col-auto">{{ ur_nonelderly_ambulatory}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Non-Elderly Non-Ambulatory riders</div>
+                                <div class="col-auto">{{ ur_nonelderly_nonambulatory}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Unknown riders</div>
+                                <div class="col-auto">{{ ur_unknown }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="list_unique_riders" role="tabpanel" aria-labelledby="list-tab">
+                <div>
+                    <table class="mytable mytable-striped">
+                        <thead>
+                            <td class="mytable-col-lg">Name</td>
+                            <td class="mytable-col-sm">Elderly?</td>
+                            <td class="mytable-col-sm">Ambulatory?</td>
+                        </thead>
+                        {% for rider in unique_riders %}
+                        <tr>
+                            <td>{{ rider.name }}</td>
+                            <td class="text-center">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
+                            <td class="text-center">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% if no_vehicle_errors %}
 <hr/>
 <h3>Shifts &amp; trips without an assigned vehicle</h3>

@@ -6,6 +6,15 @@ from django.urls import reverse
 from transit.models import Driver, Vehicle, Trip, Shift, TripType
 
 def report(request, year, month):
+    class UniqueRider:
+        def __init__(self, name, elderly=None, ambulatory=None):
+            self.name = name
+            self.elderly = elderly
+            self.ambulatory = ambulatory
+
+        def __lt__(self, other):
+            return self.name < other.name
+
     class ReportVehicle():
         class Day():
             def __init__(self):
@@ -34,6 +43,8 @@ def report(request, year, month):
     month_prev = date_start + datetime.timedelta(days=-1)
     month_prev.replace(day=1)
     month_next = date_end + datetime.timedelta(days=1)
+
+    unique_riders = []
 
     triptypes = TripType.objects.all()
 
@@ -122,6 +133,18 @@ def report(request, year, month):
                     if trip.trip_type != None:
                         rv_day.trip_types[str(trip.trip_type)] = 1
 
+                    ur_index = None
+                    for i in range(len(unique_riders)):
+                        if unique_riders[i].name == trip.name:
+                            ur_index = i
+                            if unique_riders[i].elderly is None:
+                                unique_riders[i].elderly = trip.elderly
+                            if unique_riders[i].ambulatory is None:
+                                unique_riders[i].ambulatory = trip.ambulatory
+
+                    if ur_index is None:
+                        unique_riders.append(UniqueRider(trip.name, trip.elderly, trip.ambulatory))
+
             if not shift_data_list or not trip_data_list:
                 continue
 
@@ -165,6 +188,25 @@ def report(request, year, month):
             if error_str != '':
                 no_vehicle_errors.append(error_str)
 
+    unique_riders.sort()
+    ur_elderly_ambulatory = 0
+    ur_elderly_nonambulatory = 0
+    ur_nonelderly_ambulatory = 0
+    ur_nonelderly_nonambulatory = 0
+    ur_unknown = 0
+
+    for i in unique_riders:
+        if i.elderly and i.ambulatory:
+            ur_elderly_ambulatory += 1
+        elif i.elderly and i.ambulatory == False:
+            ur_elderly_nonambulatory +=1
+        elif i.elderly == False and i.ambulatory:
+            ur_nonelderly_ambulatory +=1
+        elif i.elderly == False and i.ambulatory == False:
+            ur_nonelderly_nonambulatory +=1
+        else:
+            ur_unknown +=1
+
     context = {
         'date_start': date_start,
         'date_end': date_end,
@@ -173,6 +215,12 @@ def report(request, year, month):
         'vehicles': vehicle_list,
         'no_vehicle_errors': no_vehicle_errors,
         'triptypes': triptypes,
+        'unique_riders': unique_riders,
+        'ur_elderly_ambulatory': ur_elderly_ambulatory,
+        'ur_elderly_nonambulatory': ur_elderly_nonambulatory,
+        'ur_nonelderly_ambulatory': ur_nonelderly_ambulatory,
+        'ur_nonelderly_nonambulatory': ur_nonelderly_nonambulatory,
+        'ur_unknown': ur_unknown,
     }
     return render(request, 'report/view.html', context)
 

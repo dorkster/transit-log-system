@@ -115,6 +115,8 @@ class tripStartForm(forms.Form):
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     adjacent_trips = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class tripEndForm(forms.Form):

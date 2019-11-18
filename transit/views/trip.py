@@ -230,6 +230,8 @@ def tripStart(request, id):
             trip.start_time = form.cleaned_data['time']
             trip.driver = form.cleaned_data['driver']
             trip.vehicle = form.cleaned_data['vehicle']
+            trip.collected_cash = moneyParse(form.cleaned_data['collected_cash'])
+            trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
             trip.save()
 
             if form.cleaned_data['adjacent_trips'] != '':
@@ -254,6 +256,8 @@ def tripStart(request, id):
             'time': auto_time,
             'driver': trip.driver,
             'vehicle': trip.vehicle,
+            'collected_cash': moneyFormat(trip.collected_cash),
+            'collected_check': moneyFormat(trip.collected_check),
         }
         form = tripStartForm(initial=initial)
 

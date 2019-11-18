@@ -25,7 +25,7 @@
                     <a href="{% url 'driver-edit' driver.id %}" class="dropdown-item">Edit driver</a>
                     {% if perms.transit.can_delete_driver %}
                     <hr/>
-                    <a href="{% url 'driver-delete' driver.i0d %}" class="dropdown-item text-danger">Delete driver</a>
+                    <a href="{% url 'driver-delete' driver.id %}" class="dropdown-item text-danger">Delete driver</a>
                     {% endif %}
                 </div>
             </div>

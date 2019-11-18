@@ -44,7 +44,7 @@
                 <div class="dropdown-menu">
                     <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item">Edit issue</a>
                     <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}Set as not resolved{% else %}Set as resolved{% endif %}</a>
-                    <hr/>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger">Delete issue</a>
                 </div>
             </div>

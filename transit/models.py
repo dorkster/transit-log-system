@@ -25,6 +25,10 @@ class Trip(models.Model):
         (STATUS_CANCELED, 'Canceled'),
         (STATUS_NO_SHOW, 'No Show'),
     ]
+    STATUS_LEVELS_ACTIVITY = [
+        (STATUS_NORMAL, '---------'),
+        (STATUS_CANCELED, 'Canceled'),
+    ]
 
     # TODO event? (i.e. Mealsite)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -49,11 +53,19 @@ class Trip(models.Model):
     end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
+    is_activity = models.BooleanField(default=False, editable=False)
 
     class Meta:
         ordering = ['-date', 'sort_index']
 
     def __str__(self):
+        if self.is_activity:
+            output = '[' + str(self.date) + '] - '
+            if self.appointment_time: 
+                output += str(self.appointment_time) + ' - '
+            output += self.note
+            return output
+
         output = '[' + str(self.date) + '] - ' + self.name
         if self.address is not None and self.address != '':
             output += ' from ' + self.address
@@ -72,6 +84,8 @@ class Trip(models.Model):
     def get_driver_color(self):
         if self.status > 0:
             return 'BBBBBB'
+        elif self.is_activity:
+            return 'DDD9C3'
         else:
             return Driver.get_color(self.driver)
 
@@ -93,7 +107,10 @@ class Trip(models.Model):
         return self.get_phone_number('cell')
 
     def get_class_name(self):
-        return 'Trip'
+        if self.is_activity:
+            return 'Activity'
+        else:
+            return 'Trip'
 
     class LogData():
         def __init__(self):
@@ -103,7 +120,7 @@ class Trip(models.Model):
             self.end_time = None
 
     def get_parsed_log_data(self, shift_miles):
-        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
+        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '' or self.is_activity:
             return None
 
         data = self.LogData()
@@ -115,7 +132,7 @@ class Trip(models.Model):
         return data
 
     def get_error_str(self):
-        if self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
+        if (self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '') or self.is_activity:
             return '' # Empty; can be safely ignored
         if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
             error_msg = ''

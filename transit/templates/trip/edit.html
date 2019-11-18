@@ -4,9 +4,9 @@
 {% load static %}
 <h2>
     {% if is_new %}
-    New Trip
+    New {% if trip.is_activity %}Activity{% else %}Trip{% endif %}
     {% else %}
-    Trip Edit
+    {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Edit
     {% endif %}
 </h2>
 <form class="mb-4" action="" method="post">
@@ -32,6 +32,15 @@
             </div>
         </div>
         <div class="row">
+            {% if trip.is_activity %}
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Activity Information</legend>
+                    <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
+                    <div class="mb-2"><label for="{{ form.description.id_for_label }}"><strong>{{ form.description.label }}</strong></label><br/>{{ form.description }}</div>
+                </fieldset>
+            </div>
+            {% else %}
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <legend>Client Information</legend>
@@ -104,6 +113,7 @@
                     <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label><br/>{{ form.end_time }}</div>
                 </fieldset>
             </div>
+            {% endif %}
         </div>
         <hr>
         <div class="d-flex flex-wrap mt-2">
@@ -113,7 +123,7 @@
             </div>
             {% if not is_new %}
             <div>
-                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Trip" formnovalidate>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete {% if trip.is_activity %}Activity{% else %}Trip{% endif %}" formnovalidate>
             </div>
             {% endif %}
         </div>
@@ -123,6 +133,19 @@
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
 <script type="text/javascript">
+    var status_input = document.getElementById("id_status")
+    function setStatusColor() {
+        if (status_input.value > 0) {
+            status_input.classList.add("bg-danger", "text-light");
+        }
+        else {
+            status_input.classList.remove("bg-danger", "text-light");
+        }
+    }
+    status_input.addEventListener("change", setStatusColor);
+    setStatusColor();
+
+{% if not trip.is_activity %}
     function ajaxSetVehicleFromDriver() {
         $.ajax({
             type: "GET",
@@ -147,18 +170,6 @@
     }
 
     $("#id_driver").change(ajaxSetVehicleFromDriver);
-
-    var status_input = document.getElementById("id_status")
-    function setStatusColor() {
-        if (status_input.value > 0) {
-            status_input.classList.add("bg-danger", "text-light");
-        }
-        else {
-            status_input.classList.remove("bg-danger", "text-light");
-        }
-    }
-    status_input.addEventListener("change", setStatusColor);
-    setStatusColor();
 
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
 
@@ -219,6 +230,7 @@
             }
         }
     }
+{% endif %}
 </script>
 {% endblock %}
 {% endblock %}

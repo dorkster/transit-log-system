@@ -42,7 +42,17 @@
 <p>There are no shifts for this day.</p>
 {% endif %}
 <hr/>
-<h3 class="mt-4">Trips <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<h3 class="mt-4">
+    Trips
+    <span class="btn-group dropdown ajax-blocker">
+        <a class="btn btn-secondary" href="{% url 'trip-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
+        <a href="#_" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{% url 'trip-create' 'view' date.year date.month date.day %}">New Trip</a>
+            <a class="dropdown-item" href="{% url 'trip-create-activity' 'view' date.year date.month date.day %}">New Activity</a>
+        </div>
+    </span>
+</h3>
 <div class="container-fluid border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
@@ -151,6 +161,13 @@
                                 <span class="oi oi-pencil"></span>
                             </button>
                             <div class="dropdown-menu">
+                                {% if trip.is_activity %}
+                                <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item">Edit activity</a>
+                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
+                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
+                                <hr/>
+                                <a href="{% url 'trip-delete-activity' 'view' trip.id %}" class="dropdown-item text-danger">Delete activity</a>
+                                {% else %}
                                 <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item">Edit trip</a>
                                 {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
                                 {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
@@ -159,16 +176,35 @@
                                 <a href="{% url 'trip-create-return' 'view' trip.id %}" class="dropdown-item">Create Return Trip</a>
                                 <hr/>
                                 <a href="{% url 'trip-delete' 'view' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     <div class="p-1">
-                        <h4 class="card-title mb-0">{{ trip.name }}</h4>
+                        <h4 class="card-title mb-0">
+                            {% if trip.is_activity %}
+                            {{ trip.note }}
+                            {% else %}
+                            {{ trip.name }}
+                            {% endif %}
+                        </h4>
                     </div>
                 </div>
                 <div class="d-flex flex-wrap">
                     <div class="p-1 w-100" style="max-width: 540px;">
                         <div class="list-group list-group-flush" style="max-width: 540px;">
+                            {% if trip.is_activity %}
+                                {% if trip.appointment_time %}
+                                <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center p-1">
+                                    {% if trip.appointment_time %}
+                                    <span class="badge badge-info">
+                                        <span class="oi oi-clock mr-1"></span><strong>{{ trip.appointment_time }}</strong>
+                                    </span>
+                                    {% endif %}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            {% else %}
                             {% if trip.address or trip.pick_up_time %}
                             <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center p-1">
                                 <span class="mr-2">
@@ -203,6 +239,7 @@
                                 {% endif %}
                             </div>
                             {% endif %}
+                            {% endif %}
                             {% if trip.trip_type or trip.status > 0 or trip.tags%}
                             <div class="list-group-item bg-transparent p-1">
                                 {% if trip.status == 1 %}
@@ -224,6 +261,7 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% if not trip.is_activity %}
                     <div class="ml-auto align-self-end p-1">
                         <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
                         <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
@@ -245,6 +283,7 @@
                         <a href="#_" class="btn btn-secondary btn-lg disabled">Call</a>
                         {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

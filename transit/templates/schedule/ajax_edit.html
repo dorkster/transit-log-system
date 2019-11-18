@@ -76,17 +76,24 @@
 <hr/>
 <h3>
     Trips
-    <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="oi oi-list mr-2"></span>Templates
-            </button>
-            <div class="dropdown-menu">
-                {% for template in templates %}
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'load_template', '{{template.id}}')">{{template}}</a>
-                {% endfor %}
-            </div>
-        </span>
+    <span class="btn-group dropdown ajax-blocker">
+        <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
+        <a href="#_" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{% url 'trip-create' 'edit' date.year date.month date.day %}">New Trip</a>
+            <a class="dropdown-item" href="{% url 'trip-create-activity' 'edit' date.year date.month date.day %}">New Activity</a>
+        </div>
+    </span>
+    <span class="dropdown ajax-blocker">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="oi oi-list mr-2"></span>Templates
+        </button>
+        <div class="dropdown-menu">
+            {% for template in templates %}
+            <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'load_template', '{{template.id}}')">{{template}}</a>
+            {% endfor %}
+        </div>
+    </span>
 </h3>
 </div>
 {% if trips %}
@@ -123,6 +130,13 @@
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu">
+                    {% if trip.is_activity %}
+                    <a href="{% url 'trip-edit-activity' 'edit' trip.id %}" class="dropdown-item">Edit activity</a>
+                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
+                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
+                    <hr/>
+                    <a href="{% url 'trip-delete-activity' 'edit' trip.id %}" class="dropdown-item text-danger">Delete activity</a>
+                    {% else %}
                     <a href="{% url 'trip-edit' 'edit' trip.id %}" class="dropdown-item">Edit trip</a>
                     {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
                     {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
@@ -132,9 +146,14 @@
                     <a href="{% url 'trip-create-return' 'edit' trip.id %}" class="dropdown-item">Create Return Trip</a>
                     <hr/>
                     <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                    {% endif %}
                 </div>
             </div>
         </td>
+        {% if trip.is_activity %}
+        <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
+        <td colspan=11 class="text-center">{{ trip.note }}</td>
+        {% else %}
         <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
         <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
         <td class="mytable-col-md">{{ trip.name }}</td>
@@ -278,6 +297,7 @@
                 </div>
             </div>
         </td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

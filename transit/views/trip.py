@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.core import serializers
 
 from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag
-from transit.forms import EditTripForm, tripStartForm, tripEndForm
+from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
 
 def tripCreate(request, mode, year, month, day):
     trip = Trip()
@@ -45,6 +45,12 @@ def tripCreateReturn(request, mode, id):
 
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
+def tripCreateActivity(request, mode, year, month, day):
+    trip = Trip()
+    trip.date = datetime.date(year, month, day)
+    trip.is_activity = True
+    return tripCreateEditCommon(request, mode, trip, is_new=True)
+
 def tripCreateEditCommon(request, mode, trip, is_new):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
@@ -61,32 +67,42 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         return HttpResponseRedirect(reverse('trip-delete', kwargs={'mode':mode, 'id':trip.id}))
 
     if request.method == 'POST':
-        form = EditTripForm(request.POST)
+        if trip.is_activity:
+            form = EditActivityForm(request.POST)
+        else:
+            form = EditTripForm(request.POST)
 
         if form.is_valid():
             old_date = trip.date
-            FrequentTag.removeTags(trip.get_tag_list())
 
-            trip.date = form.cleaned_data['date']
-            trip.name = form.cleaned_data['name']
-            trip.address = form.cleaned_data['address']
-            trip.phone_home = form.cleaned_data['phone_home']
-            trip.phone_cell = form.cleaned_data['phone_cell']
-            trip.destination = form.cleaned_data['destination']
-            trip.pick_up_time = form.cleaned_data['pick_up_time']
-            trip.appointment_time = form.cleaned_data['appointment_time']
-            trip.trip_type = form.cleaned_data['trip_type']
-            trip.tags = form.cleaned_data['tags']
-            trip.elderly = form.cleaned_data['elderly']
-            trip.ambulatory = form.cleaned_data['ambulatory']
-            trip.driver = form.cleaned_data['driver']
-            trip.vehicle = form.cleaned_data['vehicle']
-            trip.start_miles = form.cleaned_data['start_miles']
-            trip.start_time = form.cleaned_data['start_time']
-            trip.end_miles = form.cleaned_data['end_miles']
-            trip.end_time = form.cleaned_data['end_time']
-            trip.note = form.cleaned_data['notes']
-            trip.status = form.cleaned_data['status']
+            if trip.is_activity:
+                trip.date = form.cleaned_data['date']
+                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.note = form.cleaned_data['description']
+                trip.status = form.cleaned_data['status']
+            else:
+                FrequentTag.removeTags(trip.get_tag_list())
+
+                trip.date = form.cleaned_data['date']
+                trip.name = form.cleaned_data['name']
+                trip.address = form.cleaned_data['address']
+                trip.phone_home = form.cleaned_data['phone_home']
+                trip.phone_cell = form.cleaned_data['phone_cell']
+                trip.destination = form.cleaned_data['destination']
+                trip.pick_up_time = form.cleaned_data['pick_up_time']
+                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.trip_type = form.cleaned_data['trip_type']
+                trip.tags = form.cleaned_data['tags']
+                trip.elderly = form.cleaned_data['elderly']
+                trip.ambulatory = form.cleaned_data['ambulatory']
+                trip.driver = form.cleaned_data['driver']
+                trip.vehicle = form.cleaned_data['vehicle']
+                trip.start_miles = form.cleaned_data['start_miles']
+                trip.start_time = form.cleaned_data['start_time']
+                trip.end_miles = form.cleaned_data['end_miles']
+                trip.end_time = form.cleaned_data['end_time']
+                trip.note = form.cleaned_data['notes']
+                trip.status = form.cleaned_data['status']
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -100,35 +116,45 @@ def tripCreateEditCommon(request, mode, trip, is_new):
                 else:
                     trip.sort_index = 0
 
-            FrequentTag.addTags(trip.get_tag_list())
+            if not trip.is_activity:
+                FrequentTag.addTags(trip.get_tag_list())
 
             trip.save()
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
-        initial = {
-            'date': trip.date,
-            'name': trip.name,
-            'address': trip.address,
-            'phone_home': trip.phone_home,
-            'phone_cell': trip.phone_cell,
-            'destination': trip.destination,
-            'pick_up_time': trip.pick_up_time,
-            'appointment_time': trip.appointment_time,
-            'trip_type': trip.trip_type,
-            'tags': trip.tags,
-            'elderly': trip.elderly,
-            'ambulatory': trip.ambulatory,
-            'driver': trip.driver,
-            'vehicle': trip.vehicle,
-            'start_miles': trip.start_miles,
-            'start_time': trip.start_time,
-            'end_miles': trip.end_miles,
-            'end_time': trip.end_time,
-            'notes': trip.note,
-            'status': trip.status,
-        }
-        form = EditTripForm(initial=initial)
+        if trip.is_activity:
+            initial = {
+                'date': trip.date,
+                'appointment_time': trip.appointment_time,
+                'description': trip.note,
+                'status': trip.status,
+            }
+            form = EditActivityForm(initial=initial)
+        else:
+            initial = {
+                'date': trip.date,
+                'name': trip.name,
+                'address': trip.address,
+                'phone_home': trip.phone_home,
+                'phone_cell': trip.phone_cell,
+                'destination': trip.destination,
+                'pick_up_time': trip.pick_up_time,
+                'appointment_time': trip.appointment_time,
+                'trip_type': trip.trip_type,
+                'tags': trip.tags,
+                'elderly': trip.elderly,
+                'ambulatory': trip.ambulatory,
+                'driver': trip.driver,
+                'vehicle': trip.vehicle,
+                'start_miles': trip.start_miles,
+                'start_time': trip.start_time,
+                'end_miles': trip.end_miles,
+                'end_time': trip.end_time,
+                'notes': trip.note,
+                'status': trip.status,
+            }
+            form = EditTripForm(initial=initial)
 
     context = {
         'form': form,

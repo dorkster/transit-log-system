@@ -126,6 +126,10 @@ nav {
         </thead>
         {% for trip in trips %}
         <tr style="background: #{{ trip.get_driver_color }};">
+            {% if trip.is_activity %}
+            <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
+            <td colspan=11 class="text-center">{{ trip.note }}</td>
+            {% else %}
             <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
             <td class="mytable-col-md">{{ trip.name }}</td>
@@ -173,6 +177,7 @@ nav {
             <td class="mytable-col-md">
                 {% if trip.note %}{{ trip.note }}{% endif %}
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>

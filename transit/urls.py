@@ -30,6 +30,10 @@ urlpatterns = [
     path('schedule/view/trips/<uuid:id>/start/', views.tripStart, name='trip-start'),
     path('schedule/view/trips/<uuid:id>/end/', views.tripEnd, name='trip-end'),
 
+    path('schedule/<slug:mode>/activities/create/<int:year>/<int:month>/<int:day>', views.tripCreateActivity, name='trip-create-activity'),
+    path('schedule/<slug:mode>/activities/<uuid:id>/edit/', views.tripEdit, name='trip-edit-activity'),
+    path('schedule/<slug:mode>/activities/<uuid:id>/delete/', views.tripDelete, name='trip-delete-activity'),
+
     path('clients/', views.clientList, name='clients'),
     path('clients/create', views.clientCreate, name='client-create'),
     path('clients/<uuid:id>/edit', views.clientEdit, name='client-edit'),

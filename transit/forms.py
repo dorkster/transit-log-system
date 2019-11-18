@@ -169,3 +169,8 @@ class EditTemplateTripForm(forms.Form):
 class EditScheduleMessageForm(forms.Form):
     message = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
+class EditActivityForm(forms.Form):
+    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))

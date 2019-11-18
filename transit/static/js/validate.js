@@ -61,8 +61,7 @@ function validateMilesString(value, strip_leading_zero) {
     if (value == "")
         return "";
 
-    var val_upper = value.toUpperCase();
-    var val_stripped = val_upper.replace(/[^0-9\.]/g, '');
+    var val_stripped = value.replace(/[^0-9\.]/g, '');
 
     if (val_stripped == "")
         return "";
@@ -100,8 +99,7 @@ function validateFuel(input) {
     if (input.value == "")
         return;
 
-    var val_upper = input.value.toUpperCase();
-    var val_stripped = val_upper.replace(/[^0-9\.]/g, '');
+    var val_stripped = input.value.replace(/[^0-9\.]/g, '');
 
     if (val_stripped == "") {
         input.value = "";
@@ -131,8 +129,7 @@ function validatePhone(input) {
     if (input.value == "")
         return;
 
-    var val_upper = input.value.toUpperCase();
-    var val_stripped = val_upper.replace(/[^0-9]/g, '');
+    var val_stripped = input.value.replace(/[^0-9]/g, '');
 
     if (val_stripped == "") {
         input.value = "";
@@ -176,5 +173,40 @@ function validateColor(input) {
         input.value = val_stripped.substring(0,6);
     else if (val_stripped.length >= 8)
         input.value = val_stripped.substring(0,8);
+}
+
+function validateMoney(input) {
+    if (input.value == "")
+        return;
+
+    var val_stripped = input.value.replace(/[^0-9\.]/g, '');
+
+    if (val_stripped == "") {
+        input.value = "";
+        return;
+    }
+
+    var val_split = val_stripped.split(".");
+
+    var val_new = val_split[0];
+    if (val_new == "")
+        val_new = "0";
+
+    if (val_split.length > 1) {
+        if (val_split[1] != ""){
+            var val_cents = val_split[1].replace(/[^0-9]/g, '').substring(0,2);
+            while (val_cents.length < 2) {
+                val_cents += "0";
+            }
+            val_new += "." + val_cents;
+        }
+        else
+            val_new += ".00";
+    }
+    else {
+        val_new += ".00";
+    }
+
+    input.value = val_new;
 }
 

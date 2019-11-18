@@ -61,6 +61,11 @@ class formWidgetAttrs():
     color = default.copy()
     color['onchange'] = 'validateColor(this)'
 
+    money = default.copy()
+    money['onchange'] = 'validateMoney(this)'
+    money['inputmode'] = 'numeric'
+    money['pattern'] = '[0-9]*\.[0-9]*'
+
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
 
@@ -85,6 +90,8 @@ class EditTripForm(forms.Form):
     end_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
+    collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))

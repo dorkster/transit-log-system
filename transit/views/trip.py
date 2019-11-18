@@ -1,4 +1,5 @@
 import datetime, uuid
+import re
 import json
 
 from django.shortcuts import render, get_object_or_404
@@ -9,6 +10,24 @@ from django.core import serializers
 
 from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
+
+def moneyParse(value):
+    num_only = ''
+    matches = re.findall('\d*', value)
+    for i in matches:
+        num_only += i
+    
+    if num_only == '':
+        return 0
+    else:
+        return int(num_only)
+
+def moneyFormat(value):
+    if value == 0:
+        return ''
+
+    s = str(value)
+    return s[:len(s)-2] + '.' + s[len(s)-2:]
 
 def tripCreate(request, mode, year, month, day):
     trip = Trip()
@@ -103,6 +122,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
                 trip.end_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['notes']
                 trip.status = form.cleaned_data['status']
+                trip.collected_cash = moneyParse(form.cleaned_data['collected_cash'])
+                trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -153,6 +174,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
                 'end_time': trip.end_time,
                 'notes': trip.note,
                 'status': trip.status,
+                'collected_cash': moneyFormat(trip.collected_cash),
+                'collected_check': moneyFormat(trip.collected_check),
             }
             form = EditTripForm(initial=initial)
 

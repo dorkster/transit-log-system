@@ -54,6 +54,8 @@ class Trip(models.Model):
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
     is_activity = models.BooleanField(default=False, editable=False)
+    collected_cash = models.IntegerField(default=0)
+    collected_check = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['-date', 'sort_index']

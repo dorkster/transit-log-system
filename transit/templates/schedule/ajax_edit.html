@@ -277,6 +277,25 @@
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
                             </div>
                         </div>
+                        {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
+                        <div class="list-group-item p-1 list-group-item-success">
+                            <div class="row">
+                                <div class="col text-muted">Money Collected</div>
+                            </div>
+                            {% if trip.collected_cash > 0 %}
+                            <div class="row">
+                                <div class="col text-muted">- Cash</div>
+                                <div class="col-auto">${{ trip.get_collected_cash_str }}</div>
+                            </div>
+                            {% endif %}
+                            {% if trip.collected_check > 0 %}
+                            <div class="row">
+                                <div class="col text-muted">- Check</div>
+                                <div class="col-auto">${{ trip.get_collected_check_str }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         {% if trip.status > 0 %}
                         <div class="list-group-item p-1">
                             {% if trip.status == 1 %}

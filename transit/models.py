@@ -177,6 +177,18 @@ class Trip(models.Model):
         print(tags)
         return tags
 
+    def get_collected_cash_str(self):
+        if self.collected_cash == 0:
+            return '0.00'
+        s = str(self.collected_cash)
+        return s[:len(s)-2] + '.' + s[len(s)-2:]
+
+    def get_collected_check_str(self):
+        if self.collected_check == 0:
+            return '0.00'
+        s = str(self.collected_check)
+        return s[:len(s)-2] + '.' + s[len(s)-2:]
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)

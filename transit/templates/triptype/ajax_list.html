@@ -23,7 +23,7 @@
                 <div class="dropdown-menu">
                     <a href="{% url 'triptype-edit' triptype.id %}" class="dropdown-item">Edit Trip Type</a>
                     {% if perms.transit.can_delete_triptype %}
-                    <hr/>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'triptype-delete' triptype.id %}" class="dropdown-item text-danger">Delete Trip Type</a>
                     {% endif %}
                 </div>

@@ -36,7 +36,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item">Edit trip</a>
-                    <hr/>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete trip</a>
                 </div>
             </div>

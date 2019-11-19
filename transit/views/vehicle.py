@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from transit.models import Vehicle
-from transit.forms import EditVehicleForm
+from transit.forms import EditVehicleForm, vehicleMaintainForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -113,4 +113,33 @@ def ajaxVehicleList(request):
 
     vehicles = Vehicle.objects.all()
     return render(request, 'vehicle/ajax_list.html', {'vehicles': vehicles})
+
+def vehicleMaintainEdit(request, id):
+    vehicle = get_object_or_404(Vehicle, id=id)
+
+    if request.method == 'POST':
+        form = vehicleMaintainForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('vehicle-status'))
+
+        if form.is_valid():
+            vehicle.oil_change_miles = form.cleaned_data['oil_change_miles']
+            vehicle.inspection_date = form.cleaned_data['inspection_date']
+            vehicle.save()
+
+            return HttpResponseRedirect(reverse('vehicle-status'))
+    else:
+        initial = {
+            'oil_change_miles': vehicle.oil_change_miles,
+            'inspection_date': vehicle.inspection_date,
+        }
+        form = vehicleMaintainForm(initial=initial)
+
+    context = {
+        'form': form,
+        'vehicle': vehicle,
+    }
+
+    return render(request, 'vehicle/maintain.html', context)
 

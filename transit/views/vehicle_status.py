@@ -2,7 +2,7 @@ import uuid
 
 from django.shortcuts import render, get_object_or_404
 
-from transit.models import VehicleIssue
+from transit.models import VehicleIssue, Vehicle
 
 def vehicleStatus(request):
     return render(request, 'vehicle/status/view.html', context={})
@@ -34,7 +34,8 @@ def ajaxVehicleStatus(request):
     context = {
         'vehicle_issues': vehicle_issues,
         'filter_show_resolved': filter_show_resolved,
-        'is_filtered': (filter_show_resolved)
+        'is_filtered': (filter_show_resolved),
+        'logged_vehicles': Vehicle.objects.filter(is_logged=True)
     }
     return render(request, 'vehicle/status/ajax_view.html', context=context)
 

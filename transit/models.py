@@ -218,6 +218,8 @@ class Vehicle(models.Model):
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.SM)
     is_logged = models.BooleanField(default=True)
+    oil_change_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
+    inspection_date = models.DateField(blank=True, null=True)
 
     class Meta:
         ordering = ['sort_index']

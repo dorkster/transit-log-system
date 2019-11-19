@@ -1,3 +1,27 @@
+<h3>Maintainence Information</h3>
+{% if logged_vehicles %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td>Vehicle</td>
+        <td>Last Oil Change</td>
+        <td>Inspection Sticker</td>
+        <td></td>
+    </thead>
+{% for vehicle in logged_vehicles %}
+    <tr>
+        <td class="mytable-col-lg">{{vehicle.name}}</td>
+        <td class="mytable-col-lg">{{ vehicle.oil_change_miles }}</td>
+        <td class="mytable-col-lg">{{ vehicle.inspection_date|date:"n / Y" }}</td>
+        <td class="mytable-col-md">
+            <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-secondary w-100">Update</a>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+{% else %}
+<p>There are no logged vehicles.</p>
+{% endif %}
+<hr/>
 <h3>Reported Issues <a class="btn btn-secondary" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 <div class="container-fluid border p-2 mb-3" style="background: #eee;">
     <div class="row">

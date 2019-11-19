@@ -207,6 +207,32 @@ def report(request, year, month):
         else:
             ur_unknown +=1
 
+    money_trips = []
+
+    for day in range(date_start.day, date_end.day+1):
+        day_date = datetime.date(year, month, day)
+        day_trips = Trip.objects.filter(date=day_date)
+        for trip in day_trips:
+            if trip.collected_cash > 0 or trip.collected_check > 0:
+                money_trips.append(trip)
+
+    total_collected_cash = 0
+    total_collected_check = 0
+    total_collected_cash_str = '0.00'
+    total_collected_check_str = '0.00'
+
+    for i in money_trips:
+        total_collected_cash += i.collected_cash
+        total_collected_check += i.collected_check
+
+    if total_collected_cash > 0:
+        s = str(total_collected_cash)
+        total_collected_cash_str = s[:len(s)-2] + '.' + s[len(s)-2:]
+
+    if total_collected_check > 0:
+        s = str(total_collected_check)
+        total_collected_check_str = s[:len(s)-2] + '.' + s[len(s)-2:]
+
     context = {
         'date_start': date_start,
         'date_end': date_end,
@@ -221,6 +247,9 @@ def report(request, year, month):
         'ur_nonelderly_ambulatory': ur_nonelderly_ambulatory,
         'ur_nonelderly_nonambulatory': ur_nonelderly_nonambulatory,
         'ur_unknown': ur_unknown,
+        'money_trips': money_trips,
+        'total_collected_cash': total_collected_cash_str,
+        'total_collected_check': total_collected_check_str,
     }
     return render(request, 'report/view.html', context)
 

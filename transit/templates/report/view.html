@@ -20,11 +20,12 @@
     </div>
 </div>
 <hr/>
+<div style="max-width: 800px;">
 {% for v in vehicles %}
+{% if v.days or v.errors %}
 <div class="row mb-3">
     <div class="col">
-        {% if v.days or v.errors %}
-        <h3>{{ v.vehicle }}</h3>
+        <h3>Vehicle: {{ v.vehicle }}</h3>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="tab_summary_{{v.vehicle.id}}" data-toggle="tab" href="#summary_{{v.vehicle.id}}" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
@@ -152,14 +153,14 @@
             </div>
             {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
+{% endif %}
 {% endfor %}
 {% if unique_riders %}
 <div class="row mb-3">
     <div class="col">
-        <h3>Elderly/Ambulatory Rider Summary</h3>
+        <h3>Elderly/Ambulatory Riders</h3>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="tab_summary_unique_riders" data-toggle="tab" href="#summary_unique_riders" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
@@ -227,6 +228,61 @@
     </div>
 </div>
 {% endif %}
+{% if money_trips %}
+<div class="row mb-3">
+    <div class="col">
+        <h3>Money Collected</h3>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab_summary_unique_riders" data-toggle="tab" href="#summary_money" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tab_list_unique_riders" data-toggle="tab" href="#list_contributions" role="tab" aria-controls="list" aria-selected="false">Contributions</a>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-1 bg-white" id="myTabContent">
+            <div class="tab-pane fade show active" id="summary_money" role="tabpanel" aria-labelledby="summary-tab">
+                <div>
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Total Cash Collected</div>
+                                <div class="col-auto">${{ total_collected_cash }}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Total Checks Collected</div>
+                                <div class="col-auto">${{ total_collected_check }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="list_contributions" role="tabpanel" aria-labelledby="list-tab">
+                <div>
+                    <table class="mytable mytable-striped">
+                        <thead>
+                            <td class="mytable-col-md">Date</td>
+                            <td class="mytable-col-lg">Name</td>
+                            <td class="mytable-col-sm">Cash</td>
+                            <td class="mytable-col-sm">Check</td>
+                        </thead>
+                        {% for trip in money_trips %}
+                        <tr>
+                            <td><a href="{% url 'trip-edit' 'edit' trip.id %}">{{ trip.date }}</a></td>
+                            <td>{{ trip.name }}</td>
+                            <td>${{ trip.get_collected_cash_str }}</td>
+                            <td>${{ trip.get_collected_check_str }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% if no_vehicle_errors %}
 <hr/>
 <h3>Shifts &amp; trips without an assigned vehicle</h3>
@@ -236,6 +292,7 @@
     {% endfor %}
 </ul>
 {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}

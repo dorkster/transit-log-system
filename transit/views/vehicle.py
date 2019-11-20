@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Vehicle
+from transit.models import Vehicle, Shift
 from transit.forms import EditVehicleForm, vehicleMaintainForm
 
 from django.contrib.auth.decorators import permission_required
@@ -142,4 +142,38 @@ def vehicleMaintainEdit(request, id):
     }
 
     return render(request, 'vehicle/maintain.html', context)
+
+def vehiclePreTrip(request, shift_id):
+    shift = get_object_or_404(Shift, id=shift_id)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+    else:
+        pass
+
+    checklist = {
+        'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},
+        'cl_engine': {'label': 'Start Engine'},
+        'cl_headlights': {'label': 'Head Lights / High Beams'},
+        'cl_hazards': {'label': 'Hazards / Ambers'},
+        'cl_directional': {'label': 'Directional'},
+        'cl_markers': {'label': 'Markers / Reflectors'},
+        'cl_windshield': {'label': 'Windshield'},
+        'cl_glass': {'label': 'All Other Glass'},
+        'cl_mirrors': {'label': 'All Mirrors'},
+        'cl_doors': {'label': 'All Door Operation'},
+        'cl_tires': {'label': 'Tires', 'subitems': ('Pressure', 'Condition')},
+        'cl_leaks': {'label': 'Leaks of Any Kind'},
+        'cl_body': {'label': 'Body Damage'},
+        'cl_registration': {'label': 'Registration', 'subitems': ('Plate', 'Sticker')},
+        'cl_wheelchair': {'label': 'Wheelchair Lift', 'subitems': ('Condition', 'Operation')},
+        'cl_mechanical': {'label': 'Mechanical'},
+        'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
+    }
+    context = {
+        'shift': shift,
+        'checklist': checklist,
+    }
+    return render(request, 'vehicle/pretrip.html', context=context)
 

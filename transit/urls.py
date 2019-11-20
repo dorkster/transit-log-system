@@ -75,6 +75,8 @@ urlpatterns = [
     path('vehicle-status/issues/<uuid:id>/delete', views.vehicleIssueDelete, name='vehicle-issue-delete'),
     path('vehicle-status/maintainence/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
 
+    path('vehicle-pretrip/create/<uuid:shift_id>', views.vehiclePreTrip, name='vehicle-pretrip-create'),
+
     path('import/', views.excelImport, name='excel-import'),
 
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),

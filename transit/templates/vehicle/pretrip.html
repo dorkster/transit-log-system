@@ -1,0 +1,90 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+{% load static %}
+<h2>
+    Pre-Trip: {{ shift }}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    {% for key,item in checklist.items %}
+                    <div class="d-flex">
+                        <div class="w-50">
+                            <div class="mb-2">
+                                <strong>{{ item.label }}</strong>
+                                {% if item.subitems %}
+                                    {% for subitem in item.subitems %}
+                                    <div class="pt-1 pb-1 small text-muted">{{ subitem }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="w-50 text-right">
+                            <div class="btn-group" role="group">
+                                <button type="button" id="fail_{{key}}" class="btn btn-outline-dark" onclick="checklistFail('{{key}}')">Fail</button>
+                                <button type="button" id="pass_{{key}}" class="btn btn-outline-dark" onclick="checklistPass('{{key}}')">Pass</button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    {% endfor %}
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <input id="submit" class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes" disabled>
+                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+            </div>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    // 0 is unset, 1 is fail, 2 is pass
+    var checklist_data = {
+        {% for item in checklist %}
+        "{{item}}": 0,
+        {% endfor %}
+    };
+    function checklistFail(id) {
+        $('#fail_' + id).removeClass("btn-outline-dark");
+        $('#fail_' + id).addClass("btn-danger");
+        $('#pass_' + id).removeClass("btn-success");
+        $('#pass_' + id).addClass("btn-outline-dark");
+
+        checklist_data[id] = 1;
+        validateFailPass();
+    }
+    function checklistPass(id) {
+        $('#fail_' + id).removeClass("btn-danger");
+        $('#fail_' + id).addClass("btn-outline-dark");
+        $('#pass_' + id).removeClass("btn-outline-dark");
+        $('#pass_' + id).addClass("btn-success");
+
+        checklist_data[id] = 2;
+        validateFailPass();
+    }
+    function validateFailPass() {
+        for (var key in checklist_data) {
+            if (checklist_data.hasOwnProperty(key))
+                if (checklist_data[key] == 0) {
+                    // invalid form, disable the submit button
+                    $('#submit').prop('disabled', true);
+                    return
+                }
+        }
+
+        // valid form, enable the submit button
+        $('#submit').prop('disabled', false);
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

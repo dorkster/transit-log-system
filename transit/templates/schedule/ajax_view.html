@@ -11,7 +11,7 @@
 <h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
     {% for shift in shifts %}
-    <div class="card mb-2" style="background: #{{ shift.get_driver_color }}; max-width: 960px;">
+    <div class="card mb-3 border-secondary" style="background: #{{ shift.get_driver_color }}; max-width: 960px;">
         <div class="card-body p-0">
             <div class="d-flex flex-wrap">
                 <div class="p-1">
@@ -29,7 +29,7 @@
                 <div class="p-1">
                     <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
                 </div>
-                <div class="ml-auto p-1">
+                <div class="text-right p-1 card-footer w-100">
                     <a href="{% url 'shift-start' shift.id %}" class="btn {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>
                     <a href="{% url 'shift-end' shift.id %}" class="btn {% if not shift.start_miles or shift.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
                     <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info">Fuel</a>
@@ -150,8 +150,9 @@
 </div>
 {% if trips %}
     {% for trip in trips %}
-    <div class="card mb-2" style="background: #{{ trip.get_driver_color }}; max-width: 960px;">
+    <div class="card mb-3 border-secondary" style="background: #{{ trip.get_driver_color }}; max-width: 960px;">
         <div class="card-body p-0">
+            <div style="background: rgba(255,255,255,.3); border-bottom: 1px solid rgba(0,0,0,.125);">
             <a id="trip_{{ trip.id }}"></a>
             <div>
                 <div class="d-flex">
@@ -190,6 +191,8 @@
                         </h4>
                     </div>
                 </div>
+            </div>
+            </div>
                 <div class="d-flex flex-wrap">
                     <div class="p-1 w-100" style="max-width: 540px;">
                         <div class="list-group list-group-flush" style="max-width: 540px;">
@@ -206,37 +209,45 @@
                                 {% endif %}
                             {% else %}
                             {% if trip.address or trip.pick_up_time %}
-                            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center p-1">
-                                <span class="mr-2">
-                                    <span class="oi oi-home"></span>
-
+                            <div class="list-group-item bg-transparent p-1" style="display: table;">
+                                <div class="pr-2" style="width: 90px; display: table-cell;">
+                                    {% if trip.pick_up_time %}
+                                    <span class="badge badge-primary">
+                                        <span class="oi oi-home"></span>
+                                        <strong>{{ trip.pick_up_time }}</strong>
+                                    </span>
+                                    {% else %}
+                                    <span class="badge w-100 text-left">
+                                        <span class="oi oi-home"></span>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div style="display: table-cell;">
                                     {% if trip.address %}
                                     <strong>{{ trip.address }}</strong>
                                     {% endif %}
-                                </span>
-
-                                {% if trip.pick_up_time %}
-                                <span class="badge badge-primary">
-                                    <span class="oi oi-clock mr-1"></span><strong>{{ trip.pick_up_time }}</strong>
-                                </span>
-                                {% endif %}
+                                </div>
                             </div>
                             {% endif %}
                             {% if trip.destination or trip.appointment_time %}
-                            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center p-1">
-                                <span class="mr-2">
-                                    <span class="oi oi-arrow-right"></span>
-
+                            <div class="list-group-item bg-transparent p-1 display: table;">
+                                <div class="pr-2" style="width: 90px; display: table-cell">
+                                    {% if trip.appointment_time %}
+                                    <span class="badge badge-success">
+                                        <span class="oi oi-arrow-right"></span>
+                                        <strong>{{ trip.appointment_time }}</strong>
+                                    </span>
+                                    {% else %}
+                                    <span class="badge w-100 text-left">
+                                        <span class="oi oi-arrow-right"></span>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div style="display: table-cell">
                                     {% if trip.destination %}
                                     <strong>{{ trip.destination }}</strong>
                                     {% endif %}
-                                </span>
-
-                                {% if trip.appointment_time %}
-                                <span class="badge badge-success">
-                                    <span class="oi oi-clock mr-1"></span><strong>{{ trip.appointment_time }}</strong>
-                                </span>
-                                {% endif %}
+                                </div>
                             </div>
                             {% endif %}
                             {% endif %}
@@ -250,7 +261,7 @@
                                 {% if trip.trip_type.name == 'Medical' %}
                                 <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
                                 {% elif trip.trip_type %}
-                                <span class="badge badge-primary"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
+                                <span class="badge badge-info"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
                                 {% endif %}
                                 {% if trip.tags %}
                                 {% for tag in trip.get_tag_list %}
@@ -262,7 +273,7 @@
                         </div>
                     </div>
                     {% if not trip.is_activity %}
-                    <div class="ml-auto align-self-end p-1">
+                    <div class="text-right p-1 card-footer w-100">
                         <a href="{% url 'trip-start' trip.id %}" class="btn {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
                         <a href="{% url 'trip-end' trip.id %}" class="btn {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
                         {% if trip.phone_home and trip.phone_cell %}

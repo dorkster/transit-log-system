@@ -21,8 +21,6 @@
                         </button>
                         <div class="dropdown-menu">
                             <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item">Edit Shift</a>
-                            <div class="dropdown-divider"></div>
-                            <a href="{% url 'shift-delete' 'view' shift.id %}" class="dropdown-item text-danger">Delete Shift</a>
                         </div>
                     </div>
                 </div>
@@ -164,19 +162,15 @@
                             <div class="dropdown-menu">
                                 {% if trip.is_activity %}
                                 <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item">Edit activity</a>
+                                <div class="dropdown-divider"></div>
                                 {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
                                 {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
-                                <div class="dropdown-divider"></div>
-                                <a href="{% url 'trip-delete-activity' 'view' trip.id %}" class="dropdown-item text-danger">Delete activity</a>
                                 {% else %}
                                 <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item">Edit trip</a>
+                                <div class="dropdown-divider"></div>
                                 {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
                                 {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
                                 {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item">Set as no show</a>{% endif %}
-                                <div class="dropdown-divider"></div>
-                                <a href="{% url 'trip-create-return' 'view' trip.id %}" class="dropdown-item">Create Return Trip</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="{% url 'trip-delete' 'view' trip.id %}" class="dropdown-item text-danger">Delete trip</a>
                                 {% endif %}
                             </div>
                         </div>

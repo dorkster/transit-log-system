@@ -30,9 +30,9 @@
                     <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
                 </div>
                 <div class="ml-auto p-1">
-                    <a href="{% url 'shift-start' shift.id %}" class="btn btn-lg {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>
-                    <a href="{% url 'shift-end' shift.id %}" class="btn btn-lg {% if not shift.start_miles or shift.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
-                    <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info btn-lg">Fuel</a>
+                    <a href="{% url 'shift-start' shift.id %}" class="btn {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>
+                    <a href="{% url 'shift-end' shift.id %}" class="btn {% if not shift.start_miles or shift.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                    <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info">Fuel</a>
                 </div>
             </div>
         </div>
@@ -263,11 +263,11 @@
                     </div>
                     {% if not trip.is_activity %}
                     <div class="ml-auto align-self-end p-1">
-                        <a href="{% url 'trip-start' trip.id %}" class="btn btn-lg {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
-                        <a href="{% url 'trip-end' trip.id %}" class="btn btn-lg {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
+                        <a href="{% url 'trip-start' trip.id %}" class="btn {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
+                        <a href="{% url 'trip-end' trip.id %}" class="btn {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
                         {% if trip.phone_home and trip.phone_cell %}
                         <span class="dropdown ajax-blocker">
-                            <button class="btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Call
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
@@ -276,11 +276,11 @@
                             </div>
                         </span>
                         {% elif trip.phone_home %}
-                        <a href="tel:{{ trip.get_phone_home_number }}" class="btn btn-info btn-lg">Call</a>
+                        <a href="tel:{{ trip.get_phone_home_number }}" class="btn btn-info">Call</a>
                         {% elif trip.phone_cell %}
-                        <a href="tel:{{ trip.get_phone_cell_number }}" class="btn btn-info btn-lg">Call</a>
+                        <a href="tel:{{ trip.get_phone_cell_number }}" class="btn btn-info">Call</a>
                         {% else %}
-                        <a href="#_" class="btn btn-secondary btn-lg disabled">Call</a>
+                        <a href="#_" class="btn btn-secondary disabled">Call</a>
                         {% endif %}
                     </div>
                     {% endif %}

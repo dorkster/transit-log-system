@@ -498,6 +498,9 @@ class PreTrip(models.Model):
     cl_mechanical = models.IntegerField(default=0)
     cl_interior = models.IntegerField(default=0)
 
+    def __str__(self):
+        return str(self.date) + ' - ' + str(self.driver) + ' - ' + str(self.vehicle) + ' - ' + self.status()
+
     def status(self):
         if self.cl_fluids == 2 and self.cl_engine == 2 and self.cl_headlights == 2 and self.cl_hazards == 2 and self.cl_directional == 2 and self.cl_markers == 2 and self.cl_windshield == 2 and self.cl_glass == 2 and self.cl_mirrors == 2 and self.cl_doors == 2 and self.cl_tires == 2 and self.cl_leaks == 2 and self.cl_body == 2 and self.cl_registration == 2 and self.cl_wheelchair == 2 and self.cl_interior == 2:
             return "Passed"

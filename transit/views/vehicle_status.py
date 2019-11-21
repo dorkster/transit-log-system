@@ -36,7 +36,7 @@ def ajaxVehicleStatus(request):
         'filter_show_resolved': filter_show_resolved,
         'is_filtered': (filter_show_resolved),
         'logged_vehicles': Vehicle.objects.filter(is_logged=True),
-        'pretrips': PreTrip.objects.all()[:50],
+        'pretrips': list(reversed(PreTrip.objects.all()))[:50],
     }
     return render(request, 'vehicle/status/ajax_view.html', context=context)
 

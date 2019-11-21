@@ -188,3 +188,6 @@ class vehicleMaintainForm(forms.Form):
     oil_change_miles = forms.CharField(label='Last Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --')))
 
+class vehiclePreTripForm(forms.Form):
+    checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
+

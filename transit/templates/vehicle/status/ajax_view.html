@@ -84,3 +84,23 @@
 {% else %}
 <p>There are no reported vehicle issues.</p>
 {% endif %}
+<hr/>
+<h3>Pre-Trip Log</h3>
+{% if pretrips %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td class="mytable-col-md">Date</td>
+        <td class="mytable-col-md">Vehicle</td>
+        <td class="mytable-col-md">Driver</td>
+        <td class="mytable-col-xl">Status</td>
+    </thead>
+    {% for pretrip in pretrips %}
+    <tr>
+        <td>{{ pretrip.date }}</td>
+        <td>{{ pretrip.vehicle }}</td>
+        <td>{{ pretrip.driver }}</td>
+        <td>{{ pretrip.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

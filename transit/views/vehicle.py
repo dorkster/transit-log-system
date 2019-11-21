@@ -1,11 +1,12 @@
 import uuid
+import json
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Vehicle, Shift
-from transit.forms import EditVehicleForm, vehicleMaintainForm
+from transit.models import Vehicle, Shift, PreTrip
+from transit.forms import EditVehicleForm, vehicleMaintainForm, vehiclePreTripForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -147,10 +148,43 @@ def vehiclePreTrip(request, shift_id):
     shift = get_object_or_404(Shift, id=shift_id)
 
     if request.method == 'POST':
+        form = vehiclePreTripForm(request.POST)
+
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+
+        if form.is_valid():
+            pretrip = PreTrip()
+            pretrip.date = shift.date
+            pretrip.driver = shift.driver
+            pretrip.vehicle = shift.vehicle
+            pretrip.shift_id = shift_id
+
+            if form.cleaned_data['checklist'] != '':
+                cl = json.loads(form.cleaned_data['checklist'])
+                pretrip.cl_fluids = cl['cl_fluids']
+                pretrip.cl_engine = cl['cl_engine']
+                pretrip.cl_headlights = cl['cl_headlights']
+                pretrip.cl_hazards = cl['cl_hazards']
+                pretrip.cl_directional = cl['cl_directional']
+                pretrip.cl_markers = cl['cl_markers']
+                pretrip.cl_windshield = cl['cl_windshield']
+                pretrip.cl_glass = cl['cl_glass']
+                pretrip.cl_mirrors = cl['cl_mirrors']
+                pretrip.cl_doors = cl['cl_doors']
+                pretrip.cl_tires = cl['cl_tires']
+                pretrip.cl_leaks = cl['cl_leaks']
+                pretrip.cl_body = cl['cl_body']
+                pretrip.cl_registration = cl['cl_registration']
+                pretrip.cl_wheelchair = cl['cl_wheelchair']
+                pretrip.cl_mechanical = cl['cl_mechanical']
+                pretrip.cl_interior = cl['cl_interior']
+
+                pretrip.save()
+
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
-        pass
+        form = vehiclePreTripForm()
 
     checklist = {
         'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},
@@ -172,6 +206,7 @@ def vehiclePreTrip(request, shift_id):
         'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
     }
     context = {
+        'form': form,
         'shift': shift,
         'checklist': checklist,
     }

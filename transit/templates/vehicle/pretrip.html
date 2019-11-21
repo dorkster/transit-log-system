@@ -7,6 +7,7 @@
 </h2>
 <form class="mb-4" action="" method="post">
     {% csrf_token %}
+    {{ form.checklist }}
     <div class="container ml-0">
         <div class="row">
             <div class="col border m-1 pt-1">
@@ -58,6 +59,8 @@
         $('#pass_' + id).addClass("btn-outline-dark");
 
         checklist_data[id] = 1;
+
+        $('#id_checklist').val(JSON.stringify(checklist_data));
         validateFailPass();
     }
     function checklistPass(id) {
@@ -67,6 +70,8 @@
         $('#pass_' + id).addClass("btn-success");
 
         checklist_data[id] = 2;
+        $('#id_checklist').val(JSON.stringify(checklist_data));
+
         validateFailPass();
     }
     function validateFailPass() {

@@ -322,6 +322,9 @@ class Shift(models.Model):
     def check_end_time(self):
         return self.check_blank(self.end_time)
 
+    def check_pretrip(self):
+        return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)
+
 
 class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -470,3 +473,34 @@ class FrequentTag(models.Model):
                     f_tag.save()
             except:
                 pass
+
+class PreTrip(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField(editable=False)
+    driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
+    vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
+    shift_id = models.UUIDField(editable=False)
+    cl_fluids = models.IntegerField(default=0)
+    cl_engine = models.IntegerField(default=0)
+    cl_headlights = models.IntegerField(default=0)
+    cl_hazards = models.IntegerField(default=0)
+    cl_directional = models.IntegerField(default=0)
+    cl_markers = models.IntegerField(default=0)
+    cl_windshield = models.IntegerField(default=0)
+    cl_glass = models.IntegerField(default=0)
+    cl_mirrors = models.IntegerField(default=0)
+    cl_doors = models.IntegerField(default=0)
+    cl_tires = models.IntegerField(default=0)
+    cl_leaks = models.IntegerField(default=0)
+    cl_body = models.IntegerField(default=0)
+    cl_registration = models.IntegerField(default=0)
+    cl_wheelchair = models.IntegerField(default=0)
+    cl_mechanical = models.IntegerField(default=0)
+    cl_interior = models.IntegerField(default=0)
+
+    def status(self):
+        if self.cl_fluids == 2 and self.cl_engine == 2 and self.cl_headlights == 2 and self.cl_hazards == 2 and self.cl_directional == 2 and self.cl_markers == 2 and self.cl_windshield == 2 and self.cl_glass == 2 and self.cl_mirrors == 2 and self.cl_doors == 2 and self.cl_tires == 2 and self.cl_leaks == 2 and self.cl_body == 2 and self.cl_registration == 2 and self.cl_wheelchair == 2 and self.cl_interior == 2:
+            return "Passed"
+        else:
+            return "Failed"
+

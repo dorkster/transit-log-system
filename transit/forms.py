@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 
 from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip
@@ -185,8 +187,12 @@ class EditActivityForm(forms.Form):
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class vehicleMaintainForm(forms.Form):
+    MONTHS = {}
+    for i in range(1,13):
+        MONTHS[i] = str(i) + ' - ' + datetime.date(1900, i, 1).strftime('%B')
+
     oil_change_miles = forms.CharField(label='Last Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
-    inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --')))
+    inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --'), months=MONTHS))
 
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)

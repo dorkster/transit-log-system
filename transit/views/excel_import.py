@@ -177,6 +177,10 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
                     phone_str = phone_str[len(phone_str)-10:len(phone_str)-7] + '-' + phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
                 elif len(phone_str) >= 7:
                     phone_str = phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
+                else:
+                    phone_str = ''
+
+                trip.phone_home = phone_str
 
             if row[T_DESTINATION].value != None:
                 trip.destination = str(row[T_DESTINATION].value).strip()

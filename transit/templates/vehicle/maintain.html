@@ -14,7 +14,17 @@
                     <div class="mb-2"><label for="{{ form.oil_change_miles.id_for_label }}"><strong>{{ form.oil_change_miles.label }}</strong></label><br/>{{ form.oil_change_miles }}</div>
                     <div class="mb-2"><label for="{{ form.inspection_date.id_for_label }}"><strong>{{ form.inspection_date.label }}</strong></label><br/>{{ form.inspection_date }}</div>
                     <script type="text/javascript">
-                        $("#id_inspection_date_day").val(1);
+                        function checkDate() {
+                            if ($("#id_inspection_date_month").val() == "" && $("#id_inspection_date_year").val() == "") {
+                                $("#id_inspection_date_day").val("");
+                            }
+                            else {
+                                $("#id_inspection_date_day").val(1);
+                            }
+                        }
+                        $("#id_inspection_date_month").on("change", checkDate);
+                        $("#id_inspection_date_year").on("change", checkDate);
+                        checkDate();
                         $("#id_inspection_date_day").attr("style", "display: none !important;");
                     </script>
                 </fieldset>

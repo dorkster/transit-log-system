@@ -12,6 +12,10 @@ BOOL_CHOICES = (
     (False, 'No')
 )
 
+YEARS = []
+for year in range(2019, datetime.date.today().year + 2):
+    YEARS.append(year)
+
 class formWidgetAttrs():
     default = {'class': 'form-control form-control-width-fix'}
     default['onfocus'] = 'inputScrollToView(this)'
@@ -69,10 +73,10 @@ class formWidgetAttrs():
     money['pattern'] = '[0-9]*\.[0-9]*'
 
 class DatePickerForm(forms.Form):
-    date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
 class EditTripForm(forms.Form):
-    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     phone_home = forms.CharField(label='Phone (Home)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
@@ -96,7 +100,7 @@ class EditTripForm(forms.Form):
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
 
 class EditShiftForm(forms.Form):
-    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     start_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile_shift))
@@ -153,7 +157,6 @@ class UploadFileForm(forms.Form):
     dry_run = forms.ChoiceField(choices=BOOL_CHOICES, label="Dry run? (i.e. don't write to database)", required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditVehicleIssueForm(forms.Form):
-    # date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
@@ -181,7 +184,7 @@ class EditScheduleMessageForm(forms.Form):
     message = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditActivityForm(forms.Form):
-    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date))
+    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
@@ -191,8 +194,8 @@ class vehicleMaintainForm(forms.Form):
     for i in range(1,13):
         MONTHS[i] = str(i) + ' - ' + datetime.date(1900, i, 1).strftime('%B')
 
-    oil_change_miles = forms.CharField(label='Last Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
-    inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --'), months=MONTHS))
+    oil_change_miles = forms.CharField(label='Next Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
+    inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --'), months=MONTHS, years=YEARS))
 
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)

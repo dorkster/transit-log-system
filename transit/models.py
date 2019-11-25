@@ -507,3 +507,6 @@ class PreTrip(models.Model):
         else:
             return "Failed"
 
+    def get_class_name(self):
+        return 'Pre-Trip'
+

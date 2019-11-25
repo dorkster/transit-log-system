@@ -75,7 +75,8 @@ urlpatterns = [
     path('vehicle-status/issues/<uuid:id>/delete', views.vehicleIssueDelete, name='vehicle-issue-delete'),
     path('vehicle-status/maintainence/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
 
-    path('vehicle-pretrip/create/<uuid:shift_id>', views.vehiclePreTrip, name='vehicle-pretrip-create'),
+    path('vehicle-pretrip/create/<uuid:shift_id>', views.vehiclePreTripCreate, name='vehicle-pretrip-create'),
+    path('vehicle-pretrip/<uuid:id>/delete', views.vehiclePreTripDelete, name='vehicle-pretrip-delete'),
 
     path('import/', views.excelImport, name='excel-import'),
 

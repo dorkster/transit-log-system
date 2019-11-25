@@ -144,7 +144,7 @@ def vehicleMaintainEdit(request, id):
 
     return render(request, 'vehicle/maintain.html', context)
 
-def vehiclePreTrip(request, shift_id):
+def vehiclePreTripCreate(request, shift_id):
     shift = get_object_or_404(Shift, id=shift_id)
 
     if request.method == 'POST':
@@ -211,4 +211,21 @@ def vehiclePreTrip(request, shift_id):
         'checklist': checklist,
     }
     return render(request, 'vehicle/pretrip.html', context=context)
+
+@permission_required('transit.can_delete_pretrip')
+def vehiclePreTripDelete(request, id):
+    pretrip = get_object_or_404(PreTrip, id=id)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('vehicle-status'))
+
+        pretrip.delete()
+        return HttpResponseRedirect(reverse('vehicle-status'))
+
+    context = {
+        'model': pretrip,
+    }
+
+    return render(request, 'model_delete.html', context)
 

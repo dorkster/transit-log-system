@@ -93,6 +93,9 @@
         <td class="mytable-col-md">Vehicle</td>
         <td class="mytable-col-md">Driver</td>
         <td class="mytable-col-xl">Status</td>
+        {% if perms.transit.can_delete_pretrip %}
+        <td class="mytable-col-sm"></td>
+        {% endif %}
     </thead>
     {% for pretrip in pretrips %}
     <tr>
@@ -100,6 +103,9 @@
         <td>{{ pretrip.vehicle }}</td>
         <td>{{ pretrip.driver }}</td>
         <td>{{ pretrip.status }}</td>
+        {% if perms.transit.can_delete_pretrip %}
+        <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

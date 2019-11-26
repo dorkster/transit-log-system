@@ -1,6 +1,7 @@
 import uuid
 
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 
 from transit.models import VehicleIssue, Vehicle, PreTrip
 
@@ -31,12 +32,16 @@ def ajaxVehicleStatus(request):
     else:
         vehicle_issues = VehicleIssue.objects.all()
 
+    pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), 50)
+    pretrip_page = request.GET.get('pretrip_page')
+    pretrips_paginated = pretrip_pages.get_page(pretrip_page)
+
     context = {
         'vehicle_issues': vehicle_issues,
         'filter_show_resolved': filter_show_resolved,
         'is_filtered': (filter_show_resolved),
         'logged_vehicles': Vehicle.objects.filter(is_logged=True),
-        'pretrips': list(reversed(PreTrip.objects.all()))[:50],
+        'pretrips': pretrips_paginated,
     }
     return render(request, 'vehicle/status/ajax_view.html', context=context)
 

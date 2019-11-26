@@ -123,6 +123,15 @@
     </tr>
     {% endfor %}
 </table>
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?pretrip_page={{ pretrips.previous_page_number }}{% else %}#_{% endif %}">&laquo;</a></li>
+        {% for page in pretrips.paginator.page_range %}
+        <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?pretrip_page={{ page }}">{{ page }}</a></li>
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?pretrip_page={{ pretrips.next_page_number }}{% else %}#_{% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
 {% else %}
 <p>There are no logged pre-trip reports.</p>
 {% endif %}

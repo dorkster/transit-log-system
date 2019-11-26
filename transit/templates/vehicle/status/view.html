@@ -9,7 +9,12 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-status' %}", "#vehicle_status");
+    var params = new URLSearchParams(location.search);
+    var pretrip_page = params.get('pretrip_page');
+    if (pretrip_page == null)
+        pretrip_page = 1;
+
+    var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-status' %}?pretrip_page=" + pretrip_page, "#vehicle_status");
 
     // Fetch the initial data and repeat every 10 seconds
     ajax_loader.run();

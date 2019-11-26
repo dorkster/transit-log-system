@@ -7,6 +7,8 @@ from django.urls import reverse
 from transit.models import VehicleIssue
 from transit.forms import EditVehicleIssueForm
 
+from django.contrib.auth.decorators import permission_required
+
 def vehicleIssueCreate(request):
     vehicle_issue = VehicleIssue()
     return vehicleIssueCreateEditCommon(request, vehicle_issue, is_new=True)
@@ -55,6 +57,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
 
     return render(request, 'vehicle/issues/edit.html', context)
 
+@permission_required('transit.can_delete_vehicleissue')
 def vehicleIssueDelete(request, id):
     vehicle_issue = get_object_or_404(VehicleIssue, id=id)
 

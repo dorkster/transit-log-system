@@ -44,7 +44,7 @@
                 <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
                 <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
             </div>
-            {% if not is_new %}
+            {% if not is_new and perms.transit.can_delete_vehicleissue %}
             <div>
                 <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Vehicle Issue" formnovalidate>
             </div>

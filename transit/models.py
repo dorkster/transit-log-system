@@ -411,11 +411,19 @@ class TemplateTrip(models.Model):
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
+    is_activity = models.BooleanField(default=False, editable=False)
 
     class Meta:
         ordering = ['parent', 'sort_index']
 
     def __str__(self):
+        if self.is_activity:
+            output = ''
+            if self.appointment_time: 
+                output += str(self.appointment_time) + ' - '
+            output += self.note
+            return output
+
         output = '[' + self.parent.name + '] - ' + self.name
         if self.address is not None and self.address != '':
             output += ' from ' + self.address
@@ -424,7 +432,10 @@ class TemplateTrip(models.Model):
         return output
 
     def get_class_name(self):
-        return 'Trip Template'
+        if self.is_activity:
+            return 'Activity Template'
+        else:
+            return 'Trip Template'
 
     def get_tag_list(self):
         tags = self.tags.split(',')

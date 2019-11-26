@@ -180,6 +180,10 @@ class EditTemplateTripForm(forms.Form):
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
 
+class EditTemplateActivityForm(forms.Form):
+    appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+
 class EditScheduleMessageForm(forms.Form):
     message = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 

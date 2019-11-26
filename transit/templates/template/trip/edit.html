@@ -4,9 +4,9 @@
 {% load static %}
 <h2>
     {% if is_new %}
-    New Trip Template
+    New {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Template
     {% else %}
-    Trip Template Edit
+    {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Template Edit
     {% endif %}
 </h2>
 <form class="mb-4" action="" method="post">
@@ -18,6 +18,15 @@
     </datalist>
     <div class="container ml-0">
         <div class="row">
+            {% if trip.is_activity %}
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Activity Information</legend>
+                    <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
+                    <div class="mb-2"><label for="{{ form.description.id_for_label }}"><strong>{{ form.description.label }}</strong></label><br/>{{ form.description }}</div>
+                </fieldset>
+            </div>
+            {% else %}
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <legend>Client Information</legend>
@@ -77,6 +86,7 @@
                     </div>
                 </fieldset>
             </div>
+            {% endif %}
         </div>
         <hr>
         <div class="d-flex flex-wrap mt-2">
@@ -86,7 +96,7 @@
             </div>
             {% if not is_new %}
             <div>
-                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Trip Template" formnovalidate>
+                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Template" formnovalidate>
             </div>
             {% endif %}
         </div>

@@ -65,6 +65,10 @@ urlpatterns = [
     path('templates/<uuid:parent>/trips/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit'),
     path('templates/<uuid:parent>/trips/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete'),
 
+    path('templates/<uuid:parent>/activities/create', views.templateTripCreateActivity, name='template-trip-create-activity'),
+    path('templates/<uuid:parent>/activities/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit-activity'),
+    path('templates/<uuid:parent>/activities/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete-activity'),
+
     path('report/<int:year>/<int:month>', views.report, name='report'),
     path('report/this-month', views.reportThisMonth, name='report-this-month'),
     path('report/last-month', views.reportLastMonth, name='report-last-month'),

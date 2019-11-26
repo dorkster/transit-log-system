@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.core import serializers
 
 from transit.models import Template, TemplateTrip, Client, FrequentTag
-from transit.forms import EditTemplateTripForm
+from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 def templateTripList(request, parent):
     context = {
@@ -19,6 +19,12 @@ def templateTripList(request, parent):
 def templateTripCreate(request, parent):
     trip = TemplateTrip()
     trip.parent = Template.objects.get(id=parent)
+    return templateTripCreateEditCommon(request, trip, is_new=True)
+
+def templateTripCreateActivity(request, parent):
+    trip = TemplateTrip()
+    trip.parent = Template.objects.get(id=parent)
+    trip.is_activity = True
     return templateTripCreateEditCommon(request, trip, is_new=True)
 
 def templateTripEdit(request, parent, id):
@@ -35,7 +41,10 @@ def templateTripCreateEditCommon(request, trip, is_new):
             trip.sort_index = 0
 
     if request.method == 'POST':
-        form = EditTemplateTripForm(request.POST)
+        if trip.is_activity:
+            form = EditTemplateActivityForm(request.POST)
+        else:
+            form = EditTemplateTripForm(request.POST)
 
         if 'cancel' in request.POST:
             url_hash = '' if is_new else '#trip_' + str(trip.id)
@@ -44,42 +53,54 @@ def templateTripCreateEditCommon(request, trip, is_new):
             return HttpResponseRedirect(reverse('template-trip-delete', kwargs={'parent':trip.parent.id, 'id':trip.id}))
 
         if form.is_valid():
-            FrequentTag.removeTags(trip.get_tag_list())
+            if trip.is_activity:
+                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.note = form.cleaned_data['description']
+            else:
+                FrequentTag.removeTags(trip.get_tag_list())
 
-            trip.name = form.cleaned_data['name']
-            trip.address = form.cleaned_data['address']
-            trip.phone_home = form.cleaned_data['phone_home']
-            trip.phone_cell = form.cleaned_data['phone_cell']
-            trip.destination = form.cleaned_data['destination']
-            trip.pick_up_time = form.cleaned_data['pick_up_time']
-            trip.appointment_time = form.cleaned_data['appointment_time']
-            trip.trip_type = form.cleaned_data['trip_type']
-            trip.tags = form.cleaned_data['tags']
-            trip.elderly = form.cleaned_data['elderly']
-            trip.ambulatory = form.cleaned_data['ambulatory']
-            trip.note = form.cleaned_data['notes']
+                trip.name = form.cleaned_data['name']
+                trip.address = form.cleaned_data['address']
+                trip.phone_home = form.cleaned_data['phone_home']
+                trip.phone_cell = form.cleaned_data['phone_cell']
+                trip.destination = form.cleaned_data['destination']
+                trip.pick_up_time = form.cleaned_data['pick_up_time']
+                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.trip_type = form.cleaned_data['trip_type']
+                trip.tags = form.cleaned_data['tags']
+                trip.elderly = form.cleaned_data['elderly']
+                trip.ambulatory = form.cleaned_data['ambulatory']
+                trip.note = form.cleaned_data['notes']
 
-            FrequentTag.addTags(trip.get_tag_list())
+            if not trip.is_activity:
+                FrequentTag.addTags(trip.get_tag_list())
 
             trip.save()
 
             return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + '#trip_' + str(trip.id))
     else:
-        initial = {
-            'name': trip.name,
-            'address': trip.address,
-            'phone_home': trip.phone_home,
-            'phone_cell': trip.phone_cell,
-            'destination': trip.destination,
-            'pick_up_time': trip.pick_up_time,
-            'appointment_time': trip.appointment_time,
-            'trip_type': trip.trip_type,
-            'tags': trip.tags,
-            'elderly': trip.elderly,
-            'ambulatory': trip.ambulatory,
-            'notes': trip.note,
-        }
-        form = EditTemplateTripForm(initial=initial)
+        if trip.is_activity:
+            initial = {
+                'appointment_time': trip.appointment_time,
+                'description': trip.note,
+            }
+            form = EditTemplateActivityForm(initial=initial)
+        else:
+            initial = {
+                'name': trip.name,
+                'address': trip.address,
+                'phone_home': trip.phone_home,
+                'phone_cell': trip.phone_cell,
+                'destination': trip.destination,
+                'pick_up_time': trip.pick_up_time,
+                'appointment_time': trip.appointment_time,
+                'trip_type': trip.trip_type,
+                'tags': trip.tags,
+                'elderly': trip.elderly,
+                'ambulatory': trip.ambulatory,
+                'notes': trip.note,
+            }
+            form = EditTemplateTripForm(initial=initial)
 
     context = {
         'form': form,

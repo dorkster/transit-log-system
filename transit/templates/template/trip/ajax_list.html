@@ -1,8 +1,17 @@
 <div class="row">
     <div class="col">
-<h3>
-    <a href="{% url 'templates' %}" class="btn btn-secondary"><span class="oi oi-chevron-left"></span></a>
-    Trips for {{ template.name }} template <a class="btn btn-secondary" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+        <h3>
+            <a href="{% url 'templates' %}" class="btn btn-secondary"><span class="oi oi-chevron-left"></span></a>
+            Trips for {{ template.name }} template
+            <span class="btn-group dropdown ajax-blocker">
+                <a class="btn btn-secondary" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a>
+                <a href="#_" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{% url 'template-trip-create' parent %}">New Trip</a>
+                    <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}">New Activity</a>
+                </div>
+            </span>
+        </h3>
     </div>
     <div class="col-auto">
     </div>
@@ -35,12 +44,22 @@
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu">
+                    {% if trip.is_activity %}
+                    <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item">Edit activity</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'template-trip-delete-activity' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete activity</a>
+                    {% else %}
                     <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item">Edit trip</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                    {% endif %}
                 </div>
             </div>
         </td>
+        {% if trip.is_activity %}
+        <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
+        <td colspan=5 class="text-center">{{ trip.note }}</td>
+        {% else %}
         <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
         <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
         <td class="mytable-col-md">{{ trip.name }}</td>
@@ -121,6 +140,7 @@
                 </div>
             </div>
         </td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

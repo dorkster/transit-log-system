@@ -369,6 +369,8 @@ class VehicleIssue(models.Model):
     description = models.TextField(max_length=FieldSizes.XL, blank=True)
     priority = models.IntegerField(choices=PRIORITY_LEVELS, default=PRIORITY_MEDIUM)
     is_resolved = models.BooleanField(default=False)
+    pretrip = models.ForeignKey('PreTrip', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
+    pretrip_field = models.CharField(max_length=FieldSizes.SM, default=False, editable=False)
 
     class Meta:
         ordering = ['is_resolved', '-priority', '-date']
@@ -475,6 +477,26 @@ class FrequentTag(models.Model):
                 pass
 
 class PreTrip(models.Model):
+    CHECKLIST = {
+        'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},
+        'cl_engine': {'label': 'Start Engine'},
+        'cl_headlights': {'label': 'Head Lights / High Beams'},
+        'cl_hazards': {'label': 'Hazards / Ambers'},
+        'cl_directional': {'label': 'Directional'},
+        'cl_markers': {'label': 'Markers / Reflectors'},
+        'cl_windshield': {'label': 'Windshield'},
+        'cl_glass': {'label': 'All Other Glass'},
+        'cl_mirrors': {'label': 'All Mirrors'},
+        'cl_doors': {'label': 'All Door Operation'},
+        'cl_tires': {'label': 'Tires', 'subitems': ('Pressure', 'Condition')},
+        'cl_leaks': {'label': 'Leaks of Any Kind'},
+        'cl_body': {'label': 'Body Damage'},
+        'cl_registration': {'label': 'Registration', 'subitems': ('Plate', 'Sticker')},
+        'cl_wheelchair': {'label': 'Wheelchair Lift', 'subitems': ('Condition', 'Operation')},
+        'cl_mechanical': {'label': 'Mechanical'},
+        'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
+    }
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField(editable=False)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
@@ -499,13 +521,35 @@ class PreTrip(models.Model):
     cl_interior = models.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.date) + ' - ' + str(self.driver) + ' - ' + str(self.vehicle) + ' - ' + self.status()
+        output = str(self.date) + ' - ' + str(self.driver) + ' - ' + str(self.vehicle)
+        if (self.status() == 2):
+            output += ' - Passed'
+        elif self.status() == 1:
+            output += ' - Failed'
+        
+        return output
 
     def status(self):
         if self.cl_fluids == 2 and self.cl_engine == 2 and self.cl_headlights == 2 and self.cl_hazards == 2 and self.cl_directional == 2 and self.cl_markers == 2 and self.cl_windshield == 2 and self.cl_glass == 2 and self.cl_mirrors == 2 and self.cl_doors == 2 and self.cl_tires == 2 and self.cl_leaks == 2 and self.cl_body == 2 and self.cl_registration == 2 and self.cl_wheelchair == 2 and self.cl_interior == 2:
-            return "Passed"
+            return 2
         else:
-            return "Failed"
+            return 1
+
+    def failure_list(self):
+        output = []
+
+        issues = VehicleIssue.objects.filter(pretrip=self)
+
+        for i in self.CHECKLIST:
+            if getattr(self, i) == 1:
+                fail = { 'label': self.CHECKLIST[i]['label'], 'issue_id': None }
+                for issue in issues:
+                    if issue.pretrip_field == i:
+                        fail['issue_id'] = issue.id
+                        break
+                output.append(fail)
+
+        return output
 
     def get_class_name(self):
         return 'Pre-Trip'

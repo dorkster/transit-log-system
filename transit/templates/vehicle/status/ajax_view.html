@@ -102,7 +102,18 @@
         <td>{{ pretrip.date }}</td>
         <td>{{ pretrip.vehicle }}</td>
         <td>{{ pretrip.driver }}</td>
-        <td>{{ pretrip.status }}</td>
+        <td>
+            {% if pretrip.status == 2 %}
+            <span class="text-success"><strong>Passed</strong></span>
+            {% elif pretrip.status == 1 %}
+            <span class="text-danger"><strong>Failed</strong></span>
+            <ul class="small text-muted mb-0">
+            {% for fail in pretrip.failure_list %}
+            <li>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        </td>
         {% if perms.transit.can_delete_pretrip %}
         <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
         {% endif %}

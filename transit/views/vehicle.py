@@ -180,6 +180,8 @@ def vehiclePreTripCreate(request, shift_id):
                 pretrip.cl_mechanical = cl['cl_mechanical']['status']
                 pretrip.cl_interior = cl['cl_interior']['status']
 
+                pretrip.save()
+
                 # open vehicle issues as needed
                 for key in cl:
                     if cl[key]['status'] == 1 and cl[key]['issue'] != "":
@@ -189,37 +191,18 @@ def vehiclePreTripCreate(request, shift_id):
                         issue.vehicle = shift.vehicle
                         issue.description = cl[key]['issue']
                         issue.priority = cl[key]['issue_prio']
+                        issue.pretrip = pretrip
+                        issue.pretrip_field = key
                         issue.save()
-
-                pretrip.save()
 
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
         form = vehiclePreTripForm()
 
-    checklist = {
-        'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},
-        'cl_engine': {'label': 'Start Engine'},
-        'cl_headlights': {'label': 'Head Lights / High Beams'},
-        'cl_hazards': {'label': 'Hazards / Ambers'},
-        'cl_directional': {'label': 'Directional'},
-        'cl_markers': {'label': 'Markers / Reflectors'},
-        'cl_windshield': {'label': 'Windshield'},
-        'cl_glass': {'label': 'All Other Glass'},
-        'cl_mirrors': {'label': 'All Mirrors'},
-        'cl_doors': {'label': 'All Door Operation'},
-        'cl_tires': {'label': 'Tires', 'subitems': ('Pressure', 'Condition')},
-        'cl_leaks': {'label': 'Leaks of Any Kind'},
-        'cl_body': {'label': 'Body Damage'},
-        'cl_registration': {'label': 'Registration', 'subitems': ('Plate', 'Sticker')},
-        'cl_wheelchair': {'label': 'Wheelchair Lift', 'subitems': ('Condition', 'Operation')},
-        'cl_mechanical': {'label': 'Mechanical'},
-        'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
-    }
     context = {
         'form': form,
         'shift': shift,
-        'checklist': checklist,
+        'checklist': PreTrip.CHECKLIST,
     }
     return render(request, 'vehicle/pretrip.html', context=context)
 

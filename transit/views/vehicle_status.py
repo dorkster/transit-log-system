@@ -36,8 +36,12 @@ def ajaxVehicleStatus(request):
     pretrip_page = request.GET.get('pretrip_page')
     pretrips_paginated = pretrip_pages.get_page(pretrip_page)
 
+    issue_pages = Paginator(vehicle_issues, 25)
+    issue_page = request.GET.get('issue_page')
+    issues_paginated = issue_pages.get_page(issue_page)
+
     context = {
-        'vehicle_issues': vehicle_issues,
+        'vehicle_issues': issues_paginated,
         'filter_show_resolved': filter_show_resolved,
         'is_filtered': (filter_show_resolved),
         'logged_vehicles': Vehicle.objects.filter(is_logged=True),

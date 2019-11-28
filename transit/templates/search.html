@@ -1,0 +1,70 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h2>Search for Trips</h2>
+<form class="mb-4" action="" method="get">
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
+                <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label><br/>{{ form.address }}</div>
+                <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label><br/>{{ form.destination }}</div>
+            </div>
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
+                <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+            </div>
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.start_date.id_for_label }}"><strong>{{ form.start_date.label }}</strong></label><br/>{{ form.start_date }}</div>
+                <div class="mb-2"><label for="{{ form.end_date.id_for_label }}"><strong>{{ form.end_date.label }}</strong></label><br/>{{ form.end_date }}</div>
+            </div>
+        </div>
+        <button class="btn btn-secondary mt-4" type="submit" name="search"><span class="oi oi-magnifying-glass mr-2"></span>Search</button>
+    </div>
+</form>
+{% if results %}
+<hr/>
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td>Date</td>
+        <td>Name</td>
+        <td>Address</td>
+        <td>Destination</td>
+        <td>Driver</td>
+        <td>Vehicle</td>
+    </thead>
+{% for trip in results %}
+<tr style="background: #{{ trip.get_driver_color }};">
+        <td class="mytable-col-xs"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+        <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
+        <td class="mytable-col-lg">{{trip.name}}</td>
+        <td class="mytable-col-lg">{{trip.address}}</td>
+        <td class="mytable-col-lg">{{trip.destination}}</td>
+        <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>
+        <td class="mytable-col-md">{% if trip.vehicle %}{{trip.vehicle}}{% endif %}</td>
+{% endfor %}
+</table>
+{% if results.paginator.num_pages > 1 %}
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#_" onclick="{% if results.has_previous %}setParam('page', {{ results.previous_page_number }}){% endif %}">&laquo;</a></li>
+        {% for page in results.paginator.page_range %}
+        {% if page > page_range_start and page <= page_range_end %}
+        <li class="page-item {% if results.number == page %}active{% endif %}"><a class="page-link" href="#_" onclick="setParam('page', {{ page }})">{{ page }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="#_" onclick="{% if results.has_next %}setParam('page', {{ results.next_page_number }}){% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
+{% endif %}
+<p>Showing results {{ result_start }}-{{ result_end }} of {{ results.paginator.count }}</p>
+{% elif searched %}
+<hr/>
+<p>No results found.</p>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

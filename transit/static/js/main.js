@@ -81,3 +81,8 @@ function getCurrentTime(input) {
     $("#" + input).val(time_str);
 }
 
+function setParam(param, value) {
+    var url = new URL(location);
+    url.searchParams.set(param, value);
+    window.open(url, "_self");
+}

@@ -204,3 +204,11 @@ class vehicleMaintainForm(forms.Form):
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
 
+class SearchTripsForm(forms.Form):
+    name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
+    end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))

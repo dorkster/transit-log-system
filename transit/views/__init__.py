@@ -12,3 +12,4 @@ from .vehicle_status import *
 from .vehicle_issue import *
 from .template import *
 from .template_trip import *
+from .search import *

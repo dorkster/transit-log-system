@@ -24,7 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('transit/', include('transit.urls')),
     path('', RedirectView.as_view(url='/transit/', permanent=True)),
-    path('accounts/', include('django.contrib.auth.urls')),
 ]
     
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

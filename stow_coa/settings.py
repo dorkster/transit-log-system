@@ -20,12 +20,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)'
+# SECRET_KEY = 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-# TODO turn this off!
+# TODO Use domain name (and localhost) here!!!
 ALLOWED_HOSTS = ['*']
 
 
@@ -128,3 +130,7 @@ STATIC_URL = '/transit/static/'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
+# Security stuff
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'

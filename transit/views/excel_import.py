@@ -43,6 +43,29 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
         errors.append(str(file_obj) + ': Could not parse date string')
         return
 
+    # Sanity check the template format
+    santity_check_failed = False
+    page_error = ' is not on the correct row/column, which is a sign that rows/columns have been added/deleted.'
+    if str(sheet['K1'].value).strip() != 'Page 1':
+        errors.append(str(file_obj) + ': "Page 1"' + page_error) 
+        santity_check_failed = True
+    if str(sheet['K27'].value).strip() != 'Page 2':
+        errors.append(str(file_obj) + ': "Page 2"' + page_error)
+        santity_check_failed = True
+    if str(sheet['K50'].value).strip() != 'Page 3':
+        errors.append(str(file_obj) + ': "Page 3"' + page_error)
+        santity_check_failed = True
+    if str(sheet['K73'].value).strip() != 'Page 4':
+        errors.append(str(file_obj) + ': "Page 4"' + page_error)
+        santity_check_failed = True
+    if str(sheet['A97'].value).strip() != 'DRIVER':
+        errors.append(str(file_obj) + ': The shift summary header is not on the correct row, which is a sign that rows have been added/deleted.')
+        santity_check_failed = True
+
+    if santity_check_failed:
+        errors.append(str(file_obj) +': Incorrect template format detected. Canceling import!')
+        return
+
     S_DRIVER = 0
     S_VEHICLE = 2
     S_START_MILES = 3
@@ -51,7 +74,6 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
     S_END_TIME = 6
     S_FUEL = 7
 
-    # TODO verify that this range hasn't been altered by adding/deleting rows
     shift_data = sheet['A98:H100']
     for row in shift_data:
         shift = Shift()
@@ -130,7 +152,6 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
     # T_AMBULATORY = 15
 
     pages = []
-    # TODO verify that these ranges haven't been altered by adding/deleting rows
     pages.append(sheet['A5:P26'])
     pages.append(sheet['A30:P49'])
     pages.append(sheet['A53:P72'])

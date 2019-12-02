@@ -9,11 +9,6 @@ from openpyxl import load_workbook
 from transit.models import Shift, Trip, Driver, Vehicle, TripType
 from transit.forms import UploadFileForm
 
-def getWorkHourTime(t_time):
-    if t_time.hour >= 1 and t_time.hour <= 6:
-        return t_time.replace(hour=(t_time.hour+12))
-    return t_time
-
 def excelImport(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -33,6 +28,100 @@ def excelImport(request):
     return render(request, 'excel_import.html', {'form': form, 'import_done': False, })
 
 def excelParseFile(file_obj, shifts, trips, errors, options):
+    def parseString(cell_value):
+        if cell_value != None:
+            return str(cell_value).strip()
+        else:
+            return ''
+
+    def parseTime(cell_value, file_obj, errors, error_str):
+        def getWorkHourTime(t_time):
+            if t_time.hour >= 1 and t_time.hour <= 6:
+                return t_time.replace(hour=(t_time.hour+12))
+            return t_time
+
+        if type(cell_value) == datetime.time:
+            return getWorkHourTime(cell_value).strftime('%_I:%M %p').strip()
+        elif cell_value != None:
+            errors.append(str(file_obj) + ': Could not parse ' + error_str + ' time, "' + str(cell_value) + '"')
+        return ''
+
+    def parseMiles(cell_value, file_obj, errors, error_str):
+        if type(cell_value) == int or type(cell_value) == float:
+            return '{:.1f}'.format(float(cell_value)).strip()
+        elif cell_value != None:
+            errors.append(str(file_obj) + ': Could not parse ' + error_str + ' miles, "' + str(cell_value) + '"')
+        return ''
+
+    def parseFuel(cell_value, file_obj, errors):
+        if type(cell_value) == int or type(cell_value) == float:
+            return '{:.1f}'.format(float(cell_value)).strip()
+        elif cell_value != None:
+            errors.append(str(file_obj) + ': Could not parse fuel, "' + str(cell_value) + '"')
+        return ''
+
+    def parseDriver(cell_value):
+        if cell_value == None:
+            return (None, Trip.STATUS_NORMAL)
+
+        driver_name = str(cell_value).strip()
+        driver = None
+        status = Trip.STATUS_NORMAL
+        if driver_name == 'Canceled':
+            status = Trip.STATUS_CANCELED
+        else:
+            query = Driver.objects.filter(name=driver_name)
+            if query:
+                driver = query[0]
+
+        return (driver, status)
+
+    def parseVehicle(cell_value):
+        if cell_value == None:
+            return None
+
+        vehicle_name = str(cell_value).strip()
+        query = Vehicle.objects.filter(name=vehicle_name)
+        if query:
+            return query[0]
+        else:
+            return None
+
+    def parsePhone(cell_value):
+        if cell_value == None:
+            return ''
+
+        phone_str = str(cell_value).split(' ')[0].strip()
+
+        matches = re.findall('\d*', phone_str)
+        phone_str = ''
+        for i in matches:
+            phone_str += i
+
+        if len(phone_str) >= 10:
+            phone_str = phone_str[len(phone_str)-10:len(phone_str)-7] + '-' + phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
+        elif len(phone_str) >= 7:
+            phone_str = phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
+        else:
+            phone_str = ''
+
+        return phone_str
+
+    def parseTripType(cell_value):
+        if cell_value == None:
+            return None
+
+        trip_type = str(cell_value).strip()
+        query = None
+        if trip_type == 'Social/Rec.':
+            query = TripType.objects.filter(name='Social/Recreation')
+        else:
+            query = TripType.objects.filter(name=trip_type)
+        if query:
+            return query[0]
+        else:
+            return None
+
     workbook = load_workbook(file_obj, data_only=True)
     sheet = workbook['Schedule']
 
@@ -87,40 +176,13 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
             if row[S_DRIVER].value == None:
                 continue
 
-        if row[S_DRIVER].value != None:
-            query = Driver.objects.filter(name=str(row[S_DRIVER].value))
-            if query:
-                shift.driver = query[0]
-
-        if row[S_VEHICLE].value != None:
-            query = Vehicle.objects.filter(name=str(row[S_VEHICLE].value))
-            if query:
-                shift.vehicle = query[0]
-
-        if type(row[S_START_MILES].value) == int or type(row[S_START_MILES].value) == float:
-            shift.start_miles = '{:.1f}'.format(float(row[S_START_MILES].value)).strip()
-        elif row[S_START_MILES].value != None:
-            errors.append(str(file_obj) + ': Could not parse shift start miles, "' + str(row[S_START_MILES].value) + '"')
-
-        if type(row[S_START_TIME].value) == datetime.time:
-            shift.start_time = getWorkHourTime(row[S_START_TIME].value).strftime('%_I:%M %p').strip()
-        elif row[S_START_TIME].value != None:
-            errors.append(str(file_obj) + ': Could not parse shift start time, "' + str(row[S_START_TIME].value) + '"')
-
-        if type(row[S_END_MILES].value) == int or type(row[S_END_MILES].value) == float:
-            shift.end_miles = '{:.1f}'.format(float(row[S_END_MILES].value)).strip()
-        elif row[S_END_MILES].value != None:
-            errors.append(str(file_obj) + ': Could not parse shift end miles, "' + str(row[S_END_MILES].value) + '"')
-
-        if type(row[S_END_TIME].value) == datetime.time:
-            shift.end_time = getWorkHourTime(row[S_END_TIME].value).strftime('%_I:%M %p').strip()
-        elif row[S_END_TIME].value != None:
-            errors.append(str(file_obj) + ': Could not parse shift end time, "' + str(row[S_END_TIME].value) + '"')
-
-        if type(row[S_FUEL].value) == int or type(row[S_FUEL].value) == float:
-            shift.fuel = '{:.1f}'.format(float(row[S_FUEL].value)).strip()
-        elif row[S_FUEL].value != None:
-            errors.append(str(file_obj) + ': Could not parse shift fuel, "' + str(row[S_FUEL].value) + '"')
+        shift.driver = parseDriver(row[S_DRIVER].value)[0]
+        shift.vehicle = parseVehicle(row[S_VEHICLE].value)
+        shift.start_miles = parseMiles(row[S_START_MILES].value, file_obj, errors, 'shift start')
+        shift.start_time = parseTime(row[S_START_TIME].value, file_obj, errors, 'shift start')
+        shift.end_miles = parseMiles(row[S_END_MILES].value, file_obj, errors, 'shift end')
+        shift.end_time = parseTime(row[S_END_TIME].value, file_obj, errors, 'shift end')
+        shift.fuel = parseFuel(row[S_FUEL].value, file_obj, errors)
 
         shifts.append(shift)
         if not options['dry_run']:
@@ -170,88 +232,24 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
                 if row[T_NAME].value == None:
                     continue
 
-            if type(row[T_PICKUP].value) == datetime.time:
-                trip.pick_up_time = getWorkHourTime(row[T_PICKUP].value).strftime('%_I:%M %p').strip()
-            elif row[T_PICKUP].value != None:
-                errors.append(str(file_obj) + ': Could not parse pick-up start time, "' + str(row[T_PICKUP].value) + '"')
+            trip.pick_up_time = parseTime(row[T_PICKUP].value, file_obj, errors, 'pick-up')
+            trip.appointment_time = parseTime(row[T_APPOINTMENT].value, file_obj, errors, 'appointment')
+            trip.name = parseString(row[T_NAME].value)
+            trip.address = parseString(row[T_ADDRESS].value)
+            trip.phone_home = parsePhone(row[T_PHONE].value)
+            trip.destination = parseString(row[T_DESTINATION].value)
+            trip.start_miles = parseMiles(row[T_START_MILES].value, file_obj, errors, 'trip start')
+            trip.start_time = parseTime(row[T_START_TIME].value, file_obj, errors, 'trip start')
+            trip.end_miles = parseMiles(row[T_END_MILES].value, file_obj, errors, 'trip end')
+            trip.end_time = parseTime(row[T_END_TIME].value, file_obj, errors, 'trip end')
+            trip.note = parseString(row[T_NOTE].value)
 
-            if type(row[T_APPOINTMENT].value) == datetime.time:
-                trip.appointment_time = getWorkHourTime(row[T_APPOINTMENT].value).strftime('%_I:%M %p').strip()
-            elif row[T_APPOINTMENT].value != None:
-                errors.append(str(file_obj) + ': Could not parse appointment start time, "' + str(row[T_APPOINTMENT].value) + '"')
+            driver_query = parseDriver(row[T_DRIVER].value)
+            trip.driver = driver_query[0]
+            trip.status = driver_query[1]
 
-            if row[T_NAME].value != None:
-                trip.name = str(row[T_NAME].value).strip()
-
-            if row[T_ADDRESS].value != None:
-                trip.address = str(row[T_ADDRESS].value).strip()
-
-            if row[T_PHONE].value != None:
-                phone_str = str(row[T_PHONE].value).split(' ')[0].strip()
-
-                matches = re.findall('\d*', phone_str)
-                phone_str = ''
-                for i in matches:
-                    phone_str += i
-
-                if len(phone_str) >= 10:
-                    phone_str = phone_str[len(phone_str)-10:len(phone_str)-7] + '-' + phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
-                elif len(phone_str) >= 7:
-                    phone_str = phone_str[len(phone_str)-7:len(phone_str)-4] + '-' + phone_str[len(phone_str)-4:]
-                else:
-                    phone_str = ''
-
-                trip.phone_home = phone_str
-
-            if row[T_DESTINATION].value != None:
-                trip.destination = str(row[T_DESTINATION].value).strip()
-
-            if type(row[T_START_MILES].value) == int or type(row[T_START_MILES].value) == float:
-                trip.start_miles = '{:.1f}'.format(float(row[T_START_MILES].value)).strip()
-            elif row[T_START_MILES].value != None:
-                errors.append(str(file_obj) + ': Could not parse trip start miles, "' + str(row[T_START_MILES].value) + '"')
-
-            if type(row[T_START_TIME].value) == datetime.time:
-                trip.start_time = getWorkHourTime(row[T_START_TIME].value).strftime('%_I:%M %p').strip()
-            elif row[T_START_TIME].value != None:
-                errors.append(str(file_obj) + ': Could not parse trip start time, "' + str(row[T_START_TIME].value) + '"')
-
-            if type(row[T_END_MILES].value) == int or type(row[T_END_MILES].value) == float:
-                trip.end_miles = '{:.1f}'.format(float(row[T_END_MILES].value)).strip()
-            elif row[T_END_MILES].value != None:
-                errors.append(str(file_obj) + ': Could not parse trip end miles, "' + str(row[T_END_MILES].value) + '"')
-
-            if type(row[T_END_TIME].value) == datetime.time:
-                trip.end_time = getWorkHourTime(row[T_END_TIME].value).strftime('%_I:%M %p').strip()
-            elif row[T_END_TIME].value != None:
-                errors.append(str(file_obj) + ': Could not parse trip end time, "' + str(row[T_END_TIME].value) + '"')
-
-            if row[T_NOTE].value != None:
-                trip.note = str(row[T_NOTE].value).strip()
-
-            if row[T_DRIVER].value != None:
-                driver_name = str(row[T_DRIVER].value).strip()
-                if driver_name == 'Canceled':
-                    trip.status = Trip.STATUS_CANCELED
-                else:
-                    query = Driver.objects.filter(name=driver_name)
-                    if query:
-                        trip.driver = query[0]
-
-            if row[T_VEHICLE].value != None:
-                query = Vehicle.objects.filter(name=str(row[T_VEHICLE].value).strip())
-                if query:
-                    trip.vehicle = query[0]
-
-            if row[T_TRIPTYPE].value != None:
-                trip_type = str(row[T_TRIPTYPE].value).strip()
-                query = None
-                if trip_type == 'Social/Rec.':
-                    query = TripType.objects.filter(name='Social/Recreation')
-                else:
-                    query = TripType.objects.filter(name=trip_type)
-                if query:
-                    trip.trip_type = query[0]
+            trip.vehicle = parseVehicle(row[T_VEHICLE].value)
+            trip.trip_type = parseTripType(row[T_TRIPTYPE].value)
 
             trip.sort_index = sort_index
             sort_index += 1

@@ -131,7 +131,7 @@ def report(request, year, month):
 
                     trip_pmt += (trip_data.end_miles - trip_data.start_miles)
                     if trip.trip_type != None:
-                        rv_day.trip_types[str(trip.trip_type)] = 1
+                        rv_day.trip_types[str(trip.trip_type)] += 1
 
                     ur_index = None
                     for i in range(len(unique_riders)):

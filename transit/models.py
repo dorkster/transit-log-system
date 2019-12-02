@@ -62,10 +62,16 @@ class Trip(models.Model):
 
     def __str__(self):
         if self.is_activity:
-            output = '[' + str(self.date) + '] - '
-            if self.appointment_time: 
-                output += str(self.appointment_time) + ' - '
-            output += self.note
+            output = '[' + str(self.date) + ']'
+
+            if self.pick_up_time and self.appointment_time:
+                output += ' - ' + str(self.pick_up_time) + ' to ' + str(self.appointment_time)
+            elif self.pick_up_time:
+                output += ' - ' + str(self.pick_up_time)
+            elif self.appointment_time:
+                output += ' - ' + str(self.appointment_time)
+
+            output += ' - ' + self.note
             return output
 
         output = '[' + str(self.date) + '] - ' + self.name

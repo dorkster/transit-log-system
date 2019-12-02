@@ -153,7 +153,15 @@
             </div>
         </td>
         {% if trip.is_activity %}
-        <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
+        <td colspan=2 class="text-center">
+            {% if trip.pick_up_time and trip.appointment_time %}
+            {{ trip.pick_up_time }} - {{ trip.appointment_time }}
+            {% elif trip.pick_up_time %}
+            {{ trip.pick_up_time }}
+            {% elif trip.appointment_time %}
+            {{ trip.appointment_time }}
+            {% endif %}
+        </td>
         <td colspan=11 class="text-center">{{ trip.note }}</td>
         {% else %}
         <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>

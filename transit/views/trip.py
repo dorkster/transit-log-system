@@ -96,7 +96,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
             if trip.is_activity:
                 trip.date = form.cleaned_data['date']
-                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.pick_up_time = form.cleaned_data['start_time']
+                trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
                 trip.status = form.cleaned_data['status']
             else:
@@ -147,7 +148,8 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         if trip.is_activity:
             initial = {
                 'date': trip.date,
-                'appointment_time': trip.appointment_time,
+                'start_time': trip.pick_up_time,
+                'end_time': trip.appointment_time,
                 'description': trip.note,
                 'status': trip.status,
             }

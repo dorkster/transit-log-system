@@ -181,7 +181,8 @@ class EditTemplateTripForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
 
 class EditTemplateActivityForm(forms.Form):
-    appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditScheduleMessageForm(forms.Form):
@@ -189,7 +190,8 @@ class EditScheduleMessageForm(forms.Form):
 
 class EditActivityForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
-    appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
 

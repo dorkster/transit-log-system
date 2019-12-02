@@ -54,7 +54,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
 
         if form.is_valid():
             if trip.is_activity:
-                trip.appointment_time = form.cleaned_data['appointment_time']
+                trip.pick_up_time = form.cleaned_data['start_time']
+                trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
             else:
                 FrequentTag.removeTags(trip.get_tag_list())
@@ -81,7 +82,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
     else:
         if trip.is_activity:
             initial = {
-                'appointment_time': trip.appointment_time,
+                'start_time': trip.pick_up_time,
+                'end_time': trip.appointment_time,
                 'description': trip.note,
             }
             form = EditTemplateActivityForm(initial=initial)

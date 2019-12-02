@@ -235,6 +235,11 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
             trip.sort_index = sort_index
             sort_index += 1
 
+            if trip.name and not trip.address and not trip.destination and not trip.driver and not trip.vehicle and trip.check_blank(''):
+                trip.is_activity = True
+                trip.note = trip.name
+                trip.name = ''
+
             trips.append(trip)
             if not options['dry_run']:
                 trip.save()

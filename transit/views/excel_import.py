@@ -106,7 +106,7 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
 
     trip_query = Trip.objects.filter(date=date).order_by('-sort_index')
     if trip_query:
-        sort_index = trip_query[0]
+        sort_index = trip_query[0].sort_index + 1
     else:
         sort_index = 0
 

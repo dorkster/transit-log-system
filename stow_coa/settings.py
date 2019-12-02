@@ -59,9 +59,6 @@ ROOT_URLCONF = 'stow_coa.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,6 +126,7 @@ STATIC_URL = '/transit/static/'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL= '/'
 
 # Security stuff
 SECURE_CONTENT_TYPE_NOSNIFF = True

@@ -27,10 +27,10 @@ def excelImport(request):
             for i in request.FILES.getlist('file'):
                 excelParseFile(i, shifts, trips, errors, options)
             # return HttpResponseRedirect(reverse('excel-import'))
-            return render(request, 'excel_import.html', {'form': form, 'trips':trips, 'shifts':shifts, 'errors':errors})
+            return render(request, 'excel_import.html', {'form': form, 'import_done': True, 'trips':trips, 'shifts':shifts, 'errors':errors})
     else:
         form = UploadFileForm()
-    return render(request, 'excel_import.html', {'form': form})
+    return render(request, 'excel_import.html', {'form': form, 'import_done': False, })
 
 def excelParseFile(file_obj, shifts, trips, errors, options):
     workbook = load_workbook(file_obj, data_only=True)

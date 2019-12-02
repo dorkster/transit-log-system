@@ -2,6 +2,7 @@
 
 {% block auth_content %}
 <h2>Import Excel (xlsx) files</h2>
+{% if not import_done %}
 <form class="mb-4" action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
@@ -12,24 +13,27 @@
         </div>
     </div>
 </form>
+{% else %}
+<p>Import completed. <a href="{% url 'excel-import' %}">Click here</a> to upload more.
+{% if errors %}
+<h3>Errors</h3>
+<ul class="list-group small">
+{% for error in errors %}
+    <li class="list-group-item list-group-item-danger p-1">{{ error }}</li>
+{% endfor %}
+</ul>
+<hr/>
+{% endif %}
 {% if trips or shifts%}
-<ul class="list-group">
+<ul class="list-group small">
     {% for shift in shifts %}
-    <li class="list-group-item">Imported shift: <strong>{{ shift }}</strong></li>
+    <li class="list-group-item p-1">Imported shift: <strong>{{ shift }}</strong></li>
     {% endfor %}
     {% for trip in trips %}
-    <li class="list-group-item">Imported trip: <strong>{{ trip }}</strong></li>
+    <li class="list-group-item p-1">Imported trip: <strong>{{ trip }}</strong></li>
     {% endfor %}
 </ul>
 {% endif %}
-{% if errors %}
-<hr/>
-<h3>Errors</h3>
-<ul class="list-group">
-{% for error in errors %}
-    <li class="list-group-item list-group-item-danger">{{ error }}</li>
-{% endfor %}
-</ul>
 {% endif %}
 {% endblock %}
 

@@ -234,6 +234,12 @@ def ajaxScheduleCommon(request, template):
         request.session['schedule_view_search'] = ''
         request.session['schedule_view_driver'] = ''
         request.session['schedule_view_vehicle'] = ''
+    elif request.user.is_superuser and request_action == 'delete_all_shifts':
+        for i in Shift.objects.filter(date=date):
+            i.delete()
+    elif request.user.is_superuser and request_action == 'delete_all_trips':
+        for i in Trip.objects.filter(date=date):
+            i.delete()
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)

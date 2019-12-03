@@ -195,6 +195,11 @@ class Trip(models.Model):
         s = str(self.collected_check)
         return s[:len(s)-2] + '.' + s[len(s)-2:]
 
+    def is_medical(self):
+        if self.trip_type is None:
+            return False
+        return self.trip_type.name == 'Medical'
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -448,6 +453,11 @@ class TemplateTrip(models.Model):
         for i in range(0, len(tags)):
             tags[i] = tags[i].strip()
         return tags
+
+    def is_medical(self):
+        if self.trip_type is None:
+            return False
+        return self.trip_type.name == 'Medical'
 
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

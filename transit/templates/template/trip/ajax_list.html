@@ -30,7 +30,7 @@
         <td></td>
     </thead>
     {% for trip in trips %}
-    <tr>
+    <tr class="{% if trip.is_medical %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">
@@ -98,7 +98,7 @@
                                 <div class="col text-muted">Trip Type</div>
                                 <div class="col-auto">
                                     {% if trip.trip_type %}
-                                    {% if trip.trip_type.name == 'Medical' %}
+                                    {% if trip.is_medical %}
                                     <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
                                     {% else %}
                                     <span class="badge badge-primary">{{trip.trip_type}}</span>

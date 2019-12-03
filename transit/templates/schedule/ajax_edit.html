@@ -116,7 +116,7 @@
         <td></td>
     </thead>
     {% for trip in trips %}
-    <tr style="background: #{{ trip.get_driver_color }};">
+    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">
@@ -180,7 +180,7 @@
         <td class="mytable-col-lg">{{ trip.destination }}</td>
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.driver is None %}---------{% else %}{% for driver in drivers %}{% if trip.driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
                 </button>
                 <div class="dropdown-menu">
@@ -193,7 +193,7 @@
         </td>
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.vehicle is None %}---------{% else %}{% for vehicle in vehicles %}{% if trip.vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
                 </button>
                 <div class="dropdown-menu">
@@ -248,7 +248,7 @@
                                 <div class="col text-muted">Trip Type</div>
                                 <div class="col-auto">
                                     {% if trip.trip_type %}
-                                    {% if trip.trip_type.name == 'Medical' %}
+                                    {% if trip.is_medical %}
                                     <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
                                     {% else %}
                                     <span class="badge badge-primary"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>

@@ -259,7 +259,7 @@
                                 {% elif trip.status == 2 %}
                                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                                 {% endif %}
-                                {% if trip.trip_type.name == 'Medical' %}
+                                {% if trip.is_medical %}
                                 <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
                                 {% elif trip.trip_type %}
                                 <span class="badge badge-info"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>

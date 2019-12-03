@@ -10,10 +10,10 @@
         <hr>
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-4">
-                <input class="btn btn-secondary btn-lg" type="submit" name="cancel" value="Cancel Changes">
+                <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel Changes</button>
             </div>
             <div>
-                <input class="btn btn-danger btn-lg" type="submit" name="delete" value="Delete {{ model.get_class_name }}">
+                <button class="btn btn-danger btn-lg m-2" type="submit" name="delete" formnovalidate><span class="oi oi-delete mr-2"></span>Delete {{model.get_class_name}}</button>
             </div>
             <div>
             </div>

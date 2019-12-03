@@ -41,12 +41,12 @@
         <hr>
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-3">
-                <input class="btn btn-success btn-lg m-2" type="submit" name="save" value="Save Changes">
-                <input class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" value="Cancel Changes" formnovalidate>
+                <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>
+                <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel Changes</button>
             </div>
             {% if not is_new and perms.transit.can_delete_vehicleissue %}
             <div>
-                <input class="btn btn-danger btn-lg m-2" type="submit" name="delete" value="Delete Vehicle Issue" formnovalidate>
+                <button class="btn btn-danger btn-lg m-2" type="submit" name="delete" formnovalidate><span class="oi oi-delete mr-2"></span>Delete {{vehicle_issue.get_class_name}}</button>
             </div>
             {% endif %}
         </div>

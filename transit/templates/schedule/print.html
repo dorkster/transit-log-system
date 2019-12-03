@@ -9,6 +9,9 @@
     #print-print, #print-close {
         display: none;
     }
+    .footer {
+        display: none;
+    }
 }
 body.bg-light {
     background: none !important;
@@ -70,28 +73,28 @@ nav {
         <tr style="background: #{{ shift.get_driver_color }};">
             <td class="mytable-col-md">{{ shift.driver }}</td>
             <td class="mytable-col-md">{{ shift.vehicle }}</td>
-            <td class="mytable-col-sm">
+            <td class="mytable-col-md text-center">
                 {% if shift.check_start_miles %}
                 {{ shift.start_miles }}
                 {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
                 {% endif %}
             </td>
-            <td class="mytable-col-sm">
+            <td class="mytable-col-md text-center">
                 {% if shift.check_start_time %}
                 {{ shift.start_time }}
                 {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
                 {% endif %}
             </td>
-            <td class="mytable-col-sm">
+            <td class="mytable-col-md text-center">
                 {% if shift.check_end_miles %}
                 {{ shift.end_miles }}
                 {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
                 {% endif %}
             </td>
-            <td class="mytable-col-sm">
+            <td class="mytable-col-md text-center">
                 {% if shift.check_end_time %}
                 {{ shift.end_time }}
                 {% else %}
@@ -132,7 +135,7 @@ nav {
             {% else %}
             <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
-            <td class="mytable-col-md">{{ trip.name }}</td>
+            <td class="mytable-col-lg">{{ trip.name }}</td>
             <td class="mytable-col-lg">{{ trip.address }}</td>
             <td class="mytable-col-md" style="white-space: nowrap;">
                 {% if trip.phone_home and trip.phone_cell %}

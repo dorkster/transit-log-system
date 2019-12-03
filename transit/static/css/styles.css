@@ -71,3 +71,8 @@
 .text-bold {
     font-weight: bold;
 }
+
+.sort-arrow {
+    /* line-height: 1.2em; */
+    font-size: 75%;
+}

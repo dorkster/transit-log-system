@@ -1,4 +1,4 @@
-<h3>Templates <a class="btn btn-secondary" href="{% url 'template-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<h3>Templates <a class="btn btn-success btn-sm" href="{% url 'template-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if templates %}
 <table class="mytable mytable-striped">
     <thead>
@@ -30,7 +30,7 @@
         </td>
         <td class="mytable-col-lg">{{ template.name }}</td>
         <td class="mytable-col-lg">
-            <a href="{% url 'template-trips' template.id %}" class="btn btn-secondary w-100">View/Edit Trips</a>
+            <a href="{% url 'template-trips' template.id %}" class="btn btn-secondary btn-sm w-100"><span class="oi oi-list mr-2"></span>Edit Trips</a>
         </td>
     </tr>
     {% endfor %}

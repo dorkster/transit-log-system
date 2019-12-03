@@ -1,11 +1,11 @@
 <div class="row">
     <div class="col">
         <h3>
-            <a href="{% url 'templates' %}" class="btn btn-secondary"><span class="oi oi-chevron-left"></span></a>
+            <a href="{% url 'templates' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
             Trips for {{ template.name }} template
             <span class="btn-group dropdown ajax-blocker">
-                <a class="btn btn-secondary" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a>
-                <a href="#_" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+                <a class="btn btn-success btn-sm" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a>
+                <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{% url 'template-trip-create' parent %}">New Trip</a>
                     <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}">New Activity</a>

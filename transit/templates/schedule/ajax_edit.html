@@ -9,7 +9,7 @@
     </div>
 </div>
 <hr/>
-<h3>Shifts <a class="btn btn-secondary" href="{% url 'shift-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<h3>Shifts <a class="btn btn-success btn-sm" href="{% url 'shift-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
 <table class="mytable">
     <thead>
@@ -77,15 +77,15 @@
 <h3>
     Trips
     <span class="btn-group dropdown ajax-blocker">
-        <a class="btn btn-secondary" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
-        <a href="#_" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+        <a class="btn btn-success btn-sm" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
+        <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
         <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="{% url 'trip-create' 'edit' date.year date.month date.day %}">New Trip</a>
             <a class="dropdown-item" href="{% url 'trip-create-activity' 'edit' date.year date.month date.day %}">New Activity</a>
         </div>
     </span>
     <span class="dropdown ajax-blocker">
-        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="oi oi-list mr-2"></span>Templates
         </button>
         <div class="dropdown-menu">
@@ -337,8 +337,8 @@
     {% if user.is_superuser %}
     <hr/>
     <h3>For Administrators</h3>
-    {% if shifts %}<a class="btn btn-danger" href="#_" onclick="deleteAll('shifts')">Delete all shifts</a>{% endif %}
-    {% if trips %}<a class="btn btn-danger" href="#_" onclick="deleteAll('trips')">Delete all trips</a>{% endif %}
+    {% if shifts %}<a class="btn btn-danger btn-sm" href="#_" onclick="deleteAll('shifts')">Delete all shifts</a>{% endif %}
+    {% if trips %}<a class="btn btn-danger btn-sm" href="#_" onclick="deleteAll('trips')">Delete all trips</a>{% endif %}
     <script type="text/javascript">
         function deleteAll(type) {
             if (type == "shifts") {

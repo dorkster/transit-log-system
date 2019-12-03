@@ -30,7 +30,7 @@
         <td></td>
     </thead>
     {% for trip in trips %}
-    <tr class="{% if trip.is_medical %}text-bold{% endif %}">
+    <tr class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">

@@ -1,9 +1,11 @@
 import datetime
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType
+from transit.forms import DatePickerForm
 
 def report(request, year, month):
     class UniqueRider:
@@ -34,6 +36,15 @@ def report(request, year, month):
             self.errors = []
 
     date_start = datetime.date(year, month, 1)
+
+    if request.method == 'POST':
+        date_picker = DatePickerForm(request.POST)
+        if date_picker.is_valid():
+            date_picker_date = date_picker.cleaned_data['date']
+            return HttpResponseRedirect(reverse('report', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
+    else:
+        date_picker = DatePickerForm(initial={'date':date_start})
+
     date_end = date_start
     if date_end.month == 12:
         date_end = date_end.replace(day=31)
@@ -238,6 +249,7 @@ def report(request, year, month):
         'date_end': date_end,
         'month_prev': reverse('report', kwargs={'year':month_prev.year, 'month':month_prev.month}),
         'month_next': reverse('report', kwargs={'year':month_next.year, 'month':month_next.month}),
+        'date_picker': date_picker,
         'vehicles': vehicle_list,
         'no_vehicle_errors': no_vehicle_errors,
         'triptypes': triptypes,

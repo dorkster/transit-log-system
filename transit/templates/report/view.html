@@ -11,11 +11,32 @@
                 <a title="Previous month" class="btn btn-secondary" href="{{ month_prev }}">
                     <span class="oi oi-chevron-left"></span>
                 </a>
+                <div class="btn-group" role="group" id="date_dropdown">
+                    <button title="Select a month" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="oi oi-calendar"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                {{ date_picker }}
+                                <input type="submit" value="Go" class="btn btn-secondary align-top">
+                            </form>
+                        </div>
+                        <a class="dropdown-item" href="{% url 'report-this-month' %}">Go to this month</a>
+                    </div>
+                </div>
                 <a title="Next month" class="btn btn-secondary" href="{{ month_next }}">
                     <span class="oi oi-chevron-right"></span>
                 </a>
-
             </div>
+            <script type="text/javascript">
+                // Keep the dropdown from closing when picking a date
+                $('#date_dropdown option, #date_dropdown select').click(function(e) {
+                    e.stopPropagation();
+                });
+                $("#id_date_day").attr("style", "display: none !important;");
+            </script>
         </div>
     </div>
 </div>

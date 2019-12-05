@@ -270,11 +270,11 @@
                                 {% endfor %}
                                 {% endif %}
                             </div>
-                            {% if trip.note %}
+                            {% endif %}
+                            {% if trip.note and not trip.is_activity %}
                             <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
                                 {{ trip.note }}
                             </div>
-                            {% endif %}
                             {% endif %}
                         </div>
                     </div>

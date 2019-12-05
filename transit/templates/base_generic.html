@@ -67,9 +67,10 @@
                         <div class="dropdown-menu dropdown-menu-right">
                             {% if user.is_superuser %}
                             <a class="dropdown-item" href="/admin">View Admin Control Panel</a>
-                            <a class="dropdown-item" href="{% url 'excel-import' %}">Import Excel Files</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
+                            <a class="dropdown-item" href="{% url 'excel-import' %}">Import Excel Files</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'password_change' %}">Change Password</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>

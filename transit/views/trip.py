@@ -181,6 +181,13 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             }
             form = EditTripForm(initial=initial)
 
+    addresses = set()
+    for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=30))):
+        if i.address:
+            addresses.add(str(i.address))
+        if i.destination:
+            addresses.add(str(i.destination))
+
     context = {
         'form': form,
         'trip': trip,
@@ -188,6 +195,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
         'frequent_tags': FrequentTag.objects.all()[:10],
+        'addresses': sorted(addresses),
     }
 
     return render(request, 'trip/edit.html', context)

@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -60,11 +61,23 @@ def clientCreateEditCommon(request, client, is_new):
         }
         form = EditClientForm(initial=initial)
 
+    names = set()
+    addresses = set()
+    for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=30))):
+        if i.name:
+            names.add(str(i.name))
+        if i.address:
+            addresses.add(str(i.address))
+        if i.destination:
+            addresses.add(str(i.destination))
+
     context = {
         'form': form,
         'client': client,
         'is_new': is_new,
-        'frequent_tags': FrequentTag.objects.all()[:10]
+        'frequent_tags': FrequentTag.objects.all()[:10],
+        'names': sorted(names),
+        'addresses': sorted(addresses),
     }
 
     return render(request, 'client/edit.html', context)

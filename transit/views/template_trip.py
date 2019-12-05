@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -6,7 +7,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Template, TemplateTrip, Client, FrequentTag
+from transit.models import Template, TemplateTrip, Client, FrequentTag, Trip
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 def templateTripList(request, parent):
@@ -104,6 +105,13 @@ def templateTripCreateEditCommon(request, trip, is_new):
             }
             form = EditTemplateTripForm(initial=initial)
 
+    addresses = set()
+    for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=30))):
+        if i.address:
+            addresses.add(str(i.address))
+        if i.destination:
+            addresses.add(str(i.destination))
+
     context = {
         'form': form,
         'trip': trip,
@@ -111,6 +119,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         'clients_json': serializers.serialize('json', Client.objects.all()),
         'is_new': is_new,
         'frequent_tags': FrequentTag.objects.all()[:10],
+        'addresses': sorted(addresses),
     }
 
     return render(request, 'template/trip/edit.html', context)

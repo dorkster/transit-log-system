@@ -16,6 +16,11 @@
         <option value="{{ client.name }}">
         {% endfor %}
     </datalist>
+    <datalist id='addresses'>
+        {% for address in addresses %}
+        <option value="{{ address }}">
+        {% endfor %}
+    </datalist>
     <div class="container ml-0">
         <div class="row">
             {% if trip.is_activity %}

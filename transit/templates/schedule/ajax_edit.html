@@ -89,6 +89,9 @@
             <span class="oi oi-list mr-2"></span>Templates
         </button>
         <div class="dropdown-menu">
+            {% if not templates %}
+            <span class="dropdown-header">There are no available templates.</span>
+            {% endif %}
             {% for template in templates %}
             <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'load_template', '{{template.id}}')">{{template}}</a>
             {% endfor %}

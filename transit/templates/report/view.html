@@ -43,10 +43,10 @@
 <hr/>
 <div style="max-width: 800px;">
 {% for v in vehicles %}
+<h3>Vehicle: {{ v.vehicle }}</h3>
 {% if v.days or v.errors %}
 <div class="row mb-3">
     <div class="col">
-        <h3>Vehicle: {{ v.vehicle }}</h3>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="tab_summary_{{v.vehicle.id}}" data-toggle="tab" href="#summary_{{v.vehicle.id}}" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
@@ -176,6 +176,8 @@
         </div>
     </div>
 </div>
+{% else %}
+<p>No log data for this vehicle is available.</p>
 {% endif %}
 {% endfor %}
 {% if unique_riders %}

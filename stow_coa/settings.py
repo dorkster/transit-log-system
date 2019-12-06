@@ -28,7 +28,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'su1tw^4je357w$4l=^uh-=7!_5t$vl
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 # TODO Use domain name (and localhost) here!!!
-ALLOWED_HOSTS = ['*']
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['stow-ma-coa.org']
 
 
 # Application definition

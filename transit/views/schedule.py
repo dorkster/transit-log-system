@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage
+from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag
 from transit.forms import DatePickerForm, EditScheduleMessageForm
 
 def schedule(request, mode, year, month, day):
@@ -239,6 +239,8 @@ def ajaxScheduleCommon(request, template):
             i.delete()
     elif request.user.is_superuser and request_action == 'delete_all_trips':
         for i in Trip.objects.filter(date=date):
+            FrequentTag.removeTags(i.get_tag_list())
+            # no need to update sort_index when deleting all trips
             i.delete()
     elif request_action == 'toggle_extra_columns':
         request.session['schedule_edit_extra_columns'] = not request.session.get('schedule_edit_extra_columns', False)

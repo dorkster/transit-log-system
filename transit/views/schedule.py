@@ -240,6 +240,8 @@ def ajaxScheduleCommon(request, template):
     elif request.user.is_superuser and request_action == 'delete_all_trips':
         for i in Trip.objects.filter(date=date):
             i.delete()
+    elif request_action == 'toggle_extra_columns':
+        request.session['schedule_edit_extra_columns'] = not request.session.get('schedule_edit_extra_columns', False)
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)
@@ -301,6 +303,7 @@ def ajaxScheduleCommon(request, template):
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'templates': Template.objects.all(),
         'message': message,
+        'show_extra_columns': request.session.get('schedule_edit_extra_columns', False),
     }
     return render(request, template, context=context)
 

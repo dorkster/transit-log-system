@@ -180,7 +180,6 @@ class Trip(models.Model):
         tags = self.tags.split(',')
         for i in range(0, len(tags)):
             tags[i] = tags[i].strip()
-        print(tags)
         return tags
 
     def get_collected_cash_str(self):

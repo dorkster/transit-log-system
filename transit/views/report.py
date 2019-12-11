@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from transit.models import Driver, Vehicle, Trip, Shift, TripType
+from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
 from transit.forms import DatePickerForm
 
 def report(request, year, month):
@@ -200,6 +200,18 @@ def report(request, year, month):
                 no_vehicle_errors.append(error_str)
 
     unique_riders.sort()
+
+    # try to fetch missing unique rider data from list of clients
+    for i in unique_riders:
+        if i.elderly == None or i.ambulatory == None:
+            client_query = Client.objects.filter(name=i.name)
+            if len(client_query) > 0:
+                client = client_query[0]
+                if i.elderly == None and client.elderly != None:
+                    i.elderly = client.elderly
+                if i.ambulatory == None and client.ambulatory != None:
+                    i.ambulatory = client.ambulatory
+
     ur_elderly_ambulatory = 0
     ur_elderly_nonambulatory = 0
     ur_nonelderly_ambulatory = 0

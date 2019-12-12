@@ -276,6 +276,7 @@ class Shift(models.Model):
 
     class LogData():
         def __init__(self):
+            self.driver = None
             self.start_miles = None
             self.start_time = None
             self.end_miles = None
@@ -290,6 +291,7 @@ class Shift(models.Model):
             return None
 
         data = self.LogData()
+        data.driver = self.driver
         data.start_miles = float(self.start_miles)
         data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
         data.end_miles = float(self.end_miles)

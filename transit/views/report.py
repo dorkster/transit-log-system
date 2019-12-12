@@ -34,6 +34,11 @@ def report(request, year, month):
             self.days = []
             self.total = self.Day()
             self.errors = []
+    
+    class DriverSummary():
+        def __init__(self):
+            self.service_miles = 0
+            self.service_hours = 0
 
     date_start = datetime.date(year, month, 1)
 
@@ -58,6 +63,10 @@ def report(request, year, month):
     unique_riders = []
 
     triptypes = TripType.objects.all()
+
+    driver_summaries = {}
+    for driver in Driver.objects.filter(is_logged=True):
+        driver_summaries[str(driver)] = DriverSummary()
 
     vehicles = Vehicle.objects.filter(is_logged=True)
     vehicle_list = []
@@ -180,6 +189,12 @@ def report(request, year, month):
             for i in triptypes:
                 rv.total.trip_types[str(i)] += rv_day.trip_types[str(i)]
 
+            for driver in Driver.objects.filter(is_logged=True):
+                for shift in shift_data_list:
+                    if shift.driver == driver:
+                        driver_summaries[str(driver)].service_miles += (shift.end_miles - shift.start_miles)
+                        driver_summaries[str(driver)].service_hours += ((shift.end_time - shift.start_time).seconds / 60 / 60)
+
             rv.days.append(rv_day)
 
         rv.total.service_miles = '{:.1f}'.format(total_service_miles)
@@ -274,6 +289,7 @@ def report(request, year, month):
         'money_trips': money_trips,
         'total_collected_cash': total_collected_cash_str,
         'total_collected_check': total_collected_check_str,
+        'driver_summaries': driver_summaries,
     }
     return render(request, 'report/view.html', context)
 

@@ -306,6 +306,38 @@
     </div>
 </div>
 {% endif %}
+{% if driver_summaries %}
+<div class="row mb-3">
+    <div class="col">
+        <h3>Per-Driver Data</h3>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab_summary_drivers" data-toggle="tab" href="#summary_drivers" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-1 bg-white" id="myTabContent">
+            <div class="tab-pane fade show active" id="summary_drivers" role="tabpanel" aria-labelledby="summary-tab">
+                <div>
+                    <table class="mytable mytable-striped">
+                        <thead>
+                            <td class="mytable-col-md">Driver</td>
+                            <td class="mytable-col-lg">Service Miles</td>
+                            <td class="mytable-col-lg">Service Hours</td>
+                        </thead>
+                        {% for driver,summary in driver_summaries.items %}
+                        <tr>
+                            <td>{{driver}}</td>
+                            <td>{{ summary.service_miles|floatformat:1 }}</td>
+                            <td>{{ summary.service_hours|floatformat:1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% if no_vehicle_errors %}
 <hr/>
 <h3>Shifts &amp; trips without an assigned vehicle</h3>

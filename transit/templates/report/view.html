@@ -181,6 +181,7 @@
 {% endif %}
 {% endfor %}
 {% if unique_riders %}
+<hr/>
 <div class="row mb-3">
     <div class="col">
         <h3>Elderly/Ambulatory Riders</h3>
@@ -252,6 +253,7 @@
 </div>
 {% endif %}
 {% if money_trips %}
+<hr/>
 <div class="row mb-3">
     <div class="col">
         <h3>Money Collected</h3>
@@ -307,6 +309,7 @@
 </div>
 {% endif %}
 {% if driver_summaries %}
+<hr/>
 <div class="row mb-3">
     <div class="col">
         <h3>Per-Driver Data</h3>
@@ -321,14 +324,22 @@
                     <table class="mytable mytable-striped">
                         <thead>
                             <td class="mytable-col-md">Driver</td>
-                            <td class="mytable-col-lg">Service Miles</td>
-                            <td class="mytable-col-lg">Service Hours</td>
+                            <td class="mytable-col-md">Service Miles</td>
+                            <td class="mytable-col-md">Service Hours</td>
+                            <td class="mytable-col-md">Deadhead Miles</td>
+                            <td class="mytable-col-md">Deadhead Hours</td>
+                            <td class="mytable-col-md">Total Miles</td>
+                            <td class="mytable-col-md">Total Hours</td>
                         </thead>
                         {% for driver,summary in driver_summaries.items %}
                         <tr>
                             <td>{{driver}}</td>
                             <td>{{ summary.service_miles|floatformat:1 }}</td>
-                            <td>{{ summary.service_hours|floatformat:1 }}</td>
+                            <td>{{ summary.service_hours|floatformat:2 }}</td>
+                            <td>{{ summary.deadhead_miles|floatformat:1 }}</td>
+                            <td>{{ summary.deadhead_hours|floatformat:2 }}</td>
+                            <td>{{ summary.total_miles|floatformat:1 }}</td>
+                            <td>{{ summary.total_hours|floatformat:2 }}</td>
                         </tr>
                         {% endfor %}
                     </table>

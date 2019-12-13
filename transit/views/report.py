@@ -39,6 +39,10 @@ def report(request, year, month):
         def __init__(self):
             self.service_miles = 0
             self.service_hours = 0
+            self.deadhead_miles = 0
+            self.deadhead_hours = 0
+            self.total_miles = 0
+            self.total_hours = 0
 
     date_start = datetime.date(year, month, 1)
 
@@ -189,11 +193,18 @@ def report(request, year, month):
             for i in triptypes:
                 rv.total.trip_types[str(i)] += rv_day.trip_types[str(i)]
 
-            for driver in Driver.objects.filter(is_logged=True):
-                for shift in shift_data_list:
-                    if shift.driver == driver:
-                        driver_summaries[str(driver)].service_miles += (shift.end_miles - shift.start_miles)
-                        driver_summaries[str(driver)].service_hours += ((shift.end_time - shift.start_time).seconds / 60 / 60)
+            for shift in day_shifts:
+                shift_data = shift.get_parsed_log_data()
+                driver_summaries[str(shift.driver)].service_miles += (shift_data.end_miles - shift_data.start_miles)
+                driver_summaries[str(shift.driver)].service_hours += ((shift_data.end_time - shift_data.start_time).seconds / 60 / 60)
+                shift_trips = shift.get_start_end_trips()
+                if shift_trips is not None:
+                    driver_summaries[str(shift.driver)].deadhead_miles += (shift_trips[0].start_miles - shift_data.start_miles) + (shift_data.end_miles - shift_trips[2].end_miles)
+                    driver_summaries[str(shift.driver)].deadhead_hours += ((shift_trips[1].start_time - shift_data.start_time) + (shift_data.end_time - shift_trips[3].end_time)).seconds / 60 / 60
+
+            for i in driver_summaries:
+                driver_summaries[i].total_miles = driver_summaries[i].service_miles + driver_summaries[i].deadhead_miles
+                driver_summaries[i].total_hours = driver_summaries[i].service_hours + driver_summaries[i].deadhead_hours
 
             rv.days.append(rv_day)
 

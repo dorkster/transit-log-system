@@ -276,7 +276,6 @@ class Shift(models.Model):
 
     class LogData():
         def __init__(self):
-            self.driver = None
             self.start_miles = None
             self.start_time = None
             self.end_miles = None
@@ -336,6 +335,40 @@ class Shift(models.Model):
 
     def check_pretrip(self):
         return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)
+
+    def get_start_end_trips(self):
+        trip_miles_start = 0
+        trip_miles_end = 0
+        trip_time_start = 0
+        trip_time_end = 0
+        trip_data_list = []
+        shift_data = self.get_parsed_log_data()
+
+        for trip in Trip.objects.filter(date=self.date, vehicle=self.vehicle, status=Trip.STATUS_NORMAL):
+            trip_data = trip.get_parsed_log_data(self.start_miles)
+
+            if trip_data is None:
+                continue
+
+            # TODO also check time?
+            if trip_data.start_miles < shift_data.start_miles or trip_data.end_miles > shift_data.end_miles:
+                continue
+
+            trip_data_list.append(trip_data)
+            last_index = len(trip_data_list)-1
+            if trip_data.start_miles < trip_data_list[trip_miles_start].start_miles:
+                trip_miles_start = last_index
+            if trip_data.end_miles > trip_data_list[trip_miles_end].end_miles:
+                trip_miles_end = last_index
+            if trip_data.start_time < trip_data_list[trip_time_start].start_time:
+                trip_time_start = last_index
+            if trip_data.end_time > trip_data_list[trip_time_end].end_time:
+                trip_time_end = last_index
+
+        if len(trip_data_list) > 0:
+            return (trip_data_list[trip_miles_start], trip_data_list[trip_time_start], trip_data_list[trip_miles_end], trip_data_list[trip_time_end])
+        else:
+            return None
 
 
 class Client(models.Model):

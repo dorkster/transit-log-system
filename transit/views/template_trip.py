@@ -28,6 +28,22 @@ def templateTripCreateActivity(request, parent):
     trip.is_activity = True
     return templateTripCreateEditCommon(request, trip, is_new=True)
 
+def templateTripCreateReturn(request, parent, id):
+    origin_trip = get_object_or_404(TemplateTrip, id=id)
+    trip = TemplateTrip()
+    trip.parent = origin_trip.parent
+    trip.name = origin_trip.name
+    trip.address = origin_trip.destination
+    trip.phone_home = origin_trip.phone_home
+    trip.phone_cell = origin_trip.phone_cell
+    trip.destination = origin_trip.address
+    trip.trip_type = origin_trip.trip_type
+    trip.tags = origin_trip.tags
+    trip.elderly = origin_trip.elderly
+    trip.ambulatory = origin_trip.ambulatory
+
+    return templateTripCreateEditCommon(request, trip, is_new=True)
+
 def templateTripEdit(request, parent, id):
     trip = get_object_or_404(TemplateTrip, id=id)
     return templateTripCreateEditCommon(request, trip, is_new=False)

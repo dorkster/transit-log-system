@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Template
+from transit.models import Template, TemplateTrip, FrequentTag
 from transit.forms import EditTemplateForm
 
 def templateList(request):
@@ -70,6 +70,11 @@ def templateDelete(request, id):
             if i.sort_index > template.sort_index:
                 i.sort_index -= 1;
                 i.save()
+
+        trip_query = TemplateTrip.objects.filter(parent=id)
+        for i in trip_query:
+            FrequentTag.removeTags(i.get_tag_list())
+            i.delete()
 
         template.delete()
         return HttpResponseRedirect(reverse('templates'))

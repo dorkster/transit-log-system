@@ -173,6 +173,8 @@ def ajaxTemplateTripList(request, parent):
             trip.sort_index = swap_index
             query[0].save()
             trip.save()
+    elif request_action == 'toggle_extra_columns':
+        request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)
 
     trips = TemplateTrip.objects.filter(parent=parent)
 
@@ -180,6 +182,7 @@ def ajaxTemplateTripList(request, parent):
         'parent': parent,
         'trips': trips,
         'template': Template.objects.get(id=parent),
+        'show_extra_columns': request.session.get('template_extra_columns', False),
     }
     return render(request, 'template/trip/ajax_list.html', context=context)
 

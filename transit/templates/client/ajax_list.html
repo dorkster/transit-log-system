@@ -82,6 +82,13 @@
     </div>
 </div>
 {% if clients %}
+<a class="small" href="#_" onclick="ajax_loader.run('', 'toggle_extra_columns', '')">
+{% if show_extra_columns %}
+Hide extra columns
+{% else %}
+Show extra columns
+{% endif %}
+</a>
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
@@ -89,7 +96,12 @@
         <td>Address</td>
         <td>Phone (Home)</td>
         <td>Phone (Cell)</td>
+        {% if show_extra_columns %}
+        <td>Elderly?</td>
+        <td>Ambulatory?</td>
+        {% else %}
         <td></td>
+        {% endif %}
     </thead>
     {% for client in clients %}
     <tr>
@@ -110,6 +122,22 @@
         <td class="mytable-col-lg">{{ client.address }}</td>
         <td class="mytable-col-md">{{ client.phone_home }}</td>
         <td class="mytable-col-md">{{ client.phone_cell }}</td>
+        {% if show_extra_columns %}
+        <td class="mytable-col-xs">
+            {% if client.elderly %}
+            <span class="oi oi-check"></span>
+            {% elif client.elderly is False %}
+            <span class="oi oi-x"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if client.ambulatory %}
+            <span class="oi oi-check"></span>
+            {% elif client.ambulatory is False %}
+            <span class="oi oi-x"></span>
+            {% endif %}
+        </td>
+        {% else %}
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -152,6 +180,7 @@
                 </div>
             </div>
         </td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

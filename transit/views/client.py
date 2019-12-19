@@ -129,6 +129,8 @@ def ajaxClientList(request):
         request.session['clients_elderly'] = 0
         request.session['clients_ambulatory'] = 0
         request.session['clients_search'] = ''
+    elif request_action == 'toggle_extra_columns':
+        request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
@@ -160,6 +162,7 @@ def ajaxClientList(request):
         'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
+        'show_extra_columns': request.session.get('clients_extra_columns', False),
     }
     return render(request, 'client/ajax_list.html', context=context)
 

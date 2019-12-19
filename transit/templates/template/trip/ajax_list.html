@@ -66,6 +66,7 @@ Show extra columns
                     {% else %}
                     <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item">Edit trip</a>
                     <div class="dropdown-divider"></div>
+                    <a href="{% url 'client-create-from-template-trip' trip.id %}" class="dropdown-item">Create Client</a>
                     <a href="{% url 'template-trip-create-return' trip.parent.id trip.id %}" class="dropdown-item">Create Return Trip</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete trip</a>

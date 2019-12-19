@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Client, Trip, FrequentTag
+from transit.models import Client, Trip, FrequentTag, TemplateTrip
 from transit.forms import EditClientForm
 
 def clientList(request):
@@ -100,6 +100,19 @@ def clientDelete(request, id):
 
 def clientCreateFromTrip(request, trip_id):
     trip = get_object_or_404(Trip, id=trip_id)
+
+    # TODO search for existing client?
+    client = Client()
+    client.name = trip.name
+    client.address = trip.address
+    client.phone_home = trip.phone_home
+    client.phone_cell = trip.phone_cell
+    client.elderly = trip.elderly
+    client.ambulatory = trip.ambulatory
+    return clientCreateEditCommon(request, client, is_new=True)
+
+def clientCreateFromTemplateTrip(request, trip_id):
+    trip = get_object_or_404(TemplateTrip, id=trip_id)
 
     # TODO search for existing client?
     client = Client()

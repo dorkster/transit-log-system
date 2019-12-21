@@ -40,6 +40,8 @@ class Trip(models.Model):
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
     phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
+    phone_address = models.CharField(verbose_name='Phone (Address)', max_length=FieldSizes.PHONE, blank=True)
+    phone_destination = models.CharField(verbose_name='Phone (Destination)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
     pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
@@ -102,17 +104,39 @@ class Trip(models.Model):
         num_regex = '\d*'
         if phone_type == 'cell':
             matches = re.findall(num_regex, self.phone_cell)
+        elif phone_type == 'address':
+            matches = re.findall(num_regex, self.phone_address)
+        elif phone_type == 'destination':
+            matches = re.findall(num_regex, self.phone_destination)
         else:
             matches = re.findall(num_regex, self.phone_home)
         for i in matches:
             num_only += i
         return num_only
 
-    def get_phone_home_number(self):
-        return self.get_phone_number('') # default is home number
+    def get_phone_number_list(self):
+        phone_numbers = []
+        if self.phone_home:
+            phone_numbers.append({'label': 'Home Phone', 'value': self.phone_home, 'tel':self.get_phone_number('')})
+        if self.phone_cell:
+            phone_numbers.append({'label': 'Cell Phone', 'value': self.phone_cell, 'tel':self.get_phone_number('cell')})
+        if self.address and self.phone_address:
+            phone_numbers.append({'label': self.address, 'value': self.phone_address, 'tel':self.get_phone_number('address')})
+        if self.destination and self.phone_destination:
+            phone_numbers.append({'label': self.destination, 'value': self.phone_destination, 'tel':self.get_phone_number('destination')})
+        return phone_numbers
 
-    def get_phone_cell_number(self):
-        return self.get_phone_number('cell')
+    def get_phone_number_count(self):
+        count = 0
+        if self.phone_home:
+            count += 1
+        if self.phone_cell:
+            count += 1
+        if self.address and self.phone_address:
+            count += 1
+        if self.destination and self.phone_destination:
+            count += 1
+        return count
 
     def get_class_name(self):
         if self.is_activity:
@@ -448,6 +472,8 @@ class TemplateTrip(models.Model):
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
     phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
+    phone_address = models.CharField(verbose_name='Phone (Address)', max_length=FieldSizes.PHONE, blank=True)
+    phone_destination = models.CharField(verbose_name='Phone (Destination)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
     pick_up_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     appointment_time = models.CharField(max_length=FieldSizes.TIME, blank=True)

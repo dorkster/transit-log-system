@@ -205,6 +205,8 @@ def ajaxScheduleCommon(request, template):
             trip.address = temp_trip.address
             trip.phone_home = temp_trip.phone_home
             trip.phone_cell = temp_trip.phone_cell
+            trip.phone_address = temp_trip.phone_address
+            trip.phone_destination = temp_trip.phone_destination
             trip.destination = temp_trip.destination
             trip.pick_up_time = temp_trip.pick_up_time
             trip.appointment_time = temp_trip.appointment_time

@@ -36,6 +36,8 @@ def templateTripCreateReturn(request, parent, id):
     trip.address = origin_trip.destination
     trip.phone_home = origin_trip.phone_home
     trip.phone_cell = origin_trip.phone_cell
+    trip.phone_address = origin_trip.phone_destination
+    trip.phone_destination = origin_trip.phone_address
     trip.destination = origin_trip.address
     trip.trip_type = origin_trip.trip_type
     trip.tags = origin_trip.tags
@@ -81,6 +83,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
                 trip.address = form.cleaned_data['address']
                 trip.phone_home = form.cleaned_data['phone_home']
                 trip.phone_cell = form.cleaned_data['phone_cell']
+                trip.phone_address = form.cleaned_data['phone_address']
+                trip.phone_destination = form.cleaned_data['phone_destination']
                 trip.destination = form.cleaned_data['destination']
                 trip.pick_up_time = form.cleaned_data['pick_up_time']
                 trip.appointment_time = form.cleaned_data['appointment_time']
@@ -110,6 +114,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
                 'address': trip.address,
                 'phone_home': trip.phone_home,
                 'phone_cell': trip.phone_cell,
+                'phone_address': trip.phone_address,
+                'phone_destination': trip.phone_destination,
                 'destination': trip.destination,
                 'pick_up_time': trip.pick_up_time,
                 'appointment_time': trip.appointment_time,

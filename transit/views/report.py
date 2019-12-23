@@ -68,6 +68,16 @@ def report(request, year, month):
 
     triptypes = TripType.objects.all()
 
+    vehicle_totals = ReportVehicle.Day()
+    vehicle_total_service_miles = 0
+    vehicle_total_service_hours = 0
+    vehicle_total_deadhead_miles = 0
+    vehicle_total_deadhead_hours = 0
+    vehicle_total_pmt = 0
+    vehicle_total_fuel = 0
+    for i in triptypes:
+        vehicle_totals.trip_types[str(i)] = 0
+
     driver_summaries = {}
     for driver in Driver.objects.filter(is_logged=True):
         driver_summaries[str(driver)] = DriverSummary()
@@ -192,6 +202,14 @@ def report(request, year, month):
             total_fuel += shift_fuel
             for i in triptypes:
                 rv.total.trip_types[str(i)] += rv_day.trip_types[str(i)]
+                vehicle_totals.trip_types[str(i)] += rv_day.trip_types[str(i)]
+
+            vehicle_total_service_miles += service_miles
+            vehicle_total_service_hours += service_hours
+            vehicle_total_deadhead_miles += deadhead_miles
+            vehicle_total_deadhead_hours += deadhead_hours
+            vehicle_total_pmt += trip_pmt
+            vehicle_total_fuel += shift_fuel
 
             for shift in day_shifts:
                 shift_data = shift.get_parsed_log_data()
@@ -216,6 +234,13 @@ def report(request, year, month):
         rv.total.pmt = '{:.1f}'.format(total_pmt)
         rv.total.fuel = '{:.1f}'.format(total_fuel).rstrip('0').rstrip('.')
         vehicle_list.append(rv)
+
+    vehicle_totals.service_miles = '{:.1f}'.format(vehicle_total_service_miles)
+    vehicle_totals.service_hours = '{:.2f}'.format(vehicle_total_service_hours).rstrip('0').rstrip('.')
+    vehicle_totals.deadhead_miles = '{:.1f}'.format(vehicle_total_deadhead_miles)
+    vehicle_totals.deadhead_hours = '{:.2f}'.format(vehicle_total_deadhead_hours).rstrip('0').rstrip('.')
+    vehicle_totals.pmt = '{:.1f}'.format(vehicle_total_pmt)
+    vehicle_totals.fuel = '{:.1f}'.format(vehicle_total_fuel).rstrip('0').rstrip('.')
 
     no_vehicle_errors = []
     for day in range(date_start.day, date_end.day+1):
@@ -302,6 +327,7 @@ def report(request, year, month):
         'total_collected_cash': total_collected_cash_str,
         'total_collected_check': total_collected_check_str,
         'driver_summaries': driver_summaries,
+        'vehicle_combined_totals': vehicle_totals,
     }
     return render(request, 'report/view.html', context)
 

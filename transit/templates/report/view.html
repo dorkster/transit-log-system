@@ -180,6 +180,73 @@
 <p>No log data for this vehicle is available.</p>
 {% endif %}
 {% endfor %}
+<hr/>
+<h3>Totals for All Vehicles</h3>
+<div class="row mb-3">
+    <div class="col">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab_summary_vehicle_total" data-toggle="tab" href="#summary_vehicle_total" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-1 bg-white" id="myTabContent">
+            <div class="tab-pane fade show active" id="summary_vehicle_total" role="tabpanel" aria-labelledby="summary-tab">
+                <div>
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Service Miles</div>
+                                <div class="col-auto">{{vehicle_combined_totals.service_miles}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Service Hours</div>
+                                <div class="col-auto">{{vehicle_combined_totals.service_hours}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Deadhead Miles</div>
+                                <div class="col-auto">{{vehicle_combined_totals.deadhead_miles}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Deadhead Hours</div>
+                                <div class="col-auto">{{vehicle_combined_totals.deadhead_hours}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Passenger Miles (PMT)</div>
+                                <div class="col-auto">{{vehicle_combined_totals.pmt}}</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Fuel (gal)</div>
+                                <div class="col-auto">{{vehicle_combined_totals.fuel}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="list-group list-group-flush" style="max-width: 400px;">
+                        {% for key,value in vehicle_combined_totals.trip_types.items %}
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">{{key}} Trips</div>
+                                <div class="col-auto">{{value}}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% if unique_riders %}
 <hr/>
 <div class="row mb-3">

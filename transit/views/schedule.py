@@ -1,4 +1,5 @@
 import datetime, uuid
+import json
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -246,6 +247,21 @@ def ajaxScheduleCommon(request, template):
             i.delete()
     elif request_action == 'toggle_extra_columns':
         request.session['schedule_edit_extra_columns'] = not request.session.get('schedule_edit_extra_columns', False)
+    elif request_action == 'quick_edit':
+        quick_edit = json.loads(request_data)
+        if quick_edit['type'] == 0:
+            shift = get_object_or_404(Shift, id=request_id)
+            if quick_edit['field_id'] == 'start_miles':
+                shift.start_miles = quick_edit['value']
+            elif quick_edit['field_id'] == 'end_miles':
+                shift.end_miles = quick_edit['value']
+            elif quick_edit['field_id'] == 'start_time':
+                shift.start_time = quick_edit['value']
+            elif quick_edit['field_id'] == 'end_time':
+                shift.end_time = quick_edit['value']
+            elif quick_edit['field_id'] == 'fuel':
+                shift.fuel = quick_edit['value']
+            shift.save()
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)

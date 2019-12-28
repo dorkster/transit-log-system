@@ -23,7 +23,7 @@
         <td>Fuel (gal)</td>
     </thead>
     {% for shift in shifts %}
-    <tr style="background: #{{ shift.get_driver_color }};">
+    <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,35 +38,35 @@
         </td>
         <td class="mytable-col-md">{{ shift.driver }}</td>
         <td class="mytable-col-md">{{ shift.vehicle }}</td>
-        <td class="mytable-col-sm">
+        <td class="mytable-col-sm qe_cell" onclick="quickEdit(this, SHIFT_START_MILES, '{{ shift.start_miles }}')">
             {% if shift.check_start_miles %}
                 {{ shift.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        <td class="mytable-col-sm qe_cell" onclick="quickEdit(this, SHIFT_START_TIME, '{{ shift.start_time }}')">
             {% if shift.check_start_time %}
                 {{ shift.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        <td class="mytable-col-sm qe_cell" onclick="quickEdit(this, SHIFT_END_MILES, '{{ shift.end_miles }}')">
             {% if shift.check_end_miles %}
                 {{ shift.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        <td class="mytable-col-sm qe_cell" onclick="quickEdit(this, SHIFT_END_TIME, '{{ shift.end_time }}')">
             {% if shift.check_end_time %}
                 {{ shift.end_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">{{ shift.fuel }}</td>
+        <td class="mytable-col-sm qe_cell" onclick="quickEdit(this, SHIFT_FUEL, '{{ shift.fuel }}')">{{ shift.fuel }}</td>
     </tr>
     {% endfor %}
 </table>

@@ -11,6 +11,10 @@
     border: 1px solid #777 !important;
 }
 
+.mytable td.qe_cell_active, .mytable td.qe_cell:hover {
+    background: #00000011;
+}
+
 .mytable-col-xs {
     text-align: center !important;
     width: 4em;

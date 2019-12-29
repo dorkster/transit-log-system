@@ -137,7 +137,7 @@ Show extra columns
         {% endif %}
     </thead>
     {% for trip in trips %}
-    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
+    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <div class="btn-group-vertical">
@@ -231,28 +231,28 @@ Show extra columns
                 </div>
             </div>
         </td>
-        <td class="mytable-col-sm">
+        {% if settings.enable_quick_edit %}<td class="mytable-col-sm qe_cell" onclick="quickEdit(this, TRIP_START_MILES, '{{ trip.start_miles }}')">{% else %}<td class="mytable-col-sm">{% endif %}
             {% if trip.check_start_miles %}
                 {{ trip.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        {% if settings.enable_quick_edit %}<td class="mytable-col-sm qe_cell" onclick="quickEdit(this, TRIP_START_TIME, '{{ trip.start_time }}')">{% else %}<td class="mytable-col-sm">{% endif %}
             {% if trip.check_start_time %}
                 {{ trip.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        {% if settings.enable_quick_edit %}<td class="mytable-col-sm qe_cell" onclick="quickEdit(this, TRIP_END_MILES, '{{ trip.end_miles }}')">{% else %}<td class="mytable-col-sm">{% endif %}
             {% if trip.check_end_miles %}
                 {{ trip.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm">
+        {% if settings.enable_quick_edit %}<td class="mytable-col-sm qe_cell" onclick="quickEdit(this, TRIP_END_TIME, '{{ trip.end_time }}')">{% else %}<td class="mytable-col-sm">{% endif %}
             {% if trip.check_end_time %}
                 {{ trip.end_time }}
             {% else %}

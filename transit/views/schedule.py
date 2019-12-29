@@ -250,6 +250,7 @@ def ajaxScheduleCommon(request, template):
     elif request_action == 'quick_edit':
         quick_edit = json.loads(request_data)
         if quick_edit['type'] == 0:
+            # shifts
             shift = get_object_or_404(Shift, id=request_id)
             if quick_edit['field_id'] == 'start_miles':
                 shift.start_miles = quick_edit['value']
@@ -262,6 +263,18 @@ def ajaxScheduleCommon(request, template):
             elif quick_edit['field_id'] == 'fuel':
                 shift.fuel = quick_edit['value']
             shift.save()
+        elif quick_edit['type'] == 1:
+            # trips
+            trip = get_object_or_404(Trip, id=request_id)
+            if quick_edit['field_id'] == 'start_miles':
+                trip.start_miles = quick_edit['value']
+            elif quick_edit['field_id'] == 'end_miles':
+                trip.end_miles = quick_edit['value']
+            elif quick_edit['field_id'] == 'start_time':
+                trip.start_time = quick_edit['value']
+            elif quick_edit['field_id'] == 'end_time':
+                trip.end_time = quick_edit['value']
+            trip.save()
 
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)

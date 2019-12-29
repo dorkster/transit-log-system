@@ -110,6 +110,30 @@
         'label': 'Fuel (gal)',
         'validation': 'fuel',
     };
+    var TRIP_START_MILES = {
+        'type': QUICK_EDIT_TRIP,
+        'id': 'start_miles',
+        'label': 'Start Miles',
+        'validation': 'miles',
+    };
+    var TRIP_END_MILES = {
+        'type': QUICK_EDIT_TRIP,
+        'id': 'end_miles',
+        'label': 'End Miles',
+        'validation': 'miles',
+    };
+    var TRIP_START_TIME = {
+        'type': QUICK_EDIT_TRIP,
+        'id': 'start_time',
+        'label': 'Start Time',
+        'validation': 'time',
+    };
+    var TRIP_END_TIME = {
+        'type': QUICK_EDIT_TRIP,
+        'id': 'end_time',
+        'label': 'End Time',
+        'validation': 'time',
+    };
 
     function quickEdit(cell, field, field_data) {
         if (window.getSelection)

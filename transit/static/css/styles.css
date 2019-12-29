@@ -13,6 +13,7 @@
 
 .mytable td.qe_cell_active, .mytable td.qe_cell:hover {
     background: #00000011;
+    cursor: pointer;
 }
 
 .mytable-col-xs {

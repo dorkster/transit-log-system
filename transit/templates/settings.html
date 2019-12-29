@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h2>Settings</h2>
+{% if updated %}
+<div class="alert alert-success alert-dismissible show" role="alert">
+    Settings have been successfully updated.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col-md border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>General</legend>
+                    <div class="mb-2"><label for="{{ form.enable_quick_edit.id_for_label }}"><strong>{{ form.enable_quick_edit.label }}</strong></label><br/>{{ form.enable_quick_edit }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>
+                <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel Changes</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

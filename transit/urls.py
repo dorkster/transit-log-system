@@ -9,6 +9,8 @@ urlpatterns = [
     path('accounts/password-change/', auth_views.PasswordChangeView.as_view(template_name='user/password_change.html'), name='password_change'),
     path('accounts/password-change-done/', auth_views.PasswordChangeDoneView.as_view(template_name='user/password_change_done.html'), name='password_change_done'),
 
+    path('settings/', views.sitesettingsEdit, name='settings'),
+
     path('schedule/<slug:mode>/<int:year>/<int:month>/<int:day>', views.schedule, name='schedule'),
     path('schedule/<slug:mode>/today', views.scheduleToday, name='schedule-today'),
     path('schedule/<slug:mode>/tomorrow', views.scheduleTomorrow, name='schedule-tomorrow'),

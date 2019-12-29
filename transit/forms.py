@@ -221,3 +221,6 @@ class SearchTripsForm(forms.Form):
     vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
     end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
+
+class SiteSettingsForm(forms.Form):
+    enable_quick_edit = forms.ChoiceField(choices=BOOL_CHOICES, label='Enable Quick Edit', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))

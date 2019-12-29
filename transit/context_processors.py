@@ -1,6 +1,6 @@
 import datetime
 
-from transit.models import VehicleIssue, Vehicle, Shift
+from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift
 
 def notifications(request):
     vehicle_inspections = []
@@ -24,6 +24,7 @@ def notifications(request):
 
     vehicle_issues = VehicleIssue.objects.filter(priority__gt=VehicleIssue.PRIORITY_LOW, is_resolved=False)
     return {
+        'settings': SiteSettings.load(),
         'notifications': (len(vehicle_issues) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0),
         'notify_vehicle_issues': vehicle_issues,
         'notify_vehicle_inspections': vehicle_inspections,

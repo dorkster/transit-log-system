@@ -46,6 +46,7 @@
     </div>
 </div>
 <hr/>
+{% if settings.enable_quick_edit %}
 <div class="modal ajax-blocker" id="quick_edit" tabindex="-1" role="dialog" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -67,10 +68,12 @@
         </div>
     </div>
 </div>
+{% endif %}
 <div id="schedule-edit">
 </div>
 
 {% block javascript %}
+{% if settings.enable_quick_edit %}
 {% load static %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 <script type="text/javascript">
@@ -160,6 +163,7 @@
         });
     }
 </script>
+{% endif %}
 <script type="text/javascript">
     var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-edit' %}", "#schedule-edit");
     ajax_loader.extra_data["year"] = {{date.year}};

@@ -2,6 +2,22 @@ import uuid, re, datetime
 from django.db import models
 from django.urls import reverse
 
+class SingletonModel(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(SingletonModel, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
 class FieldSizes():
     # generic sizes
     SM = 64
@@ -641,3 +657,5 @@ class PreTrip(models.Model):
     def get_class_name(self):
         return 'Pre-Trip'
 
+class SiteSettings(SingletonModel):
+    enable_quick_edit = models.BooleanField(default=True)

@@ -23,7 +23,7 @@ def clientEdit(request, id):
     client = get_object_or_404(Client, id=id)
     return clientCreateEditCommon(request, client, is_new=False)
 
-def clientCreateEditCommon(request, client, is_new):
+def clientCreateEditCommon(request, client, is_new, is_dupe=False):
     if request.method == 'POST':
         form = EditClientForm(request.POST)
 
@@ -78,6 +78,7 @@ def clientCreateEditCommon(request, client, is_new):
         'frequent_tags': FrequentTag.objects.all()[:10],
         'names': sorted(names),
         'addresses': sorted(addresses),
+        'is_dupe': is_dupe,
     }
 
     return render(request, 'client/edit.html', context)
@@ -103,7 +104,7 @@ def clientCreateFromTrip(request, trip_id):
 
     existing_clients = Client.objects.filter(name=trip.name)
     if len(existing_clients) > 0:
-        return clientCreateEditCommon(request, existing_clients[0], is_new=False)
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True)
 
     client = Client()
     client.name = trip.name
@@ -119,7 +120,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
 
     existing_clients = Client.objects.filter(name=trip.name)
     if len(existing_clients) > 0:
-        return clientCreateEditCommon(request, existing_clients[0], is_new=False)
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True)
 
     client = Client()
     client.name = trip.name

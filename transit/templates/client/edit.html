@@ -9,6 +9,9 @@
     Client Edit
     {% endif %}
 </h2>
+{% if is_dupe %}
+<div class="alert alert-primary" role="alert">An existing client with the name '{{client.name}}' was found.</div>
+{% endif %}
 <form class="mb-4" action="" method="post">
     {% csrf_token %}
     <datalist id='client-names'>

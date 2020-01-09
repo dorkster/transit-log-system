@@ -14,3 +14,4 @@ from .template import *
 from .template_trip import *
 from .search import *
 from .sitesettings import *
+from .help import *

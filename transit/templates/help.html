@@ -1,0 +1,42 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h2>Help</h2>
+<hr/>
+<div class="container ml-0">
+    <div class="row">
+        {% if topics %}
+        <div class="col-xs-auto pb-4">
+            <div class="list-group">
+            {% for topic in topics %}
+            <a href="{% url 'help-topic' topic.slug %}" class="list-group-item list-group-item-action {% if topic.id == current.id %}active{% endif %}">{{ topic.title }}</a>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="col">
+            <h3>{{ current.title }}</h3>
+            {{ current.body|safe }}
+            {% if previous or next %}
+            <hr/>
+            <div class="row">
+                <div class="col-auto mr-auto">
+                {% if previous %}
+                <a class="btn btn-primary" href="{% url 'help-topic' previous.slug %}"><span class="oi oi-arrow-left mr-2"></span>{{ previous.title }}</a>
+                {% endif %}
+                </div>
+                <div class="col-auto">
+                {% if next %}
+                <a class="btn btn-primary" href="{% url 'help-topic' next.slug %}">{{ next.title }}<span class="oi oi-arrow-right ml-2"></span></a>
+                {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

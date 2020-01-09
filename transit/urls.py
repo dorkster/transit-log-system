@@ -11,6 +11,9 @@ urlpatterns = [
 
     path('settings/', views.sitesettingsEdit, name='settings'),
 
+    path('help/', views.helpMain, name='help'),
+    path('help/<slug:slug>/', views.helpPage, name='help-topic'),
+
     path('schedule/<slug:mode>/<int:year>/<int:month>/<int:day>', views.schedule, name='schedule'),
     path('schedule/<slug:mode>/today', views.scheduleToday, name='schedule-today'),
     path('schedule/<slug:mode>/tomorrow', views.scheduleTomorrow, name='schedule-tomorrow'),

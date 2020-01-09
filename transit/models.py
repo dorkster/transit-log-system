@@ -659,3 +659,16 @@ class PreTrip(models.Model):
 
 class SiteSettings(SingletonModel):
     enable_quick_edit = models.BooleanField(default=True)
+
+class HelpPage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0)
+    slug = models.CharField(max_length=FieldSizes.MD, unique=True)
+    title = models.CharField(max_length=FieldSizes.XL)
+    body = models.TextField(max_length=8192, blank=True)
+
+    class Meta:
+        ordering = ['sort_index']
+
+    def __str__(self):
+        return self.title

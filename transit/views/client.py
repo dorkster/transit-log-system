@@ -101,7 +101,10 @@ def clientDelete(request, id):
 def clientCreateFromTrip(request, trip_id):
     trip = get_object_or_404(Trip, id=trip_id)
 
-    # TODO search for existing client?
+    existing_clients = Client.objects.filter(name=trip.name)
+    if len(existing_clients) > 0:
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False)
+
     client = Client()
     client.name = trip.name
     client.address = trip.address
@@ -114,7 +117,10 @@ def clientCreateFromTrip(request, trip_id):
 def clientCreateFromTemplateTrip(request, trip_id):
     trip = get_object_or_404(TemplateTrip, id=trip_id)
 
-    # TODO search for existing client?
+    existing_clients = Client.objects.filter(name=trip.name)
+    if len(existing_clients) > 0:
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False)
+
     client = Client()
     client.name = trip.name
     client.address = trip.address

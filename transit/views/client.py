@@ -34,21 +34,27 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False):
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
         if form.is_valid():
-            FrequentTag.removeTags(client.get_tag_list())
+            existing_clients = Client.objects.filter(name=form.cleaned_data['name'])
+            if len(existing_clients) > 0:
+                unique_client = existing_clients[0]
+            else:
+                unique_client = client
 
-            client.name = form.cleaned_data['name']
-            client.address = form.cleaned_data['address']
-            client.phone_home = form.cleaned_data['phone_home']
-            client.phone_cell = form.cleaned_data['phone_cell']
-            client.elderly = form.cleaned_data['elderly']
-            client.ambulatory = form.cleaned_data['ambulatory']
-            client.tags = form.cleaned_data['tags']
+            FrequentTag.removeTags(unique_client.get_tag_list())
 
-            FrequentTag.addTags(client.get_tag_list())
+            unique_client.name = form.cleaned_data['name']
+            unique_client.address = form.cleaned_data['address']
+            unique_client.phone_home = form.cleaned_data['phone_home']
+            unique_client.phone_cell = form.cleaned_data['phone_cell']
+            unique_client.elderly = form.cleaned_data['elderly']
+            unique_client.ambulatory = form.cleaned_data['ambulatory']
+            unique_client.tags = form.cleaned_data['tags']
 
-            client.save()
+            FrequentTag.addTags(unique_client.get_tag_list())
 
-            return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
+            unique_client.save()
+
+            return HttpResponseRedirect(reverse('clients') + '#client_' + str(unique_client.id))
     else:
         initial = {
             'name': client.name,

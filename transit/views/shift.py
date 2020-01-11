@@ -77,8 +77,6 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             'fuel': shift.fuel
         }
         form = EditShiftForm(initial=initial)
-        form.fields['driver'].queryset = Driver.objects.filter(is_logged=True)
-        form.fields['vehicle'].queryset = Vehicle.objects.filter(is_logged=True)
 
     context = {
         'form': form,

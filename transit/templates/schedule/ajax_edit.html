@@ -102,7 +102,23 @@
 </h3>
 </div>
 {% if trips %}
-<a class="small" href="#_" onclick="ajax_loader.run('', 'toggle_extra_columns', '')">
+<script type="text/javascript">
+    var trip_mover = new RowMover("row-mover-trips");
+
+    function moveTrip(target) {
+        if (trip_mover.item != "") {
+            var item = trip_mover.item;
+            trip_mover.clear();
+            ajax_loader.run(item, "mv_trip", target);
+        }
+    }
+
+    function toggleTripColumns() {
+        trip_mover.clear();
+        ajax_loader.run('', 'toggle_extra_columns', '');
+    }
+</script>
+<a class="small" href="#_" onclick="toggleTripColumns()">
 {% if show_extra_columns %}
 Hide extra columns
 {% else %}
@@ -137,13 +153,13 @@ Show extra columns
         {% endif %}
     </thead>
     {% for trip in trips %}
+    {% if trip.sort_index == 0 %}
+    <tr class="row-mover-trips mytable-sort mytable-sort-hidden" onclick="moveTrip('')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
+    {% endif %}
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="trip_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -407,6 +423,7 @@ Show extra columns
         {% endif %}
         {% endif %}
     </tr>
+    <tr class="row-mover-trips mytable-sort mytable-sort-hidden" onclick="moveTrip('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
     {% endfor %}
 </table>
 {% else %}
@@ -422,10 +439,16 @@ Show extra columns
         function deleteAll(type) {
             if (type == "shifts") {
                 if (confirm("Delete ALL shifts for {{ date }}? This can not be undone!"))
+                    {% if trips %}
+                    trip_mover.clear();
+                    {% endif %}
                     ajax_loader.run('', 'delete_all_shifts', '');
             }
             else if (type == "trips") {
                 if (confirm("Delete ALL trips for {{ date }}? This can not be undone!"))
+                    {% if trips %}
+                    trip_mover.clear();
+                    {% endif %}
                     ajax_loader.run('', 'delete_all_trips', '');
             }
         }

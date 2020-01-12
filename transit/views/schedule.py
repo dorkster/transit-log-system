@@ -127,23 +127,34 @@ def ajaxScheduleCommon(request, template):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
+    if request_action == 'mv_trip':
         trip = get_object_or_404(Trip, id=request_id)
+        original_index = trip.sort_index
+        trip.sort_index = -1
 
-        do_sort = False
-        if request_data == 'u':
-            query = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index-1)
-            do_sort = True
-        elif request_data == 'd':
-            query = Trip.objects.filter(date=trip.date).filter(sort_index=trip.sort_index+1)
-            do_sort = True
+        # "remove" the selected trip by shifting everything below it up by 1
+        below_trips = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
+        for i in below_trips:
+            i.sort_index -= 1;
+            i.save()
 
-        if do_sort and len(query) > 0:
-            swap_index = query[0].sort_index
-            query[0].sort_index = trip.sort_index
-            trip.sort_index = swap_index
-            query[0].save()
-            trip.save()
+        if request_data == '':
+            new_index = 0
+        else:
+            target_trip = get_object_or_404(Trip, id=request_data)
+            if trip.id != target_trip.id:
+                new_index = target_trip.sort_index + 1
+            else:
+                new_index = original_index
+
+        # prepare to insert the trip at the new index by shifting everything below it down by 1
+        below_trips = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
+        for i in below_trips:
+            i.sort_index += 1
+            i.save()
+
+        trip.sort_index = new_index
+        trip.save()
     elif request_action == 'set_driver':
         trip = get_object_or_404(Trip, id=request_id)
         prev_driver = trip.driver

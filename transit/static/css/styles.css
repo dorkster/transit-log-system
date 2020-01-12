@@ -51,6 +51,27 @@
     background: rgba(0,0,0,0.04);
 }
 
+.mytable-sort {
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    background-image: linear-gradient(#cccccc, #ffffff);
+    font-size: 80%;
+}
+
+.mytable-sort:hover {
+    background-image: linear-gradient(#bbbbbb, #eeeeee);
+}
+
+.mytable-sort td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.mytable-sort-hidden {
+    display: none;
+}
+
 .form-control-width-fix {
     width: auto !important;
     display: inline !important;

@@ -52,8 +52,8 @@ function AjaxLoader(url, div_id) {
                     if (hash && hash != '_')
                         var hash_element = document.getElementById(hash);
                         if (hash_element) {
-                            hash_element.scrollIntoView();
-                            window.scrollBy(0, -25);
+                            // hash_element.scrollIntoView({behavior: "smooth", block: "center"});
+                            hash_element.scrollIntoView({block: "center"});
                         }
                 }
             }
@@ -86,3 +86,67 @@ function setParam(param, value) {
     url.searchParams.set(param, value);
     window.open(url, "_self");
 }
+
+function RowMover(row_class) {
+    this.item = "";
+    this.row_class = row_class;
+    this.button = null;
+
+    var self = this;
+
+    self.toggle = function(button, item) {
+        if (self.item != item) {
+            self.clear();
+
+            $("." + row_class).each(function(index, value) {
+                $(value).removeClass("mytable-sort-hidden");
+                $(value).addClass("ajax-blocker show");
+                $(value).children().html("<span class=\"oi oi-resize-height mr-4\"></span>Move selected row to here<span class=\"oi oi-resize-height ml-4\"></span>");
+
+                $(button).removeClass("btn-outline-dark");
+                $(button).addClass("btn-primary active");
+            });
+
+            button.scrollIntoView({behavior: "smooth", block: "center"});
+
+            self.item = item;
+            self.button = button;
+        }
+        else {
+            button.scrollIntoView({behavior: "smooth", block: "center"});
+            self.clear();
+        }
+    };
+
+    self.clear = function() {
+        $(".btn-row-mover").each(function(index, value) {
+            $(value).removeClass("btn-primary active");
+            $(value).addClass("btn-outline-dark");
+        });
+
+        $("." + row_class).each(function(index, value) {
+            $(value).addClass("mytable-sort-hidden");
+            $(value).removeClass("ajax-blocker show");
+            $(value).children().html("");
+        });
+        self.item = "";
+        self.button = null;
+    };
+
+
+    // handle ajax-blockers
+    $(".dropdown.ajax-blocker").on("show.bs.dropdown", function() {
+        self.clear();
+    });
+    $(".modal.ajax-blocker").on("show.bs.modal", function() {
+        self.clear();
+    });
+
+    // clear when pressing escape
+    $(document).keydown(function(e) {
+        if (e.key == "Escape") {
+            self.clear();
+        }
+    });
+}
+

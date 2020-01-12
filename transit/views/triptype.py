@@ -93,21 +93,32 @@ def ajaxTripTypeList(request):
 
     if request_action == 'mv':
         triptype = get_object_or_404(TripType, id=request_id)
+        original_index = triptype.sort_index
+        triptype.sort_index = -1
 
-        do_sort = False
-        if request_data == 'u':
-            query = TripType.objects.filter(sort_index=triptype.sort_index-1)
-            do_sort = True
-        elif request_data == 'd':
-            query = TripType.objects.filter(sort_index=triptype.sort_index+1)
-            do_sort = True
+        # "remove" the selected item by shifting everything below it up by 1
+        below_items = TripType.objects.filter(sort_index__gt=original_index)
+        for i in below_items:
+            i.sort_index -= 1;
+            i.save()
 
-        if do_sort and len(query) > 0:
-            swap_index = query[0].sort_index
-            query[0].sort_index = triptype.sort_index
-            triptype.sort_index = swap_index
-            query[0].save()
-            triptype.save()
+        if request_data == '':
+            new_index = 0
+        else:
+            target_item = get_object_or_404(TripType, id=request_data)
+            if triptype.id != target_item.id:
+                new_index = target_item.sort_index + 1
+            else:
+                new_index = original_index
+
+        # prepare to insert the item at the new index by shifting everything below it down by 1
+        below_items = TripType.objects.filter(sort_index__gte=new_index)
+        for i in below_items:
+            i.sort_index += 1
+            i.save()
+
+        triptype.sort_index = new_index
+        triptype.save()
 
     triptypes = TripType.objects.all()
     return render(request, 'triptype/ajax_list.html', {'triptypes': triptypes})

@@ -95,21 +95,32 @@ def ajaxTemplateList(request):
 
     if request_action == 'mv':
         template = get_object_or_404(Template, id=request_id)
+        original_index = template.sort_index
+        template.sort_index = -1
 
-        do_sort = False
-        if request_data == 'u':
-            query = Template.objects.filter(sort_index=template.sort_index-1)
-            do_sort = True
-        elif request_data == 'd':
-            query = Template.objects.filter(sort_index=template.sort_index+1)
-            do_sort = True
+        # "remove" the selected item by shifting everything below it up by 1
+        below_items = Template.objects.filter(sort_index__gt=original_index)
+        for i in below_items:
+            i.sort_index -= 1;
+            i.save()
 
-        if do_sort and len(query) > 0:
-            swap_index = query[0].sort_index
-            query[0].sort_index = template.sort_index
-            template.sort_index = swap_index
-            query[0].save()
-            template.save()
+        if request_data == '':
+            new_index = 0
+        else:
+            target_item = get_object_or_404(Template, id=request_data)
+            if template.id != target_item.id:
+                new_index = target_item.sort_index + 1
+            else:
+                new_index = original_index
+
+        # prepare to insert the item at the new index by shifting everything below it down by 1
+        below_items = Template.objects.filter(sort_index__gte=new_index)
+        for i in below_items:
+            i.sort_index += 1
+            i.save()
+
+        template.sort_index = new_index
+        template.save()
 
     templates = Template.objects.all()
     return render(request, 'template/ajax_list.html', {'templates': templates})

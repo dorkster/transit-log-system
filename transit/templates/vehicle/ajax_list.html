@@ -1,6 +1,9 @@
 <h3>Vehicles <a class="btn btn-success btn-sm" href="{% url 'vehicle-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if vehicles %}
-<table class="mytable mytable-striped">
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
+<table class="mytable mytable-striped-sort">
     <thead>
         <td></td>
         <td></td>
@@ -8,13 +11,13 @@
         <td>Is logged?</td>
     </thead>
     {% for vehicle in vehicles %}
+    {% if vehicle.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    {% endif %}
     <tr>
         <td class="mytable-col-arrows">
             <a id="vehicle_{{ vehicle_.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ vehicle.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ vehicle.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ vehicle.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -33,6 +36,7 @@
         <td class="mytable-col-lg">{{ vehicle.name }}</td>
         <td class="mytable-col-sm"><span class="oi {% if vehicle.is_logged %}oi-check{% elif vehicle.is_logged is False %}oi-x{% endif %}"></span></td>
     </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ vehicle.id }}')"><td colspan="4"></td></tr>
     {% endfor %}
 </table>
 {% endif %}

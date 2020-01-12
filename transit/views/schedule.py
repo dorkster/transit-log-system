@@ -133,23 +133,23 @@ def ajaxScheduleCommon(request, template):
         trip.sort_index = -1
 
         # "remove" the selected trip by shifting everything below it up by 1
-        below_trips = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
-        for i in below_trips:
+        below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
+        for i in below_items:
             i.sort_index -= 1;
             i.save()
 
         if request_data == '':
             new_index = 0
         else:
-            target_trip = get_object_or_404(Trip, id=request_data)
-            if trip.id != target_trip.id:
-                new_index = target_trip.sort_index + 1
+            target_item = get_object_or_404(Trip, id=request_data)
+            if trip.id != target_item.id:
+                new_index = target_item.sort_index + 1
             else:
                 new_index = original_index
 
         # prepare to insert the trip at the new index by shifting everything below it down by 1
-        below_trips = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
-        for i in below_trips:
+        below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
+        for i in below_items:
             i.sort_index += 1
             i.save()
 

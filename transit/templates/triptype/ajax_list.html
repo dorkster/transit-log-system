@@ -1,19 +1,22 @@
 <h3>Trip Types <a class="btn btn-success btn-sm" href="{% url 'triptype-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if triptypes %}
-<table class="mytable mytable-striped">
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
+<table class="mytable mytable-striped-sort">
     <thead>
         <td></td>
         <td></td>
         <td>Name</td>
     </thead>
     {% for triptype in triptypes %}
+    {% if triptype.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="3"></td></tr>
+    {% endif %}
     <tr>
         <td class="mytable-col-arrows">
             <a id="triptype_{{ triptype.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ triptype.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ triptype.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ triptype.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -31,6 +34,7 @@
         </td>
         <td class="mytable-col-lg">{{ triptype.name }}</td>
     </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ triptype.id }}')"><td colspan="3"></td></tr>
     {% endfor %}
 </table>
 {% endif %}

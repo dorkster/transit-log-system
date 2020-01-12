@@ -47,7 +47,11 @@
     background: rgba(0,0,0,0.1);
 }
 
-.mytable-striped tr:nth-child(even) {
+.mytable-striped tr:nth-child(2n+2) {
+    background: rgba(0,0,0,0.04);
+}
+
+.mytable-striped-sort tr:nth-child(4n+4) {
     background: rgba(0,0,0,0.04);
 }
 

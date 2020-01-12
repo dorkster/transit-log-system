@@ -1,6 +1,9 @@
 <h3>Templates <a class="btn btn-success btn-sm" href="{% url 'template-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if templates %}
-<table class="mytable mytable-striped">
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
+<table class="mytable mytable-striped-sort">
     <thead>
         <td></td>
         <td></td>
@@ -8,13 +11,13 @@
         <td></td>
     </thead>
     {% for template in templates %}
+    {% if template.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    {% endif %}
     <tr>
         <td class="mytable-col-arrows">
             <a id="template_{{ template.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ template.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ template.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ template.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -33,6 +36,7 @@
             <a href="{% url 'template-trips' template.id %}" class="btn btn-secondary btn-sm w-100"><span class="oi oi-list mr-2"></span>Edit Trips</a>
         </td>
     </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ template.id }}')"><td colspan="4"></td></tr>
     {% endfor %}
 </table>
 {% else %}

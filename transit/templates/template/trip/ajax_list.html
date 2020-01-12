@@ -17,14 +17,17 @@
     </div>
 </div>
 {% if trips %}
-<a class="small" href="#_" onclick="ajax_loader.run('', 'toggle_extra_columns', '')">
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
+<a class="small" href="#_" onclick="(function(){ row_mover.clear(); ajax_loader.run('', 'toggle_extra_columns', ''); })();">
 {% if show_extra_columns %}
 Hide extra columns
 {% else %}
 Show extra columns
 {% endif %}
 </a>
-<table class="mytable mytable-striped">
+<table class="mytable mytable-striped-sort">
     <thead>
         <td></td>
         <td></td>
@@ -45,13 +48,13 @@ Show extra columns
         {% endif %}
     </thead>
     {% for trip in trips %}
+    {% if trip.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}13{% else %}9{% endif %}"></td></tr>
+    {% endif %}
     <tr class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ trip.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -215,6 +218,7 @@ Show extra columns
         {% endif %}
         {% endif %}
     </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}13{% else %}9{% endif %}"></td></tr>
     {% endfor %}
 </table>
 {% else %}

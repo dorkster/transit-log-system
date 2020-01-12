@@ -1,5 +1,8 @@
 <h3>Drivers <a class="btn btn-success btn-sm" href="{% url 'driver-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if drivers %}
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
 <table class="mytable">
     <thead>
         <td></td>
@@ -8,13 +11,13 @@
         <td>Is logged?</td>
     </thead>
     {% for driver in drivers %}
+    {% if driver.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    {% endif %}
     <tr style="background: #{{ driver.get_color }};">
         <td class="mytable-col-arrows">
             <a id="driver_{{ driver.id }}"></a>
-            <div class="btn-group-vertical">
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ driver.id }}', 'mv', 'u')"><span class="oi oi-caret-top"></span></button>
-                <button class="btn btn-outline-dark btn-sm pt-0 pb-0 sort-arrow" onclick="ajax_loader.run('{{ driver.id }}', 'mv', 'd')"><span class="oi oi-caret-bottom"></span></button>
-            </div>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ driver.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -33,6 +36,7 @@
         <td class="mytable-col-lg">{{ driver.name }}</td>
         <td class="mytable-col-sm"><span class="oi {% if driver.is_logged %}oi-check{% elif driver.is_logged is False %}oi-x{% endif %}"></span></td>
     </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ driver.id }}')"><td colspan="4"></td></tr>
     {% endfor %}
 </table>
 {% endif %}

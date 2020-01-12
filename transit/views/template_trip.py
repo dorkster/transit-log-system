@@ -179,22 +179,33 @@ def ajaxTemplateTripList(request, parent):
     request_data = request.GET['target_data']
 
     if request_action == 'mv':
-        trip = get_object_or_404(TemplateTrip, id=request_id)
+        template_trip = get_object_or_404(TemplateTrip, id=request_id)
+        original_index = template_trip.sort_index
+        template_trip.sort_index = -1
 
-        do_sort = False
-        if request_data == 'u':
-            query = TemplateTrip.objects.filter(parent=trip.parent, sort_index=trip.sort_index-1)
-            do_sort = True
-        elif request_data == 'd':
-            query = TemplateTrip.objects.filter(parent=trip.parent, sort_index=trip.sort_index+1)
-            do_sort = True
+        # "remove" the selected item by shifting everything below it up by 1
+        below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gt=original_index)
+        for i in below_items:
+            i.sort_index -= 1;
+            i.save()
 
-        if do_sort and len(query) > 0:
-            swap_index = query[0].sort_index
-            query[0].sort_index = trip.sort_index
-            trip.sort_index = swap_index
-            query[0].save()
-            trip.save()
+        if request_data == '':
+            new_index = 0
+        else:
+            target_item = get_object_or_404(TemplateTrip, id=request_data)
+            if template_trip.id != target_item.id:
+                new_index = target_item.sort_index + 1
+            else:
+                new_index = original_index
+
+        # prepare to insert the item at the new index by shifting everything below it down by 1
+        below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gte=new_index)
+        for i in below_items:
+            i.sort_index += 1
+            i.save()
+
+        template_trip.sort_index = new_index
+        template_trip.save()
     elif request_action == 'toggle_extra_columns':
         request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)
 

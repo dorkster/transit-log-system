@@ -103,22 +103,9 @@
 </div>
 {% if trips %}
 <script type="text/javascript">
-    var trip_mover = new RowMover("row-mover-trips");
-
-    function moveTrip(target) {
-        if (trip_mover.item != "") {
-            var item = trip_mover.item;
-            trip_mover.clear();
-            ajax_loader.run(item, "mv_trip", target);
-        }
-    }
-
-    function toggleTripColumns() {
-        trip_mover.clear();
-        ajax_loader.run('', 'toggle_extra_columns', '');
-    }
+    var trip_mover = new RowMover("RowMover_trips");
 </script>
-<a class="small" href="#_" onclick="toggleTripColumns()">
+<a class="small" href="#_" onclick="(function(){ trip_mover.clear(); ajax_loader.run('', 'toggle_extra_columns', ''); })();">
 {% if show_extra_columns %}
 Hide extra columns
 {% else %}
@@ -154,7 +141,7 @@ Show extra columns
     </thead>
     {% for trip in trips %}
     {% if trip.sort_index == 0 %}
-    <tr class="row-mover-trips mytable-sort mytable-sort-hidden" onclick="moveTrip('')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem(ajax_loader, '')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
     {% endif %}
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
@@ -423,7 +410,7 @@ Show extra columns
         {% endif %}
         {% endif %}
     </tr>
-    <tr class="row-mover-trips mytable-sort mytable-sort-hidden" onclick="moveTrip('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem(ajax_loader, '{{ trip.id }}')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
     {% endfor %}
 </table>
 {% else %}

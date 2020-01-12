@@ -133,6 +133,13 @@ function RowMover(row_class) {
         self.button = null;
     };
 
+    self.moveItem = function(ajax_ldr, target) {
+        if (self.item != "") {
+            var original_item = self.item;
+            self.clear();
+            ajax_ldr.run(original_item, "mv", target);
+        }
+    };
 
     // handle ajax-blockers
     $(".dropdown.ajax-blocker").on("show.bs.dropdown", function() {

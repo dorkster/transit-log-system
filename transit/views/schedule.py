@@ -127,7 +127,7 @@ def ajaxScheduleCommon(request, template):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv_trip':
+    if request_action == 'mv':
         trip = get_object_or_404(Trip, id=request_id)
         original_index = trip.sort_index
         trip.sort_index = -1

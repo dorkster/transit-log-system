@@ -11,7 +11,7 @@
     border: 1px solid #777 !important;
 }
 
-.mytable td.qe_cell_active, .mytable td.qe_cell:hover {
+.mytable td.edit_cell:hover {
     background: #00000011;
     cursor: pointer;
 }

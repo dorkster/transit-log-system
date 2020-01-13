@@ -156,6 +156,8 @@
     status_input.addEventListener("change", setStatusColor);
     setStatusColor();
 
+    focusFromParam();
+
 {% if not trip.is_activity %}
     function ajaxSetVehicleFromDriver() {
         $.ajax({

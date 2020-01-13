@@ -158,3 +158,17 @@ function RowMover(row_class, ajax_ldr) {
     });
 }
 
+function focusFromParam() {
+    var params = (new URL(document.location)).searchParams;
+    var focus = params.get("focus");
+    if (focus && focus != "") {
+        var focus_elm = $("#" + focus);
+
+        if (focus_elm.attr("type") == "text" || focus_elm.prop("tagName") == "TEXTAREA") {
+            var focus_len = focus_elm.val().length;
+            focus_elm[0].setSelectionRange(focus_len, focus_len);
+        }
+        focus_elm.focus()
+        focus_elm[0].scrollIntoView({behavior: "smooth", block: "center"});
+    }
+}

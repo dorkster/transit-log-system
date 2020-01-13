@@ -108,10 +108,11 @@ class Trip(models.Model):
         return output
 
     def get_driver_color(self):
+        site_settings = SiteSettings.load()
         if self.status > 0:
-            return 'BBBBBB'
+            return site_settings.get_color('cancel')
         elif self.is_activity:
-            return 'DDD9C3'
+            return site_settings.get_color('activity')
         else:
             return Driver.get_color(self.driver)
 
@@ -659,6 +660,19 @@ class PreTrip(models.Model):
 
 class SiteSettings(SingletonModel):
     enable_quick_edit = models.BooleanField(default=True)
+    activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
+    cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
+
+    def get_color(self, context):
+        color = '00000000'
+        if context == 'activity':
+            if self.activity_color != '':
+                color = self.activity_color
+        elif context == 'cancel':
+            if self.cancel_color != '':
+                color = self.cancel_color
+
+        return color
 
 class HelpPage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

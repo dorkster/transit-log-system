@@ -16,11 +16,15 @@ def sitesettingsEdit(request):
         form = SiteSettingsForm(request.POST)
         if form.is_valid():
             settings.enable_quick_edit = form.cleaned_data['enable_quick_edit']
+            settings.activity_color = form.cleaned_data['activity_color']
+            settings.cancel_color = form.cleaned_data['cancel_color']
             settings.save()
             updated = True
     else:
         initial = {
             'enable_quick_edit': settings.enable_quick_edit,
+            'activity_color': settings.activity_color,
+            'cancel_color': settings.cancel_color,
         }
         form = SiteSettingsForm(initial=initial)
 

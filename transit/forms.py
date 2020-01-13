@@ -224,3 +224,5 @@ class SearchTripsForm(forms.Form):
 
 class SiteSettingsForm(forms.Form):
     enable_quick_edit = forms.ChoiceField(choices=BOOL_CHOICES, label='Enable Quick Edit', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    activity_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
+    cancel_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))

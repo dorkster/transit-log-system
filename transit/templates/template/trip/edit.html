@@ -114,6 +114,9 @@
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
 <script type="text/javascript">
+    focusFromParam();
+
+{% if not trip.is_activity %}
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
 
     var name_input = document.getElementById("id_name");
@@ -173,6 +176,7 @@
             }
         }
     }
+{% endif %}
 </script>
 {% endblock %}
 {% endblock %}

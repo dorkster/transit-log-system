@@ -172,3 +172,18 @@ function focusFromParam() {
         focus_elm[0].scrollIntoView({behavior: "smooth", block: "center"});
     }
 }
+
+function editCell(url, row_movers=null) {
+    var row_movers_cleared = true;
+
+    if (row_movers) {
+        for (var i = 0; i < row_movers.length; i++) {
+            if (row_movers[i].item != "")
+                row_movers_cleared = false;
+            row_movers[i].clear();
+        }
+    }
+    if (row_movers_cleared) {
+        window.location.assign(url);
+    }
+}

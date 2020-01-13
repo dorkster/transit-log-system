@@ -659,7 +659,6 @@ class PreTrip(models.Model):
         return 'Pre-Trip'
 
 class SiteSettings(SingletonModel):
-    enable_quick_edit = models.BooleanField(default=True)
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
 

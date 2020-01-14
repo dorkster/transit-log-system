@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag
+from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag, SiteSettings
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
 
 def moneyParse(value):
@@ -187,12 +187,15 @@ def tripCreateEditCommon(request, mode, trip, is_new):
             }
             form = EditTripForm(initial=initial)
 
+    site_settings = SiteSettings.load()
+
     addresses = set()
-    for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=30))):
-        if i.address:
-            addresses.add(str(i.address))
-        if i.destination:
-            addresses.add(str(i.destination))
+    if site_settings.autocomplete_history_days > 0:
+        for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=site_settings.autocomplete_history_days-1))):
+            if i.address:
+                addresses.add(str(i.address))
+            if i.destination:
+                addresses.add(str(i.destination))
 
     context = {
         'form': form,

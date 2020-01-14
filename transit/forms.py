@@ -226,3 +226,4 @@ class SearchTripsForm(forms.Form):
 class SiteSettingsForm(forms.Form):
     activity_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
     cancel_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
+    autocomplete_history_days = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs=formWidgetAttrs.default))

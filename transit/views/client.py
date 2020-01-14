@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Client, Trip, FrequentTag, TemplateTrip
+from transit.models import Client, Trip, FrequentTag, TemplateTrip, SiteSettings
 from transit.forms import EditClientForm
 
 def clientList(request):
@@ -67,15 +67,18 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False):
         }
         form = EditClientForm(initial=initial)
 
+    site_settings = SiteSettings.load()
+
     names = set()
     addresses = set()
-    for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=30))):
-        if i.name:
-            names.add(str(i.name))
-        if i.address:
-            addresses.add(str(i.address))
-        if i.destination:
-            addresses.add(str(i.destination))
+    if site_settings.autocomplete_history_days > 0:
+        for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=site_settings.autocomplete_history_days-1))):
+            if i.name:
+                names.add(str(i.name))
+            if i.address:
+                addresses.add(str(i.address))
+            if i.destination:
+                addresses.add(str(i.destination))
 
     context = {
         'form': form,

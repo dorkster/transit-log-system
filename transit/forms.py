@@ -68,7 +68,8 @@ class formWidgetAttrs():
     text_area['cols'] = '20'
 
     color = default.copy()
-    color['onchange'] = 'validateColor(this)'
+    color['class'] += ' form-control-color'
+    color['type'] = 'color'
 
     money = default.copy()
     money['onchange'] = 'validateMoney(this)'

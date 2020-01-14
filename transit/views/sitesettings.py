@@ -15,14 +15,14 @@ def sitesettingsEdit(request):
     if request.method == 'POST':
         form = SiteSettingsForm(request.POST)
         if form.is_valid():
-            settings.activity_color = form.cleaned_data['activity_color']
-            settings.cancel_color = form.cleaned_data['cancel_color']
+            settings.activity_color = form.cleaned_data['activity_color'][1:]
+            settings.cancel_color = form.cleaned_data['cancel_color'][1:]
             settings.save()
             updated = True
     else:
         initial = {
-            'activity_color': settings.activity_color,
-            'cancel_color': settings.cancel_color,
+            'activity_color': '#' + settings.activity_color,
+            'cancel_color': '#' + settings.cancel_color,
         }
         form = SiteSettingsForm(initial=initial)
 

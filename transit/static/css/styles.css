@@ -81,6 +81,10 @@
     display: inline !important;
 }
 
+.form-control-color {
+    width: 4em !important;
+}
+
 .full-miles * {
     font-size: 24pt;
 }

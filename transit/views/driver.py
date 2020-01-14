@@ -43,7 +43,7 @@ def driverCreateEditCommon(request, driver, is_new):
 
         if form.is_valid():
             driver.name = form.cleaned_data['name']
-            driver.color = form.cleaned_data['color']
+            driver.color = form.cleaned_data['color'][1:]
             driver.is_logged = form.cleaned_data['is_logged']
             driver.save()
 
@@ -51,7 +51,7 @@ def driverCreateEditCommon(request, driver, is_new):
     else:
         initial = {
             'name': driver.name,
-            'color': driver.color,
+            'color': '#' + driver.color,
             'is_logged': driver.is_logged,
         }
         form = EditDriverForm(initial=initial)

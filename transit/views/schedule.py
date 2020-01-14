@@ -115,9 +115,9 @@ def ajaxScheduleEdit(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_edit.html')
 
 def ajaxScheduleView(request):
-    return ajaxScheduleCommon(request, 'schedule/ajax_view.html')
+    return ajaxScheduleCommon(request, 'schedule/ajax_view.html', has_filter=True)
 
-def ajaxScheduleCommon(request, template):
+def ajaxScheduleCommon(request, template, has_filter=False):
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
 
     request_id = ''
@@ -270,25 +270,24 @@ def ajaxScheduleCommon(request, template):
 
     unfiltered_count = len(trips)
 
-    # TODO don't use template filename to check if we're on the View page!!!
-    if template == 'schedule/ajax_view.html':
+    if has_filter:
         if filter_hide_canceled:
             trips = trips.filter(status=Trip.STATUS_NORMAL)
 
         if filter_hide_completed:
-            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))
+            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(is_activity=True))
 
         if filter_hide_nolog:
-            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True))
+            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
 
         if filter_search != '':
-            trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search))
+            trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | (Q(is_activity=True) & Q(note__icontains=filter_search)))
 
         if filter_driver != '':
-            trips = trips.filter(driver__id=filter_driver)
+            trips = trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
 
         if filter_vehicle != '':
-            trips = trips.filter(vehicle__id=filter_vehicle)
+            trips = trips.filter(Q(vehicle__id=filter_vehicle) | Q(is_activity=True))
 
     filtered_count = len(trips)
 

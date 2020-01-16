@@ -8,34 +8,72 @@ from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
 from transit.forms import DatePickerForm
 
 def report(request, year, month):
-    class UniqueRider:
-        def __init__(self, name, elderly=None, ambulatory=None):
-            self.name = name
-            self.elderly = elderly
-            self.ambulatory = ambulatory
+    T_STR = 0
+    T_FLOAT = 1
+    class Money():
+        def __init__(self, default_value=0):
+            self.value = default_value
+        def __add__(self, other):
+            return Money(self.value + other.value)
+        def __str__(self):
+            if self.value < 10:
+                return '$0.0' + str(self.value)
+            elif self.value < 100:
+                return '$0.' + str(self.value)
+            else:
+                val_str = str(self.value)
+                return '$' + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
 
-        def __lt__(self, other):
-            return self.name < other.name
-
-    class ReportVehicle():
-        class Day():
-            def __init__(self):
-                self.date = None
-                self.service_miles = ''
-                self.service_hours = ''
-                self.deadhead_miles = ''
-                self.deadhead_hours = ''
-                self.pmt = ''
-                self.fuel = ''
-                self.trip_types = {}
-
+    class ReportShift():
         def __init__(self):
-            self.vehicle = Vehicle()
-            self.days = []
-            self.total = self.Day()
-            self.errors = []
-    
-    class DriverSummary():
+            self.shift = None
+            self.start_miles = { T_STR:None, T_FLOAT:None }
+            self.start_time = None
+            self.end_miles = { T_STR:None, T_FLOAT:None }
+            self.end_time = None
+            self.fuel = 0
+            self.start_trip = None
+            self.end_trip = None
+
+    class ReportTrip():
+        def __init__(self):
+            self.trip = None
+            self.shift = None
+            self.start_miles = { T_STR:None, T_FLOAT: None }
+            self.start_time = None
+            self.end_miles = { T_STR:None, T_FLOAT: None }
+            self.end_time = None
+            self.trip_type = None
+            self.collected_cash = Money(0)
+            self.collected_check = Money(0)
+
+    class ReportDay():
+        def __init__(self):
+            self.date = None
+            self.shifts = []
+            self.trips = []
+
+            self.by_vehicle = {}
+            for i in Vehicle.objects.all():
+                self.by_vehicle[i] = ReportSummary()
+
+            self.by_driver = {}
+            for i in Driver.objects.filter(is_logged=True):
+                self.by_driver[i] = ReportSummary()
+
+        def hasVehicleInShift(self, vehicle):
+            for i in self.shifts:
+                if i.shift.vehicle == vehicle:
+                    return True
+            return False
+        
+        def hasDriverInShift(self, driver):
+            for i in self.shifts:
+                if i.shift.driver == driver:
+                    return True
+            return False
+
+    class ReportSummary():
         def __init__(self):
             self.service_miles = 0
             self.service_hours = 0
@@ -43,6 +81,79 @@ def report(request, year, month):
             self.deadhead_hours = 0
             self.total_miles = 0
             self.total_hours = 0
+            self.pmt = 0
+            self.fuel = 0
+            self.trip_types = {}
+            self.collected_cash = Money(0)
+            self.collected_check = Money(0)
+
+            for i in TripType.objects.all():
+                self.trip_types[i] = 0
+
+        def __add__(self, other):
+            r = self
+            r.service_miles += other.service_miles
+            r.service_hours += other.service_hours
+            r.deadhead_miles += other.deadhead_miles
+            r.deadhead_hours += other.deadhead_hours
+            r.total_miles += other.total_miles
+            r.total_hours += other.total_hours
+            r.pmt += other.pmt
+            r.fuel += other.fuel
+            for i in TripType.objects.all():
+                r.trip_types[i] += other.trip_types[i]
+            r.collected_cash += other.collected_cash
+            r.collected_check += other.collected_check
+            return r
+
+    class ReportOutputVehicles():
+        def __init__(self):
+            self.vehicle = None
+            self.days = []
+            self.totals = ReportSummary()
+
+    class ReportOutputDrivers():
+        def __init__(self):
+            self.driver = None
+            self.days = []
+            self.totals = ReportSummary()
+
+    class ReportErrors():
+        SHIFT_INCOMPLETE = 0
+        TRIP_INCOMPLETE = 1
+        TRIP_NO_SHIFT = 2
+        TRIP_MILES_OOB = 3
+        TRIP_TIME_OOB = 4
+
+        def __init__(self):
+            self.errors = []
+        def add(self, date, error_code, error_shift=None, error_trip=None):
+            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip})
+
+    class UniqueRiderSummary():
+        class Rider():
+            def __init__(self, name, elderly, ambulatory):
+                self.name = name
+                self.elderly = elderly
+                self.ambulatory = ambulatory
+            def __lt__(self, other):
+                return self.name < other.name
+
+        def __init__(self):
+            self.names = []
+            self.elderly_ambulatory = 0
+            self.elderly_nonambulatory = 0
+            self.nonelderly_ambulatory = 0
+            self.nonelderly_nonambulatory = 0
+            self.unknown = 0
+
+        def __contains__(self, item):
+            for i in self.names:
+                if i.name == item:
+                    return True
+
+    report_errors = ReportErrors()
+    unique_riders = UniqueRiderSummary()
 
     date_start = datetime.date(year, month, 1)
 
@@ -64,249 +175,216 @@ def report(request, year, month):
     month_prev.replace(day=1)
     month_next = date_end + datetime.timedelta(days=1)
 
-    unique_riders = []
-
-    triptypes = TripType.objects.all()
-
-    vehicle_totals = ReportVehicle.Day()
-    vehicle_total_service_miles = 0
-    vehicle_total_service_hours = 0
-    vehicle_total_deadhead_miles = 0
-    vehicle_total_deadhead_hours = 0
-    vehicle_total_pmt = 0
-    vehicle_total_fuel = 0
-    for i in triptypes:
-        vehicle_totals.trip_types[str(i)] = 0
-
-    driver_summaries = {}
-    for driver in Driver.objects.filter(is_logged=True):
-        driver_summaries[str(driver)] = DriverSummary()
-
-    vehicles = Vehicle.objects.filter(is_logged=True)
-    vehicle_list = []
-    for vehicle in vehicles:
-        rv = ReportVehicle()
-        rv.vehicle = vehicle
-
-        total_service_miles = 0
-        total_service_hours = 0
-        total_deadhead_miles = 0
-        total_deadhead_hours = 0
-        total_pmt = 0
-        total_fuel = 0
-
-        for i in triptypes:
-            rv.total.trip_types[str(i)] = 0
-
-        for day in range(date_start.day, date_end.day+1):
-            day_date = datetime.date(year, month, day)
-            day_shifts = Shift.objects.filter(date=day_date, vehicle=vehicle)
-            day_trips = Trip.objects.filter(date=day_date, vehicle=vehicle, status=Trip.STATUS_NORMAL)
-
-            rv_day = ReportVehicle.Day()
-            rv_day.date = day_date
-            for i in triptypes:
-                rv_day.trip_types[str(i)] = 0
-
-            shift_miles_start = 0
-            shift_miles_end = 0
-            shift_time_start = 0
-            shift_time_end = 0
-            shift_fuel = 0
-            shift_data_list = []
-            for shift in day_shifts:
-                error_str = shift.get_error_str()
-                if error_str != '':
-                    rv.errors.append(error_str)
-
-                shift_data = shift.get_parsed_log_data()
-                if shift_data is not None:
-                    shift_data_list.append(shift_data)
-
-                    last_index = len(shift_data_list)-1
-                    if shift_data.start_miles < shift_data_list[shift_miles_start].start_miles:
-                        shift_miles_start = last_index
-                    if shift_data.end_miles > shift_data_list[shift_miles_end].end_miles:
-                        shift_miles_end = last_index
-                    if shift_data.start_time < shift_data_list[shift_time_start].start_time:
-                        shift_time_start = last_index
-                    if shift_data.end_time > shift_data_list[shift_time_end].end_time:
-                        shift_time_end = last_index
-
-                    shift_fuel += shift_data.fuel
-
-            trip_miles_start = 0
-            trip_miles_end = 0
-            trip_time_start = 0
-            trip_time_end = 0
-            trip_pmt = 0
-            trip_data_list = []
-            for trip in day_trips:
-                error_str = trip.get_error_str()
-                if error_str != '':
-                    rv.errors.append(error_str)
-
-                if not shift_data_list:
-                    continue
-
-                trip_data = trip.get_parsed_log_data(shift_data_list[shift_miles_start].start_miles_str)
-                if trip_data is not None:
-                    trip_data_list.append(trip_data)
-
-                    last_index = len(trip_data_list)-1
-                    if trip_data.start_miles < trip_data_list[trip_miles_start].start_miles:
-                        trip_miles_start = last_index
-                    if trip_data.end_miles > trip_data_list[trip_miles_end].end_miles:
-                        trip_miles_end = last_index
-                    if trip_data.start_time < trip_data_list[trip_time_start].start_time:
-                        trip_time_start = last_index
-                    if trip_data.end_time > trip_data_list[trip_time_end].end_time:
-                        trip_time_end = last_index
-
-                    trip_pmt += (trip_data.end_miles - trip_data.start_miles)
-                    if trip.trip_type != None:
-                        rv_day.trip_types[str(trip.trip_type)] += 1
-
-                    ur_index = None
-                    for i in range(len(unique_riders)):
-                        if unique_riders[i].name == trip.name:
-                            ur_index = i
-                            if unique_riders[i].elderly is None:
-                                unique_riders[i].elderly = trip.elderly
-                            if unique_riders[i].ambulatory is None:
-                                unique_riders[i].ambulatory = trip.ambulatory
-
-                    if ur_index is None:
-                        unique_riders.append(UniqueRider(trip.name, trip.elderly, trip.ambulatory))
-
-            if not shift_data_list or not trip_data_list:
-                continue
-
-            service_miles = shift_data_list[shift_miles_end].end_miles - shift_data_list[shift_miles_start].start_miles
-            service_hours = (shift_data_list[shift_time_end].end_time - shift_data_list[shift_time_start].start_time).seconds / 60 / 60
-            deadhead_miles = (trip_data_list[trip_miles_start].start_miles - shift_data_list[shift_miles_start].start_miles) + (shift_data_list[shift_miles_end].end_miles - trip_data_list[trip_miles_end].end_miles)
-            deadhead_hours = ((trip_data_list[trip_time_start].start_time - shift_data_list[shift_time_start].start_time).seconds + (shift_data_list[shift_time_end].end_time - trip_data_list[trip_time_end].end_time).seconds) / 60 / 60
-
-            rv_day.service_miles = '{:.1f}'.format(service_miles)
-            rv_day.service_hours = '{:.2f}'.format(service_hours).rstrip('0').rstrip('.')
-            rv_day.deadhead_miles = '{:.1f}'.format(deadhead_miles)
-            rv_day.deadhead_hours = '{:.2f}'.format(deadhead_hours).rstrip('0').rstrip('.')
-            rv_day.pmt = '{:.1f}'.format(trip_pmt)
-            rv_day.fuel = '{:.1f}'.format(shift_fuel).rstrip('0').rstrip('.')
-
-            total_service_miles += service_miles
-            total_service_hours += service_hours
-            total_deadhead_miles += deadhead_miles
-            total_deadhead_hours += deadhead_hours
-            total_pmt += trip_pmt
-            total_fuel += shift_fuel
-            for i in triptypes:
-                rv.total.trip_types[str(i)] += rv_day.trip_types[str(i)]
-                vehicle_totals.trip_types[str(i)] += rv_day.trip_types[str(i)]
-
-            vehicle_total_service_miles += service_miles
-            vehicle_total_service_hours += service_hours
-            vehicle_total_deadhead_miles += deadhead_miles
-            vehicle_total_deadhead_hours += deadhead_hours
-            vehicle_total_pmt += trip_pmt
-            vehicle_total_fuel += shift_fuel
-
-            for shift in day_shifts:
-                shift_data = shift.get_parsed_log_data()
-                if shift_data:
-                    driver_summaries[str(shift.driver)].service_miles += (shift_data.end_miles - shift_data.start_miles)
-                    driver_summaries[str(shift.driver)].service_hours += ((shift_data.end_time - shift_data.start_time).seconds / 60 / 60)
-                    shift_trips = shift.get_start_end_trips()
-                    if shift_trips is not None:
-                        driver_summaries[str(shift.driver)].deadhead_miles += (shift_trips[0].start_miles - shift_data.start_miles) + (shift_data.end_miles - shift_trips[2].end_miles)
-                        driver_summaries[str(shift.driver)].deadhead_hours += ((shift_trips[1].start_time - shift_data.start_time) + (shift_data.end_time - shift_trips[3].end_time)).seconds / 60 / 60
-
-            for i in driver_summaries:
-                driver_summaries[i].total_miles = driver_summaries[i].service_miles + driver_summaries[i].deadhead_miles
-                driver_summaries[i].total_hours = driver_summaries[i].service_hours + driver_summaries[i].deadhead_hours
-
-            rv.days.append(rv_day)
-
-        rv.total.service_miles = '{:.1f}'.format(total_service_miles)
-        rv.total.service_hours = '{:.2f}'.format(total_service_hours).rstrip('0').rstrip('.')
-        rv.total.deadhead_miles = '{:.1f}'.format(total_deadhead_miles)
-        rv.total.deadhead_hours = '{:.2f}'.format(total_deadhead_hours).rstrip('0').rstrip('.')
-        rv.total.pmt = '{:.1f}'.format(total_pmt)
-        rv.total.fuel = '{:.1f}'.format(total_fuel).rstrip('0').rstrip('.')
-        vehicle_list.append(rv)
-
-    vehicle_totals.service_miles = '{:.1f}'.format(vehicle_total_service_miles)
-    vehicle_totals.service_hours = '{:.2f}'.format(vehicle_total_service_hours).rstrip('0').rstrip('.')
-    vehicle_totals.deadhead_miles = '{:.1f}'.format(vehicle_total_deadhead_miles)
-    vehicle_totals.deadhead_hours = '{:.2f}'.format(vehicle_total_deadhead_hours).rstrip('0').rstrip('.')
-    vehicle_totals.pmt = '{:.1f}'.format(vehicle_total_pmt)
-    vehicle_totals.fuel = '{:.1f}'.format(vehicle_total_fuel).rstrip('0').rstrip('.')
-
-    no_vehicle_errors = []
-    for day in range(date_start.day, date_end.day+1):
-        day_date = datetime.date(year, month, day)
-        no_vehicle_trips = Trip.objects.filter(date=day_date, vehicle=None, status=Trip.STATUS_NORMAL)
-        for trip in no_vehicle_trips:
-            error_str = trip.get_error_str()
-            if error_str != '':
-                no_vehicle_errors.append(error_str)
-
-    unique_riders.sort()
-
-    # try to fetch missing unique rider data from list of clients
-    for i in unique_riders:
-        if i.elderly == None or i.ambulatory == None:
-            client_query = Client.objects.filter(name=i.name)
-            if len(client_query) > 0:
-                client = client_query[0]
-                if i.elderly == None and client.elderly != None:
-                    i.elderly = client.elderly
-                if i.ambulatory == None and client.ambulatory != None:
-                    i.ambulatory = client.ambulatory
-
-    ur_elderly_ambulatory = 0
-    ur_elderly_nonambulatory = 0
-    ur_nonelderly_ambulatory = 0
-    ur_nonelderly_nonambulatory = 0
-    ur_unknown = 0
-
-    for i in unique_riders:
-        if i.elderly and i.ambulatory:
-            ur_elderly_ambulatory += 1
-        elif i.elderly and i.ambulatory == False:
-            ur_elderly_nonambulatory +=1
-        elif i.elderly == False and i.ambulatory:
-            ur_nonelderly_ambulatory +=1
-        elif i.elderly == False and i.ambulatory == False:
-            ur_nonelderly_nonambulatory +=1
-        else:
-            ur_unknown +=1
+    report_all = []
 
     money_trips = []
+    money_trips_summary = ReportSummary()
 
     for day in range(date_start.day, date_end.day+1):
         day_date = datetime.date(year, month, day)
-        day_trips = Trip.objects.filter(date=day_date)
-        for trip in day_trips:
-            if trip.collected_cash > 0 or trip.collected_check > 0:
-                money_trips.append(trip)
 
-    total_collected_cash = 0
-    total_collected_check = 0
-    total_collected_cash_str = '0.00'
-    total_collected_check_str = '0.00'
+        report_day = ReportDay()
+        report_day.date = day_date
 
-    for i in money_trips:
-        total_collected_cash += i.collected_cash
-        total_collected_check += i.collected_check
+        shifts = Shift.objects.filter(date=day_date)
+        for i in shifts:
+            if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or not i.driver or not i.vehicle:
+                # skip incomplete shift
+                if i.start_miles != '' or i.start_time != '' or i.end_miles != '' or i.end_time != '':
+                    report_errors.add(day_date, report_errors.SHIFT_INCOMPLETE, error_shift=i)
+                continue
 
-    if total_collected_cash > 0:
-        s = str(total_collected_cash)
-        total_collected_cash_str = s[:len(s)-2] + '.' + s[len(s)-2:]
+            report_shift = ReportShift()
+            report_shift.shift = i
+            report_shift.start_miles[T_STR] = i.start_miles
+            report_shift.start_miles[T_FLOAT] = float(i.start_miles)
+            report_shift.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+            report_shift.end_miles[T_STR] = i.end_miles
+            report_shift.end_miles[T_FLOAT] = float(i.end_miles)
+            report_shift.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+            if i.fuel:
+                report_shift.fuel = float(i.fuel)
 
-    if total_collected_check > 0:
-        s = str(total_collected_check)
-        total_collected_check_str = s[:len(s)-2] + '.' + s[len(s)-2:]
+            report_day.shifts.append(report_shift)
+
+        trips = Trip.objects.filter(date=day_date, status=Trip.STATUS_NORMAL, is_activity=False)
+        for i in trips:
+            if i.driver and not i.driver.is_logged:
+                # skip non-logged drivers
+                continue
+
+            if i.start_miles == '' and i.start_time == '' and i.end_miles == '' and i.end_time == '':
+                # skip empty trip
+                continue
+
+            if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or not i.driver or not i.vehicle:
+                # skip incomplete shift
+                if i.driver and i.vehicle:
+                    report_errors.add(day_date, report_errors.TRIP_INCOMPLETE, error_trip=i)
+                continue
+
+            report_trip = ReportTrip()
+            report_trip.trip = i
+
+            for j in range(0, len(report_day.shifts)):
+                if i.driver == report_day.shifts[j].shift.driver and i.vehicle == report_day.shifts[j].shift.vehicle:
+                    report_trip.shift = j
+                    break
+
+            if report_trip.shift == None:
+                for j in range(0, len(report_day.shifts)):
+                    if i.vehicle == report_day.shifts[j].shift.vehicle:
+                        report_trip.shift = j
+                        break
+
+            if report_trip.shift == None:
+                # if i.vehicle.is_logged:
+                #     report_errors.add(day_date, report_errors.TRIP_NO_SHIFT, error_trip=i)
+                continue
+
+            shift = report_day.shifts[report_trip.shift]
+            report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
+            report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
+            report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+            report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
+            report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
+            report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+
+            report_trip.trip_type = i.trip_type
+            report_trip.collected_cash = Money(i.collected_cash)
+            report_trip.collected_check = Money(i.collected_check)
+
+            report_day.trips.append(report_trip)
+
+            if shift.start_trip == None or report_trip.start_miles[T_FLOAT] < report_day.trips[shift.start_trip].start_miles[T_FLOAT]:
+                report_day.shifts[report_trip.shift].start_trip = len(report_day.trips) - 1;
+
+            if shift.end_trip == None or report_trip.end_miles[T_FLOAT] > report_day.trips[shift.end_trip].end_miles[T_FLOAT]:
+                report_day.shifts[report_trip.shift].end_trip = len(report_day.trips) - 1;
+
+            # check for trip errors
+            if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                report_errors.add(day_date, report_errors.TRIP_MILES_OOB, error_trip=i)
+            if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
+                report_errors.add(day_date, report_errors.TRIP_TIME_OOB, error_trip=i)
+
+            # add money trip
+            if i.collected_cash > 0 or i.collected_check > 0:
+                money_trips.append(report_trip)
+                money_trips_summary.collected_cash += report_trip.collected_cash
+                money_trips_summary.collected_check += report_trip.collected_check
+
+            # add unique rider
+            found_unique_rider = False
+            for j in unique_riders.names:
+                if j.name == i.name:
+                    if j.elderly == None:
+                        j.elderly = i.elderly
+                    if j.ambulatory == None:
+                        j.ambulatory = i.ambulatory
+
+                    found_unique_rider = True
+                    break
+            if not found_unique_rider:
+                if i.elderly == None or i.ambulatory == None:
+                    # try to get info from Clients
+                    clients = Client.objects.filter(name=i.name)
+                    if len(clients) > 0:
+                        elderly = i.elderly
+                        ambulatory = i.ambulatory
+                        if elderly == None:
+                            elderly = clients[0].elderly
+                        if ambulatory == None:
+                            ambulatory = clients[0].ambulatory
+                        unique_riders.names.append(UniqueRiderSummary.Rider(i.name, elderly, ambulatory))
+                else:
+                    unique_riders.names.append(UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory))
+                unique_riders.names = sorted(unique_riders.names)
+
+        for i in range(0, len(report_day.shifts)):
+            shift = report_day.shifts[i]
+            if shift.start_trip == None or shift.end_trip == None:
+                # print(shift.shift.vehicle)
+                continue
+            
+            service_miles = shift.end_miles[T_FLOAT] - shift.start_miles[T_FLOAT]
+            service_hours = (shift.end_time - shift.start_time).seconds / 60 / 60
+            deadhead_miles = (report_day.trips[shift.start_trip].start_miles[T_FLOAT] - shift.start_miles[T_FLOAT]) + (shift.end_miles[T_FLOAT] - report_day.trips[shift.end_trip].end_miles[T_FLOAT])
+            deadhead_hours = ((report_day.trips[shift.start_trip].start_time - shift.start_time).seconds + (shift.end_time - report_day.trips[shift.end_trip].end_time).seconds) / 60 / 60
+
+            # per-vehicle log
+            report_day.by_vehicle[shift.shift.vehicle].service_miles += service_miles
+            report_day.by_vehicle[shift.shift.vehicle].service_hours += service_hours
+            report_day.by_vehicle[shift.shift.vehicle].deadhead_miles += deadhead_miles
+            report_day.by_vehicle[shift.shift.vehicle].deadhead_hours += deadhead_hours
+            report_day.by_vehicle[shift.shift.vehicle].total_miles += service_miles + deadhead_miles
+            report_day.by_vehicle[shift.shift.vehicle].total_hours += service_hours + deadhead_hours
+            for trip in report_day.trips:
+                if i != trip.shift:
+                    continue
+                report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
+                if trip.trip_type != None:
+                    report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type] += 1
+                report_day.by_vehicle[shift.shift.vehicle].collected_cash += trip.collected_cash
+                report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
+            report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
+
+            # per-driver log
+            report_day.by_driver[shift.shift.driver].service_miles += service_miles
+            report_day.by_driver[shift.shift.driver].service_hours += service_hours
+            report_day.by_driver[shift.shift.driver].deadhead_miles += deadhead_miles
+            report_day.by_driver[shift.shift.driver].deadhead_hours += deadhead_hours
+            report_day.by_driver[shift.shift.driver].total_miles += service_miles + deadhead_miles
+            report_day.by_driver[shift.shift.driver].total_hours += service_hours + deadhead_hours
+            for trip in report_day.trips:
+                if i != trip.shift:
+                    continue
+                report_day.by_driver[shift.shift.driver].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
+                if trip.trip_type != None:
+                    report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type] += 1
+                report_day.by_driver[shift.shift.driver].collected_cash += trip.collected_cash
+                report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
+            report_day.by_driver[shift.shift.driver].fuel += shift.fuel
+
+        report_all.append(report_day)
+
+    vehicle_reports = []
+    for vehicle in Vehicle.objects.filter(is_logged=True):
+        vehicle_report = ReportOutputVehicles()
+        vehicle_report.vehicle = vehicle
+        for report_day in report_all:
+            if report_day.hasVehicleInShift(vehicle):
+                vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle]})
+                vehicle_report.totals += report_day.by_vehicle[vehicle]
+
+        vehicle_reports.append(vehicle_report)
+
+    all_vehicles = ReportSummary()
+    for vehicle_report in vehicle_reports:
+        all_vehicles += vehicle_report.totals
+
+    driver_reports = []
+    for driver in Driver.objects.filter(is_logged=True):
+        driver_report = ReportOutputVehicles()
+        driver_report.driver = driver
+        for report_day in report_all:
+            if report_day.hasDriverInShift(driver):
+                driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver]})
+                driver_report.totals += report_day.by_driver[driver]
+
+        driver_reports.append(driver_report)
+
+    for rider in unique_riders.names:
+        if rider.elderly == None or rider.ambulatory == None:
+            unique_riders.unknown += 1
+        elif rider.elderly and rider.ambulatory:
+            unique_riders.elderly_ambulatory += 1
+        elif rider.elderly and not rider.ambulatory:
+            unique_riders.elderly_nonambulatory += 1
+        elif not rider.elderly and rider.ambulatory:
+            unique_riders.nonelderly_ambulatory += 1
+        elif not rider.elderly and not rider.ambulatory:
+            unique_riders.nonelderly_nonambulatory += 1
 
     context = {
         'date_start': date_start,
@@ -314,20 +392,15 @@ def report(request, year, month):
         'month_prev': reverse('report', kwargs={'year':month_prev.year, 'month':month_prev.month}),
         'month_next': reverse('report', kwargs={'year':month_next.year, 'month':month_next.month}),
         'date_picker': date_picker,
-        'vehicles': vehicle_list,
-        'no_vehicle_errors': no_vehicle_errors,
-        'triptypes': triptypes,
+        'vehicles': Vehicle.objects.filter(is_logged=True),
+        'reports': report_all,
+        'vehicle_reports': vehicle_reports,
+        'all_vehicles': all_vehicles,
+        'driver_reports': driver_reports,
         'unique_riders': unique_riders,
-        'ur_elderly_ambulatory': ur_elderly_ambulatory,
-        'ur_elderly_nonambulatory': ur_elderly_nonambulatory,
-        'ur_nonelderly_ambulatory': ur_nonelderly_ambulatory,
-        'ur_nonelderly_nonambulatory': ur_nonelderly_nonambulatory,
-        'ur_unknown': ur_unknown,
         'money_trips': money_trips,
-        'total_collected_cash': total_collected_cash_str,
-        'total_collected_check': total_collected_check_str,
-        'driver_summaries': driver_summaries,
-        'vehicle_combined_totals': vehicle_totals,
+        'money_trips_summary': money_trips_summary,
+        'report_errors': report_errors,
     }
     return render(request, 'report/view.html', context)
 

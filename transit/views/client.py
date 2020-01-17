@@ -132,7 +132,7 @@ def clientCreateFromTrip(request, trip_id):
     client.phone_cell = trip.phone_cell
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
-    return clientCreateEditCommon(request, client, is_new=True)
+    return clientCreateEditCommon(request, client, is_new=True, src_trip=trip)
 
 def clientCreateFromTemplateTrip(request, trip_id):
     trip = get_object_or_404(TemplateTrip, id=trip_id)
@@ -148,7 +148,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
     client.phone_cell = trip.phone_cell
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
-    return clientCreateEditCommon(request, client, is_new=True)
+    return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
 
 def ajaxClientList(request):
     request_id = ''

@@ -17,8 +17,9 @@
         {% endfor %}
     </datalist>
     <datalist id='addresses'>
-        {% for address in addresses %}
-        <option value="{{ address }}">
+        <option value="">
+        {% for destination in destinations %}
+        <option value="{{ destination.address }}">
         {% endfor %}
     </datalist>
     <div class="container ml-0">
@@ -143,6 +144,7 @@
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
+{{ destinations_json|json_script:"destinations-tag" }}
 <script type="text/javascript">
     var status_input = document.getElementById("id_status")
     function setStatusColor() {
@@ -188,6 +190,9 @@
 
     var name_input = document.getElementById("id_name");
     function onNameChanged() {
+        var address_datalist = document.getElementById("addresses");
+        address_datalist.children[0].value = "";
+
         for (i in clients) {
             if (clients[i].fields.name == name_input.value) {
                 var phone_home_input = document.getElementById("id_phone_home");
@@ -213,13 +218,13 @@
 
                 var tags_input = document.getElementById("id_tags");
                 tags_input.value = clients[i].fields.tags;
+
+                address_datalist.children[0].value = clients[i].fields.address;
+                break;
             }
         }
     }
     name_input.addEventListener("change", onNameChanged);
-
-    function getClientDefaultPhone(client_id) {
-    }
 
     function getClientPhone(input, phone_type) {
         $("#" + input).val("");
@@ -243,6 +248,24 @@
             }
         }
     }
+
+    var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
+
+    var pickup_input = document.getElementById("id_address");
+    var destination_input = document.getElementById("id_destination");
+    function onAddressChanged(address_input, phone_input) {
+        for (i in destinations) {
+            if (destinations[i].fields.address == address_input.value) {
+                phone_input.value = destinations[i].fields.phone;
+                break;
+            }
+        }
+    }
+
+    var pickup_phone_input = document.getElementById("id_phone_address");
+    var destination_phone_input = document.getElementById("id_phone_destination");
+    pickup_input.addEventListener("change", function() { onAddressChanged(this, pickup_phone_input); });
+    destination_input.addEventListener("change", function() { onAddressChanged(this, destination_phone_input); });
 {% endif %}
 </script>
 {% endblock %}

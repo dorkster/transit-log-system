@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Template, TemplateTrip, Client, FrequentTag, Trip, SiteSettings
+from transit.models import Template, TemplateTrip, Client, FrequentTag, Trip, SiteSettings, Destination
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 def templateTripList(request, parent):
@@ -129,22 +129,15 @@ def templateTripCreateEditCommon(request, trip, is_new):
 
     site_settings = SiteSettings.load()
 
-    addresses = set()
-    if site_settings.autocomplete_history_days > 0:
-        for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=site_settings.autocomplete_history_days-1))):
-            if i.address:
-                addresses.add(str(i.address))
-            if i.destination:
-                addresses.add(str(i.destination))
-
     context = {
         'form': form,
         'trip': trip,
         'clients': Client.objects.all(),
         'clients_json': serializers.serialize('json', Client.objects.all()),
+        'destinations': Destination.objects.all(),
+        'destinations_json': serializers.serialize('json', Destination.objects.all()),
         'is_new': is_new,
         'frequent_tags': FrequentTag.objects.all()[:10],
-        'addresses': sorted(addresses),
     }
 
     return render(request, 'template/trip/edit.html', context)

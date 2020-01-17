@@ -37,4 +37,6 @@
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ triptype.id }}')"><td colspan="3"></td></tr>
     {% endfor %}
 </table>
+{% else %}
+<p>There are no trip types.</p>
 {% endif %}

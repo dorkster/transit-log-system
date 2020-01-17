@@ -145,6 +145,10 @@ class EditClientForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
+class EditDestinationForm(forms.Form):
+    address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))
+    phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))

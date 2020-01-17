@@ -437,6 +437,23 @@ class Client(models.Model):
             tags[i] = tags[i].strip()
         return tags
 
+class Destination(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    address = models.CharField(max_length=FieldSizes.MD)
+    phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+
+    class Meta:
+        ordering = ['address']
+
+    def __str__(self):
+        output = self.address
+        if self.phone:
+            output += ' (' + self.phone + ')'
+        return output
+
+    def get_class_name(self):
+        return 'Destination'
+
 class VehicleIssue(models.Model):
     PRIORITY_HIGH = 2
     PRIORITY_MEDIUM = 1

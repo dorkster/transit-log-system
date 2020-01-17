@@ -51,6 +51,11 @@ urlpatterns = [
     path('clients/create-from-trip/<uuid:trip_id>', views.clientCreateFromTrip, name='client-create-from-trip'),
     path('clients/create-from-template-trip/<uuid:trip_id>', views.clientCreateFromTemplateTrip, name='client-create-from-template-trip'),
 
+    path('destinations/', views.destinationList, name='destinations'),
+    path('destinations/create', views.destinationCreate, name='destination-create'),
+    path('destinations/<uuid:id>/edit', views.destinationEdit, name='destination-edit'),
+    path('destinations/<uuid:id>/delete', views.destinationDelete, name='destination-delete'),
+
     path('drivers/', views.driverList, name='drivers'),
     path('drivers/create', views.driverCreate, name='driver-create'),
     path('drivers/<uuid:id>/edit', views.driverEdit, name='driver-edit'),
@@ -101,6 +106,7 @@ urlpatterns = [
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
+    path('ajax/destination-list/', views.ajaxDestinationList, name='ajax-destination-list'),
     path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),
     path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),

@@ -1,0 +1,30 @@
+<h3>Destinations <a class="btn btn-success btn-sm" href="{% url 'destination-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+{% if destinations %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td>Name</td>
+        <td>Phone</td>
+    </thead>
+    {% for destination in destinations %}
+    <tr>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'destination-edit' destination.id %}" class="dropdown-item">Edit Destination</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'destination-delete' destination.id %}" class="dropdown-item text-danger">Delete Destination</a>
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ destination.address }}</td>
+        <td class="mytable-col-lg">{{ destination.phone }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>There are no destinations.</p>
+{% endif %}

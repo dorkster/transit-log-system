@@ -17,10 +17,16 @@
         {% endfor %}
     </datalist>
     <datalist id='addresses'>
+        {% if destinations|length_is:"0" %}
+        {% for address in addresses %}
+        <option value="{{ address }}">
+        {% endfor %}
+        {% else %}
         <option value="">
         {% for destination in destinations %}
         <option value="{{ destination.address }}">
         {% endfor %}
+        {% endif %}
     </datalist>
     <div class="container ml-0">
         <div class="row">

@@ -127,13 +127,24 @@ def templateTripCreateEditCommon(request, trip, is_new):
             }
             form = EditTemplateTripForm(initial=initial)
 
-    site_settings = SiteSettings.load()
+    addresses = set()
+    destinations = Destination.objects.all()
+
+    if len(destinations) == 0:
+        site_settings = SiteSettings.load()
+        if site_settings.autocomplete_history_days > 0:
+            for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=site_settings.autocomplete_history_days-1))):
+                if i.address:
+                    addresses.add(str(i.address))
+                if i.destination:
+                    addresses.add(str(i.destination))
 
     context = {
         'form': form,
         'trip': trip,
         'clients': Client.objects.all(),
         'clients_json': serializers.serialize('json', Client.objects.all()),
+        'addresses': sorted(addresses),
         'destinations': Destination.objects.all(),
         'destinations_json': serializers.serialize('json', Destination.objects.all()),
         'is_new': is_new,

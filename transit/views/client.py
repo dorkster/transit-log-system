@@ -23,13 +23,18 @@ def clientEdit(request, id):
     client = get_object_or_404(Client, id=id)
     return clientCreateEditCommon(request, client, is_new=False)
 
-def clientCreateEditCommon(request, client, is_new, is_dupe=False):
+def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None, src_template_trip=None):
     if request.method == 'POST':
         form = EditClientForm(request.POST)
 
         if 'cancel' in request.POST:
-            url_hash = '' if is_new else '#client_' + str(client.id)
-            return HttpResponseRedirect(reverse('clients') + url_hash)
+            if src_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
+            elif src_template_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_template_trip.date.year, 'month':src_template_trip.date.month, 'day':src_template_trip.date.day}) + '#trip_' + str(src_template_trip.id))
+            else:
+                url_hash = '' if is_new else '#client_' + str(client.id)
+                return HttpResponseRedirect(reverse('clients') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
@@ -54,7 +59,12 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False):
 
             unique_client.save()
 
-            return HttpResponseRedirect(reverse('clients') + '#client_' + str(unique_client.id))
+            if src_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
+            elif src_template_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_template_trip.date.year, 'month':src_template_trip.date.month, 'day':src_template_trip.date.day}) + '#trip_' + str(src_template_trip.id))
+            else:
+                return HttpResponseRedirect(reverse('clients') + '#client_' + str(unique_client.id))
     else:
         initial = {
             'name': client.name,
@@ -113,7 +123,7 @@ def clientCreateFromTrip(request, trip_id):
 
     existing_clients = Client.objects.filter(name=trip.name)
     if len(existing_clients) > 0:
-        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True)
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True, src_trip=trip)
 
     client = Client()
     client.name = trip.name
@@ -129,7 +139,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
 
     existing_clients = Client.objects.filter(name=trip.name)
     if len(existing_clients) > 0:
-        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True)
+        return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True, src_template_trip=trip)
 
     client = Client()
     client.name = trip.name

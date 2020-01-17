@@ -176,7 +176,7 @@ Show extra columns
                     {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
                     {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item">Set as no show</a>{% endif %}
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item">Create Client</a>
+                    <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item">Create/Edit Client</a>
                     <a href="{% url 'trip-create-return' 'edit' trip.id %}" class="dropdown-item">Create Return Trip</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger">Delete trip</a>

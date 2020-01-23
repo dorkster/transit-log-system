@@ -42,8 +42,9 @@ class formWidgetAttrs():
 
     mile = default.copy()
     mile['onchange'] = 'validateMiles(this, false)'
-    mile['inputmode'] = 'numeric'
-    mile['pattern'] = '[0-9]*\.[0-9]*'
+    # TODO Samsung keyboard has no decimal key!!!
+    # mile['inputmode'] = 'numeric'
+    # mile['pattern'] = '[0-9]*\.[0-9]*'
 
     mile_shift = mile.copy()
     mile_shift['onchange'] = 'validateMiles(this, true)'
@@ -60,8 +61,8 @@ class formWidgetAttrs():
 
     fuel = default.copy()
     fuel['onchange'] = 'validateFuel(this)'
-    fuel['inputmode'] = 'numeric'
-    fuel['pattern'] = '[0-9]*\.[0-9]*'
+    # fuel['inputmode'] = 'numeric'
+    # fuel['pattern'] = '[0-9]*\.[0-9]*'
 
     text_area = default.copy()
     text_area['rows'] = '6'
@@ -73,8 +74,8 @@ class formWidgetAttrs():
 
     money = default.copy()
     money['onchange'] = 'validateMoney(this)'
-    money['inputmode'] = 'numeric'
-    money['pattern'] = '[0-9]*\.[0-9]*'
+    # money['inputmode'] = 'numeric'
+    # money['pattern'] = '[0-9]*\.[0-9]*'
 
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))

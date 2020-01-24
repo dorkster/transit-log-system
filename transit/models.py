@@ -305,6 +305,7 @@ class Shift(models.Model):
     end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     fuel = models.CharField('Fuel (gallons)', max_length=FieldSizes.FUEL, blank=True)
+    note = models.TextField(max_length=FieldSizes.LG, blank=True)
 
     def __str__(self):
         return '[' + str(self.date) + '] - ' + str(self.driver) + ' / ' + str(self.vehicle)

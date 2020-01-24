@@ -27,6 +27,15 @@
                 <div class="p-1">
                     <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
                 </div>
+            </div>
+            <div>
+                <div class="list-group list-group-flush">
+                    {% if shift.note %}
+                    <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
+                        {{ shift.note }}
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="text-right p-1 card-footer w-100">
                     <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn {% if shift.check_pretrip %}btn-secondary disabled{% else %}btn-warning{% endif %}">Pre-Trip</a>
                     <a href="{% url 'shift-start' shift.id %}" class="btn {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>

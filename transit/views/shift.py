@@ -47,6 +47,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             shift.end_miles = form.cleaned_data['end_miles']
             shift.end_time = form.cleaned_data['end_time']
             shift.fuel = form.cleaned_data['fuel']
+            shift.note = form.cleaned_data['notes']
             shift.save()
 
             new_day_trips = Trip.objects.filter(date=shift.date)
@@ -74,7 +75,8 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
             'start_time': shift.start_time,
             'end_miles': shift.end_miles,
             'end_time': shift.end_time,
-            'fuel': shift.fuel
+            'fuel': shift.fuel,
+            'notes': shift.note,
         }
         form = EditShiftForm(initial=initial)
 

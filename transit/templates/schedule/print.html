@@ -71,6 +71,7 @@ nav {
             <td>End Miles</td>
             <td>End Time</td>
             <td>Fuel (gal)</td>
+            <td>Notes</td>
         </thead>
         {% for shift in shifts %}
         <tr style="background: #{{ shift.get_driver_color }};">
@@ -105,6 +106,7 @@ nav {
                 {% endif %}
             </td>
             <td class="mytable-col-sm">{{ shift.fuel }}</td>
+            <td class="mytable-col-md">{{ shift.note }}</td>
         </tr>
         {% endfor %}
     </table>

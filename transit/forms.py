@@ -58,6 +58,7 @@ class formWidgetAttrs():
 
     big_mile_shift = big_mile.copy()
     big_mile_shift['onchange'] = mile_shift['onchange']
+    big_mile_shift['oninput'] = 'showFullMiles(this)'
 
     fuel = default.copy()
     fuel['onchange'] = 'validateFuel(this)'

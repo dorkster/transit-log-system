@@ -109,6 +109,22 @@ def shiftStart(request, id):
     shift = get_object_or_404(Shift, id=id)
     date = shift.date
 
+    previous_shift = None
+    previous_shifts = Shift.objects.filter(vehicle=shift.vehicle).exclude(start_miles='').exclude(end_miles='')
+    for i in previous_shifts:
+        print(str(i) + ' - ' + i.end_miles)
+        if previous_shift == None:
+            previous_shift = i
+            continue
+
+        if float(i.end_miles) >= float(previous_shift.end_miles):
+            previous_shift = i
+
+    if previous_shift == None:
+        previous_shift_end_miles = ''
+    else:
+        previous_shift_end_miles = previous_shift.end_miles
+
     if request.method == 'POST':
         form = shiftStartEndForm(request.POST)
 
@@ -116,7 +132,7 @@ def shiftStart(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
 
         if form.is_valid():
-            shift.start_miles = form.cleaned_data['miles']
+            shift.start_miles = previous_shift_end_miles[0:len(previous_shift_end_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
             shift.start_time = form.cleaned_data['time']
             shift.save()
 
@@ -135,6 +151,7 @@ def shiftStart(request, id):
     context = {
         'form': form,
         'shift': shift,
+        'previous_shift_end_miles': previous_shift_end_miles,
     }
 
     return render(request, 'shift/start.html', context)
@@ -150,7 +167,7 @@ def shiftEnd(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
 
         if form.is_valid():
-            shift.end_miles = form.cleaned_data['miles']
+            shift.end_miles = shift.start_miles[0:len(shift.start_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
             shift.end_time = form.cleaned_data['time']
             shift.save()
 

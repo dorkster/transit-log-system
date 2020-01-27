@@ -11,6 +11,8 @@
                 <fieldset class="form-group">
                     <legend><span class="small">{{ shift.date }} | {{ shift.driver }} ({{ shift.vehicle }})</span></legend>
                     <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
+                    <div id="full_miles_desc"></div>
+                    <div id="full_miles" class="full-miles"></div>
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
                         <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_time')"><span class="oi oi-clock"></span></a>
                         <br/>{{ form.time }}</div>
@@ -29,6 +31,35 @@
 
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript">
+    function showFullMiles(input) {
+        var shift_start_miles = "{{ previous_shift_end_miles }}";
+
+        $("#full_miles_desc").html("");
+
+        var new_miles = validateMilesString(input.value, false);
+        var prefix_miles = "";
+        if (new_miles != "") {
+            prefix_miles = shift_start_miles.substring(0, shift_start_miles.length - new_miles.length);
+            $("#full_miles_desc").append('<span class="text-info">Match to the odometer:</span>');
+        }
+        var combined_miles = prefix_miles + new_miles;
+
+        $("#full_miles").html("");
+        $("#full_miles").append('<span class="text-muted">' + prefix_miles + '</span><strong>' + new_miles + '</strong>');
+
+        if (shift_start_miles != "" && combined_miles != "") {
+            if (parseFloat(combined_miles) < parseFloat(shift_start_miles)) {
+                $("#full_miles").append('<span class="text-danger"><strong><span class="ml-3 oi oi-warning"></span></strong></span>');
+            }
+        }
+    }
+
+    var mile_input = document.getElementById("id_miles");
+    mile_input.addEventListener("change", function() { showFullMiles(mile_input); });
+
+    showFullMiles(mile_input);
+</script>
 {% endblock %}
 {% endblock %}
 

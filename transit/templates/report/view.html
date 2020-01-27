@@ -6,6 +6,9 @@
         <div class="col p-1">
             <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
         </div>
+        <div class="col-auto p-1">
+            <a class="btn btn-primary" href="{% url 'report-xlsx' date_start.year date_start.month %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+        </div>
         <div class="col-sm-auto p-1">
             <div class="btn-group" role="group">
                 <a title="Previous month" class="btn btn-secondary" href="{{ month_prev }}">

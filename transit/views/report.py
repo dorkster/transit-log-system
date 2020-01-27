@@ -1,11 +1,17 @@
 import datetime
+import tempfile
 
 from django.http import HttpResponseRedirect
+from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
 from transit.forms import DatePickerForm
+
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.workbook import Workbook
+from openpyxl.utils import get_column_letter
 
 T_STR = 0
 T_FLOAT = 1
@@ -24,6 +30,8 @@ class Report():
             else:
                 val_str = str(self.value)
                 return '$' + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
+        def to_float(self):
+            return float(self.value) / 100
 
     class ReportShift():
         def __init__(self):
@@ -153,7 +161,7 @@ class Report():
                 if i.name == item:
                     return True
 
-    def __init__(self, date_start, date_end):
+    def __init__(self):
         self.report_all = []
         self.vehicle_reports = []
         self.driver_reports = []
@@ -163,6 +171,7 @@ class Report():
         self.money_trips_summary = Report.ReportSummary()
         self.report_errors = Report.ReportErrors()
 
+    def load(self, date_start, date_end):
         for day in range(date_start.day, date_end.day+1):
             # TODO what if end month/year is different than start?
             day_date = datetime.date(date_start.year, date_start.month, day)
@@ -392,7 +401,8 @@ def report(request, year, month):
     month_prev.replace(day=1)
     month_next = date_end + datetime.timedelta(days=1)
 
-    report = Report(date_start, date_end)
+    report = Report()
+    report.load(date_start, date_end)
 
     context = {
         'date_start': date_start,
@@ -421,3 +431,334 @@ def reportLastMonth(request):
     date = date + datetime.timedelta(days=-1) # last day of the previous month
     return report(request, date.year, date.month)
 
+def reportXLSX(request, year, month):
+    date_start = datetime.date(year, month, 1)
+    date_end = date_start
+    if date_end.month == 12:
+        date_end = date_end.replace(day=31)
+    else:
+        date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+
+    report = Report()
+    report.load(date_start, date_end)
+
+    temp_file = tempfile.NamedTemporaryFile()
+
+    wb = Workbook()
+
+    style_font_normal = Font(name='Arial', size=10)
+    style_border_normal_side = Side(border_style='thin', color='FF000000')
+    style_border_normal = Border(left=style_border_normal_side, right=style_border_normal_side, top=style_border_normal_side, bottom=style_border_normal_side)
+    style_colwidth_normal = 13
+
+    style_font_header = Font(name='Arial', size=10, bold=True)
+    style_alignment_header = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    style_fill_header = PatternFill(fill_type='solid', fgColor='DFE0E1')
+    style_rowheight_header = 25
+
+    style_font_total = Font(name='Arial', size=10, bold=True, color='FFFFFFFF')
+    style_fill_total = PatternFill(fill_type='solid', fgColor='27A343')
+
+    #####
+    #### All Vehicle Totals
+    #####
+    ws_vehicle_total = wb.active
+    ws_vehicle_total.title = 'Totals for All Vehicles'
+
+    row_header = 1
+    row_total = 2
+
+    ws_vehicle_total.cell(row_header, 2, 'Service Miles')
+    ws_vehicle_total.cell(row_header, 3, 'Service Hours')
+    ws_vehicle_total.cell(row_header, 4, 'Deadhead Miles')
+    ws_vehicle_total.cell(row_header, 5, 'Deadhead Hours')
+    ws_vehicle_total.cell(row_header, 6, 'Passenger Miles (PMT)')
+    ws_vehicle_total.cell(row_header, 7, 'Fuel')
+
+    ws_vehicle_total.cell(row_total, 1, 'TOTAL')
+    ws_vehicle_total.cell(row_total, 2, report.all_vehicles.service_miles)
+    ws_vehicle_total.cell(row_total, 3, report.all_vehicles.service_hours)
+    ws_vehicle_total.cell(row_total, 4, report.all_vehicles.deadhead_miles)
+    ws_vehicle_total.cell(row_total, 5, report.all_vehicles.deadhead_hours)
+    ws_vehicle_total.cell(row_total, 6, report.all_vehicles.pmt)
+    ws_vehicle_total.cell(row_total, 7, report.all_vehicles.fuel)
+
+    triptype_col=8
+    for i in TripType.objects.all():
+        ws_vehicle_total.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
+        ws_vehicle_total.cell(row_total, triptype_col, report.all_vehicles.trip_types[i])
+        triptype_col += 1
+
+    ws_vehicle_total.cell(row_header, triptype_col, 'Cash Collected')
+    ws_vehicle_total.cell(row_header, triptype_col+1, 'Check Collected')
+    ws_vehicle_total.cell(row_total, triptype_col, report.all_vehicles.collected_cash.to_float())
+    ws_vehicle_total.cell(row_total, triptype_col+1, report.all_vehicles.collected_check.to_float())
+
+    # number formats
+    ws_vehicle_total.cell(row_total, 2).number_format = '0.0'
+    ws_vehicle_total.cell(row_total, 3).number_format = '0.00'
+    ws_vehicle_total.cell(row_total, 4).number_format = '0.0'
+    ws_vehicle_total.cell(row_total, 5).number_format = '0.00'
+    ws_vehicle_total.cell(row_total, 6).number_format = '0.0'
+    ws_vehicle_total.cell(row_total, 7).number_format = '0.0'
+    ws_vehicle_total.cell(row_total, triptype_col).number_format = '$0.00'
+    ws_vehicle_total.cell(row_total, triptype_col+1).number_format = '$0.00'
+
+    # apply styles
+    ws_vehicle_total.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, triptype_col+2):
+        ws_vehicle_total.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_total+1):
+            ws_vehicle_total.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_vehicle_total.cell(j, i).font = style_font_header
+                ws_vehicle_total.cell(j, i).alignment = style_alignment_header
+                ws_vehicle_total.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_vehicle_total.cell(j, i).font = style_font_total
+                ws_vehicle_total.cell(j, i).fill = style_fill_total
+            else:
+                ws_vehicle_total.cell(j, i).font = style_font_normal
+
+    #####
+    #### Per-Vehicle Reports
+    #####
+    for vr in report.vehicle_reports:
+        ws_vehicle = wb.create_sheet('Vehicle - ' + str(vr.vehicle))
+        row_header = 1
+        row_total = 1 + len(vr.days) + 1
+        ws_vehicle.cell(row_header, 2, 'Service Miles')
+        ws_vehicle.cell(row_header, 3, 'Service Hours')
+        ws_vehicle.cell(row_header, 4, 'Deadhead Miles')
+        ws_vehicle.cell(row_header, 5, 'Deadhead Hours')
+        ws_vehicle.cell(row_header, 6, 'Passenger Miles (PMT)')
+        ws_vehicle.cell(row_header, 7, 'Fuel')
+
+        for day in range(0, len(vr.days)):
+            day_row = row_header + day + 1
+            ws_vehicle.cell(day_row, 1, vr.days[day]['date'])
+            ws_vehicle.cell(day_row, 2, vr.days[day]['data'].service_miles)
+            ws_vehicle.cell(day_row, 3, vr.days[day]['data'].service_hours)
+            ws_vehicle.cell(day_row, 4, vr.days[day]['data'].deadhead_miles)
+            ws_vehicle.cell(day_row, 5, vr.days[day]['data'].deadhead_hours)
+            ws_vehicle.cell(day_row, 6, vr.days[day]['data'].pmt)
+            ws_vehicle.cell(day_row, 7, vr.days[day]['data'].fuel)
+
+            triptype_col=8
+            for i in TripType.objects.all():
+                ws_vehicle.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
+                ws_vehicle.cell(day_row, triptype_col, vr.days[day]['data'].trip_types[i])
+                triptype_col += 1
+
+            ws_vehicle.cell(row_header, triptype_col, 'Cash Collected')
+            ws_vehicle.cell(row_header, triptype_col+1, 'Check Collected')
+            ws_vehicle.cell(day_row, triptype_col, vr.days[day]['data'].collected_cash.to_float())
+            ws_vehicle.cell(day_row, triptype_col+1, vr.days[day]['data'].collected_check.to_float())
+
+        ws_vehicle.cell(row_total, 1, 'TOTAL')
+        ws_vehicle.cell(row_total, 2, vr.totals.service_miles)
+        ws_vehicle.cell(row_total, 3, vr.totals.service_hours)
+        ws_vehicle.cell(row_total, 4, vr.totals.deadhead_miles)
+        ws_vehicle.cell(row_total, 5, vr.totals.deadhead_hours)
+        ws_vehicle.cell(row_total, 6, vr.totals.pmt)
+        ws_vehicle.cell(row_total, 7, vr.totals.fuel)
+
+        triptype_col=8
+        for i in TripType.objects.all():
+            ws_vehicle.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
+            ws_vehicle.cell(row_total, triptype_col, vr.totals.trip_types[i])
+            triptype_col += 1
+
+        ws_vehicle.cell(row_header, triptype_col, 'Cash Collected')
+        ws_vehicle.cell(row_header, triptype_col+1, 'Check Collected')
+        ws_vehicle.cell(row_total, triptype_col, vr.totals.collected_cash.to_float())
+        ws_vehicle.cell(row_total, triptype_col+1, vr.totals.collected_check.to_float())
+
+        # number formats
+        for i in range(row_header + 1, row_total + 1):
+            if i < row_total:
+                ws_vehicle.cell(i, 1).number_format = 'MMM DD, YYYY'
+            ws_vehicle.cell(i, 2).number_format = '0.0'
+            ws_vehicle.cell(i, 3).number_format = '0.00'
+            ws_vehicle.cell(i, 4).number_format = '0.0'
+            ws_vehicle.cell(i, 5).number_format = '0.00'
+            ws_vehicle.cell(i, 6).number_format = '0.0'
+            ws_vehicle.cell(i, 7).number_format = '0.0'
+            ws_vehicle.cell(i, triptype_col).number_format = '$0.00'
+            ws_vehicle.cell(i, triptype_col+1).number_format = '$0.00'
+
+        # apply styles
+        ws_vehicle.row_dimensions[row_header].height = style_rowheight_header
+        for i in range(1, triptype_col+2):
+            ws_vehicle.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+            for j in range(row_header, row_total+1):
+                ws_vehicle.cell(j, i).border = style_border_normal
+                if j == row_header:
+                    ws_vehicle.cell(j, i).font = style_font_header
+                    ws_vehicle.cell(j, i).alignment = style_alignment_header
+                    ws_vehicle.cell(j, i).fill = style_fill_header
+                elif j == row_total:
+                    ws_vehicle.cell(j, i).font = style_font_total
+                    ws_vehicle.cell(j, i).fill = style_fill_total
+                else:
+                    ws_vehicle.cell(j, i).font = style_font_normal
+
+    #####
+    #### Unique/Ambulatory rider summary
+    #####
+    ws_riders = wb.create_sheet('Rider Summary')
+    row_header = 1
+    row_total = 2
+    ws_riders.cell(row_header, 2, 'Elderly Ambulatory')
+    ws_riders.cell(row_header, 3, 'Elderly Non-Ambulatory')
+    ws_riders.cell(row_header, 4, 'Non-Elderly Ambulatory')
+    ws_riders.cell(row_header, 5, 'Non-Elderly Non-Ambulatory')
+    ws_riders.cell(row_header, 6, 'Unknown')
+
+    ws_riders.cell(row_total, 1, 'TOTAL')
+    ws_riders.cell(row_total, 2, report.unique_riders.elderly_ambulatory)
+    ws_riders.cell(row_total, 3, report.unique_riders.elderly_nonambulatory)
+    ws_riders.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory)
+    ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory)
+    ws_riders.cell(row_total, 6, report.unique_riders.unknown)
+
+    row_header_riders = 4
+    for i in range(row_header_riders, row_header_riders + len(report.unique_riders.names) + 1):
+        ws_riders.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
+        if i > row_header_riders:
+            ws_riders.cell(i, 3).number_format = 'BOOLEAN'
+            ws_riders.cell(i, 4).number_format = 'BOOLEAN'
+
+    ws_riders.cell(row_header_riders, 1, 'Name')
+    ws_riders.cell(row_header_riders, 3, 'Elderly')
+    ws_riders.cell(row_header_riders, 4, 'Ambulatory')
+
+    for i in range(0, len(report.unique_riders.names)):
+        ws_riders.cell(row_header_riders + i + 1, 1, report.unique_riders.names[i].name)
+        ws_riders.cell(row_header_riders + i + 1, 3, report.unique_riders.names[i].elderly)
+        ws_riders.cell(row_header_riders + i + 1, 4, report.unique_riders.names[i].ambulatory)
+
+    # apply styles
+    ws_riders.row_dimensions[row_header].height = style_rowheight_header
+    ws_riders.row_dimensions[row_header_riders].height = style_rowheight_header
+    for i in range(1, 7):
+        ws_riders.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_total+1):
+            ws_riders.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_riders.cell(j, i).font = style_font_header
+                ws_riders.cell(j, i).alignment = style_alignment_header
+                ws_riders.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_riders.cell(j, i).font = style_font_total
+                ws_riders.cell(j, i).fill = style_fill_total
+            else:
+                ws_riders.cell(j, i).font = style_font_normal
+    for i in range(1, 5):
+        for j in range(row_header_riders, row_header_riders + len(report.unique_riders.names) + 1):
+            ws_riders.cell(j, i).border = style_border_normal
+            if j == row_header_riders:
+                ws_riders.cell(j, i).font = style_font_header
+                ws_riders.cell(j, i).alignment = style_alignment_header
+                ws_riders.cell(j, i).fill = style_fill_header
+            else:
+                ws_riders.cell(j, i).font = style_font_normal
+
+    #####
+    #### Money Collected
+    #####
+    ws_money = wb.create_sheet('Money Collected')
+    row_header = 1
+    row_total = len(report.money_trips) + 2
+
+    ws_money.cell(row_header, 1, 'Date')
+    ws_money.cell(row_header, 2, 'Name')
+    ws_money.cell(row_header, 3, 'Cash')
+    ws_money.cell(row_header, 4, 'Check')
+
+    ws_money.cell(row_total, 1, 'TOTAL')
+    ws_money.cell(row_total, 3, report.money_trips_summary.collected_cash.to_float())
+    ws_money.cell(row_total, 4, report.money_trips_summary.collected_check.to_float())
+
+    for i in range(0, len(report.money_trips)):
+        ws_money.cell(i + row_header + 1, 1, report.money_trips[i].trip.date)
+        ws_money.cell(i + row_header + 1, 2, report.money_trips[i].trip.name)
+        ws_money.cell(i + row_header + 1, 3, report.money_trips[i].collected_cash.to_float())
+        ws_money.cell(i + row_header + 1, 4, report.money_trips[i].collected_check.to_float())
+
+    # number formats
+    for i in range(row_header + 1, row_total + 1):
+        if i < row_total:
+            ws_money.cell(i, 1).number_format = 'MMM DD, YYYY'
+        ws_money.cell(i, 3).number_format = '$0.00'
+        ws_money.cell(i, 4).number_format = '$0.00'
+
+    # apply styles
+    ws_money.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 5):
+        if i == 2:
+            ws_money.column_dimensions[get_column_letter(i)].width = style_colwidth_normal * 2
+        else:
+            ws_money.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_total+1):
+            ws_money.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_money.cell(j, i).font = style_font_header
+                ws_money.cell(j, i).alignment = style_alignment_header
+                ws_money.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_money.cell(j, i).font = style_font_total
+                ws_money.cell(j, i).fill = style_fill_total
+            else:
+                ws_money.cell(j, i).font = style_font_normal
+
+    #####
+    #### Per-Driver Summary
+    #####
+    ws_drivers = wb.create_sheet('Per-Driver Summary')
+    row_header = 1
+
+    ws_drivers.cell(row_header, 1, 'Driver')
+    ws_drivers.cell(row_header, 2, 'Service Miles')
+    ws_drivers.cell(row_header, 3, 'Service Hours')
+    ws_drivers.cell(row_header, 4, 'Deadhead Miles')
+    ws_drivers.cell(row_header, 5, 'Deadhead Hours')
+    ws_drivers.cell(row_header, 6, 'Total Miles')
+    ws_drivers.cell(row_header, 7, 'Total Hours')
+
+    for i in range(0, len(report.driver_reports)):
+        ws_drivers.cell(row_header + i + 1, 1, str(report.driver_reports[i].driver))
+        ws_drivers.cell(row_header + i + 1, 2, report.driver_reports[i].totals.service_miles)
+        ws_drivers.cell(row_header + i + 1, 3, report.driver_reports[i].totals.service_hours)
+        ws_drivers.cell(row_header + i + 1, 4, report.driver_reports[i].totals.deadhead_miles)
+        ws_drivers.cell(row_header + i + 1, 5, report.driver_reports[i].totals.deadhead_hours)
+        ws_drivers.cell(row_header + i + 1, 6, report.driver_reports[i].totals.total_miles)
+        ws_drivers.cell(row_header + i + 1, 7, report.driver_reports[i].totals.total_hours)
+
+    # number formats
+    for i in range(row_header + 1, row_header + len(report.driver_reports) + 1):
+        ws_drivers.cell(i, 2).number_format = '0.0'
+        ws_drivers.cell(i, 3).number_format = '0.00'
+        ws_drivers.cell(i, 4).number_format = '0.0'
+        ws_drivers.cell(i, 5).number_format = '0.00'
+        ws_drivers.cell(i, 6).number_format = '0.0'
+        ws_drivers.cell(i, 7).number_format = '0.00'
+
+    # apply styles
+    ws_drivers.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 8):
+        ws_drivers.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_header + len(report.driver_reports) + 1):
+            ws_drivers.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_drivers.cell(j, i).font = style_font_header
+                ws_drivers.cell(j, i).alignment = style_alignment_header
+                ws_drivers.cell(j, i).fill = style_fill_header
+            else:
+                ws_drivers.cell(j, i).font = style_font_normal
+                style_fill_driver = PatternFill(fill_type='solid', fgColor=report.driver_reports[j - row_header - 1].driver.get_color())
+                ws_drivers.cell(j, i).fill = style_fill_driver
+
+    wb.save(filename=temp_file.name)
+
+    return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Report_' + date_start.strftime('%Y-%m') + '.xlsx', as_attachment=True)

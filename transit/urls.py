@@ -89,6 +89,7 @@ urlpatterns = [
     path('report/<int:year>/<int:month>', views.report, name='report'),
     path('report/this-month', views.reportThisMonth, name='report-this-month'),
     path('report/last-month', views.reportLastMonth, name='report-last-month'),
+    path('report/xlsx/<int:year>/<int:month>', views.reportXLSX, name='report-xlsx'),
 
     path('vehicle-status/', views.vehicleStatus, name='vehicle-status'),
     path('vehicle-status/issues/create', views.vehicleIssueCreate, name='vehicle-issue-create'),

@@ -16,38 +16,38 @@
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
                         <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_time')"><span class="oi oi-clock"></span></a>
                         <br/>{{ form.time }}</div>
-                    {{ form.adjacent_trips }}
+                    {{ form.additional_pickups }}
                 </fieldset>
             </div>
         </div>
-        {% if adjacent_trips %}
+        {% if additional_pickups %}
         <hr/>
         <h3>Select additional drop-offs at this stop:</h3>
         <div class="list-group">
-            {% for adjacent_trip in adjacent_trips %}
-            <a href="#_" class="list-group-item list-group-item-action" id="adjacent_trip_{{ adjacent_trip.id }}" onclick="toggleAdjacentTrip('adjacent_trip_{{ adjacent_trip.id }}')" data-id="{{ adjacent_trip.id }}">{{ adjacent_trip }}</a>
+            {% for pickup in additional_pickups %}
+            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.id }}')" data-id="{{ pickup.id }}">{{ pickup }}</a>
             {% endfor %}
         </div>
         <script type="text/javascript">
-            function toggleAdjacentTrip(item_id) {
+            function toggleAdditionalPickup(item_id) {
                 var list_item = document.getElementById(item_id);
                 if (list_item) {
-                    var adjacent_trips = {};
-                    var json_field = document.getElementById("id_adjacent_trips");
+                    var additional_pickups = {};
+                    var json_field = document.getElementById("id_additional_pickups");
                     if (json_field && json_field.value)
-                        adjacent_trips = JSON.parse(json_field.value);
+                        additional_pickups = JSON.parse(json_field.value);
 
                     if (list_item.classList.contains("active")) {
                         list_item.classList.remove("active");
-                        adjacent_trips[list_item.dataset.id] = false;
+                        additional_pickups[list_item.dataset.id] = false;
                     }
                     else {
                         list_item.classList.add("active");
-                        adjacent_trips[list_item.dataset.id] = true;
+                        additional_pickups[list_item.dataset.id] = true;
                     }
 
                     if (json_field)
-                        json_field.value = JSON.stringify(adjacent_trips);
+                        json_field.value = JSON.stringify(additional_pickups);
                 }
             }
         </script>

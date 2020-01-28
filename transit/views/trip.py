@@ -257,10 +257,10 @@ def tripStart(request, id):
             trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
             trip.save()
 
-            if form.cleaned_data['adjacent_trips'] != '':
-                adjacent_trips = json.loads(form.cleaned_data['adjacent_trips'])
-                for key in adjacent_trips:
-                    if adjacent_trips[key] is True:
+            if form.cleaned_data['additional_pickups'] != '':
+                additional_pickups = json.loads(form.cleaned_data['additional_pickups'])
+                for key in additional_pickups:
+                    if additional_pickups[key] is True:
                         a_trip = Trip.objects.get(id=uuid.UUID(key))
                         a_trip.start_miles = form.cleaned_data['miles']
                         a_trip.start_time = form.cleaned_data['time']
@@ -294,25 +294,18 @@ def tripStart(request, id):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
-    adjacent_trips = []
-    found_this_trip = False
+    additional_pickups = []
     for i in all_trips:
         if i.id == trip.id:
-            found_this_trip = True
             continue
-
         if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
-            adjacent_trips.append(i)
-        elif not found_this_trip:
-            adjacent_trips.clear()
-        elif found_this_trip:
-            break
+            additional_pickups.append(i)
 
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
-        'adjacent_trips': adjacent_trips,
+        'additional_pickups': additional_pickups,
     }
 
     return render(request, 'trip/start.html', context)
@@ -332,10 +325,10 @@ def tripEnd(request, id):
             trip.end_time = form.cleaned_data['time']
             trip.save()
 
-            if form.cleaned_data['adjacent_trips'] != '':
-                adjacent_trips = json.loads(form.cleaned_data['adjacent_trips'])
-                for key in adjacent_trips:
-                    if adjacent_trips[key] is True:
+            if form.cleaned_data['additional_pickups'] != '':
+                additional_pickups = json.loads(form.cleaned_data['additional_pickups'])
+                for key in additional_pickups:
+                    if additional_pickups[key] is True:
                         a_trip = Trip.objects.get(id=uuid.UUID(key))
                         a_trip.end_miles = form.cleaned_data['miles']
                         a_trip.end_time = form.cleaned_data['time']
@@ -363,25 +356,18 @@ def tripEnd(request, id):
             start_miles[str(shift.vehicle)] = shift.start_miles
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
-    adjacent_trips = []
-    found_this_trip = False
+    additional_pickups = []
     for i in all_trips:
         if i.id == trip.id:
-            found_this_trip = True
             continue
-
         if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
-            adjacent_trips.append(i)
-        elif not found_this_trip:
-            adjacent_trips.clear()
-        elif found_this_trip:
-            break
+            additional_pickups.append(i)
 
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
-        'adjacent_trips': adjacent_trips,
+        'additional_pickups': additional_pickups,
     }
 
     return render(request, 'trip/end.html', context)

@@ -132,12 +132,12 @@ class tripStartForm(forms.Form):
     vehicle = forms.ModelChoiceField(Vehicle.objects.all(), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
-    adjacent_trips = forms.CharField(widget=forms.HiddenInput(), required=False)
+    additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class tripEndForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    adjacent_trips = forms.CharField(widget=forms.HiddenInput(), required=False)
+    additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class EditClientForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.name))

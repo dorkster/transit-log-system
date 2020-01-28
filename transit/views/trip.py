@@ -370,7 +370,7 @@ def tripEnd(request, id):
             found_this_trip = True
             continue
 
-        if i.address == trip.address and (i.end_miles == '' and i.end_time == ''):
+        if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
             adjacent_trips.append(i)
         elif not found_this_trip:
             adjacent_trips.clear()

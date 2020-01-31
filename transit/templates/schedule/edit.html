@@ -59,6 +59,12 @@
     // Fetch the initial data and repeat every 10 seconds
     ajax_loader.run();
     ajax_loader.start(10000);
+
+    function loadTemplate(template_name, template_id) {
+        if (confirm("Are you sure you want to add the '" + template_name + "' template to the schedule?")) {
+            ajax_loader.run('', 'load_template', template_id);
+        }
+    }
 </script>
 {% endblock %}
 {% endblock %}

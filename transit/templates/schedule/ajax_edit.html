@@ -304,8 +304,8 @@ Show extra columns
                 {% endif %}
             {% endif %}
             {% if trip.tags %}
-                {% for tag in trip.get_tag_list %}
-                <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                {% for tag in trip.get_styled_tag_list %}
+                <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
                 {% endfor %}
             {% endif %}
         </td>
@@ -424,8 +424,8 @@ Show extra columns
                         {% endif %}
                         {% if trip.tags %}
                         <div class="list-group-item p-1">
-                        {% for tag in trip.get_tag_list %}
-                        <span class="badge badge-info"><span class="oi oi-tag mr-1"></span>{{tag}}</span>
+                        {% for tag in trip.get_styled_tag_list %}
+                        <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
                         {% endfor %}
                         </div>
                         {% endif %}

@@ -79,7 +79,7 @@
                         {% if frequent_tags %}
                         <br/><span class="text-muted">Frequently used: </span>
                         {% for tag in frequent_tags %}
-                        <span><a class="badge badge-info" href="#_" onclick="addFrequentTag('{{tag.tag}}')"><span class="oi oi-tag mr-1"></span>{{tag.tag}}</a> </span>
+                        <span><a class="badge {{ tag.getStyle }}" href="#_" onclick="addFrequentTag('{{tag.tag}}')"><span class="oi oi-tag mr-1"></span>{{tag.tag}}</a> </span>
                         <script type="text/javascript">
                             function addFrequentTag(tag) {
                                 if ($('#id_tags').val() == "") {

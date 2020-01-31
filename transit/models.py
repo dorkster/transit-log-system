@@ -223,6 +223,18 @@ class Trip(models.Model):
             tags[i] = tags[i].strip()
         return tags
 
+    def get_styled_tag_list(self):
+        tag_list = []
+        tags = self.tags.split(',')
+        for i in range(0, len(tags)):
+            tag_str = tags[i].strip()
+            # TODO don't hard-code this
+            if tag_str == 'Wheelchair':
+                tag_list.append((tag_str, 'badge-warning'))
+            else:
+                tag_list.append((tag_str, 'badge-info'))
+        return tag_list
+
     def get_collected_cash_str(self):
         if self.collected_cash == 0:
             return '0.00'
@@ -438,6 +450,18 @@ class Client(models.Model):
             tags[i] = tags[i].strip()
         return tags
 
+    def get_styled_tag_list(self):
+        tag_list = []
+        tags = self.tags.split(',')
+        for i in range(0, len(tags)):
+            tag_str = tags[i].strip()
+            # TODO don't hard-code this
+            if tag_str == 'Wheelchair':
+                tag_list.append((tag_str, 'badge-warning'))
+            else:
+                tag_list.append((tag_str, 'badge-info'))
+        return tag_list
+
 class Destination(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     address = models.CharField(max_length=FieldSizes.MD)
@@ -549,6 +573,18 @@ class TemplateTrip(models.Model):
             tags[i] = tags[i].strip()
         return tags
 
+    def get_styled_tag_list(self):
+        tag_list = []
+        tags = self.tags.split(',')
+        for i in range(0, len(tags)):
+            tag_str = tags[i].strip()
+            # TODO don't hard-code this
+            if tag_str == 'Wheelchair':
+                tag_list.append((tag_str, 'badge-warning'))
+            else:
+                tag_list.append((tag_str, 'badge-info'))
+        return tag_list
+
     def is_medical(self):
         if self.trip_type is None:
             return False
@@ -597,6 +633,13 @@ class FrequentTag(models.Model):
                     f_tag.save()
             except:
                 pass
+
+    def getStyle(self):
+        # TODO don't hard-code this
+        if self.tag == 'Wheelchair':
+            return 'badge-warning'
+        else:
+            return 'badge-info'
 
 class PreTrip(models.Model):
     CHECKLIST = {

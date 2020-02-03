@@ -27,7 +27,6 @@ def schedule(request, mode, year, month, day):
 
     context = {
         'date': day_date,
-        'date_str': day_date.strftime('%A, %B %d, %Y'),
         'trips': query_trips,
         'shifts': query_shifts,
         'date_picker': date_picker,
@@ -53,7 +52,6 @@ def schedulePrint(request, year, month, day):
 
     context = {
         'date': day_date,
-        'date_str': day_date.strftime('%A, %B %d, %Y'),
         'trips': query_trips,
         'shifts': query_shifts,
         'message': message,
@@ -98,7 +96,6 @@ def scheduleMessage(request, year, month, day):
         form = EditScheduleMessageForm(initial=initial)
     context = {
         'date': date,
-        'date_str': date.strftime('%A, %B %d, %Y'),
         'form': form,
     }
     return render(request, 'schedule/message_edit.html', context=context)

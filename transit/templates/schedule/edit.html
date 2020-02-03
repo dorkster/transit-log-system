@@ -4,7 +4,7 @@
 <div class="container-fluid mt-4 mb-3">
     <div class="row justify-content-between">
         <div class="col-md p-1">
-            <h5><strong>{{ date_str }}</strong></h5>
+            <h3 class="alert alert-info text-dark p-1">{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h3>
         </div>
         <div class="col-auto p-1">
             <a href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank" class="btn btn-info"><span class="oi oi-print mr-2"></span>Print</a>

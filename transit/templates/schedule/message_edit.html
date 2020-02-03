@@ -3,7 +3,7 @@
 {% block auth_content %}
 {% load static %}
 <h2>
-    Message for {{ date }}
+    Message for: {{ date|date:"l"}}, {{ date|date:"F d" }}, {{ date|date:"Y" }}
 </h2>
 <form class="mb-4" action="" method="post">
     {% csrf_token %}

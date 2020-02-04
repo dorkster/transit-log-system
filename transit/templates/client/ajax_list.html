@@ -15,7 +15,7 @@
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {% if filter_elderly == 1 %}Elderly{% elif filter_elderly == 2 %}Non-Elderly{% else %}---------{% endif %}
             </button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu shadow">
                 <a class="dropdown-item {% if filter_elderly == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '0')">---------</a>
                 <a class="dropdown-item {% if filter_elderly == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '1')">Elderly</a>
                 <a class="dropdown-item {% if filter_elderly == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_elderly', '2')">Non-Elderly</a>
@@ -25,7 +25,7 @@
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {% if filter_ambulatory == 1 %}Ambulatory{% elif filter_ambulatory == 2 %}Non-Ambulatory{% else %}---------{% endif %}
             </button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu shadow">
                 <a class="dropdown-item {% if filter_ambulatory == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '0')">---------</a>
                 <a class="dropdown-item {% if filter_ambulatory == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '1')">Ambulatory</a>
                 <a class="dropdown-item {% if filter_ambulatory == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_ambulatory', '2')">Non-Ambulatory</a>
@@ -147,7 +147,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a href="{% url 'client-edit' client.id %}" class="dropdown-item">Edit client</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'client-delete' client.id %}" class="dropdown-item text-danger">Delete client</a>
@@ -186,7 +186,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-ellipses"></span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-right p-2">
+                <div class="dropdown-menu shadow dropdown-menu-right p-2">
                     <div class="list-group list-group-flush" style="width: 300px">
                         <div class="list-group-item p-1">
                             <div class="row">

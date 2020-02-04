@@ -24,7 +24,7 @@
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a href="{% url 'vehicle-edit' vehicle.id %}" class="dropdown-item">Edit vehicle</a>
                     {% if perms.transit.can_delete_vehicle %}
                     <div class="dropdown-divider"></div>

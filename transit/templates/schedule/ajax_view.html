@@ -19,7 +19,7 @@
                         <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="oi oi-pencil"></span>
                         </button>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu shadow">
                             <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Shift</a>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
     <span class="btn-group dropdown ajax-blocker">
         <a class="btn btn-success btn-sm" href="{% url 'trip-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
         <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
-        <div class="dropdown-menu dropdown-menu-right">
+        <div class="dropdown-menu shadow dropdown-menu-right">
             <a class="dropdown-item" href="{% url 'trip-create' 'view' date.year date.month date.day %}">New Trip</a>
             <a class="dropdown-item" href="{% url 'trip-create-activity' 'view' date.year date.month date.day %}">New Activity</a>
         </div>
@@ -77,7 +77,7 @@
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
             </button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu shadow">
                 <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
                 {% for driver in drivers %}
                 <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
@@ -88,7 +88,7 @@
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
             </button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu shadow">
                 <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
                 {% for vehicle in vehicles %}
                 <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
@@ -169,7 +169,7 @@
                             <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="oi oi-pencil"></span>
                             </button>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu shadow">
                                 {% if trip.is_activity %}
                                 <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item">Edit activity</a>
                                 <div class="dropdown-divider"></div>
@@ -296,7 +296,7 @@
                             <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Call
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right" style="width: 300px;">
+                            <div class="dropdown-menu shadow dropdown-menu-right" style="width: 300px;">
                                 {% for number in trip.get_phone_number_list %}
                                 <a href="tel:{{ number.tel }}" class="dropdown-item" style="white-space: normal;">{{ number.label }}<br/><span class="text-muted">({{ number.value }})</span></a>
                                 {% endfor %}

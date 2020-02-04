@@ -27,7 +27,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu shadow">
                             <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}">Edit Schedule</a>
                             <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}">View Schedule</a>
                             <div class="dropdown-divider"></div>
@@ -43,7 +43,7 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Vehicles</a>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu shadow">
                             <a class="dropdown-item" href="{% url 'vehicle-status' %}">Vehicle Status</a>
                             <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}">Report an Issue</a>
                             <div class="dropdown-divider"></div>
@@ -52,7 +52,7 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu shadow">
                             <a class="dropdown-item" href="{% url 'report-last-month' %}">View last month's report</a>
                             <a class="dropdown-item" href="{% url 'report-this-month' %}">View this month's report</a>
                         </div>
@@ -68,7 +68,7 @@
                         <a class="nav-link dropdown-toggle text-light btn btn-info" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">
                             <span class="oi oi-person"></span> {{ user.get_username }}
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-menu shadow dropdown-menu-right">
                             {% if user.is_superuser %}
                             <a class="dropdown-item" href="/admin">View Admin Control Panel</a>
                             <div class="dropdown-divider"></div>

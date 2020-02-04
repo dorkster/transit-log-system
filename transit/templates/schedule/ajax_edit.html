@@ -33,7 +33,7 @@
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a href="{% url 'shift-edit' 'edit' shift.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit shift</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'shift-delete' 'edit' shift.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete shift</a>
@@ -92,7 +92,7 @@
     <span class="btn-group dropdown ajax-blocker">
         <a class="btn btn-success btn-sm" href="{% url 'trip-create' 'edit' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a>
         <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
-        <div class="dropdown-menu dropdown-menu-right">
+        <div class="dropdown-menu shadow dropdown-menu-right">
             <a class="dropdown-item" href="{% url 'trip-create' 'edit' date.year date.month date.day %}">New Trip</a>
             <a class="dropdown-item" href="{% url 'trip-create-activity' 'edit' date.year date.month date.day %}">New Activity</a>
         </div>
@@ -101,7 +101,7 @@
         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="oi oi-list mr-2"></span>Templates
         </button>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu shadow">
             {% if not templates %}
             <span class="dropdown-header">There are no available templates.</span>
             {% endif %}
@@ -165,7 +165,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     {% if trip.is_activity %}
                     <a href="{% url 'trip-edit-activity' 'edit' trip.id %}" class="dropdown-item">Edit activity</a>
                     <div class="dropdown-divider"></div>
@@ -235,7 +235,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.driver is None %}---------{% else %}{% for driver in drivers %}{% if trip.driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a class="dropdown-item {% if trip.driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '---------')">---------</a>
                     {% for driver in drivers %}
                     <a class="dropdown-item {% if trip.driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '{{driver.id}}')">{{driver}}</a>
@@ -248,7 +248,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.vehicle is None %}---------{% else %}{% for vehicle in vehicles %}{% if trip.vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a class="dropdown-item {% if trip.vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_vehicle', '---------')">---------</a>
                     {% for vehicle in vehicles %}
                     <a class="dropdown-item {% if trip.vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
@@ -350,7 +350,7 @@ Show extra columns
                     <span class="oi oi-ellipses"></span>
                     {% endif %}
                 </button>
-                <div class="dropdown-menu dropdown-menu-right p-2">
+                <div class="dropdown-menu shadow dropdown-menu-right p-2">
                     <div class="list-group list-group-flush" style="width: 300px">
                         <div class="list-group-item p-1">
                             <div class="row">

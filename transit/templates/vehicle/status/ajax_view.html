@@ -65,7 +65,7 @@
                 <button class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item">Edit issue</a>
                     <div class="dropdown-divider"></div>
                     <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}Set as not resolved{% else %}Set as resolved{% endif %}</a>

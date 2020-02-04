@@ -6,7 +6,7 @@
             <span class="btn-group dropdown ajax-blocker">
                 <a class="btn btn-success btn-sm" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a>
                 <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
-                <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-menu shadow dropdown-menu-right">
                     <a class="dropdown-item" href="{% url 'template-trip-create' parent %}">New Trip</a>
                     <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}">New Activity</a>
                 </div>
@@ -65,7 +65,7 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu shadow">
                     {% if trip.is_activity %}
                     <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item">Edit activity</a>
                     <div class="dropdown-divider"></div>
@@ -172,7 +172,7 @@ Show extra columns
                     <span class="oi oi-ellipses"></span>
                     {% endif %}
                 </button>
-                <div class="dropdown-menu dropdown-menu-right p-2">
+                <div class="dropdown-menu shadow dropdown-menu-right p-2">
                     <div class="list-group list-group-flush" style="width: 300px">
                         <div class="list-group-item p-1">
                             <div class="row">

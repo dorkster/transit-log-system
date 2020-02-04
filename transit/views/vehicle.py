@@ -202,6 +202,7 @@ def vehiclePreTripCreate(request, shift_id):
                         issue.vehicle = shift.vehicle
                         issue.description = cl[key]['issue']
                         issue.priority = cl[key]['issue_prio']
+                        issue.category = issue.get_category_from_checklist(key)
                         issue.pretrip = pretrip
                         issue.pretrip_field = key
                         issue.save()

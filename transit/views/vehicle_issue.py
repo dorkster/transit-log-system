@@ -34,6 +34,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             vehicle_issue.vehicle = form.cleaned_data['vehicle']
             vehicle_issue.description = form.cleaned_data['description']
             vehicle_issue.priority = form.cleaned_data['priority']
+            vehicle_issue.category = form.cleaned_data['category']
             if not is_new:
                 vehicle_issue.is_resolved = form.cleaned_data['is_resolved']
             vehicle_issue.save()
@@ -45,6 +46,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             'vehicle': vehicle_issue.vehicle,
             'description': vehicle_issue.description,
             'priority': vehicle_issue.priority,
+            'category': vehicle_issue.category,
             'is_resolved': vehicle_issue.is_resolved,
         }
         form = EditVehicleIssueForm(initial=initial)

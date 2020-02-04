@@ -48,6 +48,7 @@
         <td>Date</td>
         <td>Vehicle</td>
         <td>Driver</td>
+        <td>Category</td>
         <td>Description</td>
     </thead>
     {% for issue in vehicle_issues %}
@@ -80,6 +81,7 @@
         <td class="mytable-col-md">{{ issue.date }}</td>
         <td class="mytable-col-md">{{ issue.vehicle }}</td>
         <td class="mytable-col-md">{{ issue.driver }}</td>
+        <td class="mytable-col-lg">{% if issue.category > 0 %}{{ issue.get_category_str }}{% endif %}</td>
         <td class="mytable-col-xl">{{ issue.description }}</td>
     </tr>
     {% endfor %}

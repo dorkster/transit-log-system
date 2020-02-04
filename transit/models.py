@@ -490,6 +490,46 @@ class VehicleIssue(models.Model):
         (PRIORITY_LOW, 'Low'),
     ]
 
+    ISSUE_NONE = 0
+    ISSUE_FLUIDS = 1
+    ISSUE_ENGINE = 2
+    ISSUE_HEADLIGHTS = 3
+    ISSUE_HAZARDS = 4
+    ISSUE_DIRECTIONAL = 5
+    ISSUE_MARKERS = 6
+    ISSUE_WINDSHIELD = 7
+    ISSUE_GLASS = 8
+    ISSUE_MIRRORS = 9
+    ISSUE_DOORS = 10
+    ISSUE_TIRES = 11
+    ISSUE_LEAKS = 12
+    ISSUE_BODY = 13
+    ISSUE_REGISTRATION = 14
+    ISSUE_WHEELCHAIR = 15
+    ISSUE_MECHANICAL = 16
+    ISSUE_INTERIOR = 17
+
+    ISSUE_CATEGORIES = [
+        (ISSUE_NONE, '---------'),
+        (ISSUE_FLUIDS, 'Fuel & Fluids'),
+        (ISSUE_ENGINE, 'Engine'),
+        (ISSUE_HEADLIGHTS, 'Headlights / High Beams'),
+        (ISSUE_HAZARDS, 'Hazards / Ambers'),
+        (ISSUE_DIRECTIONAL, 'Directional'),
+        (ISSUE_MARKERS, 'Markers / Reflectors'),
+        (ISSUE_WINDSHIELD, 'Windshield'),
+        (ISSUE_GLASS, 'Other Glass'),
+        (ISSUE_MIRRORS, 'Mirrors'),
+        (ISSUE_DOORS, 'Doors'),
+        (ISSUE_TIRES, 'Tires'),
+        (ISSUE_LEAKS, 'Leaks'),
+        (ISSUE_BODY, 'Body Damage'),
+        (ISSUE_REGISTRATION, 'Registration'),
+        (ISSUE_WHEELCHAIR, 'Wheelchair Lift'),
+        (ISSUE_MECHANICAL, 'Mechanical'),
+        (ISSUE_INTERIOR, 'Interior'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
@@ -499,6 +539,7 @@ class VehicleIssue(models.Model):
     is_resolved = models.BooleanField(default=False)
     pretrip = models.ForeignKey('PreTrip', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     pretrip_field = models.CharField(max_length=FieldSizes.SM, default=False, editable=False)
+    category = models.IntegerField(choices=ISSUE_CATEGORIES, default=ISSUE_NONE)
 
     class Meta:
         ordering = ['is_resolved', '-priority', '-date']
@@ -508,6 +549,45 @@ class VehicleIssue(models.Model):
 
     def get_class_name(self):
         return 'Vehicle Issue'
+
+    def get_category_str(self):
+        for i in self.ISSUE_CATEGORIES:
+            if i[0] == self.category:
+                return i[1]
+
+    def get_category_from_checklist(self, cl_key):
+        if cl_key == 'cl_fluids':
+            return self.ISSUE_FLUIDS
+        elif cl_key == 'cl_engine':
+            return self.ISSUE_ENGINE
+        elif cl_key == 'cl_headlights':
+            return self.ISSUE_HEADLIGHTS
+        elif cl_key == 'cl_hazards':
+            return self.ISSUE_HAZARDS
+        elif cl_key == 'cl_directional':
+            return self.ISSUE_DIRECTIONAL
+        elif cl_key == 'cl_glass':
+            return self.ISSUE_GLASS
+        elif cl_key == 'cl_mirrors':
+            return self.ISSUE_MIRRORS
+        elif cl_key == 'cl_doors':
+            return self.ISSUE_DOORS
+        elif cl_key == 'cl_tires':
+            return self.ISSUE_TIRES
+        elif cl_key == 'cl_leaks':
+            return self.ISSUE_LEAKS
+        elif cl_key == 'cl_body':
+            return self.ISSUE_BODY
+        elif cl_key == 'cl_registration':
+            return self.ISSUE_REGISTRATION
+        elif cl_key == 'cl_wheelchair':
+            return self.ISSUE_WHEELCHAIR
+        elif cl_key == 'cl_mechanical':
+            return self.ISSUE_MECHANICAL
+        elif cl_key == 'cl_interior':
+            return self.ISSUE_INTERIOR
+        else:
+            return ISSUE_NONE
 
 class Template(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

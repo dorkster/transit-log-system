@@ -110,6 +110,9 @@ def tripCreateEditCommon(request, mode, trip, is_new):
                 trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
                 trip.status = form.cleaned_data['status']
+
+                if trip.pick_up_time == trip.appointment_time:
+                    trip.appointment_time = ''
             else:
                 FrequentTag.removeTags(trip.get_tag_list())
 

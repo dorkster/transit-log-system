@@ -76,6 +76,9 @@ def templateTripCreateEditCommon(request, trip, is_new):
                 trip.pick_up_time = form.cleaned_data['start_time']
                 trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
+
+                if trip.pick_up_time == trip.appointment_time:
+                    trip.appointment_time = ''
             else:
                 FrequentTag.removeTags(trip.get_tag_list())
 

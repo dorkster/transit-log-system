@@ -95,17 +95,16 @@
                 {% endfor %}
             </div>
         </span>
-    </div>
-    <div class="mt-2">
-        <button class="btn {% if filter_hide_completed %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_completed', '')">
-            Completed
-        </button>
-        <button class="btn {% if filter_hide_canceled %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')">
-            Canceled
-        </button>
-        <button class="btn {% if filter_hide_nolog %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')">
-            Non-logged
-        </button>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Show...
+            </button>
+            <div class="dropdown-menu shadow dropdown-menu-right">
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_completed', '')"><span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed</a>
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')"><span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled</a>
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')"><span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged</a>
+            </div>
+        </span>
     </div>
     <div class="mt-2">
             <!-- Button trigger modal -->

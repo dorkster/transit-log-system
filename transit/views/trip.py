@@ -66,6 +66,14 @@ def tripCreateReturn(request, mode, id):
 
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
+def tripCopy(request, mode, id):
+    origin_trip = get_object_or_404(Trip, id=id)
+    trip = Trip()
+    trip_id = trip.id
+    trip = origin_trip
+    trip.id = trip_id
+    return tripCreateEditCommon(request, mode, trip, is_new=True)
+
 def tripCreateActivity(request, mode, year, month, day):
     trip = Trip()
     trip.date = datetime.date(year, month, day)

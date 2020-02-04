@@ -31,7 +31,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
-                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_template_trip.date.year, 'month':src_template_trip.date.month, 'day':src_template_trip.date.day}) + '#trip_' + str(src_template_trip.id))
+                return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
             else:
                 url_hash = '' if is_new else '#client_' + str(client.id)
                 return HttpResponseRedirect(reverse('clients') + url_hash)
@@ -62,7 +62,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
-                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_template_trip.date.year, 'month':src_template_trip.date.month, 'day':src_template_trip.date.day}) + '#trip_' + str(src_template_trip.id))
+                return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
             else:
                 return HttpResponseRedirect(reverse('clients') + '#client_' + str(unique_client.id))
     else:

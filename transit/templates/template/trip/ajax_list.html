@@ -3,12 +3,13 @@
         <h3>
             <a href="{% url 'templates' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
             Trips for {{ template.name }} template
-            <span class="btn-group dropdown ajax-blocker">
-                <a class="btn btn-success btn-sm" href="{% url 'template-trip-create' parent %}"><span class="oi oi-plus mr-2"></span>New</a>
-                <a href="#_" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></a>
+            <span class="dropdown ajax-blocker">
+                <a href="#_" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-plus mr-2"></span>New
+                </a>
                 <div class="dropdown-menu shadow dropdown-menu-right">
-                    <a class="dropdown-item" href="{% url 'template-trip-create' parent %}">New Trip</a>
-                    <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}">New Activity</a>
+                    <a class="dropdown-item" href="{% url 'template-trip-create' parent %}"><span class="oi oi-document mr-2"></span>New Trip</a>
+                    <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}"><span class="oi oi-star mr-2"></span>New Activity</a>
                 </div>
             </span>
         </h3>

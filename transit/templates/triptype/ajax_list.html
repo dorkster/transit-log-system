@@ -24,10 +24,10 @@
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
-                    <a href="{% url 'triptype-edit' triptype.id %}" class="dropdown-item">Edit Trip Type</a>
+                    <a href="{% url 'triptype-edit' triptype.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Trip Type</a>
                     {% if perms.transit.can_delete_triptype %}
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'triptype-delete' triptype.id %}" class="dropdown-item text-danger">Delete Trip Type</a>
+                    <a href="{% url 'triptype-delete' triptype.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete Trip Type</a>
                     {% endif %}
                 </div>
             </div>

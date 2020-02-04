@@ -28,33 +28,33 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
                         <div class="dropdown-menu shadow">
-                            <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}">Edit Schedule</a>
-                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}">View Schedule</a>
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}"><span class="oi oi-spreadsheet mr-2"></span>Edit Schedule</a>
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}"><span class="oi oi-task mr-2"></span>View Schedule</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'search' %}">Search</a>
+                            <a class="dropdown-item" href="{% url 'search' %}"><span class="oi oi-magnifying-glass mr-2"></span>Search</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'clients' %}">Edit Clients</a>
-                            <a class="dropdown-item" href="{% url 'destinations' %}">Edit Destinations</a>
-                            <a class="dropdown-item" href="{% url 'templates' %}">Edit Templates</a>
+                            <a class="dropdown-item" href="{% url 'clients' %}"><span class="oi oi-people mr-2"></span>Edit Clients</a>
+                            <a class="dropdown-item" href="{% url 'destinations' %}"><span class="oi oi-pin mr-2"></span>Edit Destinations</a>
+                            <a class="dropdown-item" href="{% url 'templates' %}"><span class="oi oi-list mr-2"></span>Edit Templates</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'drivers' %}">Edit Drivers</a>
-                            <a class="dropdown-item" href="{% url 'triptypes' %}">Edit Trip Types</a>
+                            <a class="dropdown-item" href="{% url 'drivers' %}"><span class="oi oi-person mr-2"></span>Edit Drivers</a>
+                            <a class="dropdown-item" href="{% url 'triptypes' %}"><span class="oi oi-tags mr-2"></span>Edit Trip Types</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Vehicles</a>
                         <div class="dropdown-menu shadow">
-                            <a class="dropdown-item" href="{% url 'vehicle-status' %}">Vehicle Status</a>
-                            <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}">Report an Issue</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-status' %}"><span class="oi oi-wrench mr-2"></span>Vehicle Status</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-warning mr-2"></span>Report an Issue</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'vehicles' %}">Edit Vehicles</a>
+                            <a class="dropdown-item" href="{% url 'vehicles' %}"><span class="oi oi-star mr-2"></span>Edit Vehicles</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
                         <div class="dropdown-menu shadow">
-                            <a class="dropdown-item" href="{% url 'report-last-month' %}">View last month's report</a>
-                            <a class="dropdown-item" href="{% url 'report-this-month' %}">View this month's report</a>
+                            <a class="dropdown-item" href="{% url 'report-last-month' %}"><span class="oi oi-graph mr-2"></span>View last month's report</a>
+                            <a class="dropdown-item" href="{% url 'report-this-month' %}"><span class="oi oi-graph mr-2"></span>View this month's report</a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -70,15 +70,15 @@
                         </a>
                         <div class="dropdown-menu shadow dropdown-menu-right">
                             {% if user.is_superuser %}
-                            <a class="dropdown-item" href="/admin">View Admin Control Panel</a>
+                            <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>View Admin Control Panel</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'excel-import' %}">Import Excel Files</a>
+                            <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'password_change' %}">Change Password</a>
-                            <a class="dropdown-item" href="{% url 'settings' %}">Settings</a>
+                            <a class="dropdown-item" href="{% url 'password_change' %}"><span class="oi oi-key mr-2"></span>Change Password</a>
+                            <a class="dropdown-item" href="{% url 'settings' %}"><span class="oi oi-cog mr-2"></span>Settings</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}"><span class="oi oi-account-logout mr-2"></span>Logout</a>
                         </div>
                     </li>
                     {% else %}

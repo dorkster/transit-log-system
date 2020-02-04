@@ -67,16 +67,16 @@ Show extra columns
                 </button>
                 <div class="dropdown-menu shadow">
                     {% if trip.is_activity %}
-                    <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item">Edit activity</a>
+                    <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'template-trip-delete-activity' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete activity</a>
+                    <a href="{% url 'template-trip-delete-activity' trip.parent.id trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete activity</a>
                     {% else %}
-                    <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item">Edit trip</a>
+                    <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'client-create-from-template-trip' trip.id %}" class="dropdown-item">Create Client</a>
-                    <a href="{% url 'template-trip-create-return' trip.parent.id trip.id %}" class="dropdown-item">Create Return Trip</a>
+                    <a href="{% url 'client-create-from-template-trip' trip.id %}" class="dropdown-item"><span class="oi oi-person mr-2"></span>Create Client</a>
+                    <a href="{% url 'template-trip-create-return' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-loop mr-2"></span>Create Return Trip</a>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger">Delete trip</a>
+                    <a href="{% url 'template-trip-delete' trip.parent.id trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete trip</a>
                     {% endif %}
                 </div>
             </div>

@@ -148,9 +148,9 @@ Show extra columns
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
-                    <a href="{% url 'client-edit' client.id %}" class="dropdown-item">Edit client</a>
+                    <a href="{% url 'client-edit' client.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit client</a>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'client-delete' client.id %}" class="dropdown-item text-danger">Delete client</a>
+                    <a href="{% url 'client-delete' client.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete client</a>
                 </div>
             </div>
         </td>

@@ -46,6 +46,14 @@ def templateTripCreateReturn(request, parent, id):
 
     return templateTripCreateEditCommon(request, trip, is_new=True)
 
+def templateTripCopy(request, parent, id):
+    origin_trip = get_object_or_404(TemplateTrip, id=id)
+    trip = TemplateTrip()
+    trip_id = trip.id
+    trip = origin_trip
+    trip.id = trip_id
+    return templateTripCreateEditCommon(request, trip, is_new=True)
+
 def templateTripEdit(request, parent, id):
     trip = get_object_or_404(TemplateTrip, id=id)
     return templateTripCreateEditCommon(request, trip, is_new=False)

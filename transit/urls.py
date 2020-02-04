@@ -82,6 +82,7 @@ urlpatterns = [
     path('templates/<uuid:parent>/trips/create', views.templateTripCreate, name='template-trip-create'),
     path('templates/<uuid:parent>/trips/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit'),
     path('templates/<uuid:parent>/trips/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete'),
+    path('templates/<slug:parent>/trips/copy/<uuid:id>', views.templateTripCopy, name='template-trip-copy'),
     path('templates/<uuid:parent>/trips/create-return/<uuid:id>', views.templateTripCreateReturn, name='template-trip-create-return'),
 
     path('templates/<uuid:parent>/activities/create', views.templateTripCreateActivity, name='template-trip-create-activity'),

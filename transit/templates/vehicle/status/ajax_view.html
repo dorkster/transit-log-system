@@ -26,7 +26,7 @@
 <div class="container ml-0 border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
-            <h5>Filter</h5>
+            <h5>Filter{% if issue_filtered_count < issue_unfiltered_count %} ({{issue_filtered_count}}/{{issue_unfiltered_count}} visible){% endif %}</h5>
         </div>
         {% if is_filtered %}
         <div class="col-auto">
@@ -35,9 +35,60 @@
         {% endif %}
     </div>
     <div class="mt-2">
-        <button class="btn {% if filter_show_resolved %}btn-outline-dark{% else %}btn-primary{% endif %} btn-sm" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')">
-            Hide Resolved
-        </button>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
+                {% for driver in drivers %}
+                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                {% for vehicle in vehicles %}
+                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Show...
+            </button>
+            <div class="dropdown-menu shadow dropdown-menu-right">
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"><span class="mr-2 oi {% if not filter_show_resolved %}oi-x{% else %}oi-check{% endif %}"></span>Resolved</a>
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_priority is None %}All Priorities{% else %}{% for priority in priorities %}{% if filter_priority == priority.0 %}{{ priority.1 }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_priority is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '')">All Priorities</a>
+                {% for priority in priorities %}
+                <a class="dropdown-item {% if filter_priority == priority.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '{{priority.0}}')">{{priority.1}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_category is None %}All Categories{% else %}{% for category in categories %}{% if filter_category == category.0 %}{{ category.1 }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_category is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '')">All Categories</a>
+                {% for category in categories %}
+                <a class="dropdown-item {% if filter_category == category.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '{{category.0}}')">{{category.1}}</a>
+                {% endfor %}
+            </div>
+        </span>
     </div>
 </div>
 {% if vehicle_issues %}

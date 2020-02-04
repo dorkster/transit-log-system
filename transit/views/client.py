@@ -151,6 +151,14 @@ def clientCreateFromTemplateTrip(request, trip_id):
     return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
 
 def ajaxClientList(request):
+    SORT_NAME = 0
+    SORT_ADDRESS = 1
+    SORT_PHONE_HOME = 2
+    SORT_PHONE_CELL = 3
+    SORT_ELDERLY = 4
+    SORT_AMBULATORY = 5
+    SORT_TAGS = 6
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])
@@ -170,10 +178,13 @@ def ajaxClientList(request):
         request.session['clients_search'] = ''
     elif request_action == 'toggle_extra_columns':
         request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
+    elif request_action == 'sort':
+        request.session['clients_sort'] = int(request_data)
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_search = request.session.get('clients_search', '')
+    sort_mode = request.session.get('clients_sort', SORT_NAME)
 
     clients = Client.objects.all()
     unfiltered_count = len(clients)
@@ -192,6 +203,21 @@ def ajaxClientList(request):
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
 
     filtered_count = len(clients)
+
+    if sort_mode == SORT_NAME:
+        clients = clients.order_by('name')
+    elif sort_mode == SORT_ADDRESS:
+        clients = clients.order_by('address', 'name')
+    elif sort_mode == SORT_PHONE_HOME:
+        clients = clients.order_by('phone_home', 'name')
+    elif sort_mode == SORT_PHONE_CELL:
+        clients = clients.order_by('phone_cell', 'name')
+    elif sort_mode == SORT_ELDERLY:
+        clients = clients.order_by('elderly', 'name')
+    elif sort_mode == SORT_AMBULATORY:
+        clients = clients.order_by('ambulatory', 'name')
+    elif sort_mode == SORT_TAGS:
+        clients = clients.order_by('tags', 'name')
 
     context = {
         'clients': clients,

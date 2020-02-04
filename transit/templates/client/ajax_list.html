@@ -92,14 +92,14 @@ Show extra columns
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
-        <td>Name</td>
-        <td>Address</td>
-        <td>Phone (Home)</td>
-        <td>Phone (Cell)</td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">Name</a></td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">Address</a></td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">Phone (Home)</a></td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">Phone (Cell)</a></td>
         {% if show_extra_columns %}
-        <td>Elderly?</td>
-        <td>Ambulatory?</td>
-        <td>Tags</td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '4')">Elderly?</a></td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '5')">Ambulatory?</a></td>
+        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '6')">Tags</a></td>
         {% else %}
         <td></td>
         {% endif %}

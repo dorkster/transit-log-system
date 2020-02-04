@@ -228,6 +228,7 @@ def ajaxClientList(request):
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'show_extra_columns': request.session.get('clients_extra_columns', False),
+        'sort_mode': sort_mode,
     }
     return render(request, 'client/ajax_list.html', context=context)
 

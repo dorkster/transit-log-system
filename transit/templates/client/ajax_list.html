@@ -92,14 +92,49 @@ Show extra columns
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">Name</a></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">Address</a></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">Phone (Home)</a></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">Phone (Cell)</a></td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
+                Name
+                {% if sort_mode == 0 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">
+                Address
+                {% if sort_mode == 1 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
+                Phone (Home)
+                {% if sort_mode == 2 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
+                Phone (Cell)
+                {% if sort_mode == 3 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
         {% if show_extra_columns %}
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '4')">Elderly?</a></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '5')">Ambulatory?</a></td>
-        <td><a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '6')">Tags</a></td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '4')">
+                Elderly?
+                {% if sort_mode == 4 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '5')">
+                Ambulatory?
+                {% if sort_mode == 5 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '6')">
+                Tags
+                {% if sort_mode == 6 %}<span class="oi oi-sort-ascending"></span>{% endif %}
+            </a>
+        </td>
         {% else %}
         <td></td>
         {% endif %}

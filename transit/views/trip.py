@@ -80,6 +80,19 @@ def tripCreateActivity(request, mode, year, month, day):
     trip.is_activity = True
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
+def tripCreateFromClient(request, mode, id):
+    client = get_object_or_404(Client, id=id)
+    trip = Trip()
+    trip.date = datetime.datetime.now().date()
+    trip.name = client.name
+    trip.phone_home = client.phone_home
+    trip.phone_cell = client.phone_cell
+    trip.elderly = client.elderly
+    trip.ambulatory = client.ambulatory
+    trip.tags = client.tags
+
+    return tripCreateEditCommon(request, mode, trip, is_new=True)
+
 def tripCreateEditCommon(request, mode, trip, is_new):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')

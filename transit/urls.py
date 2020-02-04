@@ -27,6 +27,7 @@ urlpatterns = [
     path('schedule/<slug:mode>/trips/<uuid:id>/delete/', views.tripDelete, name='trip-delete'),
     path('schedule/<slug:mode>/trips/create-return/<uuid:id>', views.tripCreateReturn, name='trip-create-return'),
     path('schedule/<slug:mode>/trips/copy/<uuid:id>', views.tripCopy, name='trip-copy'),
+    path('schedule/<slug:mode>/trips/create-from-client/<uuid:id>', views.tripCreateFromClient, name='trip-create-from-client'),
 
     path('schedule/<slug:mode>/shifts/create/<int:year>/<int:month>/<int:day>', views.shiftCreate, name='shift-create'),
     path('schedule/<slug:mode>/shifts/create/today', views.shiftCreateToday, name='shift-create-today'),

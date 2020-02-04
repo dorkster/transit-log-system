@@ -170,10 +170,10 @@
                             </button>
                             <div class="dropdown-menu shadow">
                                 {% if trip.is_activity %}
-                                <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item">Edit activity</a>
+                                <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                                 <div class="dropdown-divider"></div>
-                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item">Reset Status</a>{% endif %}
-                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item">Set as canceled</a>{% endif %}
+                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                                 {% else %}
                                 <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                                 <div class="dropdown-divider"></div>

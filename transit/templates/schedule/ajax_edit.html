@@ -1,7 +1,9 @@
-<div class="alert {% if message %}alert-info{% else %}alert-secondary{% endif %} p-1">
+<div class="alert {% if message %}alert-info{% endif %} p-1">
     <div class="row">
         <div class="col-auto pr-0">
-            <a href="{% url 'schedule-message' date.year date.month date.day %}" class="btn btn-outline-dark btn-sm"><span class="oi oi-comment-square mr-2"></span>Edit</a>
+            <a href="{% url 'schedule-message' date.year date.month date.day %}" class="btn btn-outline-dark btn-sm">
+                <span class="oi oi-comment-square mr-2"></span>{% if message %}Edit{% else %}Add a message of the day{% endif %}
+            </a>
         </div>
         <div class="col">
             <strong style="font-size: 1.3em">{{ message }}</strong>

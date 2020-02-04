@@ -94,6 +94,27 @@ def ajaxDestinationList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    destination = Destination.objects.all()
-    return render(request, 'destination/ajax_list.html', {'destinations': destination})
+    if request_action == 'filter_search':
+        request.session['destinations_search'] = request_data
+    elif request_action == 'filter_reset':
+        request.session['destinations_search'] = ''
+
+    filter_search = request.session.get('destinations_search', '')
+
+    destinations = Destination.objects.all()
+    unfiltered_count = len(destinations)
+
+    if filter_search != '':
+        destinations = destinations.filter(address__icontains=filter_search)
+
+    filtered_count = len(destinations)
+
+    context = {
+        'destinations': destinations,
+        'filter_search': filter_search,
+        'is_filtered': (filter_search != ''),
+        'filtered_count': filtered_count,
+        'unfiltered_count': unfiltered_count,
+    }
+    return render(request, 'destination/ajax_list.html', context=context)
 

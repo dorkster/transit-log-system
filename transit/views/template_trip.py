@@ -72,6 +72,9 @@ def templateTripCreateEditCommon(request, trip, is_new):
             return HttpResponseRedirect(reverse('template-trip-delete', kwargs={'parent':trip.parent.id, 'id':trip.id}))
 
         if form.is_valid():
+            old_parent = trip.parent
+            trip.parent = form.cleaned_data['parent']
+
             if trip.is_activity:
                 trip.pick_up_time = form.cleaned_data['start_time']
                 trip.appointment_time = form.cleaned_data['end_time']
@@ -97,6 +100,21 @@ def templateTripCreateEditCommon(request, trip, is_new):
                 trip.ambulatory = form.cleaned_data['ambulatory']
                 trip.note = form.cleaned_data['notes']
 
+            # trip date changed, which means sort indexes need to be updated
+            if old_parent != trip.parent:
+                # decrease sort indexes on the old parent to fill in the gap
+                if not is_new:
+                    trips_below = TemplateTrip.objects.filter(parent=old_parent, sort_index__gt=trip.sort_index)
+                    for i in trips_below:
+                        i.sort_index -= 1
+                        i.save()
+                # set the sort index on the new parent
+                query = TemplateTrip.objects.filter(parent=trip.parent).order_by('-sort_index')
+                if len(query) > 0:
+                    trip.sort_index = query[0].sort_index + 1
+                else:
+                    trip.sort_index = 0
+
             if not trip.is_activity:
                 FrequentTag.addTags(trip.get_tag_list())
 
@@ -113,6 +131,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
             form = EditTemplateActivityForm(initial=initial)
         else:
             initial = {
+                'parent': trip.parent,
                 'name': trip.name,
                 'address': trip.address,
                 'phone_home': trip.phone_home,

@@ -156,10 +156,13 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
-                trips_below = Trip.objects.filter(date=old_date, sort_index__gt=trip.sort_index)
-                for i in trips_below:
-                    i.sort_index -= 1
-                    i.save()
+                # decrease sort indexes on the old date to fill in the gap
+                if not is_new:
+                    trips_below = Trip.objects.filter(date=old_date, sort_index__gt=trip.sort_index)
+                    for i in trips_below:
+                        i.sort_index -= 1
+                        i.save()
+                # set the sort index on the new day
                 query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
                 if len(query) > 0:
                     trip.sort_index = query[0].sort_index + 1

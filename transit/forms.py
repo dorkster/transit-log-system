@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -176,6 +176,7 @@ class EditTemplateForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditTemplateTripForm(forms.Form):
+    parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(label='Pick-Up Address', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.address))
     phone_home = forms.CharField(label='Phone (Home)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))

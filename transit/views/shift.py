@@ -141,6 +141,14 @@ def shiftStart(request, id):
             shift.start_time = form.cleaned_data['time']
             shift.save()
 
+            # reset schedule filter
+            request.session['schedule_view_hide_completed'] = False
+            request.session['schedule_view_hide_canceled'] = False
+            request.session['schedule_view_hide_nolog'] = False
+            request.session['schedule_view_search'] = ''
+            request.session['schedule_view_driver'] = ''
+            request.session['schedule_view_vehicle'] = ''
+
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
         auto_time = shift.start_time
@@ -176,6 +184,14 @@ def shiftEnd(request, id):
             shift.end_miles = shift.start_miles[0:len(shift.start_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
             shift.end_time = form.cleaned_data['time']
             shift.save()
+
+            # reset schedule filter
+            request.session['schedule_view_hide_completed'] = False
+            request.session['schedule_view_hide_canceled'] = False
+            request.session['schedule_view_hide_nolog'] = False
+            request.session['schedule_view_search'] = ''
+            request.session['schedule_view_driver'] = ''
+            request.session['schedule_view_vehicle'] = ''
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:

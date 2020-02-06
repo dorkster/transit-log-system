@@ -42,6 +42,8 @@ Show extra columns
         <td>Address</td>
         <td>Phone #</td>
         <td>Destination</td>
+        <td>Driver</td>
+        <td>Vehicle</td>
         {% if show_extra_columns %}
         <td>Notes</td>
         <td>Trip Type</td>
@@ -56,7 +58,7 @@ Show extra columns
     {% if trip.sort_index == 0 %}
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}13{% else %}9{% endif %}"></td></tr>
     {% endif %}
-    <tr class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
+    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
@@ -94,7 +96,7 @@ Show extra columns
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}9{% else %}5{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}11{% else %}7{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
             {{ trip.note }}
         </td>
         {% else %}
@@ -123,6 +125,16 @@ Show extra columns
         <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_destination', row_movers)">
             {{ trip.destination }}
             {% if trip.phone_destination and trip.destination %}<br/>Phone #: {{ trip.phone_destination }}{% endif %}
+        </td>
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_driver', row_movers)">
+            {% if trip.driver %}
+            {{ trip.driver }}
+            {% endif %}
+        </td>
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_vehicle', row_movers)">
+            {% if trip.vehicle %}
+            {{ trip.vehicle }}
+            {% endif %}
         </td>
         {% if show_extra_columns %}
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_notes', row_movers)">

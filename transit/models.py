@@ -607,6 +607,8 @@ class TemplateTrip(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('Template', on_delete=models.CASCADE)
     sort_index = models.IntegerField(default=0, editable=False)
+    driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=FieldSizes.MD)
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
@@ -669,6 +671,13 @@ class TemplateTrip(models.Model):
         if self.trip_type is None:
             return False
         return self.trip_type.name == 'Medical'
+
+    def get_driver_color(self):
+        site_settings = SiteSettings.load()
+        if self.is_activity:
+            return site_settings.get_color('activity')
+        else:
+            return Driver.get_color(self.driver)
 
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

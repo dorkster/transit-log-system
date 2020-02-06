@@ -32,6 +32,8 @@ def templateTripCreateReturn(request, parent, id):
     origin_trip = get_object_or_404(TemplateTrip, id=id)
     trip = TemplateTrip()
     trip.parent = origin_trip.parent
+    trip.driver = origin_trip.driver
+    trip.vehicle = origin_trip.vehicle
     trip.name = origin_trip.name
     trip.address = origin_trip.destination
     trip.phone_home = origin_trip.phone_home
@@ -93,6 +95,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
             else:
                 FrequentTag.removeTags(trip.get_tag_list())
 
+                trip.driver = form.cleaned_data['driver']
+                trip.vehicle = form.cleaned_data['vehicle']
                 trip.name = form.cleaned_data['name']
                 trip.address = form.cleaned_data['address']
                 trip.phone_home = form.cleaned_data['phone_home']
@@ -140,6 +144,8 @@ def templateTripCreateEditCommon(request, trip, is_new):
         else:
             initial = {
                 'parent': trip.parent,
+                'driver': trip.driver,
+                'vehicle': trip.vehicle,
                 'name': trip.name,
                 'address': trip.address,
                 'phone_home': trip.phone_home,

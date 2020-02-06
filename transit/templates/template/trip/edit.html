@@ -109,6 +109,13 @@
                     </div>
                 </fieldset>
             </div>
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Log Information</legend>
+                    <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
+                    <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                </fieldset>
+            </div>
             {% endif %}
         </div>
         <hr>

@@ -184,6 +184,8 @@ class EditTemplateTripForm(forms.Form):
     phone_address = forms.CharField(label='Phone (Pick-Up)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     phone_destination = forms.CharField(label='Phone (Destination)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     destination = forms.CharField(label='Destination Address', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.address))
+    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))

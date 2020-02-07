@@ -129,6 +129,8 @@ def search(request):
         searched = True
         trips = trips.filter(date__lte=end_date)
 
+    trips = trips.order_by('-date', '-sort_index')
+
     result_pages = Paginator(trips, 25)
     result_page = request.GET.get('page')
     if result_page is None:

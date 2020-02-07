@@ -9,6 +9,8 @@ from django.urls import reverse
 from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
 from transit.forms import DatePickerForm
 
+from django.contrib.auth.decorators import permission_required
+
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.workbook import Workbook
 from openpyxl.utils import get_column_letter
@@ -380,6 +382,7 @@ class Report():
                 self.unique_riders.nonelderly_nonambulatory += 1
 
 
+@permission_required(['transit.view_trip', 'transit.view_shift'])
 def report(request, year, month):
     date_start = datetime.date(year, month, 1)
 

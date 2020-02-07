@@ -5,9 +5,13 @@ from django.core.paginator import Paginator
 
 from transit.models import VehicleIssue, Vehicle, PreTrip, Driver
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip'])
 def vehicleStatus(request):
     return render(request, 'vehicle/status/view.html', context={})
 
+@permission_required(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip'])
 def ajaxVehicleStatus(request):
     request_id = ''
     if request.GET['target_id'] != '':
@@ -16,11 +20,12 @@ def ajaxVehicleStatus(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'toggle_resolved':
-        issue = get_object_or_404(VehicleIssue, id=request_id)
-        issue.is_resolved = not issue.is_resolved
-        issue.save()
-    elif request_action == 'filter_toggle_resolved':
+    if request.user.has_perm('transit.change_vehicleissue'):
+        if request_action == 'toggle_resolved':
+            issue = get_object_or_404(VehicleIssue, id=request_id)
+            issue.is_resolved = not issue.is_resolved
+            issue.save()
+    if request_action == 'filter_toggle_resolved':
         request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
     elif request_action == 'filter_driver':
         request.session['vehicle_status_filter_driver'] = request_data

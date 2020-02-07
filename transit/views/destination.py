@@ -8,6 +8,9 @@ from django.urls import reverse
 from transit.models import Destination, Trip, SiteSettings
 from transit.forms import EditDestinationForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_destination'])
 def destinationList(request):
     context = {
         'destination': Destination.objects.all(),
@@ -22,6 +25,7 @@ def destinationEdit(request, id):
     destination = get_object_or_404(Destination, id=id)
     return destinationCreateEditCommon(request, destination, is_new=False)
 
+@permission_required(['transit.change_destination'])
 def destinationCreateEditCommon(request, destination, is_new):
     if request.method == 'POST':
         form = EditDestinationForm(request.POST)
@@ -70,6 +74,7 @@ def destinationCreateEditCommon(request, destination, is_new):
 
     return render(request, 'destination/edit.html', context)
 
+@permission_required(['transit.delete_destination'])
 def destinationDelete(request, id):
     destination = get_object_or_404(Destination, id=id)
 
@@ -86,6 +91,7 @@ def destinationDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.view_destination'])
 def ajaxDestinationList(request):
     request_id = ''
     if request.GET['target_id'] != '':

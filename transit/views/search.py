@@ -8,6 +8,9 @@ from django.core.paginator import Paginator
 from transit.models import Trip, Driver, Vehicle
 from transit.forms import SearchTripsForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_trip'])
 def search(request):
     name = request.GET.get('name')
     address = request.GET.get('address')

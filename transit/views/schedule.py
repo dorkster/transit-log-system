@@ -9,7 +9,13 @@ from django.db.models import Q
 from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag
 from transit.forms import DatePickerForm, EditScheduleMessageForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_shift', 'transit.view_trip'])
 def schedule(request, mode, year, month, day):
+    if mode != 'read-only' and (not request.user.has_perm('transit.change_shift') or not request.user.has_perm('transit.change_trip')):
+        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'read-only', 'year':year, 'month':month, 'day':day}))
+
     day_date = datetime.date(year, month, day)
     day_date_prev = day_date + datetime.timedelta(days=-1)
     day_date_next = day_date + datetime.timedelta(days=1)
@@ -35,9 +41,12 @@ def schedule(request, mode, year, month, day):
     }
     if mode == 'view':
         return render(request, 'schedule/view.html', context=context)
+    elif mode == 'read-only':
+        return render(request, 'schedule/read_only.html', context=context)
     else:
         return render(request, 'schedule/edit.html', context=context)
 
+@permission_required(['transit.view_shift', 'transit.view_trip'])
 def schedulePrint(request, year, month, day):
     day_date = datetime.date(year, month, day)
 
@@ -58,6 +67,7 @@ def schedulePrint(request, year, month, day):
     }
     return render(request, 'schedule/print.html', context=context)
 
+@permission_required(['transit.change_schedulemessage'])
 def scheduleMessage(request, year, month, day):
     date = datetime.date(year, month, day)
 
@@ -114,6 +124,10 @@ def ajaxScheduleEdit(request):
 def ajaxScheduleView(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_view.html', has_filter=True)
 
+def ajaxScheduleReadOnly(request):
+    return ajaxScheduleCommon(request, 'schedule/ajax_read_only.html', has_filter=True)
+
+@permission_required(['transit.view_shift', 'transit.view_trip'])
 def ajaxScheduleCommon(request, template, has_filter=False):
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
 
@@ -124,111 +138,112 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
-        trip = get_object_or_404(Trip, id=request_id)
-        original_index = trip.sort_index
-        trip.sort_index = -1
+    if request.user.has_perm('transit.change_trip') and request.user.has_perm('transit.change_shift'):
+        if request_action == 'mv':
+            trip = get_object_or_404(Trip, id=request_id)
+            original_index = trip.sort_index
+            trip.sort_index = -1
 
-        # "remove" the selected trip by shifting everything below it up by 1
-        below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
-        for i in below_items:
-            i.sort_index -= 1;
-            i.save()
+            # "remove" the selected trip by shifting everything below it up by 1
+            below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
+            for i in below_items:
+                i.sort_index -= 1;
+                i.save()
 
-        if request_data == '':
-            new_index = 0
-        else:
-            target_item = get_object_or_404(Trip, id=request_data)
-            if trip.id != target_item.id:
-                new_index = target_item.sort_index + 1
+            if request_data == '':
+                new_index = 0
             else:
-                new_index = original_index
+                target_item = get_object_or_404(Trip, id=request_data)
+                if trip.id != target_item.id:
+                    new_index = target_item.sort_index + 1
+                else:
+                    new_index = original_index
 
-        # prepare to insert the trip at the new index by shifting everything below it down by 1
-        below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
-        for i in below_items:
-            i.sort_index += 1
-            i.save()
+            # prepare to insert the trip at the new index by shifting everything below it down by 1
+            below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
+            for i in below_items:
+                i.sort_index += 1
+                i.save()
 
-        trip.sort_index = new_index
-        trip.save()
-    elif request_action == 'set_driver':
-        trip = get_object_or_404(Trip, id=request_id)
-        prev_driver = trip.driver
-
-        if request_data == '---------':
-            trip.driver = None;
-            trip.vehicle = None;
-        else:
-            driver = get_object_or_404(Driver, id=uuid.UUID(request_data))
-            trip.driver = driver
-
-            # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
-            if not driver.is_logged:
-                nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
-                if len(nonlogged_vehicles) == 1:
-                    trip.vehicle = nonlogged_vehicles[0]
-
-        # attempt to set vehicle from Shift data
-        if prev_driver != trip.driver:
-            new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
-            if len(new_query) > 0:
-                trip.vehicle = new_query[0].vehicle
-            elif trip.driver is None or trip.driver.is_logged == True:
-                trip.vehicle = None
-
-        trip.save()
-
-    elif request_action == 'set_vehicle':
-        trip = get_object_or_404(Trip, id=request_id)
-        if request_data == '---------':
-            trip.vehicle = None;
-        else:
-            vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
-            trip.vehicle = vehicle
-        trip.save()
-    elif request_action == 'toggle_canceled':
-        trip = get_object_or_404(Trip, id=request_id)
-        if request_data == '0':
-            trip.status = Trip.STATUS_NORMAL
-        elif request_data == '1':
-            trip.status = Trip.STATUS_CANCELED
-        elif request_data == '2':
-            trip.status = Trip.STATUS_NO_SHOW
-        trip.save()
-    elif request_action == 'load_template':
-        parent_template = Template.objects.get(id=uuid.UUID(request_data))
-        template_trips = TemplateTrip.objects.filter(parent=parent_template)
-
-        sort_index = 0
-        query = Trip.objects.filter(date=date)
-        if (len(query) > 0):
-            sort_index = query[len(query)-1].sort_index + 1
-
-        for temp_trip in template_trips:
-            trip = Trip()
-            trip.date = date
-            trip.sort_index = sort_index
-            sort_index += 1
-            trip.driver = temp_trip.driver
-            trip.vehicle = temp_trip.vehicle
-            trip.name = temp_trip.name
-            trip.address = temp_trip.address
-            trip.phone_home = temp_trip.phone_home
-            trip.phone_cell = temp_trip.phone_cell
-            trip.phone_address = temp_trip.phone_address
-            trip.phone_destination = temp_trip.phone_destination
-            trip.destination = temp_trip.destination
-            trip.pick_up_time = temp_trip.pick_up_time
-            trip.appointment_time = temp_trip.appointment_time
-            trip.trip_type = temp_trip.trip_type
-            trip.tags = temp_trip.tags
-            trip.elderly = temp_trip.elderly
-            trip.ambulatory = temp_trip.ambulatory
-            trip.note = temp_trip.note
-            trip.is_activity = temp_trip.is_activity
+            trip.sort_index = new_index
             trip.save()
-    elif request_action == 'filter_toggle_completed':
+        elif request_action == 'set_driver':
+            trip = get_object_or_404(Trip, id=request_id)
+            prev_driver = trip.driver
+
+            if request_data == '---------':
+                trip.driver = None;
+                trip.vehicle = None;
+            else:
+                driver = get_object_or_404(Driver, id=uuid.UUID(request_data))
+                trip.driver = driver
+
+                # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
+                if not driver.is_logged:
+                    nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+                    if len(nonlogged_vehicles) == 1:
+                        trip.vehicle = nonlogged_vehicles[0]
+
+            # attempt to set vehicle from Shift data
+            if prev_driver != trip.driver:
+                new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
+                if len(new_query) > 0:
+                    trip.vehicle = new_query[0].vehicle
+                elif trip.driver is None or trip.driver.is_logged == True:
+                    trip.vehicle = None
+
+            trip.save()
+
+        elif request_action == 'set_vehicle':
+            trip = get_object_or_404(Trip, id=request_id)
+            if request_data == '---------':
+                trip.vehicle = None;
+            else:
+                vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
+                trip.vehicle = vehicle
+            trip.save()
+        elif request_action == 'toggle_canceled':
+            trip = get_object_or_404(Trip, id=request_id)
+            if request_data == '0':
+                trip.status = Trip.STATUS_NORMAL
+            elif request_data == '1':
+                trip.status = Trip.STATUS_CANCELED
+            elif request_data == '2':
+                trip.status = Trip.STATUS_NO_SHOW
+            trip.save()
+        elif request_action == 'load_template':
+            parent_template = Template.objects.get(id=uuid.UUID(request_data))
+            template_trips = TemplateTrip.objects.filter(parent=parent_template)
+
+            sort_index = 0
+            query = Trip.objects.filter(date=date)
+            if (len(query) > 0):
+                sort_index = query[len(query)-1].sort_index + 1
+
+            for temp_trip in template_trips:
+                trip = Trip()
+                trip.date = date
+                trip.sort_index = sort_index
+                sort_index += 1
+                trip.driver = temp_trip.driver
+                trip.vehicle = temp_trip.vehicle
+                trip.name = temp_trip.name
+                trip.address = temp_trip.address
+                trip.phone_home = temp_trip.phone_home
+                trip.phone_cell = temp_trip.phone_cell
+                trip.phone_address = temp_trip.phone_address
+                trip.phone_destination = temp_trip.phone_destination
+                trip.destination = temp_trip.destination
+                trip.pick_up_time = temp_trip.pick_up_time
+                trip.appointment_time = temp_trip.appointment_time
+                trip.trip_type = temp_trip.trip_type
+                trip.tags = temp_trip.tags
+                trip.elderly = temp_trip.elderly
+                trip.ambulatory = temp_trip.ambulatory
+                trip.note = temp_trip.note
+                trip.is_activity = temp_trip.is_activity
+                trip.save()
+    if request_action == 'filter_toggle_completed':
         request.session['schedule_view_hide_completed'] = not request.session.get('schedule_view_hide_completed', False)
     elif request_action == 'filter_toggle_canceled':
         request.session['schedule_view_hide_canceled'] = not request.session.get('schedule_view_hide_canceled', False)

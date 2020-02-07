@@ -17,6 +17,7 @@ def vehicleIssueEdit(request, id):
     vehicle_issue = get_object_or_404(VehicleIssue, id=id)
     return vehicleIssueCreateEditCommon(request, vehicle_issue, is_new=False)
 
+@permission_required(['transit.change_vehicleissue'])
 def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
     if request.method == 'POST':
         form = EditVehicleIssueForm(request.POST)
@@ -59,7 +60,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
 
     return render(request, 'vehicle/issues/edit.html', context)
 
-@permission_required('transit.can_delete_vehicleissue')
+@permission_required('transit.delete_vehicleissue')
 def vehicleIssueDelete(request, id):
     vehicle_issue = get_object_or_404(VehicleIssue, id=id)
 

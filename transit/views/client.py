@@ -9,6 +9,9 @@ from django.db.models import Q
 from transit.models import Client, Trip, FrequentTag, TemplateTrip, SiteSettings
 from transit.forms import EditClientForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_client'])
 def clientList(request):
     context = {
         'clients': Client.objects.all(),
@@ -23,6 +26,7 @@ def clientEdit(request, id):
     client = get_object_or_404(Client, id=id)
     return clientCreateEditCommon(request, client, is_new=False)
 
+@permission_required(['transit.change_client'])
 def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None, src_template_trip=None):
     if request.method == 'POST':
         form = EditClientForm(request.POST)
@@ -102,6 +106,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
 
     return render(request, 'client/edit.html', context)
 
+@permission_required(['transit.delete_client'])
 def clientDelete(request, id):
     client = get_object_or_404(Client, id=id)
 
@@ -118,6 +123,7 @@ def clientDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.change_client'])
 def clientCreateFromTrip(request, trip_id):
     trip = get_object_or_404(Trip, id=trip_id)
 
@@ -134,6 +140,7 @@ def clientCreateFromTrip(request, trip_id):
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True, src_trip=trip)
 
+@permission_required(['transit.change_client'])
 def clientCreateFromTemplateTrip(request, trip_id):
     trip = get_object_or_404(TemplateTrip, id=trip_id)
 
@@ -150,6 +157,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
 
+@permission_required(['transit.view_client'])
 def ajaxClientList(request):
     SORT_NAME = 0
     SORT_ADDRESS = 1

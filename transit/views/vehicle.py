@@ -10,6 +10,7 @@ from transit.forms import EditVehicleForm, vehicleMaintainForm, vehiclePreTripFo
 
 from django.contrib.auth.decorators import permission_required
 
+@permission_required(['transit.view_vehicle'])
 def vehicleList(request):
     context = {
         'vehicle': Vehicle.objects.all(),
@@ -24,6 +25,7 @@ def vehicleEdit(request, id):
     vehicle = get_object_or_404(Vehicle, id=id)
     return vehicleCreateEditCommon(request, vehicle, is_new=False)
 
+@permission_required(['transit.change_vehicle'])
 def vehicleCreateEditCommon(request, vehicle, is_new):
     if is_new == True:
         query = Vehicle.objects.all().order_by('-sort_index')
@@ -63,7 +65,7 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
 
     return render(request, 'vehicle/edit.html', context)
 
-@permission_required('transit.can_delete_vehicle')
+@permission_required('transit.delete_vehicle')
 def vehicleDelete(request, id):
     vehicle = get_object_or_404(Vehicle, id=id)
 
@@ -86,6 +88,7 @@ def vehicleDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.view_vehicle'])
 def ajaxVehicleList(request):
     request_id = ''
     if request.GET['target_id'] != '':
@@ -94,38 +97,40 @@ def ajaxVehicleList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
-        vehicle = get_object_or_404(Vehicle, id=request_id)
-        original_index = vehicle.sort_index
-        vehicle.sort_index = -1
+    if request.user.has_perm('transit.change_vehicle'):
+        if request_action == 'mv':
+            vehicle = get_object_or_404(Vehicle, id=request_id)
+            original_index = vehicle.sort_index
+            vehicle.sort_index = -1
 
-        # "remove" the selected item by shifting everything below it up by 1
-        below_items = Vehicle.objects.filter(sort_index__gt=original_index)
-        for i in below_items:
-            i.sort_index -= 1;
-            i.save()
+            # "remove" the selected item by shifting everything below it up by 1
+            below_items = Vehicle.objects.filter(sort_index__gt=original_index)
+            for i in below_items:
+                i.sort_index -= 1;
+                i.save()
 
-        if request_data == '':
-            new_index = 0
-        else:
-            target_item = get_object_or_404(Vehicle, id=request_data)
-            if vehicle.id != target_item.id:
-                new_index = target_item.sort_index + 1
+            if request_data == '':
+                new_index = 0
             else:
-                new_index = original_index
+                target_item = get_object_or_404(Vehicle, id=request_data)
+                if vehicle.id != target_item.id:
+                    new_index = target_item.sort_index + 1
+                else:
+                    new_index = original_index
 
-        # prepare to insert the item at the new index by shifting everything below it down by 1
-        below_items = Vehicle.objects.filter(sort_index__gte=new_index)
-        for i in below_items:
-            i.sort_index += 1
-            i.save()
+            # prepare to insert the item at the new index by shifting everything below it down by 1
+            below_items = Vehicle.objects.filter(sort_index__gte=new_index)
+            for i in below_items:
+                i.sort_index += 1
+                i.save()
 
-        vehicle.sort_index = new_index
-        vehicle.save()
+            vehicle.sort_index = new_index
+            vehicle.save()
 
     vehicles = Vehicle.objects.all()
     return render(request, 'vehicle/ajax_list.html', {'vehicles': vehicles})
 
+@permission_required(['transit.change_vehicle'])
 def vehicleMaintainEdit(request, id):
     vehicle = get_object_or_404(Vehicle, id=id)
 
@@ -155,6 +160,7 @@ def vehicleMaintainEdit(request, id):
 
     return render(request, 'vehicle/maintain.html', context)
 
+@permission_required(['transit.add_pretrip'])
 def vehiclePreTripCreate(request, shift_id):
     shift = get_object_or_404(Shift, id=shift_id)
 
@@ -218,7 +224,7 @@ def vehiclePreTripCreate(request, shift_id):
     }
     return render(request, 'vehicle/pretrip.html', context=context)
 
-@permission_required('transit.can_delete_pretrip')
+@permission_required('transit.delete_pretrip')
 def vehiclePreTripDelete(request, id):
     pretrip = get_object_or_404(PreTrip, id=id)
 

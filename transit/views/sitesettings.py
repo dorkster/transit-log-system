@@ -5,6 +5,9 @@ from django.urls import reverse
 from transit.models import SiteSettings
 from transit.forms import SiteSettingsForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.change_sitesettings'])
 def sitesettingsEdit(request):
     settings = SiteSettings.load()
     updated = False

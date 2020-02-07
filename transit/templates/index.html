@@ -4,6 +4,7 @@
 <h2>Welcome, {{ user }}!</h2>
 <div class="container ml-0">
     <div class="card-group">
+        {% if perms.transit.change_shift and perms.transit.change_trip %}
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">Drivers</h3>
@@ -45,6 +46,24 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Staff</h3>
+                <div class="list-group">
+                    <a class="list-group-item list-group-item-action list-group-item-primary" href="{% url 'schedule-today' 'read-only' %}">
+                        <span class="oi oi-spreadsheet mr-2"></span><strong>View schedule</strong>
+                    </a>
+                    <a class="list-group-item list-group-item-action list-group-item-info" href="{% url 'report-this-month' %}">
+                        <span class="oi oi-graph mr-2"></span>View latest report
+                    </a>
+                    <a class="list-group-item list-group-item-action list-group-item-info" href="{% url 'search' %}">
+                        <span class="oi oi-magnifying-glass mr-2"></span>Search Trips
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

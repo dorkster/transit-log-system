@@ -9,6 +9,7 @@ from transit.forms import EditTripTypeForm
 
 from django.contrib.auth.decorators import permission_required
 
+@permission_required(['transit.view_triptype'])
 def triptypeList(request):
     context = {
         'triptype': TripType.objects.all(),
@@ -23,6 +24,7 @@ def triptypeEdit(request, id):
     triptype = get_object_or_404(TripType, id=id)
     return triptypeCreateEditCommon(request, triptype, is_new=False)
 
+@permission_required(['transit.change_triptype'])
 def triptypeCreateEditCommon(request, triptype, is_new):
     if is_new == True:
         query = TripType.objects.all().order_by('-sort_index')
@@ -60,7 +62,7 @@ def triptypeCreateEditCommon(request, triptype, is_new):
 
     return render(request, 'triptype/edit.html', context)
 
-@permission_required('transit.can_delete_triptype')
+@permission_required('transit.delete_triptype')
 def triptypeDelete(request, id):
     triptype = get_object_or_404(TripType, id=id)
 
@@ -83,6 +85,7 @@ def triptypeDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.view_triptype'])
 def ajaxTripTypeList(request):
     request_id = ''
     if request.GET['target_id'] != '':
@@ -91,34 +94,35 @@ def ajaxTripTypeList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
-        triptype = get_object_or_404(TripType, id=request_id)
-        original_index = triptype.sort_index
-        triptype.sort_index = -1
+    if request.user.has_perm('transit.change_triptype'):
+        if request_action == 'mv':
+            triptype = get_object_or_404(TripType, id=request_id)
+            original_index = triptype.sort_index
+            triptype.sort_index = -1
 
-        # "remove" the selected item by shifting everything below it up by 1
-        below_items = TripType.objects.filter(sort_index__gt=original_index)
-        for i in below_items:
-            i.sort_index -= 1;
-            i.save()
+            # "remove" the selected item by shifting everything below it up by 1
+            below_items = TripType.objects.filter(sort_index__gt=original_index)
+            for i in below_items:
+                i.sort_index -= 1;
+                i.save()
 
-        if request_data == '':
-            new_index = 0
-        else:
-            target_item = get_object_or_404(TripType, id=request_data)
-            if triptype.id != target_item.id:
-                new_index = target_item.sort_index + 1
+            if request_data == '':
+                new_index = 0
             else:
-                new_index = original_index
+                target_item = get_object_or_404(TripType, id=request_data)
+                if triptype.id != target_item.id:
+                    new_index = target_item.sort_index + 1
+                else:
+                    new_index = original_index
 
-        # prepare to insert the item at the new index by shifting everything below it down by 1
-        below_items = TripType.objects.filter(sort_index__gte=new_index)
-        for i in below_items:
-            i.sort_index += 1
-            i.save()
+            # prepare to insert the item at the new index by shifting everything below it down by 1
+            below_items = TripType.objects.filter(sort_index__gte=new_index)
+            for i in below_items:
+                i.sort_index += 1
+                i.save()
 
-        triptype.sort_index = new_index
-        triptype.save()
+            triptype.sort_index = new_index
+            triptype.save()
 
     triptypes = TripType.objects.all()
     return render(request, 'triptype/ajax_list.html', {'triptypes': triptypes})

@@ -7,6 +7,9 @@ from django.urls import reverse
 from transit.models import Template, TemplateTrip, FrequentTag
 from transit.forms import EditTemplateForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_template'])
 def templateList(request):
     context = {
         'template': Template.objects.all(),
@@ -21,6 +24,7 @@ def templateEdit(request, id):
     template = get_object_or_404(Template, id=id)
     return templateCreateEditCommon(request, template, is_new=False)
 
+@permission_required(['transit.change_template'])
 def templateCreateEditCommon(request, template, is_new):
     if is_new == True:
         query = Template.objects.all().order_by('-sort_index')
@@ -58,6 +62,7 @@ def templateCreateEditCommon(request, template, is_new):
 
     return render(request, 'template/edit.html', context)
 
+@permission_required(['transit.delete_template'])
 def templateDelete(request, id):
     template = get_object_or_404(Template, id=id)
 
@@ -85,6 +90,7 @@ def templateDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.view_template'])
 def ajaxTemplateList(request):
     request_id = ''
     if request.GET['target_id'] != '':
@@ -93,34 +99,35 @@ def ajaxTemplateList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
-        template = get_object_or_404(Template, id=request_id)
-        original_index = template.sort_index
-        template.sort_index = -1
+    if request.user.has_perm('transit.change_template'):
+        if request_action == 'mv':
+            template = get_object_or_404(Template, id=request_id)
+            original_index = template.sort_index
+            template.sort_index = -1
 
-        # "remove" the selected item by shifting everything below it up by 1
-        below_items = Template.objects.filter(sort_index__gt=original_index)
-        for i in below_items:
-            i.sort_index -= 1;
-            i.save()
+            # "remove" the selected item by shifting everything below it up by 1
+            below_items = Template.objects.filter(sort_index__gt=original_index)
+            for i in below_items:
+                i.sort_index -= 1;
+                i.save()
 
-        if request_data == '':
-            new_index = 0
-        else:
-            target_item = get_object_or_404(Template, id=request_data)
-            if template.id != target_item.id:
-                new_index = target_item.sort_index + 1
+            if request_data == '':
+                new_index = 0
             else:
-                new_index = original_index
+                target_item = get_object_or_404(Template, id=request_data)
+                if template.id != target_item.id:
+                    new_index = target_item.sort_index + 1
+                else:
+                    new_index = original_index
 
-        # prepare to insert the item at the new index by shifting everything below it down by 1
-        below_items = Template.objects.filter(sort_index__gte=new_index)
-        for i in below_items:
-            i.sort_index += 1
-            i.save()
+            # prepare to insert the item at the new index by shifting everything below it down by 1
+            below_items = Template.objects.filter(sort_index__gte=new_index)
+            for i in below_items:
+                i.sort_index += 1
+                i.save()
 
-        template.sort_index = new_index
-        template.save()
+            template.sort_index = new_index
+            template.save()
 
     templates = Template.objects.all()
     return render(request, 'template/ajax_list.html', {'templates': templates})

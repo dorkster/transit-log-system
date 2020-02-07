@@ -10,6 +10,9 @@ from django.core import serializers
 from transit.models import Template, TemplateTrip, Client, FrequentTag, Trip, SiteSettings, Destination
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.view_templatetrip'])
 def templateTripList(request, parent):
     context = {
         'parent':parent,
@@ -60,6 +63,7 @@ def templateTripEdit(request, parent, id):
     trip = get_object_or_404(TemplateTrip, id=id)
     return templateTripCreateEditCommon(request, trip, is_new=False)
 
+@permission_required(['transit.change_templatetrip'])
 def templateTripCreateEditCommon(request, trip, is_new):
     if is_new == True:
         query = TemplateTrip.objects.filter(parent=trip.parent).order_by('-sort_index')
@@ -189,6 +193,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
 
     return render(request, 'template/trip/edit.html', context)
 
+@permission_required(['transit.delete_templatetrip'])
 def templateTripDelete(request, parent, id):
     trip = get_object_or_404(TemplateTrip, id=id)
 
@@ -213,6 +218,7 @@ def templateTripDelete(request, parent, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.view_templatetrip'])
 def ajaxTemplateTripList(request, parent):
     request_id = ''
     if request.GET['target_id'] != '':
@@ -221,35 +227,36 @@ def ajaxTemplateTripList(request, parent):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'mv':
-        template_trip = get_object_or_404(TemplateTrip, id=request_id)
-        original_index = template_trip.sort_index
-        template_trip.sort_index = -1
+    if request.user.has_perm('transit.change_templatetrip'):
+        if request_action == 'mv':
+            template_trip = get_object_or_404(TemplateTrip, id=request_id)
+            original_index = template_trip.sort_index
+            template_trip.sort_index = -1
 
-        # "remove" the selected item by shifting everything below it up by 1
-        below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gt=original_index)
-        for i in below_items:
-            i.sort_index -= 1;
-            i.save()
+            # "remove" the selected item by shifting everything below it up by 1
+            below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gt=original_index)
+            for i in below_items:
+                i.sort_index -= 1;
+                i.save()
 
-        if request_data == '':
-            new_index = 0
-        else:
-            target_item = get_object_or_404(TemplateTrip, id=request_data)
-            if template_trip.id != target_item.id:
-                new_index = target_item.sort_index + 1
+            if request_data == '':
+                new_index = 0
             else:
-                new_index = original_index
+                target_item = get_object_or_404(TemplateTrip, id=request_data)
+                if template_trip.id != target_item.id:
+                    new_index = target_item.sort_index + 1
+                else:
+                    new_index = original_index
 
-        # prepare to insert the item at the new index by shifting everything below it down by 1
-        below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gte=new_index)
-        for i in below_items:
-            i.sort_index += 1
-            i.save()
+            # prepare to insert the item at the new index by shifting everything below it down by 1
+            below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gte=new_index)
+            for i in below_items:
+                i.sort_index += 1
+                i.save()
 
-        template_trip.sort_index = new_index
-        template_trip.save()
-    elif request_action == 'toggle_extra_columns':
+            template_trip.sort_index = new_index
+            template_trip.save()
+    if request_action == 'toggle_extra_columns':
         request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)
 
     trips = TemplateTrip.objects.filter(parent=parent)

@@ -2,9 +2,12 @@ from django.shortcuts import render, get_object_or_404
 
 from transit.models import HelpPage
 
+from django.contrib.auth.decorators import permission_required
+
 def helpMain(request):
     return helpPage(request, slug='')
 
+@permission_required(['transit.view_helppage'])
 def helpPage(request, slug):
     topics = HelpPage.objects.all()
 

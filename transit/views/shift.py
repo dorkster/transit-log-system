@@ -7,6 +7,8 @@ from django.urls import reverse
 from transit.models import Shift, Driver, Vehicle, Trip
 from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
 
+from django.contrib.auth.decorators import permission_required
+
 def shiftCreate(request, mode, year, month, day):
     shift = Shift()
     shift.date = datetime.date(year, month, day)
@@ -24,6 +26,7 @@ def shiftEdit(request, mode, id):
     shift = get_object_or_404(Shift, id=id)
     return shiftCreateEditCommon(request, mode, shift, is_new=False)
 
+@permission_required(['transit.change_shift'])
 def shiftCreateEditCommon(request, mode, shift, is_new):
     if request.method == 'POST':
         form = EditShiftForm(request.POST)
@@ -88,6 +91,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
 
     return render(request, 'shift/edit.html', context)
 
+@permission_required(['transit.delete_shift'])
 def shiftDelete(request, mode, id):
     shift = get_object_or_404(Shift, id=id)
     date = shift.date
@@ -105,6 +109,7 @@ def shiftDelete(request, mode, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.change_shift'])
 def shiftStart(request, id):
     shift = get_object_or_404(Shift, id=id)
     date = shift.date
@@ -156,6 +161,7 @@ def shiftStart(request, id):
 
     return render(request, 'shift/start.html', context)
 
+@permission_required(['transit.change_shift'])
 def shiftEnd(request, id):
     shift = get_object_or_404(Shift, id=id)
     date = shift.date
@@ -190,6 +196,7 @@ def shiftEnd(request, id):
 
     return render(request, 'shift/end.html', context)
 
+@permission_required(['transit.change_shift'])
 def shiftFuel(request, id):
     shift = get_object_or_404(Shift, id=id)
     date = shift.date

@@ -28,6 +28,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
                         <div class="dropdown-menu shadow">
+                            {% if perms.transit.change_shift and perms.transit.change_trip %}
                             <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}"><span class="oi oi-spreadsheet mr-2"></span>Edit Schedule</a>
                             <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}"><span class="oi oi-task mr-2"></span>View Schedule</a>
                             <div class="dropdown-divider"></div>
@@ -39,8 +40,14 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'drivers' %}"><span class="oi oi-person mr-2"></span>Edit Drivers</a>
                             <a class="dropdown-item" href="{% url 'triptypes' %}"><span class="oi oi-tags mr-2"></span>Edit Trip Types</a>
+                            {% else %}
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'read-only' %}"><span class="oi oi-spreadsheet mr-2"></span>View Schedule</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'search' %}"><span class="oi oi-magnifying-glass mr-2"></span>Search</a>
+                            {% endif %}
                         </div>
                     </li>
+                    {% if perms.transit.change_vehicle %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Vehicles</a>
                         <div class="dropdown-menu shadow">
@@ -50,6 +57,7 @@
                             <a class="dropdown-item" href="{% url 'vehicles' %}"><span class="oi oi-star mr-2"></span>Edit Vehicles</a>
                         </div>
                     </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
                         <div class="dropdown-menu shadow">
@@ -57,9 +65,11 @@
                             <a class="dropdown-item" href="{% url 'report-this-month' %}"><span class="oi oi-graph mr-2"></span>View this month's report</a>
                         </div>
                     </li>
+                    {% if perms.transit.view_helppage %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'help' %}">Help</a>
                     </li>
+                    {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav ml-auto">
@@ -73,10 +83,14 @@
                             <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>View Admin Control Panel</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
+                            {% if perms.transit.change_shift and perms.transit.change_trip %}
                             <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
+                            {% endif %}
                             <a class="dropdown-item" href="{% url 'password_change' %}"><span class="oi oi-key mr-2"></span>Change Password</a>
+                            {% if perms.transit.change_sitesettings %}
                             <a class="dropdown-item" href="{% url 'settings' %}"><span class="oi oi-cog mr-2"></span>Settings</a>
+                            {% endif %}
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'logout' %}"><span class="oi oi-account-logout mr-2"></span>Logout</a>
                         </div>
@@ -92,7 +106,7 @@
                 {% endblock %}
             </div>
         </nav>
-        {% if notifications and user.is_authenticated %}
+        {% if notifications and user.is_authenticated and perms.transit.change_vehicleissue %}
             <div id="global-notifications" class="list-group list-group-flush">
             {% for issue in notify_vehicle_issues %}
             <strong><a href="{% url 'vehicle-issue-edit' issue.id %}" class="list-group-item list-group-item-action p-1 {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a></strong>

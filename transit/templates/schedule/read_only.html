@@ -1,0 +1,65 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<div class="container-fluid mt-4 mb-3">
+    <div class="row justify-content-between">
+        <div class="col-md p-1">
+            <h3 class="alert alert-info text-dark p-1">{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h3>
+        </div>
+        <div class="col-auto p-1">
+            <a href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank" class="btn btn-info"><span class="oi oi-print mr-2"></span>Print</a>
+        </div>
+        <div class="col-auto p-1">
+            <div class="btn-group" role="group">
+                <a title="Previous day" class="btn btn-secondary" href="{{ date_prev }}">
+                    <span class="oi oi-chevron-left"></span>
+                </a>
+                <div class="btn-group" role="group" id="date_dropdown">
+                    <button title="Select a date" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="oi oi-calendar"></span>
+                    </button>
+                    <div class="dropdown-menu shadow dropdown-menu-right">
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                {{ date_picker }}
+                                <input type="submit" value="Go" class="btn btn-secondary align-top">
+                            </form>
+                        </div>
+                        <a class="dropdown-item" href="{% url 'schedule-today' 'read-only' %}">Go to today</a>
+                    </div>
+                </div>
+                <a title="Next day" class="btn btn-secondary" href="{{ date_next }}">
+                    <span class="oi oi-chevron-right"></span></span>
+                </a>
+            </div>
+            <script type="text/javascript">
+                // Keep the dropdown from closing when picking a date
+                $('#date_dropdown option, #date_dropdown select').click(function(e) {
+                    e.stopPropagation();
+                })
+            </script>
+        </div>
+    </div>
+</div>
+<hr/>
+<div id="schedule-read-only">
+</div>
+
+{% block javascript %}
+<script type="text/javascript">
+    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-read-only' %}", "#schedule-read-only");
+    ajax_loader.extra_data["year"] = {{date.year}};
+    ajax_loader.extra_data["month"] = {{date.month}};
+    ajax_loader.extra_data["day"] = {{date.day}};
+
+    // Fetch the initial data and repeat every 10 seconds
+    ajax_loader.run();
+    ajax_loader.start(10000);
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

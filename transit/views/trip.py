@@ -11,6 +11,8 @@ from django.core import serializers
 from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag, SiteSettings, Destination
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
 
+from django.contrib.auth.decorators import permission_required
+
 def moneyParse(value):
     num_only = ''
     matches = re.findall('\d*', value)
@@ -93,6 +95,7 @@ def tripCreateFromClient(request, mode, id):
 
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
+@permission_required(['transit.change_trip'])
 def tripCreateEditCommon(request, mode, trip, is_new):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
@@ -240,6 +243,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
     return render(request, 'trip/edit.html', context)
 
+@permission_required(['transit.delete_trip'])
 def tripDelete(request, mode, id):
     trip = get_object_or_404(Trip, id=id)
     date = trip.date
@@ -265,6 +269,7 @@ def tripDelete(request, mode, id):
 
     return render(request, 'model_delete.html', context)
 
+@permission_required(['transit.change_trip'])
 def tripStart(request, id):
     trip = get_object_or_404(Trip, id=id)
     date = trip.date
@@ -337,6 +342,7 @@ def tripStart(request, id):
 
     return render(request, 'trip/start.html', context)
 
+@permission_required(['transit.change_trip'])
 def tripEnd(request, id):
     trip = get_object_or_404(Trip, id=id)
     date = trip.date
@@ -399,6 +405,7 @@ def tripEnd(request, id):
 
     return render(request, 'trip/end.html', context)
 
+@permission_required(['transit.change_trip'])
 def ajaxSetVehicleFromDriver(request):
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
 

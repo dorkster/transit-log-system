@@ -9,6 +9,9 @@ from openpyxl import load_workbook
 from transit.models import Shift, Trip, Driver, Vehicle, TripType
 from transit.forms import UploadFileForm
 
+from django.contrib.auth.decorators import permission_required
+
+@permission_required(['transit.change_trip', 'transit.change_shift'])
 def excelImport(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)

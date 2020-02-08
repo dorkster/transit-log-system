@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag
+from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag, SiteSettings
 from transit.forms import DatePickerForm, EditScheduleMessageForm
 
 from django.contrib.auth.decorators import permission_required
@@ -19,6 +19,13 @@ def schedule(request, mode, year, month, day):
     day_date = datetime.date(year, month, day)
     day_date_prev = day_date + datetime.timedelta(days=-1)
     day_date_next = day_date + datetime.timedelta(days=1)
+
+    site_settings = SiteSettings.load()
+    if site_settings.skip_weekends:
+        if day_date.weekday() == 0:
+            day_date_prev = day_date + datetime.timedelta(days=-3)
+        if day_date.weekday() == 4:
+            day_date_next = day_date + datetime.timedelta(days=3)
 
     query_trips = Trip.objects.filter(date=day_date)
     query_shifts = Shift.objects.filter(date=day_date)

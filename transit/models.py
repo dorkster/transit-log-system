@@ -813,6 +813,7 @@ class SiteSettings(SingletonModel):
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
     autocomplete_history_days = models.IntegerField(default=30)
     reset_filter_on_shift_change = models.BooleanField(verbose_name='Reset Schedule filter when starting/ending Shift', default=False)
+    skip_weekends = models.BooleanField(verbose_name='Skip weekends in Schedule date picker', default=False)
 
     def get_color(self, context):
         color = '00000000'

@@ -812,6 +812,7 @@ class SiteSettings(SingletonModel):
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
     autocomplete_history_days = models.IntegerField(default=30)
+    reset_filter_on_shift_change = models.BooleanField(verbose_name='Reset Schedule filter when starting/ending Shift', default=False)
 
     def get_color(self, context):
         color = '00000000'

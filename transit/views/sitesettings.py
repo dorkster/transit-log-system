@@ -21,6 +21,7 @@ def sitesettingsEdit(request):
             settings.activity_color = form.cleaned_data['activity_color'][1:]
             settings.cancel_color = form.cleaned_data['cancel_color'][1:]
             settings.autocomplete_history_days = form.cleaned_data['autocomplete_history_days']
+            settings.reset_filter_on_shift_change = form.cleaned_data['reset_filter_on_shift_change']
             settings.save()
             updated = True
     else:
@@ -28,6 +29,7 @@ def sitesettingsEdit(request):
             'activity_color': '#' + settings.activity_color,
             'cancel_color': '#' + settings.cancel_color,
             'autocomplete_history_days': settings.autocomplete_history_days,
+            'reset_filter_on_shift_change': settings.reset_filter_on_shift_change,
         }
         form = SiteSettingsForm(initial=initial)
 

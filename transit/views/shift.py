@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Shift, Driver, Vehicle, Trip
+from transit.models import Shift, Driver, Vehicle, Trip, SiteSettings
 from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
 
 from django.contrib.auth.decorators import permission_required
@@ -141,13 +141,15 @@ def shiftStart(request, id):
             shift.start_time = form.cleaned_data['time']
             shift.save()
 
-            # reset schedule filter
-            request.session['schedule_view_hide_completed'] = False
-            request.session['schedule_view_hide_canceled'] = False
-            request.session['schedule_view_hide_nolog'] = False
-            request.session['schedule_view_search'] = ''
-            request.session['schedule_view_driver'] = ''
-            request.session['schedule_view_vehicle'] = ''
+            site_settings = SiteSettings.load()
+            if site_settings.reset_filter_on_shift_change:
+                # reset schedule filter
+                request.session['schedule_view_hide_completed'] = False
+                request.session['schedule_view_hide_canceled'] = False
+                request.session['schedule_view_hide_nolog'] = False
+                request.session['schedule_view_search'] = ''
+                request.session['schedule_view_driver'] = ''
+                request.session['schedule_view_vehicle'] = ''
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
@@ -185,13 +187,15 @@ def shiftEnd(request, id):
             shift.end_time = form.cleaned_data['time']
             shift.save()
 
-            # reset schedule filter
-            request.session['schedule_view_hide_completed'] = False
-            request.session['schedule_view_hide_canceled'] = False
-            request.session['schedule_view_hide_nolog'] = False
-            request.session['schedule_view_search'] = ''
-            request.session['schedule_view_driver'] = ''
-            request.session['schedule_view_vehicle'] = ''
+            site_settings = SiteSettings.load()
+            if site_settings.reset_filter_on_shift_change:
+                # reset schedule filter
+                request.session['schedule_view_hide_completed'] = False
+                request.session['schedule_view_hide_canceled'] = False
+                request.session['schedule_view_hide_nolog'] = False
+                request.session['schedule_view_search'] = ''
+                request.session['schedule_view_driver'] = ''
+                request.session['schedule_view_vehicle'] = ''
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:

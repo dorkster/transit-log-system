@@ -205,6 +205,7 @@ Show extra columns
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         {% if trip.is_activity %}
         <td colspan=2 class="text-center">
+            <a id="trip_{{ trip.id }}"></a>
             {% if trip.pick_up_time and trip.appointment_time %}
             {{ trip.pick_up_time }} - {{ trip.appointment_time }}
             {% elif trip.pick_up_time %}
@@ -218,6 +219,7 @@ Show extra columns
         </td>
         {% else %}
         <td class="mytable-col-sm">
+            <a id="trip_{{ trip.id }}"></a>
             {{ trip.pick_up_time }}
         </td>
         <td class="mytable-col-sm">

@@ -40,9 +40,11 @@
                 })
             </script>
         </div>
+        {% if perms.transit.change_vehicle %}
         <div class="col-auto p-1">
             <a href="{% url 'schedule' 'view' date.year date.month date.day %}" class="btn btn-info"><span class="oi oi-task mr-2"></span>View</a>
         </div>
+        {% endif %}
     </div>
 </div>
 <hr/>

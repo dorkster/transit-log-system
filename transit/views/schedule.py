@@ -11,10 +11,12 @@ from transit.forms import DatePickerForm, EditScheduleMessageForm
 
 from django.contrib.auth.decorators import permission_required
 
-@permission_required(['transit.view_shift', 'transit.view_trip'])
+@permission_required(['transit.view_trip'])
 def schedule(request, mode, year, month, day):
-    if mode != 'read-only' and (not request.user.has_perm('transit.change_shift') or not request.user.has_perm('transit.change_trip')):
+    if mode != 'read-only' and (not request.user.has_perm('transit.change_shift') and not request.user.has_perm('transit.change_trip')):
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'read-only', 'year':year, 'month':month, 'day':day}))
+    elif mode == 'view' and not request.user.has_perm('transit.change_vehicle'):
+        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':year, 'month':month, 'day':day}))
 
     day_date = datetime.date(year, month, day)
     day_date_prev = day_date + datetime.timedelta(days=-1)
@@ -134,7 +136,7 @@ def ajaxScheduleView(request):
 def ajaxScheduleReadOnly(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_read_only.html', has_filter=True)
 
-@permission_required(['transit.view_shift', 'transit.view_trip'])
+@permission_required(['transit.view_trip'])
 def ajaxScheduleCommon(request, template, has_filter=False):
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
 
@@ -145,7 +147,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request.user.has_perm('transit.change_trip') and request.user.has_perm('transit.change_shift'):
+    if request.user.has_perm('transit.change_trip'):
         if request_action == 'mv':
             trip = get_object_or_404(Trip, id=request_id)
             original_index = trip.sort_index

@@ -28,22 +28,38 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
                         <div class="dropdown-menu shadow">
-                            {% if perms.transit.change_shift and perms.transit.change_trip %}
+                            {% if perms.transit.change_trip %}
                             <a class="dropdown-item" href="{% url 'schedule-today' 'edit' %}"><span class="oi oi-spreadsheet mr-2"></span>Edit Schedule</a>
-                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}"><span class="oi oi-task mr-2"></span>View Schedule</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'search' %}"><span class="oi oi-magnifying-glass mr-2"></span>Search</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'clients' %}"><span class="oi oi-people mr-2"></span>Edit Clients</a>
-                            <a class="dropdown-item" href="{% url 'destinations' %}"><span class="oi oi-pin mr-2"></span>Edit Destinations</a>
-                            <a class="dropdown-item" href="{% url 'templates' %}"><span class="oi oi-list mr-2"></span>Edit Templates</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'drivers' %}"><span class="oi oi-person mr-2"></span>Edit Drivers</a>
-                            <a class="dropdown-item" href="{% url 'triptypes' %}"><span class="oi oi-tags mr-2"></span>Edit Trip Types</a>
                             {% else %}
                             <a class="dropdown-item" href="{% url 'schedule-today' 'read-only' %}"><span class="oi oi-spreadsheet mr-2"></span>View Schedule</a>
+                            {% endif %}
+                            {% if perms.transit.change_vehicle %}
+                            <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}"><span class="oi oi-task mr-2"></span>View Schedule</a>
+                            {% endif %}
+                            {% if perms.transit.view_trip %}
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'search' %}"><span class="oi oi-magnifying-glass mr-2"></span>Search</a>
+                            {% endif %}
+                            {% if perms.transit.view_client or perms.transit.view_destination or perms.transit.view_template %}
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
+                            {% if perms.transit.view_client %}
+                            <a class="dropdown-item" href="{% url 'clients' %}"><span class="oi oi-people mr-2"></span>Clients</a>
+                            {% endif %}
+                            {% if perms.transit.view_destination %}
+                            <a class="dropdown-item" href="{% url 'destinations' %}"><span class="oi oi-pin mr-2"></span>Destinations</a>
+                            {% endif %}
+                            {% if perms.transit.view_template %}
+                            <a class="dropdown-item" href="{% url 'templates' %}"><span class="oi oi-list mr-2"></span>Templates</a>
+                            {% endif %}
+                            {% if perms.transit.view_driver or perms.transit.view_triptype %}
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
+                            {% if perms.transit.view_driver %}
+                            <a class="dropdown-item" href="{% url 'drivers' %}"><span class="oi oi-person mr-2"></span>Drivers</a>
+                            {% endif %}
+                            {% if perms.transit.view_triptype %}
+                            <a class="dropdown-item" href="{% url 'triptypes' %}"><span class="oi oi-tags mr-2"></span>Trip Types</a>
                             {% endif %}
                         </div>
                     </li>
@@ -54,10 +70,11 @@
                             <a class="dropdown-item" href="{% url 'vehicle-status' %}"><span class="oi oi-wrench mr-2"></span>Vehicle Status</a>
                             <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-warning mr-2"></span>Report an Issue</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'vehicles' %}"><span class="oi oi-star mr-2"></span>Edit Vehicles</a>
+                            <a class="dropdown-item" href="{% url 'vehicles' %}"><span class="oi oi-star mr-2"></span>Vehicles</a>
                         </div>
                     </li>
                     {% endif %}
+                    {% if perms.transit.view_trip %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
                         <div class="dropdown-menu shadow">
@@ -65,6 +82,7 @@
                             <a class="dropdown-item" href="{% url 'report-this-month' %}"><span class="oi oi-graph mr-2"></span>View this month's report</a>
                         </div>
                     </li>
+                    {% endif %}
                     {% if perms.transit.view_helppage %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'help' %}">Help</a>
@@ -83,7 +101,7 @@
                             <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>View Admin Control Panel</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
-                            {% if perms.transit.change_shift and perms.transit.change_trip %}
+                            {% if perms.transit.change_shift and perms.transit.change_trip and perms.auth.change_user %}
                             <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}

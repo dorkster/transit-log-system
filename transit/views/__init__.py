@@ -16,3 +16,4 @@ from .search import *
 from .sitesettings import *
 from .help import *
 from .destination import *
+from .user_account import *

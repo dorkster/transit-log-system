@@ -4,10 +4,16 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+
     path('accounts/login/', auth_views.LoginView.as_view(template_name='user/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(template_name='user/logged_out.html'), name='logout'),
     path('accounts/password-change/', auth_views.PasswordChangeView.as_view(template_name='user/password_change.html'), name='password_change'),
     path('accounts/password-change-done/', auth_views.PasswordChangeDoneView.as_view(template_name='user/password_change_done.html'), name='password_change_done'),
+
+    path('accounts/', views.userList, name='users'),
+    path('accounts/create', views.userCreate, name='user-create'),
+    path('accounts/<str:username>/edit', views.userEdit, name='user-edit'),
+    path('accounts/<str:username>/delete', views.userDelete, name='user-delete'),
 
     path('settings/', views.sitesettingsEdit, name='settings'),
 

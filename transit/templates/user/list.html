@@ -1,0 +1,48 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+<h3>Users <a class="btn btn-success btn-sm" href="{% url 'user-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+{% if user_accounts %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td>Name</td>
+        <td>Type</td>
+    </thead>
+    {% for user_account in user_accounts %}
+    <tr>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a href="{% url 'user-edit' user_account.username %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit User</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'user-delete' user_account.username %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete User</a>
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ user_account.username }}</td>
+        <td class="mytable-col-lg" style="font-size: 150%;">
+            {% for user_group in user_account.groups.all %}
+            {% if user_group.name == 'Staff' %}
+            <span class="badge badge-success">{{ user_group }}</span>
+            {% elif user_group.name == 'Assistant' %}
+            <span class="badge badge-primary">{{ user_group }}</span>
+            {% else %}
+            <span class="badge badge-secondary">{{ user_group }}</span>
+            {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>There are no users.</p>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

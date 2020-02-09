@@ -235,3 +235,25 @@ class SiteSettingsForm(forms.Form):
     autocomplete_history_days = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     reset_filter_on_shift_change = forms.ChoiceField(choices=BOOL_CHOICES, label='Reset Schedule filter when starting/ending Shift', widget=forms.Select(attrs=formWidgetAttrs.default))
     skip_weekends = forms.ChoiceField(choices=BOOL_CHOICES, label='Skip weekends in the Schedule date picker', widget=forms.Select(attrs=formWidgetAttrs.default))
+
+class EditUserForm(forms.Form):
+    USER_ACCOUNT_TYPES = [
+        (0, 'Staff'),
+        (1, 'Assistant'),
+        (2, 'Basic')
+    ]
+
+    username = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    account_type = forms.ChoiceField(choices=USER_ACCOUNT_TYPES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.default))
+    password_confirm = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.default))
+
+    def clean(self):
+        cleaned_data = super(EditUserForm, self).clean()
+        password = cleaned_data.get('password')
+        password_confirm = cleaned_data.get('password_confirm')
+
+        if password != password_confirm:
+            self.add_error('password_confirm', 'Password does not match')
+
+        return cleaned_data

@@ -1,0 +1,103 @@
+{% extends "base_generic.html" %}
+
+{% block auth_content %}
+{% load static %}
+<h2>
+    {% if is_new %}
+    New User
+    {% else %}
+    User Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>General Information</legend>
+                    <div class="mb-2">
+                        <label for="{{ form.username.id_for_label }}"><strong>{{ form.username.label }}</strong></label><br/>
+                        {% if is_new %}
+                        {{ form.username }}
+                        {% else %}
+                        {{ user_account.username }}
+                        {% endif %}
+                    </div>
+                    {% if is_new and form.username.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.username.errors }}
+                    </div>
+                    {% endif %}
+                    <div class="mb-2">
+                        <label for="{{ form.account_type.id_for_label }}"><strong>{{ form.account_type.label }}</strong></label><br/>
+                        {% if user.username == user_account.username %}
+                            <div style="font-size: 150%;">
+                            {% if form.account_type.value == 0 %}
+                            <span class="badge badge-success">Staff</span>
+                            {% elif form.account_type.value == 1 %}
+                            <span class="badge badge-primary">Assistant</span>
+                            {% elif form.account_type.value == 2 %}
+                            <span class="badge badge-secondary">Basic</span>
+                            {% endif %}
+                            </div>
+                        {% else %}
+                        {{ form.account_type }}
+                        {% endif %}
+                        <div class="small mt-2">
+                            <ul class="m-0">
+                                <li><strong class="text-secondary">Basic</strong> - Can view the schedule and reports, but can't make any changes.</li>
+                                <li><strong class="text-primary">Assistant</strong> - Can change trips on the schedule. Can't change shifts, log data, or vehicle data.
+                                <li><strong class="text-success">Staff</strong> - Full access to everything.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        {% if is_new %}
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Password</legend>
+                    <div class="mb-2"><label for="{{ form.password.id_for_label }}"><strong>{{ form.password.label }}</strong></label><br/>{{ form.password }}</div>
+                    {% if form.password.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.password.errors }}
+                    </div>
+                    {% endif %}
+                    <ul class="mt-2 mb-2 small text-muted">
+                        <li>The password can't be too similar to the user's other personal information.</li>
+                        <li>The password must contain at least 8 characters.</li>
+                        <li>The password can't be a commonly used password.</li>
+                        <li>The password can't be entirely numeric.</li>
+                    </ul>
+                    <div class="mb-2"><label for="{{ form.password_confirm.id_for_label }}"><strong>{{ form.password_confirm.label }}</strong></label><br/>{{ form.password_confirm }}</div>
+                    {% if form.password_confirm.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.password_confirm.errors }}
+                    </div>
+                    {% endif %}
+                </fieldset>
+            </div>
+        </div>
+        {% endif %}
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>
+                <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel Changes</button>
+            </div>
+            {% if not is_new and perms.auth.delete_user %}
+            <div>
+                <button class="btn btn-danger btn-lg m-2" type="submit" name="delete" formnovalidate><span class="oi oi-delete mr-2"></span>Delete User</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

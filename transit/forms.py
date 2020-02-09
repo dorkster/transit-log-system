@@ -73,6 +73,12 @@ class formWidgetAttrs():
     money['onchange'] = 'validateMoney(this)'
     money['inputmode'] = 'decimal'
 
+    new_user = default.copy()
+    new_user['autocomplete'] = 'off'
+
+    new_password = default.copy()
+    new_password['autocomplete'] = 'new-password'
+
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
@@ -243,10 +249,10 @@ class EditUserForm(forms.Form):
         (2, 'Basic')
     ]
 
-    username = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    username = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.new_user))
     account_type = forms.ChoiceField(choices=USER_ACCOUNT_TYPES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.default))
-    password_confirm = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.default))
+    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.new_password))
+    password_confirm = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.new_password))
 
     def clean(self):
         cleaned_data = super(EditUserForm, self).clean()

@@ -16,8 +16,14 @@ def notifications(request):
         if v.oil_change_miles != '':
             latest_shift = Shift.objects.filter(vehicle=v.id).order_by('date').exclude(end_miles='').last()
             if latest_shift is not None and latest_shift.end_miles != '':
-                shift_miles = float(latest_shift.end_miles);
-                oil_change_miles = float(v.oil_change_miles);
+                try:
+                    shift_miles = float(latest_shift.end_miles);
+                except:
+                    shift_miles = 0
+                try:
+                    oil_change_miles = float(v.oil_change_miles);
+                except:
+                    oil_change_miles = 0
                 if shift_miles >= oil_change_miles:
                     vehicle_oil_changes.append(v)
 

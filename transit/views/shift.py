@@ -137,7 +137,10 @@ def shiftStart(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
 
         if form.is_valid():
-            shift.start_miles = previous_shift_end_miles[0:len(previous_shift_end_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
+            if len(form.cleaned_data['miles']) < len(previous_shift_end_miles):
+                shift.start_miles = previous_shift_end_miles[0:len(previous_shift_end_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
+            else:
+                shift.start_miles = form.cleaned_data['miles']
             shift.start_time = form.cleaned_data['time']
             shift.save()
 
@@ -183,7 +186,10 @@ def shiftEnd(request, id):
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
 
         if form.is_valid():
-            shift.end_miles = shift.start_miles[0:len(shift.start_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
+            if len(form.cleaned_data['miles']) < len(shift.start_miles):
+                shift.end_miles = shift.start_miles[0:len(shift.start_miles)-len(form.cleaned_data['miles'])] + form.cleaned_data['miles']
+            else:
+                shift.end_miles = form.cleaned_data['miles']
             shift.end_time = form.cleaned_data['time']
             shift.save()
 

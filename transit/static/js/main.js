@@ -53,7 +53,10 @@ function AjaxLoader(url, div_id) {
                         var hash_element = document.getElementById(hash);
                         if (hash_element) {
                             // hash_element.scrollIntoView({behavior: "smooth", block: "center"});
-                            hash_element.scrollIntoView({block: "center"});
+                            if (hash_element.dataset.scrollintoview == "start")
+                                hash_element.scrollIntoView({block: "start"});
+                            else
+                                hash_element.scrollIntoView({block: "center"});
                         }
                 }
             }

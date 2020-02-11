@@ -10,7 +10,7 @@
     Destination Edit
     {% endif %}
 </h2>
-<form class="mb-4" action="" method="post">
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <datalist id='addresses'>
         {% for address in addresses %}

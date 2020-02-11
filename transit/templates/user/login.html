@@ -11,7 +11,7 @@
 {% endif %}
 
 <div class="container ml-0">
-<form method="post" action="{% url 'login' %}">
+<form method="post" action="{% url 'login' %}" onsubmit="return checkForm(this, event);">
 {% csrf_token %}
     <div class="row">
         <div class="col-md border m-1 p-2">

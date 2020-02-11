@@ -19,7 +19,7 @@
         </div>
     </div>
 </div>
-<form class="mb-4" action="" method="post">
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     {{ form.checklist }}
     <div class="container ml-0">

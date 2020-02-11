@@ -190,3 +190,11 @@ function editCell(url, row_movers=null) {
         window.location.assign(url);
     }
 }
+
+function checkForm(form, ev) {
+    if ($(form).data('submitted'))
+        ev.preventDefault();
+    else
+        $(form).data('submitted', true);
+    return true;
+}

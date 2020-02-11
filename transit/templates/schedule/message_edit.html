@@ -5,7 +5,7 @@
 <h2>
     Message for: {{ date|date:"l"}}, {{ date|date:"F d" }}, {{ date|date:"Y" }}
 </h2>
-<form class="mb-4" action="" method="post">
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <div class="container ml-0">
         <div class="row">

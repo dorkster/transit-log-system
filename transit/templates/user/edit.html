@@ -9,7 +9,7 @@
     User Edit
     {% endif %}
 </h2>
-<form class="mb-4" action="" method="post">
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <div class="container ml-0">
         <div class="row">

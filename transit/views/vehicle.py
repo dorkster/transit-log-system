@@ -164,6 +164,10 @@ def vehicleMaintainEdit(request, id):
 def vehiclePreTripCreate(request, shift_id):
     shift = get_object_or_404(Shift, id=shift_id)
 
+    # Pretrip was already logged, return to the schedule
+    if len(PreTrip.objects.filter(shift_id=shift_id)) > 0:
+        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+
     if request.method == 'POST':
         form = vehiclePreTripForm(request.POST)
 

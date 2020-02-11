@@ -3,7 +3,7 @@
 {% block auth_content %}
 <h2>Import Excel (xlsx) files</h2>
 {% if not import_done %}
-<form class="mb-4" action="" method="post" enctype="multipart/form-data">
+<form class="mb-4" action="" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     {{ form.as_p }}
     <hr>

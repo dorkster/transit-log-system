@@ -12,7 +12,7 @@
 {% if is_dupe %}
 <div class="alert alert-primary" role="alert">An existing client with the name '{{client.name}}' was found.</div>
 {% endif %}
-<form class="mb-4" action="" method="post">
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <datalist id='client-names'>
         {% for name in names %}

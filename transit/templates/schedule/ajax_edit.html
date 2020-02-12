@@ -349,7 +349,11 @@ Show extra columns
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.note %}
                     <span class="oi oi-document"></span>
-                    {% else %}
+                    {% endif %}
+                    {% if trip.tags %}
+                    <span class="oi oi-tag"></span>
+                    {% endif %}
+                    {% if not trip.tags and not trip.note %}
                     <span class="oi oi-ellipses"></span>
                     {% endif %}
                 </button>

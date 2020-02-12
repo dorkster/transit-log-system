@@ -186,7 +186,11 @@ Show extra columns
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if client.tags %}
+                    <span class="oi oi-tag"></span>
+                    {% else %}
                     <span class="oi oi-ellipses"></span>
+                    {% endif %}
                 </button>
                 <div class="dropdown-menu shadow dropdown-menu-right p-2">
                     <div class="list-group list-group-flush" style="width: 300px">

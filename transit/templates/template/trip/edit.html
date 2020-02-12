@@ -71,15 +71,21 @@
                 <fieldset class="form-group">
                     <legend>Trip Information</legend>
                     <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address', 'id_phone_address')"><span class="oi oi-home"></span></a>
                         <br/>{{ form.address }}</div>
-                    <div class="mb-2"><label for="{{ form.phone_address.id_for_label }}"><strong>{{ form.phone_address.label }}</strong></label><br/>{{ form.phone_address }}</div>
+                    <div class="mb-2"><label for="{{ form.phone_address.id_for_label }}"><strong>{{ form.phone_address.label }}</strong></label>
+                        <a title="Get the pick-up phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_address', 'id_phone_address')"><span class="oi oi-phone"></span></a>
+                        <br/>{{ form.phone_address }}
+                    </div>
                     <div class="mb-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination', 'id_phone_destination')"><span class="oi oi-home"></span></a>
                         <br/>{{ form.destination }}</div>
-                    <div class="mb-2"><label for="{{ form.phone_destination.id_for_label }}"><strong>{{ form.phone_destination.label }}</strong></label><br/>{{ form.phone_destination }}</div>
+                    <div class="mb-2"><label for="{{ form.phone_destination.id_for_label }}"><strong>{{ form.phone_destination.label }}</strong></label>
+                        <a title="Get the destination phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_destination', 'id_phone_destination')"><span class="oi oi-phone"></span></a>
+                        <br/>{{ form.phone_destination }}
+                    </div>
                     <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.trip_type.id_for_label }}"><strong>{{ form.trip_type.label }}</strong></label><br/>{{ form.trip_type }}</div>
@@ -194,11 +200,12 @@
         }
     }
 
-    function getClientAddress(input) {
-        $("#" + input).val("");
+    function getClientAddress(address_input, phone_input) {
+        $("#" + address_input).val("");
+        $("#" + phone_input).val("");
         for (i in clients) {
             if (clients[i].fields.name == name_input.value) {
-                $("#" + input).val(clients[i].fields.address);
+                $("#" + address_input).val(clients[i].fields.address);
             }
         }
     }
@@ -211,6 +218,16 @@
         for (i in destinations) {
             if (destinations[i].fields.address == address_input.value) {
                 phone_input.value = destinations[i].fields.phone;
+                break;
+            }
+        }
+    }
+
+    function getDestinationPhone(address_input, phone_input) {
+        $("#" + phone_input).val("");
+        for (i in destinations) {
+            if (destinations[i].fields.address == $("#" + address_input).val()) {
+                $("#" + phone_input).val(destinations[i].fields.phone);
                 break;
             }
         }

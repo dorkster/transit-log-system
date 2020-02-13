@@ -168,18 +168,6 @@ class Trip(models.Model):
             self.end_miles = None
             self.end_time = None
 
-    def get_parsed_log_data(self, shift_miles):
-        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '' or self.is_activity:
-            return None
-
-        data = self.LogData()
-        data.start_miles = float(shift_miles[0:len(shift_miles)-len(self.start_miles)] + self.start_miles)
-        data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
-        data.end_miles = float(shift_miles[0:len(shift_miles)-len(self.end_miles)] + self.end_miles)
-        data.end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
-
-        return data
-
     def get_error_str(self):
         if (self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '') or self.is_activity:
             return '' # Empty; can be safely ignored
@@ -339,23 +327,6 @@ class Shift(models.Model):
             # string used for parsing Trip log data
             self.start_miles_str = None
 
-    def get_parsed_log_data(self):
-        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
-            return None
-
-        data = self.LogData()
-        data.driver = self.driver
-        data.start_miles = float(self.start_miles)
-        data.start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
-        data.end_miles = float(self.end_miles)
-        data.end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
-        if self.fuel != '':
-            data.fuel = float(self.fuel)
-
-        data.start_miles_str = self.start_miles
-
-        return data
-
     def get_error_str(self):
         if self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
             return '' # Empty; can be safely ignored
@@ -389,40 +360,6 @@ class Shift(models.Model):
 
     def check_pretrip(self):
         return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)
-
-    def get_start_end_trips(self):
-        trip_miles_start = 0
-        trip_miles_end = 0
-        trip_time_start = 0
-        trip_time_end = 0
-        trip_data_list = []
-        shift_data = self.get_parsed_log_data()
-
-        for trip in Trip.objects.filter(date=self.date, vehicle=self.vehicle, status=Trip.STATUS_NORMAL):
-            trip_data = trip.get_parsed_log_data(self.start_miles)
-
-            if trip_data is None:
-                continue
-
-            # TODO also check time?
-            if trip_data.start_miles < shift_data.start_miles or trip_data.end_miles > shift_data.end_miles:
-                continue
-
-            trip_data_list.append(trip_data)
-            last_index = len(trip_data_list)-1
-            if trip_data.start_miles < trip_data_list[trip_miles_start].start_miles:
-                trip_miles_start = last_index
-            if trip_data.end_miles > trip_data_list[trip_miles_end].end_miles:
-                trip_miles_end = last_index
-            if trip_data.start_time < trip_data_list[trip_time_start].start_time:
-                trip_time_start = last_index
-            if trip_data.end_time > trip_data_list[trip_time_end].end_time:
-                trip_time_end = last_index
-
-        if len(trip_data_list) > 0:
-            return (trip_data_list[trip_miles_start], trip_data_list[trip_time_start], trip_data_list[trip_miles_end], trip_data_list[trip_time_end])
-        else:
-            return None
 
 
 class Client(models.Model):

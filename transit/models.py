@@ -161,30 +161,6 @@ class Trip(models.Model):
         else:
             return 'Trip'
 
-    class LogData():
-        def __init__(self):
-            self.start_miles = None
-            self.start_time = None
-            self.end_miles = None
-            self.end_time = None
-
-    def get_error_str(self):
-        if (self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '') or self.is_activity:
-            return '' # Empty; can be safely ignored
-        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
-            error_msg = ''
-
-            if self.vehicle == None:
-                error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Trip contains log data, but has no vehicle assigned.</span><br/>'
-            else:
-                error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Trip contains partial log data.</span><br/>'
-
-            if error_msg != '':
-                error_ref = str(self) + '<br/><a href="' + reverse('schedule', kwargs={'mode':'edit', 'year':self.date.year, 'month':self.date.month, 'day':self.date.day}) + '#trip_' + str(self.id) + '">View Schedule</a> | <a href="' + reverse('trip-edit', kwargs={'mode':'edit', 'id':self.id}) + '">Edit</a>'
-                return error_msg + error_ref
-        else:
-            return ''
-
     def check_blank(self, field):
         if field != '':
             return True
@@ -315,28 +291,6 @@ class Shift(models.Model):
 
     def get_class_name(self):
         return 'Shift'
-
-    class LogData():
-        def __init__(self):
-            self.start_miles = None
-            self.start_time = None
-            self.end_miles = None
-            self.end_time = None
-            self.fuel = 0
-
-            # string used for parsing Trip log data
-            self.start_miles_str = None
-
-    def get_error_str(self):
-        if self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
-            return '' # Empty; can be safely ignored
-        if self.start_miles == '' or self.start_time == '' or self.end_miles == '' or self.end_time == '':
-            # vehicle can not be None due to form validation, so no need to check for it here
-            error_msg = '<strong class="text-danger">Error</strong><span class="text-muted">: Shift contains partial log data.</span><br/>'
-            error_ref = str(self) + '<br/><a href="' + reverse('schedule', kwargs={'mode':'edit', 'year':self.date.year, 'month':self.date.month, 'day':self.date.day}) + '">View Schedule</a> | <a href="' + reverse('shift-edit', kwargs={'mode':'edit', 'id':self.id}) + '">Edit</a>'
-            return error_msg + error_ref
-        else:
-            return ''
 
     def check_blank(self, field):
         if field != '':

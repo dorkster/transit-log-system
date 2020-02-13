@@ -457,6 +457,10 @@ class VehicleIssue(models.Model):
             return self.ISSUE_HAZARDS
         elif cl_key == 'cl_directional':
             return self.ISSUE_DIRECTIONAL
+        elif cl_key == 'cl_markers':
+            return self.ISSUE_MARKERS
+        elif cl_key == 'cl_windshield':
+            return self.ISSUE_WINDSHIELD
         elif cl_key == 'cl_glass':
             return self.ISSUE_GLASS
         elif cl_key == 'cl_mirrors':
@@ -478,7 +482,7 @@ class VehicleIssue(models.Model):
         elif cl_key == 'cl_interior':
             return self.ISSUE_INTERIOR
         else:
-            return ISSUE_NONE
+            return self.ISSUE_NONE
 
 class Template(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

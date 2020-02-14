@@ -135,6 +135,8 @@ class Report():
         TRIP_NO_SHIFT = 2
         TRIP_MILES_OOB = 3
         TRIP_TIME_OOB = 4
+        SHIFT_PARSE = 5
+        TRIP_PARSE = 6
 
         def __init__(self):
             self.errors = []
@@ -178,6 +180,9 @@ class Report():
             # TODO what if end month/year is different than start?
             day_date = datetime.date(date_start.year, date_start.month, day)
 
+            # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...
+            fallback_time = datetime.datetime(year=day_date.year, month=day_date.month, day=day_date.day, hour=8, minute=0)
+
             report_day = Report.ReportDay()
             report_day.date = day_date
 
@@ -191,14 +196,40 @@ class Report():
 
                 report_shift = Report.ReportShift()
                 report_shift.shift = i
+
                 report_shift.start_miles[T_STR] = i.start_miles
-                report_shift.start_miles[T_FLOAT] = float(i.start_miles)
-                report_shift.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+                try:
+                    report_shift.start_miles[T_FLOAT] = float(i.start_miles)
+                except:
+                    report_shift.start_miles[T_FLOAT] = 0
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+
+
+                try:
+                    report_shift.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+                except:
+                    report_shift.start_time = fallback_time
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+
                 report_shift.end_miles[T_STR] = i.end_miles
-                report_shift.end_miles[T_FLOAT] = float(i.end_miles)
-                report_shift.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+                try:
+                    report_shift.end_miles[T_FLOAT] = float(i.end_miles)
+                except:
+                    report_shift.end_miles[T_FLOAT] = 0
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+
+                try:
+                    report_shift.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+                except:
+                    report_shift.end_time = fallback_time
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+
                 if i.fuel:
-                    report_shift.fuel = float(i.fuel)
+                    try:
+                        report_shift.fuel = float(i.fuel)
+                    except:
+                        report_shift.fuel = 0
+                        self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 report_day.shifts.append(report_shift)
 
@@ -238,12 +269,38 @@ class Report():
                     continue
 
                 shift = report_day.shifts[report_trip.shift]
-                report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
-                report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
-                report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
-                report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
-                report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
-                report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+
+                if len(i.start_miles) < len(shift.start_miles[T_STR]):
+                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
+                else:
+                    report_trip.start_miles[T_STR] = i.start_miles
+                try:
+                    report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
+                except:
+                    report_trip.start_miles[T_FLOAT] = 0
+                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+
+                try:
+                    report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+                except:
+                    report_trip.start_time = fallback_time
+                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+
+                if len(i.end_miles) < len(shift.start_miles[T_STR]):
+                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
+                else:
+                    report_trip.end_miles[T_STR] = i.end_miles
+                try:
+                    report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
+                except:
+                    report_trip.end_miles[T_FLOAT] = 0
+                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+
+                try:
+                    report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+                except:
+                    report_trip.end_time = fallback_time
+                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
 
                 report_trip.trip_type = i.trip_type
                 report_trip.collected_cash = Report.Money(i.collected_cash)

@@ -117,13 +117,15 @@ def shiftStart(request, id):
     previous_shift = None
     previous_shifts = Shift.objects.filter(vehicle=shift.vehicle).exclude(start_miles='').exclude(end_miles='')
     for i in previous_shifts:
-        print(str(i) + ' - ' + i.end_miles)
         if previous_shift == None:
             previous_shift = i
             continue
 
-        if float(i.end_miles) >= float(previous_shift.end_miles):
-            previous_shift = i
+        try:
+            if float(i.end_miles) >= float(previous_shift.end_miles):
+                previous_shift = i
+        except:
+            continue
 
     if previous_shift == None:
         previous_shift_end_miles = ''

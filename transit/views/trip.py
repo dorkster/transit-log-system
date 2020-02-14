@@ -322,8 +322,18 @@ def tripStart(request, id):
 
     query = Shift.objects.filter(date=trip.date)
     for shift in query:
-        if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
-            start_miles[str(shift.vehicle)] = shift.start_miles
+        if start_miles[str(shift.vehicle)] == '':
+            try:
+                test_float = float(shift.start_miles)
+                start_miles[str(shift.vehicle)] = shift.start_miles
+            except:
+                continue
+
+        try:
+            if shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles):
+                start_miles[str(shift.vehicle)] = shift.start_miles
+        except:
+            continue
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []
@@ -385,8 +395,18 @@ def tripEnd(request, id):
 
     query = Shift.objects.filter(date=trip.date)
     for shift in query:
-        if start_miles[str(shift.vehicle)] == '' or (shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles)):
-            start_miles[str(shift.vehicle)] = shift.start_miles
+        if start_miles[str(shift.vehicle)] == '':
+            try:
+                test_float = float(shift.start_miles)
+                start_miles[str(shift.vehicle)] = shift.start_miles
+            except:
+                continue
+
+        try:
+            if shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles):
+                start_miles[str(shift.vehicle)] = shift.start_miles
+        except:
+            continue
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []

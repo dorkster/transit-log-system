@@ -1,13 +1,13 @@
 import datetime, uuid
-import json
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag, SiteSettings
+from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag, SiteSettings, TripType
 from transit.forms import DatePickerForm, EditScheduleMessageForm
+from transit.views.report import Report
 
 from django.contrib.auth.decorators import permission_required
 
@@ -345,3 +345,82 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     }
     return render(request, template, context=context)
 
+
+def schedulePrintDailyLog(request, year, month, day):
+    return schedulePrintDailyLogShift(request, year, month, day, id=None)
+
+def schedulePrintDailyLogShift(request, year, month, day, id):
+    day_date = datetime.date(year, month, day)
+
+    shifts = Shift.objects.filter(date=day_date)
+    shifts = shifts.exclude(start_miles='')
+    shifts = shifts.exclude(end_miles='')
+    report = Report()
+
+    if id == None:
+        current_shift = None
+        context = {
+            'date': day_date,
+            'shifts': shifts,
+            'current_shift': current_shift,
+        }
+    else:
+        current_shift = get_object_or_404(Shift, id=id)
+        report.load(day_date, day_date, daily_log_shift=id)
+        if len(report.report_all) > 0:
+            report_summary = report.report_all[0].by_vehicle[current_shift.vehicle]
+
+        try:
+            trips_medical = report_summary.trip_types[TripType.objects.get(name='Medical')]
+        except:
+            trips_medical = 0
+
+        try:
+            trips_nutrition = report_summary.trip_types[TripType.objects.get(name='Nutrition')]
+        except:
+            trips_nutrition = 0
+
+        try:
+            trips_social = report_summary.trip_types[TripType.objects.get(name='Social/Recreation')]
+        except:
+            trips_social = 0
+
+        try:
+            trips_shopping = report_summary.trip_types[TripType.objects.get(name='Shopping')]
+        except:
+            trips_shopping = 0
+
+        try:
+            trips_other = report_summary.trip_types[TripType.objects.get(name='Other')]
+        except:
+            trips_other = 0
+
+        try:
+            money_cash = report_summary.collected_cash
+        except:
+            money_cash = Report.Money(0)
+
+        try:
+            money_check = report_summary.collected_check
+        except:
+            money_check = Report.Money(0)
+
+        money_total = money_cash + money_check
+
+        context = {
+            'date': day_date,
+            'shifts': shifts,
+            'current_shift': current_shift,
+            'report': report,
+            'trips_medical': trips_medical,
+            'trips_nutrition': trips_nutrition,
+            'trips_social': trips_social,
+            'trips_shopping': trips_shopping,
+            'trips_other': trips_other,
+            'trips_total': trips_medical + trips_nutrition + trips_social + trips_shopping + trips_other,
+            'money_cash': money_cash,
+            'money_check': money_check,
+            'money_total': money_total,
+        }
+
+    return render(request, 'schedule/print_daily_log.html', context)

@@ -159,6 +159,7 @@ class Report():
             self.nonelderly_ambulatory = 0
             self.nonelderly_nonambulatory = 0
             self.unknown = 0
+            self.total = 0
 
         def __contains__(self, item):
             for i in self.names:
@@ -175,7 +176,10 @@ class Report():
         self.money_trips_summary = Report.ReportSummary()
         self.report_errors = Report.ReportErrors()
 
-    def load(self, date_start, date_end):
+    def load(self, date_start, date_end, daily_log_shift=None):
+        if date_start != date_end:
+            daily_log_shift = None
+
         for day in range(date_start.day, date_end.day+1):
             # TODO what if end month/year is different than start?
             day_date = datetime.date(date_start.year, date_start.month, day)
@@ -320,43 +324,46 @@ class Report():
                 if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_trip=i)
 
-                # add money trip
-                if i.collected_cash > 0 or i.collected_check > 0:
-                    self.money_trips.append(report_trip)
-                    self.money_trips_summary.collected_cash += report_trip.collected_cash
-                    self.money_trips_summary.collected_check += report_trip.collected_check
+                if daily_log_shift == None or (daily_log_shift != None and daily_log_shift == shift.shift.id):
+                    # add money trip
+                    if i.collected_cash > 0 or i.collected_check > 0:
+                        self.money_trips.append(report_trip)
+                        self.money_trips_summary.collected_cash += report_trip.collected_cash
+                        self.money_trips_summary.collected_check += report_trip.collected_check
 
-                # add unique rider
-                found_unique_rider = False
-                for j in self.unique_riders.names:
-                    if j.name == i.name:
-                        if j.elderly == None:
-                            j.elderly = i.elderly
-                        if j.ambulatory == None:
-                            j.ambulatory = i.ambulatory
+                    # add unique rider
+                    found_unique_rider = False
+                    for j in self.unique_riders.names:
+                        if j.name == i.name:
+                            if j.elderly == None:
+                                j.elderly = i.elderly
+                            if j.ambulatory == None:
+                                j.ambulatory = i.ambulatory
 
-                        found_unique_rider = True
-                        break
-                if not found_unique_rider:
-                    if i.elderly == None or i.ambulatory == None:
-                        # try to get info from Clients
-                        clients = Client.objects.filter(name=i.name)
-                        if len(clients) > 0:
-                            elderly = i.elderly
-                            ambulatory = i.ambulatory
-                            if elderly == None:
-                                elderly = clients[0].elderly
-                            if ambulatory == None:
-                                ambulatory = clients[0].ambulatory
-                            self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory))
-                    else:
-                        self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory))
-                    self.unique_riders.names = sorted(self.unique_riders.names)
+                            found_unique_rider = True
+                            break
+                    if not found_unique_rider:
+                        if i.elderly == None or i.ambulatory == None:
+                            # try to get info from Clients
+                            clients = Client.objects.filter(name=i.name)
+                            if len(clients) > 0:
+                                elderly = i.elderly
+                                ambulatory = i.ambulatory
+                                if elderly == None:
+                                    elderly = clients[0].elderly
+                                if ambulatory == None:
+                                    ambulatory = clients[0].ambulatory
+                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory))
+                        else:
+                            self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory))
+                        self.unique_riders.names = sorted(self.unique_riders.names)
 
             for i in range(0, len(report_day.shifts)):
                 shift = report_day.shifts[i]
                 if shift.start_trip == None or shift.end_trip == None:
-                    # print(shift.shift.vehicle)
+                    continue
+
+                if daily_log_shift != None and daily_log_shift != shift.shift.id:
                     continue
                 
                 service_miles = shift.end_miles[T_FLOAT] - shift.start_miles[T_FLOAT]
@@ -427,6 +434,7 @@ class Report():
             self.driver_reports.append(driver_report)
 
         for rider in self.unique_riders.names:
+            self.unique_riders.total += 1
             if rider.elderly == None or rider.ambulatory == None:
                 self.unique_riders.unknown += 1
             elif rider.elderly and rider.ambulatory:

@@ -342,11 +342,12 @@ def tripStart(request, id):
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []
-    for i in all_trips:
-        if i.id == trip.id:
-            continue
-        if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
-            additional_pickups.append(i)
+    if trip.address != '':
+        for i in all_trips:
+            if i.id == trip.id:
+                continue
+            if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
+                additional_pickups.append(i)
 
     context = {
         'form': form,
@@ -415,11 +416,12 @@ def tripEnd(request, id):
 
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []
-    for i in all_trips:
-        if i.id == trip.id:
-            continue
-        if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
-            additional_pickups.append(i)
+    if trip.destination != '':
+        for i in all_trips:
+            if i.id == trip.id:
+                continue
+            if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
+                additional_pickups.append(i)
 
     context = {
         'form': form,

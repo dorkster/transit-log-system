@@ -19,6 +19,12 @@
                     <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
                     <div id="full_miles_desc"></div>
                     <div id="full_miles" class="full-miles"></div>
+                    <div id="mile_suggestion" class="mb-3" style="font-size: 120%; display: none;">
+                        <span class="text-danger">
+                            <em>Did you mean: <span id="mile_suggestion_prefix"></span><strong><span id="mile_suggestion_suffix"></span></strong>?</em>
+                            <a id="mile_suggestion_button" href="#_" class="ml-2 btn btn-success" data-suggestion="" onclick="useSuggestion(this, mile_input)">Yes</a>
+                        </span>
+                    </div>
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
                         <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_time')"><span class="oi oi-clock"></span></a>
                         <br/>{{ form.time }}</div>
@@ -80,9 +86,14 @@
     {% for key,val in start_miles.items %}
     start_miles["{{ key }}"] = "{{ val }}";
     {% endfor %}
+    var prev_miles = {};
+    {% for key,val in prev_miles.items %}
+    prev_miles["{{ key }}"] = "{{ val }}";
+    {% endfor %}
 
     function showFullMiles(input) {
         var shift_start_miles = start_miles["{{ trip.vehicle }}"];
+        var shift_prev_miles = prev_miles["{{ trip.vehicle }}"];
 
         $("#full_miles_desc").html("");
 
@@ -97,19 +108,51 @@
         $("#full_miles").html("");
         $("#full_miles").append('<span class="text-muted">' + prefix_miles + '</span><strong>' + new_miles + '</strong>');
 
-        var error = false;
-        if (shift_start_miles != "" && combined_miles != "") {
-            var combined_miles_start = shift_start_miles.substring(0, shift_start_miles.length - "{{ trip.start_miles }}".length) + "{{ trip.start_miles }}";
+        $("#mile_suggestion").hide();
+        if (shift_prev_miles != "" && combined_miles != "") {
+            if (parseFloat(combined_miles) < parseFloat(shift_prev_miles)) {
+                var prev_prefix_miles = shift_prev_miles.substring(0, shift_prev_miles.length - new_miles.length);
 
-            if (parseFloat(combined_miles) < parseFloat(shift_start_miles))
-                error = true;
-            else if (parseFloat(combined_miles) < parseFloat(combined_miles_start))
-                error = true;
-        }
+                if ((combined_miles == prev_prefix_miles + new_miles) || (parseFloat(prev_prefix_miles + new_miles) < parseFloat(shift_prev_miles))) {
+                    if (prev_prefix_miles == "") {
+                        prev_prefix_miles = "1";
+                    }
+                    else {
+                        prev_prefix_miles = (parseFloat(prev_prefix_miles) + 1).toString();
+                    }
+                }
 
-        if (error) {
-            $("#full_miles").append('<span class="text-danger"><strong><span class="ml-3 oi oi-warning"></span></strong></span>');
+                var suggest_prefix = "";
+                var suggest_suffix = "";
+
+                var suggest_miles = prev_prefix_miles + new_miles;
+                if (suggest_miles.length > combined_miles.length) {
+                    suggest_suffix = suggest_miles;
+                }
+                else {
+                    for (var i = 0; i < suggest_miles.length; i++) {
+                        if (suggest_miles.charAt(i) == combined_miles.charAt(i)) {
+                            suggest_prefix += suggest_miles.charAt(i);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    suggest_suffix = suggest_miles.substring(suggest_prefix.length, suggest_miles.length);
+                }
+
+                $("#full_miles").append('<span class="text-danger"><strong><span class="ml-3 oi oi-warning"></span></strong></span>');
+                $("#mile_suggestion").show();
+                $("#mile_suggestion_prefix").html(suggest_prefix);
+                $("#mile_suggestion_suffix").html(suggest_suffix);
+                $("#mile_suggestion_button").data("suggestion", suggest_suffix);
+            }
         }
+    }
+
+    function useSuggestion(button, input) {
+        input.value = $(button).data("suggestion");
+        showFullMiles(input);
     }
 
     var mile_input = document.getElementById("id_miles");

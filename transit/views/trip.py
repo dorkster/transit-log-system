@@ -325,8 +325,8 @@ def tripStart(request, id):
     for vehicle in Vehicle.objects.all():
         start_miles[str(vehicle)] = ''
 
-    query = Shift.objects.filter(date=trip.date)
-    for shift in query:
+    day_shifts = Shift.objects.filter(date=trip.date)
+    for shift in day_shifts:
         if start_miles[str(shift.vehicle)] == '':
             try:
                 test_float = float(shift.start_miles)
@@ -349,10 +349,33 @@ def tripStart(request, id):
             if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
                 additional_pickups.append(i)
 
+    prev_miles = dict()
+    for vehicle in Vehicle.objects.all():
+        start_miles_str = start_miles[str(vehicle)]
+        prev_miles[str(vehicle)] = start_miles_str
+        vehicle_trips = all_trips.filter(vehicle=vehicle)
+        for vehicle_trip in vehicle_trips:
+            if vehicle_trip.end_miles != '':
+                mile_str = vehicle_trip.end_miles
+            elif vehicle_trip.start_miles != '':
+                mile_str = vehicle_trip.start_miles
+            else:
+                continue
+
+            if len(mile_str) < len(start_miles_str):
+                mile_str = start_miles_str[0:len(start_miles_str) - len(mile_str)] + mile_str
+
+            try:
+                if mile_str != '' and float(mile_str) > float(prev_miles[str(vehicle)]):
+                    prev_miles[str(vehicle)] = mile_str
+            except:
+                continue
+
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
+        'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,
     }
 
@@ -423,10 +446,33 @@ def tripEnd(request, id):
             if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
                 additional_pickups.append(i)
 
+    prev_miles = dict()
+    for vehicle in Vehicle.objects.all():
+        start_miles_str = start_miles[str(vehicle)]
+        prev_miles[str(vehicle)] = start_miles_str
+        vehicle_trips = all_trips.filter(vehicle=vehicle)
+        for vehicle_trip in vehicle_trips:
+            if vehicle_trip.end_miles != '':
+                mile_str = vehicle_trip.end_miles
+            elif vehicle_trip.start_miles != '':
+                mile_str = vehicle_trip.start_miles
+            else:
+                continue
+
+            if len(mile_str) < len(start_miles_str):
+                mile_str = start_miles_str[0:len(start_miles_str) - len(mile_str)] + mile_str
+
+            try:
+                if mile_str != '' and float(mile_str) > float(prev_miles[str(vehicle)]):
+                    prev_miles[str(vehicle)] = mile_str
+            except:
+                continue
+
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
+        'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,
     }
 

@@ -66,7 +66,7 @@ def tripCreateReturn(request, mode, id):
     trip.driver = origin_trip.driver
     trip.vehicle = origin_trip.vehicle
 
-    return tripCreateEditCommon(request, mode, trip, is_new=True)
+    return tripCreateEditCommon(request, mode, trip, is_new=True, is_return_trip=True)
 
 def tripCopy(request, mode, id):
     origin_trip = get_object_or_404(Trip, id=id)
@@ -96,7 +96,7 @@ def tripCreateFromClient(request, mode, id):
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
 @permission_required(['transit.change_trip'])
-def tripCreateEditCommon(request, mode, trip, is_new):
+def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
         if len(query) > 0:
@@ -177,6 +177,10 @@ def tripCreateEditCommon(request, mode, trip, is_new):
 
             trip.save()
 
+            if is_new and not is_return_trip and not trip.is_activity:
+                if form.cleaned_data['create_return_trip'] == True:
+                    return HttpResponseRedirect(reverse('trip-create-return', kwargs={'mode':mode, 'id':trip.id}))
+
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         if trip.is_activity:
@@ -238,6 +242,7 @@ def tripCreateEditCommon(request, mode, trip, is_new):
         'destinations': destinations,
         'destinations_json': serializers.serialize('json', Destination.objects.all()),
         'is_new': is_new,
+        'is_return_trip': is_return_trip,
         'frequent_tags': FrequentTag.objects.all()[:10],
     }
 

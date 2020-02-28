@@ -9,7 +9,10 @@
     {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Edit
     {% endif %}
 </h2>
-<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
+{% if is_return_trip %}
+<div class="alert alert-primary" role="alert">Return trip created. Use <a class="alert-link" href="#_" onclick="document.getElementById('trip_form').submit();return false;">Save Changes</a> to confirm.</div>
+{% endif %}
+<form id="trip_form" class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <datalist id='client-names'>
         {% for client in clients %}
@@ -140,7 +143,33 @@
             </div>
             {% endif %}
         </div>
-        <hr>
+        <hr/>
+        {% if is_new and not trip.is_activity and not is_return_trip %}
+        {{ form.create_return_trip }}
+        <a class="btn btn-outline-dark" href="#_" onclick="toggleReturnTrip(this)"><span class="oi oi-circle-x mr-2"></span>Create a return trip</a>
+        <script type="text/javascript">
+            function toggleReturnTrip(btn) {
+                var field = document.getElementById("id_create_return_trip");
+                if (field) {
+                    if (field.value == "False") {
+                        field.value = "True";
+                        btn.classList.remove("btn-outline-dark");
+                        btn.classList.add("btn-primary");
+                        btn.firstChild.classList.remove("oi-circle-x");
+                        btn.firstChild.classList.add("oi-circle-check");
+                    }
+                    else {
+                        field.value = "False";
+                        btn.classList.remove("btn-primary");
+                        btn.classList.add("btn-outline-dark");
+                        btn.firstChild.classList.remove("oi-circle-check");
+                        btn.firstChild.classList.add("oi-circle-x");
+                    }
+                }
+            }
+        </script>
+        <hr/>
+        {% endif %}
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-3">
                 <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>

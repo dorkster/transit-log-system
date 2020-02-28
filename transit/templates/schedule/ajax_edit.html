@@ -460,18 +460,20 @@ Show extra columns
     <script type="text/javascript">
         function deleteAll(type) {
             if (type == "shifts") {
-                if (confirm("Delete ALL shifts for {{ date }}? This can not be undone!"))
-                    {% if trips %}
+                if (confirm("Delete ALL shifts for {{ date }}? This can not be undone!")) {
+                    {% if shifts %}
                     trip_mover.clear();
                     {% endif %}
                     ajax_loader.run('', 'delete_all_shifts', '');
+                }
             }
             else if (type == "trips") {
-                if (confirm("Delete ALL trips for {{ date }}? This can not be undone!"))
+                if (confirm("Delete ALL trips for {{ date }}? This can not be undone!")) {
                     {% if trips %}
                     trip_mover.clear();
                     {% endif %}
                     ajax_loader.run('', 'delete_all_trips', '');
+                }
             }
         }
     </script>

@@ -130,16 +130,16 @@
         {% if notifications and user.is_authenticated and perms.transit.change_vehicleissue %}
             <div id="global-notifications" class="list-group list-group-flush">
             {% for issue in notify_vehicle_issues %}
-            <strong><a href="{% url 'vehicle-issue-edit' issue.id %}" class="list-group-item list-group-item-action p-1 {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a></strong>
+            <strong><a href="{% url 'vehicle-issue-edit' issue.id %}" class="global-notification list-group-item list-group-item-action p-1 {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a></strong>
             {% endfor %}
             {% if notify_vehicle_issues_low|length > 0 %}
-            <strong><a href="{% url 'vehicle-status' %}#issues" class="list-group-item list-group-item-action p-1 bg-white">{{ notify_vehicle_issues_low|length }} low priority vehicle {% if notify_vehicle_issues_low|length == 1 %}issue{% else %}issues{% endif %}</a></strong>
+            <strong><a href="{% url 'vehicle-status' %}#issues" class="global-notification list-group-item list-group-item-action p-1 bg-white">{{ notify_vehicle_issues_low|length }} low priority vehicle {% if notify_vehicle_issues_low|length == 1 %}issue{% else %}issues{% endif %}</a></strong>
             {% endif %}
             {% for vehicle in notify_vehicle_inspections %}
-            <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for inspection!</a></strong>
+            <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for inspection!</a></strong>
             {% endfor %}
             {% for vehicle in notify_vehicle_oil_changes %}
-            <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for an oil change!</a></strong>
+            <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for an oil change!</a></strong>
             {% endfor %}
             </div>
         {% endif %}

@@ -1,0 +1,23 @@
+{% extends "help.html" %}
+{% block help_content %}
+<p>It is highly recommended to set up clients and templates before creating schedules. Doing so will make creating recurring trips easier and less prone to typo errors.</p>
+
+<h4>Clients</h4>
+
+<p>The <strong><a href="/transit/clients/">Clients</a></strong> page can be accessed via the main menu under <em>Schedule >> Edit Clients</em>.</p>
+
+<p>The clients created here will appear in the drop-down of the <strong>Name</strong> field when creating trips in a template or schedule.</p>
+
+<p><img src="/transit/static/img/help_clients.png" alt="The clients page" /></p>
+
+<p>The available fields when creating a client are fairly straight-forward:</p>
+
+<ul>
+<li><strong>Name</strong> - The client&rsquo;s full name</li>
+<li><strong>Address</strong> - The client&rsquo;s home address</li>
+<li><strong>Phone</strong> - The client&rsquo;s home and/or cell phone number</li>
+<li><strong>Elderly</strong> - Is the client elderly?</li>
+<li><strong>Ambulatory</strong> - Is the client ambulatory?</li>
+<li><strong>Tags</strong> - A list of user-defined labels, separated by commas.</li>
+</ul>
+{% endblock %}

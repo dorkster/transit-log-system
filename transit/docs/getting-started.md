@@ -1,1 +1,0 @@
-This guide will walk you through setting up and using the schedule system, along with managing things such as vehicle issues and monthly reports.

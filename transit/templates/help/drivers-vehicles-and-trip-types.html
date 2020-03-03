@@ -1,0 +1,35 @@
+{% extends "help.html" %}
+{% block help_content %}
+<p>Before using the schedule system, it is important to first set up the available <strong>drivers</strong> and <strong>vehicles</strong>, as well as the different <strong>trip types</strong>.</p>
+
+<p>Your administrator has likely already done this for you, but it is worth reviewing this section to learn how to add, edit, and re-order these items.</p>
+
+<h4>Drivers</h4>
+
+<p>The <strong><a href="/transit/drivers/">Drivers</a></strong> page can be accessed via the main menu under <em>Schedule >> Edit Drivers</em>.</p>
+
+<p><img src="/transit/static/img/help_drivers_list.png" alt="The drivers page" /></p>
+
+<p>When creating or editing a driver, the following properties can be changed:</p>
+
+<ul>
+<li><strong>Name</strong> - The name of the driver</li>
+<li><strong>Color</strong> - The background color used for the driver on the schedule</li>
+<li><strong>Is logged?</strong> - Whether or not this driver is displayed in various places. Generally, employed drivers should be logged, and volunteers should not be logged.</li>
+</ul>
+
+
+<h4>Vehicles</h4>
+
+<p>The <strong><a href="/transit/vehicles/">Vehicles</a></strong> page can be accessed via the main menu under <em>Schedule >> Edit Vehicles</em>.</p>
+
+<p>Everything here is similar to dealing with drivers, except vehicles only have two properties: <strong>Name</strong> and <strong>Is logged?</strong></p>
+
+<p>In most scenarios, all vehicles will be logged. The notable exception being a &ldquo;personal&rdquo; vehicle.</p>
+
+<h4>Trip Types</h4>
+
+<p>The <strong><a href="/transit/triptypes">Trip Types</a></strong> page can be accessed via the main menu under <em>Schedule >> Edit Trip Types</em>.</p>
+
+<p>For monthly reports that require a breakdown of trips by type, said types can be set up here. Again, the interface here is identical to editing drivers and vehicles. Trip types only have one property, which is their display <strong>Name</strong>.</p>
+{% endblock %}

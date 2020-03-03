@@ -20,7 +20,6 @@ def userGetGroup(request, group_name):
 
     permissions = []
     if group_name == 'Basic':
-        permissions.append(Permission.objects.get(codename='view_helppage'))
         permissions.append(Permission.objects.get(codename='view_schedulemessage'))
         permissions.append(Permission.objects.get(codename='view_shift'))
         permissions.append(Permission.objects.get(codename='view_trip'))
@@ -31,7 +30,6 @@ def userGetGroup(request, group_name):
         permissions.append(Permission.objects.get(codename='change_frequenttag'))
         permissions.append(Permission.objects.get(codename='delete_frequenttag'))
         permissions.append(Permission.objects.get(codename='view_frequenttag'))
-        permissions.append(Permission.objects.get(codename='view_helppage'))
         permissions.append(Permission.objects.get(codename='add_schedulemessage'))
         permissions.append(Permission.objects.get(codename='change_schedulemessage'))
         permissions.append(Permission.objects.get(codename='delete_schedulemessage'))
@@ -69,7 +67,6 @@ def userGetGroup(request, group_name):
         permissions.append(Permission.objects.get(codename='change_frequenttag'))
         permissions.append(Permission.objects.get(codename='delete_frequenttag'))
         permissions.append(Permission.objects.get(codename='view_frequenttag'))
-        permissions.append(Permission.objects.get(codename='view_helppage'))
         permissions.append(Permission.objects.get(codename='add_pretrip'))
         permissions.append(Permission.objects.get(codename='change_pretrip'))
         permissions.append(Permission.objects.get(codename='view_pretrip'))

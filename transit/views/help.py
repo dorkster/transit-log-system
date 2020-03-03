@@ -1,45 +1,42 @@
 from django.shortcuts import render, get_object_or_404
 
-from transit.models import HelpPage
-
-from django.contrib.auth.decorators import permission_required
-
 def helpMain(request):
     return helpPage(request, slug='')
 
-@permission_required(['transit.view_helppage'])
 def helpPage(request, slug):
-    topics = HelpPage.objects.all()
-
     if slug == '':
         slug = 'getting-started'
 
-    slug_pages = HelpPage.objects.filter(slug=slug)
+    topics = (
+        ('Getting Started', 'getting-started'),
+        ('Drivers, Vehicles, and Trip Types', 'drivers-vehicles-and-trip-types'),
+        ('Clients, Destinations, and Templates', 'clients-destinations-and-templates'),
+        ('Editing the Schedule', 'editing-the-schedule'),
+        ('Using the Schedule', 'using-the-schedule'),
+        ('Vehicle Status', 'vehicle-status'),
+        ('Monthly Reports', 'monthly-reports'),
+    )
 
-    if len(slug_pages) == 0 and len(topics) > 0:
-        current = topics[0]
-    elif len(slug_pages) == 0 and len(topics) == 0:
-        current = HelpPage()
-        current.title = 'No help topics found'
-        current.body = '<p>Add help pages via the <a href="/admin/transit/helppage/">admin control panel</a>.</p>'
-    else:
-        current = slug_pages[0]
+    topic_prev = None
+    topic_next = None
+    topic_current = None
 
-    page_previous = None
-    previous_filter = HelpPage.objects.filter(sort_index=current.sort_index-1)
-    if len(previous_filter) > 0:
-        page_previous = previous_filter[0]
+    for i in range(0, len(topics)):
+        if slug == topics[i][1]:
+            topic_current = topics[i]
 
-    page_next = None
-    next_filter = HelpPage.objects.filter(sort_index=current.sort_index+1)
-    if len(next_filter) > 0:
-        page_next = next_filter[0]
+            if i > 0:
+                topic_prev = topics[i-1]
+            if i < (len(topics) - 1):
+                topic_next = topics[i+1]
+
+            break
 
     context = {
-        'current': current,
+        'topic_current': topic_current,
+        'topic_prev': topic_prev,
+        'topic_next': topic_next,
         'topics': topics,
-        'previous': page_previous,
-        'next': page_next,
     }
-    return render(request, 'help.html', context)
+    return render(request, 'help/' + slug + '.html', context)
 

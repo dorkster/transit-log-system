@@ -2,22 +2,69 @@
 {% block help_content %}
 <p>It is highly recommended to set up clients and templates before creating schedules. Doing so will make creating recurring trips easier and less prone to typo errors.</p>
 
+<hr/>
+
 <h4>Clients</h4>
 
-<p>The <strong><a href="/transit/clients/">Clients</a></strong> page can be accessed via the main menu under <em>Schedule >> Edit Clients</em>.</p>
+<p>The <strong><a href="{% url 'clients' %}">Clients</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Clients</em>.</p>
 
-<p>The clients created here will appear in the drop-down of the <strong>Name</strong> field when creating trips in a template or schedule.</p>
+<p>The clients created here will appear in the drop-down of the <strong>Name</strong> field when creating trips in a template or schedule. Defining clients here allows fields such as the address and phone number to be automatically filled in when creating trips.</p>
 
-<p><img src="/transit/static/img/help_clients.png" alt="The clients page" /></p>
+<div class="help-img">
+    <img src="/transit/static/img/help_clients.png" alt="The clients page"/>
+    <div class="help-img-text help-img-text-left" style="left: 180px; top: 20px;">Create a new client</div>
+    <div class="help-img-text help-img-text-left" style="left: 210px; top: 110px;">Filter the available clients by elderly and ambulatory status...</div>
+    <div class="help-img-text help-img-text-left" style="left: 120px; top: 160px;">...Or simply search by name and address</div>
+    <div class="help-img-text help-img-text-left" style="left: 70px; top: 260px;">Edit or delete an existing client</div>
+    <div class="help-img-text help-img-text-right" style="right: 90px; top: 260px;">See additional information about a client<br/>Clicking <em>"Show extra columns"</em> will also reveal this information</div>
+</div>
 
 <p>The available fields when creating a client are fairly straight-forward:</p>
 
 <ul>
-<li><strong>Name</strong> - The client&rsquo;s full name</li>
-<li><strong>Address</strong> - The client&rsquo;s home address</li>
-<li><strong>Phone</strong> - The client&rsquo;s home and/or cell phone number</li>
+<li><strong>Name</strong> - The client's full name</li>
+<li><strong>Address</strong> - The client's home address</li>
+<li><strong>Phone</strong> - The client's home and/or cell phone number</li>
 <li><strong>Elderly</strong> - Is the client elderly?</li>
 <li><strong>Ambulatory</strong> - Is the client ambulatory?</li>
 <li><strong>Tags</strong> - A list of user-defined labels, separated by commas.</li>
 </ul>
+
+<hr/>
+
+<h4>Destinations</h4>
+<p>The <strong><a href="{% url 'destinations' %}">Destinations</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Destinations</em>.</p>
+
+<p>Much like clients, destinations provide a way to quickly populate fields when creating trips in a template or schedule. When creating a trip, destinations defined here will appear in the drop-down of the <strong>Pick-Up Address</strong> and <strong>Destination Address</strong> fields.</p>
+
+<p>Destinations only have two fields to define: the <strong>Address</strong> and, optionally, the <strong>Phone</strong> number.</p>
+
+<hr/>
+
+<h4>Templates</h4>
+
+<p>The <strong><a href="{% url 'templates' %}">Templates</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Templates</em>.</p>
+
+<p>For things such as daily schedules and regular group outings, templates can be created to speed up inserting multiple trips into the schedule.</p>
+
+<div class="help-img">
+    <img src="/transit/static/img/help_templates.png" alt="The templates page"/>
+    <div class="help-img-text help-img-text-left" style="left: 215px; top: 20px;">Create a new template</div>
+    <div class="help-img-text help-img-text-left" style="left: 110px; top: 90px;">Edit the template name or delete the template</div>
+    <div class="help-img-text help-img-text-left" style="left: 55px; top: 140px;">Change the order that templates appear</div>
+    <div class="help-img-text help-img-text-right" style="right: 150px; top: 210px;">Add or edit trips and activities in this template</div>
+</div>
+
+<p>Once a template has been created, clicking on <em>Edit Trips</em> will lead to the page where trips and activities can be added or edited.</p>
+
+<div class="help-img">
+    <img src="/transit/static/img/help_template_trips.png" alt="The Edit Trips page for a 'Thursday' template"/>
+    <div class="help-img-text help-img-text-left" style="left: 475px; top: 20px;">Create a new trip or activity</div>
+    <div class="help-img-text help-img-text-left" style="left: 110px; top: 130px;">Edit or delete the trip or activity<br/>For trips, there are shortcuts to copy the trip, create a return trip, or create a client</div>
+    <div class="help-img-text help-img-text-left" style="left: 55px; top: 245px;">Change the order of trips</div>
+    <div class="help-img-text help-img-text-right" style="right: 65px; top: 250px;">See additional information about a trip<br/>Clicking <em>"Show extra columns"</em> will also reveal this information</div>
+</div>
+
+<p>Trips and activities are added and modifed in templates the same way they are in the main schedule. The next section, <a href="{% url 'help-topic' 'editing-the-schedule' %}">Editing the Schedule</a>, will cover this topic in greater detail.</p>
+
 {% endblock %}

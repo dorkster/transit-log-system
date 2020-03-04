@@ -1,34 +1,106 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+<style type="text/css">
+.help-img {
+    position: relative;
+    margin-bottom: 1em;
+    display: inline-block;
+}
+
+.help-img img {
+    border: 1px solid #999;
+    box-shadow: 2px 2px 4px #00000044;
+}
+
+.help-img-text {
+    position: absolute;
+    background: #000000cc;
+    color: #fff;
+    font-weight: bold;
+    padding: 0.4em;
+    font-size: 80%;
+	border-radius: 4px;
+    cursor: default;
+    max-width: 200px;
+}
+
+.help-img-text-left:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 12px;
+	width: 0;
+	height: 0;
+	border: 8px solid transparent;
+	border-right-color: #000000cc;
+	border-left: 0;
+	margin-top: -8px;
+	margin-left: -8px;
+}
+
+.help-img-text-right:after {
+    content: '';
+	position: absolute;
+	right: 0;
+	top: 12px;
+	width: 0;
+	height: 0;
+	border: 8px solid transparent;
+	border-left-color: #000000cc;
+	border-right: 0;
+	margin-top: -8px;
+	margin-right: -8px;
+}
+
+.help-img-text:hover {
+    background: #000000;
+}
+
+.help-img-text-left:hover:after {
+    border-right-color: #000000;
+}
+
+.help-img-text-right:hover:after {
+    border-left-color: #000000;
+}
+</style>
 <h2>Help</h2>
 <hr/>
 <div class="container ml-0">
     <div class="row">
-        {% if topics %}
-        <div class="col-xs-auto pb-4">
-            <div class="list-group">
-            {% for topic in topics %}
-            <a href="{% url 'help-topic' topic.1 %}" class="list-group-item list-group-item-action {% if topic.1 == topic_current.1 %}active{% endif %}">{{ topic.0 }}</a>
-            {% endfor %}
-            </div>
-        </div>
-        {% endif %}
         <div class="col">
             <h3>{{ topic_current.0 }}</h3>
             {% block help_content %}
             {% endblock %}
+            <hr/>
             <div class="row">
-                <div class="col-auto mr-auto">
-                    {% if topic_prev %}
-                    <a href="{% url 'help-topic' topic_prev.1 %}" class="btn btn-primary"><span class="oi oi-arrow-left mr-2"></span>{{ topic_prev.0 }}</a>
+                <div class="col-auto pt-1 pb-1">
+                    {% if topics %}
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{topic_current.0 }}
+                        </button>
+                        <div class="dropdown-menu shadow">
+                        {% for topic in topics %}
+                        <a href="{% url 'help-topic' topic.1 %}" class="dropdown-item {% if topic.1 == topic_current.1 %}active{% endif %}">{{ topic.0 }}</a>
+                        {% endfor %}
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
-                <div class="col-auto">
-                    {% if topic_next %}
-                    <a href="{% url 'help-topic' topic_next.1 %}" class="btn btn-primary">{{ topic_next.0 }}<span class="oi oi-arrow-right ml-2"></span></a>
-                    {% endif %}
+            </div>
+            <div class="row">
+                {% if topic_prev %}
+                <div class="col-auto pt-1 pb-1">
+                    <a href="{% url 'help-topic' topic_prev.1 %}" class="btn btn-primary"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
                 </div>
+                {% endif %}
+                {% if topic_next %}
+                <div class="col-auto pt-1 pb-1">
+                    <a href="{% url 'help-topic' topic_next.1 %}" class="btn btn-primary">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

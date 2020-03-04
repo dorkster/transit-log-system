@@ -217,9 +217,29 @@ def shiftEnd(request, id):
         }
         form = shiftStartEndForm(initial=initial)
 
+    shift_prev_trip_miles = shift.start_miles
+    vehicle_trips = Trip.objects.filter(date=shift.date, status=Trip.STATUS_NORMAL, vehicle=shift.vehicle)
+    for vehicle_trip in vehicle_trips:
+        if vehicle_trip.end_miles != '':
+            mile_str = vehicle_trip.end_miles
+        elif vehicle_trip.start_miles != '':
+            mile_str = vehicle_trip.start_miles
+        else:
+            continue
+
+        if len(mile_str) < len(shift.start_miles):
+            mile_str = shift.start_miles[0:len(shift.start_miles) - len(mile_str)] + mile_str
+
+        try:
+            if mile_str != '' and float(mile_str) > float(shift_prev_trip_miles):
+                shift_prev_trip_miles = mile_str
+        except:
+            continue
+
     context = {
         'form': form,
         'shift': shift,
+        'shift_prev_trip_miles': shift_prev_trip_miles,
     }
 
     return render(request, 'shift/end.html', context)

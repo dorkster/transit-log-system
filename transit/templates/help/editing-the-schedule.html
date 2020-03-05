@@ -1,5 +1,33 @@
 {% extends "help.html" %}
 {% block help_content %}
+<p>Now that <a href="{% url 'help-topic' 'drivers-vehicles-and-trip-types' %}">Drivers, Vehicles, and Trip Types</a> and <a href="{% url 'help-topic' 'clients-destinations-and-templates'%}">Clients, Destinations, and Templates</a> have been set up, it's time to start editing schedules.</p>
+<p>The <strong><a href="{% url 'schedule-today' 'edit' %}">Edit Schedule</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Edit Schedule</em>.
+<hr/>
+<div class="help-img">
+    <img src="/transit/static/img/help_schedule.png" alt="The schedule page"/>
+    <div class="help-img-text help-img-text-right" style="right: 350px; top: 30px;">
+        (From left to right)<br/>
+        <ul>
+            <li>Print the schedule or the daily reports</li>
+            <li>Select the date</li>
+            <li>Switch to the drivers' <em>View</em> mode</li>
+        </ul>
+    </div>
+    <div class="help-img-text help-img-text-left" style="left: 170px; top: 195px;">Create a new shift</div>
+    <div class="help-img-text help-img-text-left" style="left: 70px; top: 265px;">Edit or delete a shift</div>
+    <div class="help-img-text help-img-text-left" style="left: 300px; top: 375px;">
+        (From left to right)<br/>
+        <ul>
+            <li>Create a new trip or activity</li>
+            <li>Select an available template to insert its contents into the schedule</li>
+        </ul>
+    </div>
+    <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 110px; top: 515px;">Edit or delete the trip or activity<br/>Trips and activities can be canceled from here<br/>For trips, there are shortcuts to copy the trip, create a return trip, or create a client</div>
+    <div class="help-img-text help-img-text-left" style="left: 55px; top: 635px;">Change the order of trips</div>
+    <div class="help-img-text help-img-text-right" style="right: 65px; top: 515px;">See additional information about a trip<br/>Clicking <em>"Show extra columns"</em> will also reveal this information</div>
+    <div class="help-img-text help-img-text-right" style="right: 420px; top: 620px;">Drivers and vehicles can be easily assigned by dispatchers</div>
+</div>
+
 <p>There are two types of entries that can be added to the schedule: <strong>activities</strong> and <strong>trips</strong>.</p>
 <p>Activities are suitable for things such as staff meetings, designated office time, etc. They consist of a <strong>Description</strong>, plus an optional <strong>Start Time</strong> and <strong>End Time</strong>.</p>
 {% endblock %}

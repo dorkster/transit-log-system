@@ -72,9 +72,15 @@ Show extra columns
                     {% if trip.is_activity %}
                     <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                     <div class="dropdown-divider"></div>
+                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-delete-activity' trip.parent.id trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete activity</a>
                     {% else %}
                     <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
+                    <div class="dropdown-divider"></div>
+                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-copy' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-clipboard mr-2"></span>Copy Trip</a>
                     <div class="dropdown-divider"></div>
@@ -153,8 +159,6 @@ Show extra columns
             {% if trip.status > 0 %}
                 {% if trip.status == 1 %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                {% elif trip.status == 2 %}
-                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                 {% endif %}
             {% endif %}
             {% if trip.tags %}
@@ -237,6 +241,13 @@ Show extra columns
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
                             </div>
                         </div>
+                        {% if trip.status > 0 %}
+                        <div class="list-group-item p-1">
+                            {% if trip.status == 1 %}
+                            <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         {% if trip.tags %}
                         <div class="list-group-item p-1">
                         {% for tag in trip.get_styled_tag_list %}

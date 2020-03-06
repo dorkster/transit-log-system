@@ -499,6 +499,13 @@ class Template(models.Model):
         return 'Template'
 
 class TemplateTrip(models.Model):
+    STATUS_NORMAL = 0
+    STATUS_CANCELED = 1
+
+    STATUS_LEVELS = [
+        (STATUS_NORMAL, '---------'),
+        (STATUS_CANCELED, 'Canceled'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('Template', on_delete=models.CASCADE)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -519,6 +526,7 @@ class TemplateTrip(models.Model):
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
     is_activity = models.BooleanField(default=False, editable=False)
+    status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
 
     class Meta:
         ordering = ['parent', 'sort_index']
@@ -569,7 +577,9 @@ class TemplateTrip(models.Model):
 
     def get_driver_color(self):
         site_settings = SiteSettings.load()
-        if self.is_activity:
+        if self.status > 0:
+            return site_settings.get_color('cancel')
+        elif self.is_activity:
             return site_settings.get_color('activity')
         else:
             return Driver.get_color(self.driver)

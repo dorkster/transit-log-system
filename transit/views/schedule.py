@@ -251,6 +251,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.ambulatory = temp_trip.ambulatory
                 trip.note = temp_trip.note
                 trip.is_activity = temp_trip.is_activity
+                trip.status = temp_trip.status
                 trip.save()
     if request_action == 'filter_toggle_completed':
         request.session['schedule_view_hide_completed'] = not request.session.get('schedule_view_hide_completed', False)

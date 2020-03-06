@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -200,11 +200,14 @@ class EditTemplateTripForm(forms.Form):
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
+    status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditTemplateActivityForm(forms.Form):
+    parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditScheduleMessageForm(forms.Form):
     message = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))

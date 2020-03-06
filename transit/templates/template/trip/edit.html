@@ -36,6 +36,12 @@
                     <div>{{ form.parent }}</div>
                 </fieldset>
             </div>
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>{{ form.status.label }}</legend>
+                    <div class="mb-2">{{ form.status }}</div>
+                </fieldset>
+            </div>
         </div>
         <div class="row">
             {% if trip.is_activity %}
@@ -144,6 +150,18 @@
 {{ clients_json|json_script:"clients-tag" }}
 {{ destinations_json|json_script:"destinations-tag" }}
 <script type="text/javascript">
+    var status_input = document.getElementById("id_status")
+    function setStatusColor() {
+        if (status_input.value > 0) {
+            status_input.classList.add("bg-danger", "text-light");
+        }
+        else {
+            status_input.classList.remove("bg-danger", "text-light");
+        }
+    }
+    status_input.addEventListener("change", setStatusColor);
+    setStatusColor();
+
     focusFromParam();
 
 {% if not trip.is_activity %}

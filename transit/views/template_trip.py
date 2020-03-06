@@ -88,6 +88,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         if form.is_valid():
             old_parent = trip.parent
             trip.parent = form.cleaned_data['parent']
+            trip.status = form.cleaned_data['status']
 
             if trip.is_activity:
                 trip.pick_up_time = form.cleaned_data['start_time']
@@ -140,9 +141,11 @@ def templateTripCreateEditCommon(request, trip, is_new):
     else:
         if trip.is_activity:
             initial = {
+                'parent': trip.parent,
                 'start_time': trip.pick_up_time,
                 'end_time': trip.appointment_time,
                 'description': trip.note,
+                'status': trip.status,
             }
             form = EditTemplateActivityForm(initial=initial)
         else:
@@ -164,6 +167,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
                 'elderly': trip.elderly,
                 'ambulatory': trip.ambulatory,
                 'notes': trip.note,
+                'status': trip.status,
             }
             form = EditTemplateTripForm(initial=initial)
 
@@ -256,6 +260,13 @@ def ajaxTemplateTripList(request, parent):
 
             template_trip.sort_index = new_index
             template_trip.save()
+        elif request_action == 'toggle_canceled':
+            trip = get_object_or_404(TemplateTrip, id=request_id)
+            if request_data == '0':
+                trip.status = Trip.STATUS_NORMAL
+            elif request_data == '1':
+                trip.status = Trip.STATUS_CANCELED
+            trip.save()
     if request_action == 'toggle_extra_columns':
         request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)
 

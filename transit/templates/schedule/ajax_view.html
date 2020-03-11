@@ -37,9 +37,30 @@
                     {% endif %}
                 </div>
                 <div class="text-right p-1 card-footer w-100">
-                    <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn {% if shift.check_pretrip %}btn-secondary disabled{% else %}btn-warning{% endif %}">Pre-Trip</a>
-                    <a href="{% url 'shift-start' shift.id %}" class="btn {% if shift.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Start</a>
-                    <a href="{% url 'shift-end' shift.id %}" class="btn {% if not shift.start_miles or shift.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                    {% if shift.check_pretrip %}
+                        <span class="d-inline-block alert alert-warning pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                            Pre-Trip<br/>
+                            Complete
+                        </span>
+                    {% else %}
+                    <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn btn-warning">Pre-Trip</a>
+                    {% endif %}
+                    {% if shift.start_miles %}
+                        <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
+                            {{ shift.start_miles }}<br/>
+                            {{ shift.start_time }}
+                        </span>
+                    {% else %}
+                    <a href="{% url 'shift-start' shift.id %}" class="btn btn-primary">Start</a>
+                    {% endif %}
+                    {% if shift.end_miles %}
+                        <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
+                            {{ shift.end_miles }}<br/>
+                            {{ shift.end_time }}
+                        </span>
+                    {% else %}
+                    <a href="{% url 'shift-end' shift.id %}" class="btn {% if not shift.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                    {% endif %}
                     <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info">Fuel</a>
                 </div>
             </div>
@@ -289,8 +310,24 @@
                     </div>
                     {% if not trip.is_activity %}
                     <div class="text-right p-1 card-footer w-100">
-                        <a href="{% url 'trip-start' trip.id %}" class="btn {% if trip.status > 0 or trip.start_miles %}btn-secondary disabled{% else %}btn-primary{% endif %}">Pick Up</a>
-                        <a href="{% url 'trip-end' trip.id %}" class="btn {% if trip.status > 0 or not trip.start_miles or trip.end_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop off</a>
+                        {% if trip.status == 0 %}
+                            {% if trip.start_miles %}
+                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
+                                {{ trip.start_miles }}<br/>
+                                {{ trip.start_time }}
+                            </span>
+                            {% else %}
+                            <a href="{% url 'trip-start' trip.id %}" class="btn btn-primary">Pick Up</a>
+                            {% endif %}
+                            {% if trip.end_miles %}
+                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
+                                {{ trip.end_miles }}<br/>
+                                {{ trip.end_time }}
+                            </span>
+                            {% else %}
+                            <a href="{% url 'trip-end' trip.id %}" class="btn {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
+                            {% endif %}
+                        {% endif %}
                         {% if trip.get_phone_number_count > 1 %}
                         <span class="dropdown ajax-blocker">
                             <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -1,4 +1,11 @@
 {% extends "help.html" %}
 {% block help_content %}
 <p>This guide will walk you through setting up and using the schedule system, along with managing things such as vehicle issues and monthly reports.</p>
+<ol>
+    {% for topic in topics %}
+    {% if topic.1 is not topic_current.1 %}
+    <li><a href="{% url 'help-topic' topic.1 %}">{{ topic.0 }}</a></li>
+    {% endif %}
+    {% endfor %}
+</ol>
 {% endblock %}

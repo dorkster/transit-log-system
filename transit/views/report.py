@@ -145,10 +145,11 @@ class Report():
 
     class UniqueRiderSummary():
         class Rider():
-            def __init__(self, name, elderly, ambulatory):
+            def __init__(self, name, elderly, ambulatory, trips=0):
                 self.name = name
                 self.elderly = elderly
                 self.ambulatory = ambulatory
+                self.trips = trips
             def __lt__(self, other):
                 return self.name < other.name
 
@@ -341,6 +342,7 @@ class Report():
                                 j.ambulatory = i.ambulatory
 
                             found_unique_rider = True
+                            j.trips += 1
                             break
                     if not found_unique_rider:
                         if i.elderly == None or i.ambulatory == None:
@@ -353,9 +355,9 @@ class Report():
                                     elderly = clients[0].elderly
                                 if ambulatory == None:
                                     ambulatory = clients[0].ambulatory
-                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory))
+                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory, trips=1))
                         else:
-                            self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory))
+                            self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory, trips=1))
                         self.unique_riders.names = sorted(self.unique_riders.names)
 
             for i in range(0, len(report_day.shifts)):
@@ -700,11 +702,13 @@ def reportXLSX(request, year, month):
     ws_riders.cell(row_header_riders, 1, 'Name')
     ws_riders.cell(row_header_riders, 3, 'Elderly')
     ws_riders.cell(row_header_riders, 4, 'Ambulatory')
+    ws_riders.cell(row_header_riders, 5, 'Total Trips')
 
     for i in range(0, len(report.unique_riders.names)):
         ws_riders.cell(row_header_riders + i + 1, 1, report.unique_riders.names[i].name)
         ws_riders.cell(row_header_riders + i + 1, 3, report.unique_riders.names[i].elderly)
         ws_riders.cell(row_header_riders + i + 1, 4, report.unique_riders.names[i].ambulatory)
+        ws_riders.cell(row_header_riders + i + 1, 5, report.unique_riders.names[i].trips)
 
     # apply styles
     ws_riders.row_dimensions[row_header].height = style_rowheight_header
@@ -722,7 +726,7 @@ def reportXLSX(request, year, month):
                 ws_riders.cell(j, i).fill = style_fill_total
             else:
                 ws_riders.cell(j, i).font = style_font_normal
-    for i in range(1, 5):
+    for i in range(1, 6):
         for j in range(row_header_riders, row_header_riders + len(report.unique_riders.names) + 1):
             ws_riders.cell(j, i).border = style_border_normal
             if j == row_header_riders:

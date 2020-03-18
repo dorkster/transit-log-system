@@ -222,12 +222,14 @@
         <td class="mytable-col-lg">Name</td>
         <td class="mytable-col-sm">Elderly</td>
         <td class="mytable-col-sm">Ambulatory</td>
+        <td class="mytable-col-sm">Total Trips</td>
     </thead>
     {% for rider in unique_riders.names %}
     <tr>
         <td class="mytable-col-lg">{{rider.name}}</td>
         <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
         <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
+        <td class="mytable-col-sm">{{rider.trips}}</td>
     </tr>
     {% endfor %}
 </table>

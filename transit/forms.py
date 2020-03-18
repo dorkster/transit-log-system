@@ -82,6 +82,10 @@ class formWidgetAttrs():
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
+class DateRangePickerForm(forms.Form):
+    date_start = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    date_end = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+
 class EditTripForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))

@@ -7,7 +7,7 @@
             <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
         </div>
         <div class="col-auto p-1">
-            <a class="btn btn-primary" href="{% url 'report-xlsx' date_start.year date_start.month %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+            <a class="btn btn-primary" href="{% url 'report-xlsx' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
         </div>
         <div class="col-sm-auto p-1">
             <div class="btn-group" role="group">
@@ -27,6 +27,22 @@
                             </form>
                         </div>
                         <a class="dropdown-item" href="{% url 'report-this-month' %}">Go to this month</a>
+                        <div class="dropdown-divider"></div>
+                        <div class="p-2 small"><strong>Custom Date Range</strong></div>
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                <div class="mb-2">
+                                    {{ date_range_picker.date_start }}
+                                </div>
+                                <div class="mb-2">
+                                    {{ date_range_picker.date_end }}
+                                </div>
+                                <div>
+                                    <button class="btn btn-secondary align-top w-100" type="submit" name="date_range">Go</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <a title="Next month" class="btn btn-secondary" href="{{ month_next }}">

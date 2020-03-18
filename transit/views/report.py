@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
-from transit.forms import DatePickerForm
+from transit.forms import DatePickerForm, DateRangePickerForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -181,10 +181,8 @@ class Report():
         if date_start != date_end:
             daily_log_shift = None
 
-        for day in range(date_start.day, date_end.day+1):
-            # TODO what if end month/year is different than start?
-            day_date = datetime.date(date_start.year, date_start.month, day)
-
+        day_date = date_start
+        while day_date < (date_end + datetime.timedelta(days=1)):
             # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...
             fallback_time = datetime.datetime(year=day_date.year, month=day_date.month, day=day_date.day, hour=8, minute=0)
 
@@ -409,6 +407,8 @@ class Report():
 
             self.report_all.append(report_day)
 
+            day_date += datetime.timedelta(days=1)
+
         self.vehicle_reports = []
         for vehicle in Vehicle.objects.filter(is_logged=True):
             vehicle_report = Report.ReportOutputVehicles()
@@ -448,24 +448,43 @@ class Report():
             elif not rider.elderly and not rider.ambulatory:
                 self.unique_riders.nonelderly_nonambulatory += 1
 
-
 @permission_required(['transit.view_trip', 'transit.view_shift'])
-def report(request, year, month):
+def reportMonth(request, year, month):
     date_start = datetime.date(year, month, 1)
-
-    if request.method == 'POST':
-        date_picker = DatePickerForm(request.POST)
-        if date_picker.is_valid():
-            date_picker_date = date_picker.cleaned_data['date']
-            return HttpResponseRedirect(reverse('report', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
-    else:
-        date_picker = DatePickerForm(initial={'date':date_start})
-
     date_end = date_start
     if date_end.month == 12:
         date_end = date_end.replace(day=31)
     else:
         date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+
+    return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def report(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    date_start = datetime.date(start_year, start_month, start_day)
+    date_end = datetime.date(end_year, end_month, end_day)
+
+    if date_start > date_end:
+        swap_date = date_start
+        date_start = date_end
+        date_end = swap_date
+
+    if request.method == 'POST':
+        date_picker = DatePickerForm(request.POST)
+        date_range_picker = DateRangePickerForm(request.POST)
+
+        if 'date_range' in request.POST:
+            if date_range_picker.is_valid():
+                new_start = date_range_picker.cleaned_data['date_start']
+                new_end = date_range_picker.cleaned_data['date_end']
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+        else:
+            if date_picker.is_valid():
+                date_picker_date = date_picker.cleaned_data['date']
+                return HttpResponseRedirect(reverse('report-month', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
+    else:
+        date_picker = DatePickerForm(initial={'date':date_start})
+        date_range_picker = DateRangePickerForm(initial={'date_start':date_start, 'date_end':date_end})
 
     month_prev = date_start + datetime.timedelta(days=-1)
     month_prev.replace(day=1)
@@ -477,9 +496,10 @@ def report(request, year, month):
     context = {
         'date_start': date_start,
         'date_end': date_end,
-        'month_prev': reverse('report', kwargs={'year':month_prev.year, 'month':month_prev.month}),
-        'month_next': reverse('report', kwargs={'year':month_next.year, 'month':month_next.month}),
+        'month_prev': reverse('report-month', kwargs={'year':month_prev.year, 'month':month_prev.month}),
+        'month_next': reverse('report-month', kwargs={'year':month_next.year, 'month':month_next.month}),
         'date_picker': date_picker,
+        'date_range_picker': date_range_picker,
         'vehicles': Vehicle.objects.filter(is_logged=True),
         'reports': report.report_all,
         'vehicle_reports': report.vehicle_reports,
@@ -492,22 +512,26 @@ def report(request, year, month):
     }
     return render(request, 'report/view.html', context)
 
+@permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportThisMonth(request):
     date = datetime.datetime.now().date()
-    return report(request, date.year, date.month)
+    return reportMonth(request, date.year, date.month)
 
+@permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportLastMonth(request):
     date = (datetime.datetime.now().date()).replace(day=1) # first day of this month 
     date = date + datetime.timedelta(days=-1) # last day of the previous month
-    return report(request, date.year, date.month)
+    return reportMonth(request, date.year, date.month)
 
-def reportXLSX(request, year, month):
-    date_start = datetime.date(year, month, 1)
-    date_end = date_start
-    if date_end.month == 12:
-        date_end = date_end.replace(day=31)
-    else:
-        date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportXLSX(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    date_start = datetime.date(start_year, start_month, start_day)
+    date_end = datetime.date(end_year, end_month, end_day)
+
+    if date_start > date_end:
+        swap_date = date_start
+        date_start = date_end
+        date_end = swap_date
 
     report = Report()
     report.load(date_start, date_end)
@@ -833,4 +857,4 @@ def reportXLSX(request, year, month):
 
     wb.save(filename=temp_file.name)
 
-    return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Report_' + date_start.strftime('%Y-%m') + '.xlsx', as_attachment=True)
+    return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Report_' + date_start.strftime('%Y-%m-%d') + '_to_' + date_end.strftime('%Y-%m-%d') + '.xlsx', as_attachment=True)

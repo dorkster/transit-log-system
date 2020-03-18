@@ -354,6 +354,9 @@ class Report():
                                 if ambulatory == None:
                                     ambulatory = clients[0].ambulatory
                                 self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory, trips=1))
+                            else:
+                                # could not find client, add as unknown
+                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly=None, ambulatory=None, trips=1))
                         else:
                             self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory, trips=1))
                         self.unique_riders.names = sorted(self.unique_riders.names)

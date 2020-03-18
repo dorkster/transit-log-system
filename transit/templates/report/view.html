@@ -242,7 +242,11 @@
     </thead>
     {% for rider in unique_riders.names %}
     <tr>
-        <td class="mytable-col-lg">{{rider.name}}</td>
+        <td class="mytable-col-lg">
+            <a href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                {{rider.name}}
+            </a>
+        </td>
         <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
         <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
         <td class="mytable-col-sm">{{rider.trips}}</td>

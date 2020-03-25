@@ -59,17 +59,20 @@ class Report():
             self.collected_check = Report.Money(0)
 
     class ReportDay():
+        query_vehicles = Vehicle.objects.all()
+        query_drivers = Driver.objects.filter(is_logged=True)
+
         def __init__(self):
             self.date = None
             self.shifts = []
             self.trips = []
 
             self.by_vehicle = {}
-            for i in Vehicle.objects.all():
+            for i in self.query_vehicles:
                 self.by_vehicle[i] = Report.ReportSummary()
 
             self.by_driver = {}
-            for i in Driver.objects.filter(is_logged=True):
+            for i in self.query_drivers:
                 self.by_driver[i] = Report.ReportSummary()
 
         def hasVehicleInShift(self, vehicle):
@@ -85,6 +88,8 @@ class Report():
             return False
 
     class ReportSummary():
+        query_triptypes = TripType.objects.all()
+
         def __init__(self):
             self.service_miles = 0
             self.service_hours = 0
@@ -98,7 +103,7 @@ class Report():
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
 
-            for i in TripType.objects.all():
+            for i in self.query_triptypes:
                 self.trip_types[i] = 0
 
         def __add__(self, other):
@@ -111,7 +116,7 @@ class Report():
             r.total_hours += other.total_hours
             r.pmt += other.pmt
             r.fuel += other.fuel
-            for i in TripType.objects.all():
+            for i in self.query_triptypes:
                 r.trip_types[i] += other.trip_types[i]
             r.collected_cash += other.collected_cash
             r.collected_check += other.collected_check
@@ -190,6 +195,7 @@ class Report():
             report_day.date = day_date
 
             shifts = Shift.objects.filter(date=day_date)
+            shifts = shifts.select_related('driver').select_related('vehicle')
             for i in shifts:
                 if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or not i.driver or not i.vehicle:
                     # skip incomplete shift
@@ -237,6 +243,7 @@ class Report():
                 report_day.shifts.append(report_shift)
 
             trips = Trip.objects.filter(date=day_date, status=Trip.STATUS_NORMAL, is_activity=False)
+            trips = trips.select_related('driver').select_related('vehicle').select_related('trip_type')
             for i in trips:
                 if i.driver and not i.driver.is_logged:
                     # skip non-logged drivers

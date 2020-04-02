@@ -49,7 +49,7 @@ def templateTripCreateReturn(request, parent, id):
     trip.elderly = origin_trip.elderly
     trip.ambulatory = origin_trip.ambulatory
 
-    return templateTripCreateEditCommon(request, trip, is_new=True)
+    return templateTripCreateEditCommon(request, trip, is_new=True, is_return_trip=True)
 
 def templateTripCopy(request, parent, id):
     origin_trip = get_object_or_404(TemplateTrip, id=id)
@@ -64,7 +64,7 @@ def templateTripEdit(request, parent, id):
     return templateTripCreateEditCommon(request, trip, is_new=False)
 
 @permission_required(['transit.change_templatetrip'])
-def templateTripCreateEditCommon(request, trip, is_new):
+def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
     if is_new == True:
         query = TemplateTrip.objects.filter(parent=trip.parent).order_by('-sort_index')
         if len(query) > 0:
@@ -137,6 +137,10 @@ def templateTripCreateEditCommon(request, trip, is_new):
 
             trip.save()
 
+            if is_new and not is_return_trip and not trip.is_activity:
+                if form.cleaned_data['create_return_trip'] == True:
+                    return HttpResponseRedirect(reverse('template-trip-create-return', kwargs={'parent':trip.parent.id, 'id':trip.id}))
+
             return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + '#trip_' + str(trip.id))
     else:
         if trip.is_activity:
@@ -192,6 +196,7 @@ def templateTripCreateEditCommon(request, trip, is_new):
         'destinations': Destination.objects.all(),
         'destinations_json': serializers.serialize('json', Destination.objects.all()),
         'is_new': is_new,
+        'is_return_trip': is_return_trip,
         'frequent_tags': FrequentTag.objects.all()[:10],
     }
 

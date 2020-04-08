@@ -60,6 +60,7 @@ urlpatterns = [
     path('clients/<uuid:id>/delete', views.clientDelete, name='client-delete'),
     path('clients/create-from-trip/<uuid:trip_id>', views.clientCreateFromTrip, name='client-create-from-trip'),
     path('clients/create-from-template-trip/<uuid:trip_id>', views.clientCreateFromTemplateTrip, name='client-create-from-template-trip'),
+    path('clients/xlsx', views.clientXLSX, name='client-xlsx'),
 
     path('destinations/', views.destinationList, name='destinations'),
     path('destinations/create', views.destinationCreate, name='destination-create'),

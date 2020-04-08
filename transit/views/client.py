@@ -1,8 +1,10 @@
 import uuid
 import datetime
+import tempfile
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
+from django.http import FileResponse
 from django.urls import reverse
 from django.db.models import Q
 
@@ -10,6 +12,10 @@ from transit.models import Client, Trip, FrequentTag, TemplateTrip, SiteSettings
 from transit.forms import EditClientForm
 
 from django.contrib.auth.decorators import permission_required
+
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.workbook import Workbook
+from openpyxl.utils import get_column_letter
 
 @permission_required(['transit.view_client'])
 def clientList(request):
@@ -240,3 +246,108 @@ def ajaxClientList(request):
     }
     return render(request, 'client/ajax_list.html', context=context)
 
+@permission_required(['transit.view_client'])
+def clientXLSX(request):
+    SORT_NAME = 0
+    SORT_ADDRESS = 1
+    SORT_PHONE_HOME = 2
+    SORT_PHONE_CELL = 3
+    SORT_ELDERLY = 4
+    SORT_AMBULATORY = 5
+    SORT_TAGS = 6
+
+    filter_elderly = request.session.get('clients_elderly', 0)
+    filter_ambulatory = request.session.get('clients_ambulatory', 0)
+    filter_search = request.session.get('clients_search', '')
+    sort_mode = request.session.get('clients_sort', SORT_NAME)
+
+    clients = Client.objects.all()
+
+    if filter_elderly == 1:
+        clients = clients.filter(elderly=True)
+    elif filter_elderly == 2:
+        clients = clients.filter(elderly=False)
+
+    if filter_ambulatory == 1:
+        clients = clients.filter(ambulatory=True)
+    elif filter_ambulatory == 2:
+        clients = clients.filter(ambulatory=False)
+
+    if filter_search != '':
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
+
+    if sort_mode == SORT_NAME:
+        clients = clients.order_by('name')
+    elif sort_mode == SORT_ADDRESS:
+        clients = clients.order_by('address', 'name')
+    elif sort_mode == SORT_PHONE_HOME:
+        clients = clients.order_by('phone_home', 'name')
+    elif sort_mode == SORT_PHONE_CELL:
+        clients = clients.order_by('phone_cell', 'name')
+    elif sort_mode == SORT_ELDERLY:
+        clients = clients.order_by('elderly', 'name')
+    elif sort_mode == SORT_AMBULATORY:
+        clients = clients.order_by('ambulatory', 'name')
+    elif sort_mode == SORT_TAGS:
+        clients = clients.order_by('tags', 'name')
+
+    temp_file = tempfile.NamedTemporaryFile()
+
+    wb = Workbook()
+
+    style_font_normal = Font(name='Arial', size=10)
+    style_border_normal_side = Side(border_style='thin', color='FF000000')
+    style_border_normal = Border(left=style_border_normal_side, right=style_border_normal_side, top=style_border_normal_side, bottom=style_border_normal_side)
+    style_colwidth_normal = 13
+    style_colwidth_large = 30
+
+    style_font_header = Font(name='Arial', size=10, bold=True)
+    style_alignment_header = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    style_fill_header = PatternFill(fill_type='solid', fgColor='DFE0E1')
+    style_rowheight_header = 25
+
+    ws = wb.active
+    ws.title = 'Clients'
+
+    row_header = 1
+
+    ws.cell(row_header, 1, 'Name')
+    ws.cell(row_header, 2, 'Address')
+    ws.cell(row_header, 3, 'Phone (Home)')
+    ws.cell(row_header, 4, 'Phone (Cell)')
+    ws.cell(row_header, 5, 'Elderly?')
+    ws.cell(row_header, 6, 'Ambulatory?')
+    ws.cell(row_header, 7, 'Tags')
+
+    for i in range(0, len(clients)):
+        ws.cell(i+2, 1, clients[i].name)
+        ws.cell(i+2, 2, clients[i].address)
+        ws.cell(i+2, 3, clients[i].phone_home)
+        ws.cell(i+2, 4, clients[i].phone_cell)
+        ws.cell(i+2, 5, clients[i].elderly)
+        ws.cell(i+2, 6, clients[i].ambulatory)
+        ws.cell(i+2, 7, clients[i].tags)
+
+        # display elderly/ambulatory as booleans
+        ws.cell(i+2, 5).number_format = 'BOOLEAN'
+        ws.cell(i+2, 6).number_format = 'BOOLEAN'
+
+    # apply styles
+    ws.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 8):
+        if i == 1 or i == 2 or i == 7:
+            ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
+        else:
+            ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, len(clients)+2):
+            ws.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws.cell(j, i).font = style_font_header
+                ws.cell(j, i).alignment = style_alignment_header
+                ws.cell(j, i).fill = style_fill_header
+            else:
+                ws.cell(j, i).font = style_font_normal
+
+    wb.save(filename=temp_file.name)
+
+    return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Clients.xlsx', as_attachment=True)

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, FrequentTag, SiteSettings, TripType
-from transit.forms import DatePickerForm, EditScheduleMessageForm
+from transit.forms import DatePickerForm, EditScheduleMessageForm, SchedulePrintFilterForm
 from transit.views.report import Report
 
 from django.contrib.auth.decorators import permission_required
@@ -68,11 +68,54 @@ def schedulePrint(request, year, month, day):
     else:
         message = ''
 
+    filter_form = SchedulePrintFilterForm(request.GET)
+
+    filter_hide_canceled = True if request.GET.get('hide_canceled') == '1' else False
+    filter_hide_completed = True if request.GET.get('hide_completed') == '1' else False
+    filter_hide_nolog = True if request.GET.get('hide_nolog') == '1' else False
+    filter_search = '' if request.GET.get('search') == None else request.GET.get('search')
+    filter_driver = '' if request.GET.get('driver') == None else request.GET.get('driver')
+    filter_vehicle = '' if request.GET.get('vehicle') == None else request.GET.get('vehicle')
+
+    unfiltered_count = len(query_trips)
+
+    if filter_hide_canceled:
+        query_trips = query_trips.filter(status=Trip.STATUS_NORMAL)
+
+    if filter_hide_completed:
+        query_trips = query_trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(is_activity=True))
+
+    if filter_hide_nolog:
+        query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
+
+    if filter_search != '':
+        query_trips = query_trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | (Q(is_activity=True) & Q(note__icontains=filter_search)))
+
+    if filter_driver != '':
+        query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
+
+    if filter_vehicle != '':
+        query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | Q(is_activity=True))
+
+    filtered_count = len(query_trips)
+
     context = {
         'date': day_date,
         'trips': query_trips,
         'shifts': query_shifts,
         'message': message,
+        'drivers': Driver.objects.all(),
+        'vehicles': Vehicle.objects.all(),
+        'filter_form': filter_form,
+        'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
+        'filtered_count': filtered_count,
+        'unfiltered_count': unfiltered_count,
+        'filter_hide_canceled': filter_hide_canceled,
+        'filter_hide_completed': filter_hide_completed,
+        'filter_hide_nolog': filter_hide_nolog,
+        'filter_search': filter_search,
+        'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
+        'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
     }
     return render(request, 'schedule/print.html', context=context)
 

@@ -6,7 +6,7 @@
     @page {
         size: landscape;
     }
-    #print-print, #print-close {
+    #print-print, #print-close, #print-filter {
         display: none;
     }
 }
@@ -114,6 +114,104 @@ nav {
     <p>There are no shifts for this day.</p>
     {% endif %}
     <hr/>
+    <form id="filter_form" action="" method="get" onsubmit="return checkForm(this, event);">
+    {{ filter_form }}
+    </form>
+    <div id="print-filter" class="container ml-0 border p-2 mb-3" style="background: #eee;">
+        <div class="row">
+            <div class="col">
+                <h5>Filter{% if filtered_count < unfiltered_count %} ({{filtered_count}}/{{unfiltered_count}} visible){% endif %}</h5>
+            </div>
+            {% if is_filtered %}
+            <div class="col-auto">
+                <button class="btn btn-outline-danger btn-sm" onclick="printFilter('reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="mt-2">
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="printFilter('driver', '')">All Drivers</a>
+                    {% for driver in drivers %}
+                    <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="printFilter('driver', '{{driver.id}}')">{{driver}}</a>
+                    {% endfor %}
+                </div>
+            </span>
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="printFilter('vehicle', '')">All Vehicles</a>
+                    {% for vehicle in vehicles %}
+                    <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="printFilter('vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                    {% endfor %}
+                </div>
+            </span>
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Show...
+                </button>
+                <div class="dropdown-menu shadow dropdown-menu-right">
+                    <a class="dropdown-item" href="#_" onclick="printFilter('toggle_completed', '')"><span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed</a>
+                    <a class="dropdown-item" href="#_" onclick="printFilter('toggle_canceled', '')"><span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled</a>
+                    <a class="dropdown-item" href="#_" onclick="printFilter('toggle_nolog', '')"><span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged</a>
+                </div>
+            </span>
+        </div>
+        <div class="mt-2">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
+                    <span class="oi oi-magnifying-glass mr-2"></span>Search
+                </button>
+
+                <!-- Modal -->
+                <div class="modal ajax-blocker" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form id="filter_search_form">
+                                <div class="modal-body">
+                                    <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="oi oi-magnifying-glass mr-2"></span>Search
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    $('#filter_search_form').on('submit', function(e){
+                        e.preventDefault();
+                        $('#modal_filter_search').modal('hide');
+                        printFilter('search', $('#filter_search').val());
+                    });
+                    $('#modal_filter_search').on('show.bs.modal', function(){
+                        $('#filter_search').val('{{filter_search}}');
+                    });
+                    $('#modal_filter_search').on('shown.bs.modal', function(){
+                        $('#filter_search').focus();
+                        $('#filter_search').select();
+                    });
+                </script>
+        {% if filter_search %}
+        <button class="btn btn-outline-danger btn-sm" onclick="printFilter('search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
+        {% endif %}
+        </div>
+    </div>
+    <hr/>
     <h5>Trips</h5>
     {% if trips %}
     <table class="mytable">
@@ -200,7 +298,52 @@ nav {
     {% endif %}
 </div>
 <script type="text/javascript">
+    {% if not is_filtered %}
     window.print();
+    {% endif %}
+
+    function printFilter(field, data) {
+        if (field == "reset") {
+            $("#id_driver").val("");
+            $("#id_vehicle").val("");
+            $("#id_search").val("");
+            $("#id_hide_completed").val("");
+            $("#id_hide_canceled").val("");
+            $("#id_hide_nolog").val("");
+        }
+        else if (field == "driver") {
+            $("#id_driver").val(data);
+        }
+        else if (field == "vehicle") {
+            $("#id_vehicle").val(data);
+        }
+        else if (field == "search") {
+            $("#id_search").val(data);
+        }
+        else if (field == "toggle_completed") {
+            var current_val = $("#id_hide_completed").val();
+            if (current_val == "" || current_val == "0")
+                $("#id_hide_completed").val("1");
+            else
+                $("#id_hide_completed").val("0");
+        }
+        else if (field == "toggle_canceled") {
+            var current_val = $("#id_hide_canceled").val();
+            if (current_val == "" || current_val == "0")
+                $("#id_hide_canceled").val("1");
+            else
+                $("#id_hide_canceled").val("0");
+        }
+        else if (field == "toggle_nolog") {
+            var current_val = $("#id_hide_nolog").val();
+            if (current_val == "" || current_val == "0")
+                $("#id_hide_nolog").val("1");
+            else
+                $("#id_hide_nolog").val("0");
+        }
+
+        $("#filter_form").submit();
+    }
 </script>
 {% endblock %}
 

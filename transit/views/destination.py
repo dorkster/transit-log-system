@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Destination, Trip, SiteSettings
+from transit.models import Destination, Trip, SiteSettings, TemplateTrip
 from transit.forms import EditDestinationForm
 
 from django.contrib.auth.decorators import permission_required
@@ -26,13 +26,18 @@ def destinationEdit(request, id):
     return destinationCreateEditCommon(request, destination, is_new=False)
 
 @permission_required(['transit.change_destination'])
-def destinationCreateEditCommon(request, destination, is_new):
+def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src_trip=None, src_template_trip=None):
     if request.method == 'POST':
         form = EditDestinationForm(request.POST)
 
         if 'cancel' in request.POST:
-            url_hash = '' if is_new else '#destination_' + str(destination.id)
-            return HttpResponseRedirect(reverse('destinations') + url_hash)
+            if src_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
+            elif src_template_trip != None:
+                return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
+            else:
+                url_hash = '' if is_new else '#destination_' + str(destination.id)
+                return HttpResponseRedirect(reverse('destinations') + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('destination-delete', kwargs={'id':destination.id}))
 
@@ -47,7 +52,12 @@ def destinationCreateEditCommon(request, destination, is_new):
             unique_destination.phone = form.cleaned_data['phone']
             unique_destination.save()
 
-            return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(unique_destination.id))
+            if src_trip != None:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
+            elif src_template_trip != None:
+                return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
+            else:
+                return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(unique_destination.id))
     else:
         initial = {
             'address': destination.address,
@@ -70,6 +80,7 @@ def destinationCreateEditCommon(request, destination, is_new):
         'destination': destination,
         'is_new': is_new,
         'addresses': sorted(addresses),
+        'is_dupe': is_dupe,
     }
 
     return render(request, 'destination/edit.html', context)
@@ -90,6 +101,48 @@ def destinationDelete(request, id):
     }
 
     return render(request, 'model_delete.html', context)
+
+@permission_required(['transit.change_destination'])
+def destinationCreateFromTrip(request, trip_id, use_address):
+    trip = get_object_or_404(Trip, id=trip_id)
+
+    if use_address == 1:
+        target_address = trip.address
+        target_phone = trip.phone_address
+    else:
+        # 'destination' is the default
+        target_address = trip.destination
+        target_phone = trip.phone_destination
+
+    existing_destinations = Destination.objects.filter(address=target_address)
+    if len(existing_destinations) > 0:
+        return destinationCreateEditCommon(request, existing_destinations[0], is_new=False, is_dupe=True, src_trip=trip)
+
+    destination = Destination()
+    destination.address = target_address
+    destination.phone = target_phone
+    return destinationCreateEditCommon(request, destination, is_new=True, src_trip=trip)
+
+@permission_required(['transit.change_destination'])
+def destinationCreateFromTemplateTrip(request, trip_id, use_address):
+    trip = get_object_or_404(TemplateTrip, id=trip_id)
+
+    if use_address == 1:
+        target_address = trip.address
+        target_phone = trip.phone_address
+    else:
+        # 'destination' is the default
+        target_address = trip.destination
+        target_phone = trip.phone_destination
+
+    existing_destinations = Destination.objects.filter(address=target_address)
+    if len(existing_destinations) > 0:
+        return destinationCreateEditCommon(request, existing_destinations[0], is_new=False, is_dupe=True, src_template_trip=trip)
+
+    destination = Destination()
+    destination.address = target_address
+    destination.phone = target_phone
+    return destinationCreateEditCommon(request, destination, is_new=True, src_template_trip=trip)
 
 @permission_required(['transit.view_destination'])
 def ajaxDestinationList(request):

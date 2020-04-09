@@ -66,6 +66,8 @@ urlpatterns = [
     path('destinations/create', views.destinationCreate, name='destination-create'),
     path('destinations/<uuid:id>/edit', views.destinationEdit, name='destination-edit'),
     path('destinations/<uuid:id>/delete', views.destinationDelete, name='destination-delete'),
+    path('destinations/create-from-trip/<uuid:trip_id>/<int:use_address>', views.destinationCreateFromTrip, name='destination-create-from-trip'),
+    path('destinations/create-from-template-trip/<uuid:trip_id>/<int:use_address>', views.destinationCreateFromTemplateTrip, name='destination-create-from-template-trip'),
 
     path('drivers/', views.driverList, name='drivers'),
     path('drivers/create', views.driverCreate, name='driver-create'),

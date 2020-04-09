@@ -186,12 +186,53 @@ Show extra columns
                     {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item"><span class="oi oi-person mr-2"></span>Create/Edit Client</a>
+                    {% if trip.address and trip.destination %}
+                    <a href="" data-toggle="modal" data-target="#modal_create_dest_{{trip.id}}" class="dropdown-item"><span class="oi oi-pin mr-2"></span>Create/Edit Destination</a>
+                    {% elif trip.address %}
+                    <a href="{% url 'destination-create-from-trip' trip.id 1 %}" class="dropdown-item"><span class="oi oi-pin mr-2"></span>Create/Edit Destination</a>
+                    {% elif trip.destination %}
+                    <a href="{% url 'destination-create-from-trip' trip.id 0 %}" class="dropdown-item"><span class="oi oi-pin mr-2"></span>Create/Edit Destination</a>
+                    {% endif %}
                     <a href="{% url 'trip-create-return' 'edit' trip.id %}" class="dropdown-item"><span class="oi oi-loop mr-2"></span>Create Return Trip</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete trip</a>
                     {% endif %}
                 </div>
             </div>
+            {% if trip.address and trip.destination %}
+            <!-- Create/Edit Destination Modal -->
+            <div class="modal ajax-blocker" id="modal_create_dest_{{trip.id}}" tabindex="-1" role="dialog" aria-labelledby="modal_create_dest_title_{{trip.id}}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_create_dest_title_{{trip.id}">Select a Destination to create/edit</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="list-group text-left">
+                                <a class="list-group-item" href="{% url 'destination-create-from-trip' trip.id 1 %}">
+                                    {{trip.address}}
+                                    {% if trip.phone_address %}
+                                    <br/>{{trip.phone_address}}
+                                    {% endif %}
+                                </a>
+                                <a class="list-group-item" href="{% url 'destination-create-from-trip' trip.id 0 %}">
+                                    {{trip.destination}}
+                                    {% if trip.phone_destination %}
+                                    <br/>{{trip.phone_destination}}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </td>
         {% if trip.is_activity %}
         <td colspan=2 class="text-center edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_start_time', row_movers)">

@@ -141,11 +141,11 @@
 {% if vehicle_issues.paginator.num_pages > 1 %}
 <nav class="mt-2">
     <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_previous %}?issue_page={{ vehicle_issues.previous_page_number }}&pretrip_page={{ pretrips.number }}{% else %}#_{% endif %}">&laquo;</a></li>
+        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_previous %}?issue_page={{ vehicle_issues.previous_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&laquo;</a></li>
         {% for page in vehicle_issues.paginator.page_range %}
-        <li class="page-item {% if vehicle_issues.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ page }}&pretrip_page={{ pretrips.number }}">{{ page }}</a></li>
+        <li class="page-item {% if vehicle_issues.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ page }}&pretrip_page={{ pretrips.number }}#issues">{{ page }}</a></li>
         {% endfor %}
-        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_next %}?issue_page={{ vehicle_issues.next_page_number }}&pretrip_page={{ pretrips.number }}{% else %}#_{% endif %}">&raquo;</a></li>
+        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_next %}?issue_page={{ vehicle_issues.next_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&raquo;</a></li>
     </ul>
 </nav>
 {% endif %}
@@ -153,6 +153,7 @@
 <p>There are no reported vehicle issues.</p>
 {% endif %}
 <hr/>
+<a id="pretrips" data-scrollintoview="start"></a>
 <h3>Pre-Trip Log</h3>
 {% if pretrips %}
 <table class="mytable mytable-striped">
@@ -191,11 +192,11 @@
 {% if pretrips.paginator.num_pages > 1 %}
 <nav class="mt-2">
     <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.previous_page_number }}{% else %}#_{% endif %}">&laquo;</a></li>
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.previous_page_number }}{% endif %}#pretrips">&laquo;</a></li>
         {% for page in pretrips.paginator.page_range %}
-        <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ vehicle_issues.number }}&pretrip_page={{ page }}">{{ page }}</a></li>
+        <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ vehicle_issues.number }}&pretrip_page={{ page }}#pretrips">{{ page }}</a></li>
         {% endfor %}
-        <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.next_page_number }}{% else %}#_{% endif %}">&raquo;</a></li>
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.next_page_number }}{% endif %}#pretrips">&raquo;</a></li>
     </ul>
 </nav>
 {% endif %}

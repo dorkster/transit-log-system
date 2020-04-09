@@ -99,6 +99,13 @@ def schedulePrint(request, year, month, day):
 
     filtered_count = len(query_trips)
 
+    # if the GET request is populated, the filter has been used. So we don't want to auto-show the print dialog
+    show_dialog = True
+    for i in request.GET:
+        if i == 'driver':
+            show_dialog = False
+            break
+
     context = {
         'date': day_date,
         'trips': query_trips,
@@ -116,6 +123,7 @@ def schedulePrint(request, year, month, day):
         'filter_search': filter_search,
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
+        'show_dialog': show_dialog,
     }
     return render(request, 'schedule/print.html', context=context)
 

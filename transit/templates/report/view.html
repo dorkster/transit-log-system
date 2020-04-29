@@ -161,22 +161,24 @@
         <td class="mytable-col-sm">Cash Collected</td>
         <td class="mytable-col-sm">Checks Collected</td>
     </thead>
-    {% for day in v.days %}
-    <tr>
-        <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{day.date}}</a></td>
-        <td class="mytable-col-sm">{{day.data.service_miles|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{day.data.service_hours|floatformat:2}}</td>
-        <td class="mytable-col-sm">{{day.data.deadhead_miles|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{day.data.deadhead_hours|floatformat:2}}</td>
-        <td class="mytable-col-sm">{{day.data.pmt|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{day.data.fuel|floatformat:1}}</td>
-        {% for key, value in day.data.trip_types.items %}
-        <td class="mytable-col-sm">{{value}}</td>
+    <tbody class="mytable-hoverhi">
+        {% for day in v.days %}
+        <tr>
+            <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{day.date}}</a></td>
+            <td class="mytable-col-sm {% if day.data.service_miles == 0 %}mytable-zero{%endif%}">{{day.data.service_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if day.data.service_hours == 0 %}mytable-zero{%endif%}">{{day.data.service_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm {% if day.data.deadhead_miles == 0 %}mytable-zero{%endif%}">{{day.data.deadhead_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if day.data.deadhead_hours == 0 %}mytable-zero{%endif%}">{{day.data.deadhead_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm {% if day.data.pmt == 0 %}mytable-zero{%endif%}">{{day.data.pmt|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if day.data.fuel == 0 %}mytable-zero{%endif%}">{{day.data.fuel|floatformat:1}}</td>
+            {% for key, value in day.data.trip_types.items %}
+            <td class="mytable-col-sm {% if value == 0 %}mytable-zero{%endif%}">{{value}}</td>
+            {% endfor %}
+            <td class="mytable-col-sm {% if day.data.collected_cash.value == 0 %}mytable-zero{%endif%}">{{day.data.collected_cash}}</td>
+            <td class="mytable-col-sm {% if day.data.collected_check.value == 0 %}mytable-zero{%endif%}">{{day.data.collected_check}}</td>
+        </tr>
         {% endfor %}
-        <td class="mytable-col-sm">{{day.data.collected_cash}}</td>
-        <td class="mytable-col-sm">{{day.data.collected_check}}</td>
-    </tr>
-    {% endfor %}
+    </tbody>
     <thead>
         <td class="mytable-col-md">Date</td>
         <td class="mytable-col-sm">Service Miles</td>
@@ -240,18 +242,20 @@
         <td class="mytable-col-sm">Ambulatory</td>
         <td class="mytable-col-sm">Total Trips</td>
     </thead>
-    {% for rider in unique_riders.names %}
-    <tr>
-        <td class="mytable-col-lg">
-            <a target="_blank" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
-                {{rider.name}}
-            </a>
-        </td>
-        <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
-        <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
-        <td class="mytable-col-sm">{{rider.trips}}</td>
-    </tr>
-    {% endfor %}
+    <tbody class="mytable-hoverhi">
+        {% for rider in unique_riders.names %}
+        <tr>
+            <td class="mytable-col-lg">
+                <a target="_blank" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                    {{rider.name}}
+                </a>
+            </td>
+            <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
+            <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
+            <td class="mytable-col-sm">{{rider.trips}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 <hr/>
 {% endif%}
@@ -265,14 +269,16 @@
         <td class="mytable-col-sm">Cash</td>
         <td class="mytable-col-sm">Check</td>
     </thead>
-    {% for money_trip in money_trips %}
-    <tr>
-        <td class="mytable-col-md"><a href="{% url 'trip-edit' 'edit' money_trip.trip.id %}">{{ money_trip.trip.date }}</a></td>
-        <td class="mytable-col-lg">{{ money_trip.trip.name }}</td>
-        <td class="mytable-col-sm">{{ money_trip.collected_cash}}</td>
-        <td class="mytable-col-sm">{{ money_trip.collected_check}}</td>
-    </tr>
-    {% endfor %}
+    <tbody class="mytable-hoverhi">
+        {% for money_trip in money_trips %}
+        <tr>
+            <td class="mytable-col-md"><a href="{% url 'trip-edit' 'edit' money_trip.trip.id %}">{{ money_trip.trip.date }}</a></td>
+            <td class="mytable-col-lg">{{ money_trip.trip.name }}</td>
+            <td class="mytable-col-sm {% if money_trip.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ money_trip.collected_cash}}</td>
+            <td class="mytable-col-sm {% if money_trip.collected_check.value == 0 %}mytable-zero{%endif%}">{{ money_trip.collected_check}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
     <tr class="bg-success text-light text-bold">
         <td class="mytable-col-md">TOTAL</td>
         <td class="mytable-col-lg"></td>
@@ -298,12 +304,12 @@
     {% for d in driver_reports %}
     <tr style="background: #{{d.driver.get_color}}">
         <td class="mytable-col-md">{{d.driver}}</td>
-        <td class="mytable-col-sm">{{d.totals.service_miles|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{d.totals.service_hours|floatformat:2}}</td>
-        <td class="mytable-col-sm">{{d.totals.deadhead_miles|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{d.totals.deadhead_hours|floatformat:2}}</td>
-        <td class="mytable-col-sm">{{d.totals.total_miles|floatformat:1}}</td>
-        <td class="mytable-col-sm">{{d.totals.total_hours|floatformat:2}}</td>
+        <td class="mytable-col-sm {% if d.totals.service_miles == 0 %}mytable-zero{%endif%}">{{d.totals.service_miles|floatformat:1}}</td>
+        <td class="mytable-col-sm {% if d.totals.service_hours == 0 %}mytable-zero{%endif%}">{{d.totals.service_hours|floatformat:2}}</td>
+        <td class="mytable-col-sm {% if d.totals.deadhead_miles == 0 %}mytable-zero{%endif%}">{{d.totals.deadhead_miles|floatformat:1}}</td>
+        <td class="mytable-col-sm {% if d.totals.deadhead_hours == 0 %}mytable-zero{%endif%}">{{d.totals.deadhead_hours|floatformat:2}}</td>
+        <td class="mytable-col-sm {% if d.totals.total_miles == 0 %}mytable-zero{%endif%}">{{d.totals.total_miles|floatformat:1}}</td>
+        <td class="mytable-col-sm {% if d.totals.total_hours == 0 %}mytable-zero{%endif%}">{{d.totals.total_hours|floatformat:2}}</td>
     </tr>
     {% endfor %}
 </table>

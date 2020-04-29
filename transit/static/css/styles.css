@@ -76,6 +76,15 @@
     display: none;
 }
 
+.mytable-hoverhi tr:hover {
+    background: #fff3cd;
+    font-weight: bold;
+}
+
+.mytable-zero {
+    color: rgba(0,0,0,0.2);
+}
+
 .form-control-width-fix {
     width: auto !important;
     display: inline !important;

@@ -33,6 +33,8 @@ function AjaxLoader(url, div_id) {
     }
 
     self.run = function(target_id="", target_action="", target_data="") {
+        $('.ajax-loading').show();
+
         $.ajax({
             type: "GET",
             url: self.url,
@@ -59,8 +61,10 @@ function AjaxLoader(url, div_id) {
                                 hash_element.scrollIntoView({block: "center"});
                         }
                 }
+                $('.ajax-loading').hide();
             }
             else {
+                $('.ajax-loading').hide();
                 self.stop();
                 // when the ajax blocker is hidden, fire a new ajax request
                 $('.modal.ajax-blocker.show').one('hidden.bs.modal', function(){ self.restart(); })

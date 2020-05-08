@@ -6,7 +6,7 @@
     @page {
         size: landscape;
     }
-    #print-print, #print-close, #print-filter {
+    #print-print, #print-close, #print-filter, #print-filter-hr {
         display: none;
     }
 }
@@ -211,7 +211,7 @@ nav {
         {% endif %}
         </div>
     </div>
-    <hr/>
+    <hr id="print-filter-hr" />
     <h5>Trips</h5>
     {% if trips %}
     <table class="mytable">

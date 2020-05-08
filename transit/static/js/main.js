@@ -62,6 +62,7 @@ function AjaxLoader(url, div_id) {
                         }
                 }
                 $('.ajax-loading').fadeOut();
+                self.restart();
             }
             else {
                 $('.ajax-loading').fadeOut();

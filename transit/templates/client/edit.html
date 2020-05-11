@@ -10,7 +10,7 @@
     {% endif %}
 </h2>
 {% if is_dupe %}
-<div class="alert alert-primary" role="alert">An existing client with the name '{{client.name}}' was found.</div>
+<div class="alert alert-primary" role="alert">An existing client with the name <strong>{{client.name}}</strong> was found.</div>
 {% endif %}
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
@@ -24,7 +24,22 @@
         <option value="{{ address }}">
         {% endfor %}
     </datalist>
-    <div class="container ml-0">
+    {% if is_new_from_trip %}
+    <div id="client_add_prompt" class="collapse show">
+        <div class="alert alert-primary" role="alert">
+            <div class="row">
+                <div class="col">
+                    <strong>{{client.name}}</strong> is not in the client database. Would you like to add them now?
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-success btn-sm mr-2" type="button" onclick="showClientForm()"><span class="oi oi-check mr-2"></span>Yes</a>
+                    <button class="btn btn-secondary btn-sm" type="submit" name="cancel"><span class="oi oi-x mr-2"></span>No</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div id="client_form" class="container ml-0">
         <div class="row">
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
@@ -81,6 +96,15 @@
 
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+{% if is_new_from_trip %}
+<script type="text/javascript">
+    $("#client_form").addClass("collapse");
+    function showClientForm() {
+        $("#client_form").collapse('show');
+        $("#client_add_prompt").collapse('hide');
+    }
+</script>
+{% endif %}
 {% endblock %}
 {% endblock %}
 

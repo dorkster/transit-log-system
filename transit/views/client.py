@@ -108,7 +108,6 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
         'names': sorted(names),
         'addresses': sorted(addresses),
         'is_dupe': is_dupe,
-        'is_new_from_trip': is_new and (src_trip != None or src_template_trip != None),
     }
 
     return render(request, 'client/edit.html', context)

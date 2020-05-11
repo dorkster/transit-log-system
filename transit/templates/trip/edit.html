@@ -146,10 +146,31 @@
         <hr/>
         {% if is_new and not trip.is_activity and not is_return_trip %}
         {{ form.create_return_trip }}
-        <a class="btn btn-outline-dark" href="#_" onclick="toggleReturnTrip(this)"><span class="oi oi-circle-x mr-2"></span>Create a return trip</a>
+        {{ form.add_client }}
+        <a id="create_return_trip_btn" class="btn btn-outline-dark" href="#_" onclick="toggleReturnTrip(this)"><span class="oi oi-circle-x mr-2"></span>Create a return trip</a>
+        <a id="add_client_btn" class="btn btn-outline-dark disabled" href="#_" onclick="toggleAddClient(this)"><span class="oi oi-circle-x mr-2"></span>Add to Clients</a>
         <script type="text/javascript">
             function toggleReturnTrip(btn) {
                 var field = document.getElementById("id_create_return_trip");
+                if (field) {
+                    if (field.value == "False") {
+                        field.value = "True";
+                        btn.classList.remove("btn-outline-dark");
+                        btn.classList.add("btn-primary");
+                        btn.firstChild.classList.remove("oi-circle-x");
+                        btn.firstChild.classList.add("oi-circle-check");
+                    }
+                    else {
+                        field.value = "False";
+                        btn.classList.remove("btn-primary");
+                        btn.classList.add("btn-outline-dark");
+                        btn.firstChild.classList.remove("oi-circle-check");
+                        btn.firstChild.classList.add("oi-circle-x");
+                    }
+                }
+            }
+            function toggleAddClient(btn) {
+                var field = document.getElementById("id_add_client");
                 if (field) {
                     if (field.value == "False") {
                         field.value = "True";
@@ -274,6 +295,21 @@
                 name_input.value = "";
             }
         }
+
+        {% if is_new and not trip.is_activity and not is_return_trip %}
+        if (found_client || name_input.value == "") {
+            var add_client_btn = document.getElementById("add_client_btn");
+            document.getElementById("id_add_client").value = "True";
+            toggleAddClient(add_client_btn);
+            add_client_btn.classList.add("disabled");
+        }
+        else {
+            var add_client_btn = document.getElementById("add_client_btn");
+            document.getElementById("id_add_client").value = "False";
+            toggleAddClient(add_client_btn);
+            add_client_btn.classList.remove("disabled");
+        }
+        {% endif %}
     }
     name_input.addEventListener("change", onNameChanged);
 

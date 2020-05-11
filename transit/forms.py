@@ -112,6 +112,7 @@ class EditTripForm(forms.Form):
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
@@ -206,6 +207,7 @@ class EditTemplateTripForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
 class EditTemplateActivityForm(forms.Form):
     parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))

@@ -138,6 +138,16 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             trip.save()
 
             if is_new and not is_return_trip and not trip.is_activity:
+                if form.cleaned_data['add_client'] == True:
+                    client = Client()
+                    client.name = form.cleaned_data['name']
+                    client.address = form.cleaned_data['address']
+                    client.phone_home = form.cleaned_data['phone_home']
+                    client.phone_cell = form.cleaned_data['phone_cell']
+                    client.elderly = form.cleaned_data['elderly']
+                    client.ambulatory = form.cleaned_data['ambulatory']
+                    client.save()
+
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('template-trip-create-return', kwargs={'parent':trip.parent.id, 'id':trip.id}))
 

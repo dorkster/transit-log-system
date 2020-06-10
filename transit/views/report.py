@@ -142,11 +142,42 @@ class Report():
         TRIP_TIME_OOB = 4
         SHIFT_PARSE = 5
         TRIP_PARSE = 6
+        SHIFT_MILES_LESS = 7
+        SHIFT_TIME_LESS = 8
+        TRIP_MILES_LESS = 9
+        TRIP_TIME_LESS = 10
 
         def __init__(self):
             self.errors = []
+
         def add(self, date, error_code, error_shift=None, error_trip=None):
-            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip})
+            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code)})
+
+        def getErrorMsg(self, error_code):
+            if error_code == self.SHIFT_INCOMPLETE:
+                return 'Shift contains partial log data.'
+            elif error_code == self.TRIP_INCOMPLETE:
+                return 'Trip contains partial log data.'
+            elif error_code == self.TRIP_NO_SHIFT:
+                return 'Trip does not have a matching Shift.'
+            elif error_code == self.TRIP_MILES_OOB:
+                return 'Trip mileage is not within Shift mileage.'
+            elif error_code == self.TRIP_TIME_OOB:
+                return 'Trip time is not within Shift time.'
+            elif error_code == self.SHIFT_PARSE:
+                return 'Unable to parse Shift data.'
+            elif error_code == self.TRIP_PARSE:
+                return 'Unable to parse Trip data.'
+            elif error_code == self.SHIFT_MILES_LESS:
+                return 'Shift end mileage is less than Shift start mileage.'
+            elif error_code == self.SHIFT_TIME_LESS:
+                return 'Shift end time is earlier than Shift start time.'
+            elif error_code == self.TRIP_MILES_LESS:
+                return 'Trip end mileage is less than Trip start mileage.'
+            elif error_code == self.TRIP_TIME_LESS:
+                return 'Trip end time is earlier than Trip start time.'
+            else:
+                return 'Unknown error'
 
     class UniqueRiderSummary():
         class Rider():
@@ -240,6 +271,12 @@ class Report():
                         report_shift.fuel = 0
                         self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
+                if report_shift.start_miles[T_FLOAT] > report_shift.end_miles[T_FLOAT]:
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
+
+                if report_shift.start_time > report_shift.end_time:
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
+
                 report_day.shifts.append(report_shift)
 
             trips = Trip.objects.filter(date=day_date, status=Trip.STATUS_NORMAL, is_activity=False)
@@ -327,8 +364,16 @@ class Report():
                 # check for trip errors
                 if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
                     self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_trip=i)
+
                 if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_trip=i)
+
+                if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
+
+                if report_trip.start_time > report_trip.end_time:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
+
 
                 if daily_log_shift == None or (daily_log_shift != None and daily_log_shift == shift.shift.id):
                     # add money trip

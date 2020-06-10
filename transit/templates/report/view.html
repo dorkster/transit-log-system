@@ -68,41 +68,19 @@
     {% for error in report_errors.errors %}
     <li class="list-group-item list-group-item-danger p-2 small">
         <strong class="text-danger">Error:</strong>
-        {% if error.error_code == 0 %}
-            <span class="text-bold">Shift contains partial log data.</span><br/>
+        {% if error.error_shift %}
+            <span class="text-bold">{{ error.error_msg }}</span><br/>
             <div class="mb-2">{{ error.error_shift }}</div>
             <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#shift_{{ error.error_shift.id }}">View on schedule</a>
             <a class="btn btn-sm btn-danger" href="{% url 'shift-edit' 'edit' error.error_shift.id %}">Edit Shift</a>
-        {% elif error.error_code == 1 %}
-            <span class="text-bold">Trip contains partial log data.</span><br/>
+        {% elif error.error_trip %}
+            <span class="text-bold">{{ error.error_msg }}</span><br/>
             <div class="mb-2">{{ error.error_trip }}</div>
             <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
             <a class="btn btn-sm btn-danger" href="{% url 'trip-edit' 'edit' error.error_trip.id %}">Edit Trip</a>
-        {% elif error.error_code == 2 %}
-            <span class="text-bold">Trip does not have a matching Shift.</span><br/>
-            <div class="mb-2">{{ error.error_trip }}</div>
-            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
-            <a class="btn btn-sm btn-danger" href="{% url 'trip-edit' 'edit' error.error_trip.id %}">Edit Trip</a>
-        {% elif error.error_code == 3 %}
-            <span class="text-bold">Trip mileage is not within Shift mileage.</span><br/>
-            <div class="mb-2">{{ error.error_trip }}</div>
-            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
-            <a class="btn btn-sm btn-danger" href="{% url 'trip-edit' 'edit' error.error_trip.id %}">Edit Trip</a>
-        {% elif error.error_code == 4 %}
-            <span class="text-bold">Trip time is not within Shift time.</span><br/>
-            <div class="mb-2">{{ error.error_trip }}</div>
-            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
-            <a class="btn btn-sm btn-danger" href="{% url 'trip-edit' 'edit' error.error_trip.id %}">Edit Trip</a>
-        {% elif error.error_code == 5 %}
-            <span class="text-bold">Unable to parse Shift data.</span><br/>
-            <div class="mb-2">{{ error.error_shift }}</div>
-            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#shift_{{ error.error_shift.id }}">View on schedule</a>
-            <a class="btn btn-sm btn-danger" href="{% url 'shift-edit' 'edit' error.error_shift.id %}">Edit Shift</a>
-        {% elif error.error_code == 6 %}
-            <span class="text-bold">Unable to parse Trip data.</span><br/>
-            <div class="mb-2">{{ error.error_trip }}</div>
-            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
-            <a class="btn btn-sm btn-danger" href="{% url 'trip-edit' 'edit' error.error_trip.id %}">Edit Trip</a>
+        {% else %}
+            <span class="text-bold">{{ error.error_msg }}</span><br/>
+            <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}">View schedule</a>
         {% endif %}
     </li>
     {% endfor %}

@@ -35,6 +35,15 @@
         <td>Destination</td>
         <td>Driver</td>
         <td>Vehicle</td>
+        <td>Start Miles</td>
+        <td>Start Time</td>
+        <td>End Miles</td>
+        <td>End Time</td>
+        <td>Notes</td>
+        <td>Trip Type / Tags</td>
+        <td>Money</td>
+        <td>Elderly?</td>
+        <td>Ambulatory?</td>
     </thead>
 {% for trip in results %}
 <tr style="background: #{{ trip.get_driver_color }};">
@@ -49,6 +58,83 @@
         <td class="mytable-col-lg">{{trip.destination}}</td>
         <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>
         <td class="mytable-col-md">{% if trip.vehicle %}{{trip.vehicle}}{% endif %}</td>
+        <td class="mytable-col-sm">
+            {% if trip.check_start_miles %}
+                {{ trip.start_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_start_time %}
+                {{ trip.start_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_end_miles %}
+                {{ trip.end_miles }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.check_end_time %}
+                {{ trip.end_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-md">
+            {{ trip.note }}
+        </td>
+        <td class="mytable-col-md">
+            {% if trip.trip_type %}
+            {% if trip.is_medical %}
+            <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
+            {% else %}
+            <span class="badge badge-primary"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
+            {% endif %}
+            {% endif %}
+            {% if trip.status > 0 %}
+                {% if trip.status == 1 %}
+                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
+                {% elif trip.status == 2 %}
+                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
+                {% endif %}
+            {% endif %}
+            {% if trip.tags %}
+                {% for tag in trip.get_styled_tag_list %}
+                <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
+                {% endfor %}
+            {% endif %}
+        </td>
+        <td class="mytable-col-sm">
+            {% if trip.collected_cash > 0 %}
+            Cash: ${{ trip.get_collected_cash_str }}
+            {% endif %}
+            {% if trip.collected_cash > 0 and trip.collected_check > 0 %}
+            <br/>
+            {% endif %}
+            {% if trip.collected_check > 0 %}
+            Check: ${{ trip.get_collected_check_str }}
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if trip.elderly %}
+            <span class="oi oi-check"></span>
+            {% elif trip.elderly is False %}
+            <span class="oi oi-x"></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if trip.ambulatory %}
+            <span class="oi oi-check"></span>
+            {% elif trip.ambulatory is False %}
+            <span class="oi oi-x"></span>
+            {% endif %}
+        </td>
 {% endfor %}
 </table>
 {% if results.paginator.num_pages > 1 %}

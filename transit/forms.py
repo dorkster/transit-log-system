@@ -12,6 +12,13 @@ BOOL_CHOICES = (
     (False, 'No')
 )
 
+NULL_BOOL_CHOICES = (
+    (None, '---------'),
+    (0, 'Unknown'),
+    (1, 'Yes'),
+    (2, 'No')
+)
+
 YEARS = []
 for year in range(2019, datetime.date.today().year + 2):
     YEARS.append(year)
@@ -238,6 +245,13 @@ class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class SearchTripsForm(forms.Form):
+    TRIP_STATUS_LEVELS = (
+        (None, '---------'),
+        (0, 'Normal'),
+        (1, 'Canceled'),
+        (2, 'No Show')
+    )
+
     name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
@@ -245,6 +259,12 @@ class SearchTripsForm(forms.Form):
     vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
     end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
+    notes = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    trip_type = forms.ModelChoiceField(TripType.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class SiteSettingsForm(forms.Form):
     activity_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator
 
-from transit.models import Trip, Driver, Vehicle
+from transit.models import Trip, Driver, Vehicle, TripType
 from transit.forms import SearchTripsForm
 
 from django.contrib.auth.decorators import permission_required
@@ -23,6 +23,12 @@ def search(request):
     end_year = request.GET.get('end_date_year')
     end_month = request.GET.get('end_date_month')
     end_day = request.GET.get('end_date_day')
+    notes = request.GET.get('notes')
+    elderly = request.GET.get('elderly')
+    ambulatory = request.GET.get('ambulatory')
+    trip_type = request.GET.get('trip_type')
+    tags = request.GET.get('tags')
+    status = request.GET.get('status')
 
     trips = Trip.objects.all()
     searched = False
@@ -128,6 +134,51 @@ def search(request):
     if end_date:
         searched = True
         trips = trips.filter(date__lte=end_date)
+
+    if notes:
+        searched = True
+        trips = trips.filter(note__icontains=notes)
+
+    if elderly:
+        searched = True
+        if elderly == '0':
+            trips = trips.filter(elderly=None)
+        elif elderly == '1':
+            trips = trips.filter(elderly=True)
+        elif elderly == '2':
+            trips = trips.filter(elderly=False)
+
+    if ambulatory:
+        searched = True
+        if ambulatory == '0':
+            trips = trips.filter(ambulatory=None)
+        elif ambulatory == '1':
+            trips = trips.filter(ambulatory=True)
+        elif ambulatory == '2':
+            trips = trips.filter(ambulatory=False)
+
+    if trip_type:
+        try:
+            trip_type_obj = TripType.objects.get(id=uuid.UUID(trip_type))
+        except:
+            trip_type_obj = None
+
+        if trip_type_obj:
+            searched = True
+            trips = trips.filter(trip_type=trip_type_obj)
+
+    if tags:
+        searched = True
+        trips = trips.filter(tags__icontains=tags)
+
+    if status:
+        searched = True
+        if status == '0':
+            trips = trips.filter(status=Trip.STATUS_NORMAL)
+        elif status == '1':
+            trips = trips.filter(status=Trip.STATUS_CANCELED)
+        elif status == '2':
+            trips = trips.filter(status=Trip.STATUS_NO_SHOW)
 
     trips = trips.order_by('-date', '-sort_index')
 

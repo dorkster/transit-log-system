@@ -1,3 +1,19 @@
 {% extends "help.html" %}
 {% block help_content %}
+<p>Reports give staff a way to view statistical data about all the activity over a given time period.</p>
+<p>The <strong><a href="{% url 'report-this-month' %}">Report</a></strong> page for the most recent month can be accessed via the main menu under <em>Reports &gt;&gt; View this month's report</em>.
+<hr/>
+<div class="help-img">
+    <img src="/transit/static/img/help_reports.png" alt="The report page"/>
+    <div class="help-img-text help-img-text-right" style="max-width: 400px; right: 350px; top: 30px;">
+        (From left to right)<br/>
+        <ul>
+            <li>Downloads the entire report as an Excel (XLSX) file. Please be aware that the file contains only the output data and no formulas.</li>
+            <li>Select the date. The arrows jump between entire months, but more granular control of the date range is available when clicking on the calendar.</li>
+        </ul>
+    </div>
+    <div class="help-img-text help-img-text-left" style="left: 240px; top: 210px;">Detected errors, such as incomplete log data, are displayed here.</div>
+    <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 280px; top: 370px;">Reports include a summary of usage for all vehicles, as well as a summary for each individual vehicle. Also included are summaries of elderly/ambulatory riders, collected money, and individual driver activity.</div>
+    <div class="help-img-text help-img-text-left" style="left: 110px; top: 600px;">Click on a date to go to the schedule where this vehicle was used.</div>
+</div>
 {% endblock %}

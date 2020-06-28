@@ -64,9 +64,15 @@
 .help-img-text-right:hover:after {
     border-left-color: #000000;
 }
+
 .help-img-text ul {
     padding-left: 1.5em;
     margin-bottom: 0;
+}
+
+.help-img-text a {
+    color: #fff;
+    text-decoration: underline;
 }
 </style>
 <h2>Help</h2>
@@ -74,15 +80,18 @@
 <div class="container ml-0">
     <div class="row">
         <div class="col">
-            <h3>{{ topic_current.0 }}</h3>
-            {% block help_content %}
-            {% endblock %}
-            <hr/>
             <div class="row">
+                <div class="col-auto pt-1 pb-1">
+                    {% if topic_prev %}
+                    <a href="{% url 'help-topic' topic_prev.1 %}" class="btn btn-primary btn-sm"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
+                    {% else %}
+                    <a href="#" class="disabled btn btn-primary btn-sm"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
+                    {% endif %}
+                </div>
                 <div class="col-auto pt-1 pb-1">
                     {% if topics %}
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{topic_current.0 }}
                         </button>
                         <div class="dropdown-menu shadow">
@@ -93,18 +102,48 @@
                     </div>
                     {% endif %}
                 </div>
+                <div class="col-auto pt-1 pb-1">
+                    {% if topic_next %}
+                    <a href="{% url 'help-topic' topic_next.1 %}" class="btn btn-primary btn-sm">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                    {% else %}
+                    <a href="#" class="disabled btn btn-primary btn-sm">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                    {% endif %}
+                </div>
             </div>
+            <hr/>
+            <h3>{{ topic_current.0 }}</h3>
+            {% block help_content %}
+            {% endblock %}
+            <hr/>
             <div class="row">
-                {% if topic_prev %}
                 <div class="col-auto pt-1 pb-1">
-                    <a href="{% url 'help-topic' topic_prev.1 %}" class="btn btn-primary"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
+                    {% if topic_prev %}
+                    <a href="{% url 'help-topic' topic_prev.1 %}" class="btn btn-primary btn-sm"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
+                    {% else %}
+                    <a href="#" class="disabled btn btn-primary btn-sm"><span class="oi oi-arrow-left mr-2"></span>Previous</a>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if topic_next %}
                 <div class="col-auto pt-1 pb-1">
-                    <a href="{% url 'help-topic' topic_next.1 %}" class="btn btn-primary">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                    {% if topics %}
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{topic_current.0 }}
+                        </button>
+                        <div class="dropdown-menu shadow">
+                        {% for topic in topics %}
+                        <a href="{% url 'help-topic' topic.1 %}" class="dropdown-item {% if topic.1 == topic_current.1 %}active{% endif %}">{{ topic.0 }}</a>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
+                <div class="col-auto pt-1 pb-1">
+                    {% if topic_next %}
+                    <a href="{% url 'help-topic' topic_next.1 %}" class="btn btn-primary btn-sm">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                    {% else %}
+                    <a href="#" class="disabled btn btn-primary btn-sm">Next<span class="oi oi-arrow-right ml-2"></span></a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

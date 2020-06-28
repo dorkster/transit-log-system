@@ -5,7 +5,7 @@
 <hr/>
 <div class="help-img">
     <img src="/transit/static/img/help_schedule.png" alt="The schedule page"/>
-    <div class="help-img-text help-img-text-right" style="right: 350px; top: 30px;">
+    <div class="help-img-text help-img-text-right" style="max-width: 300px; right: 350px; top: 30px;">
         (From left to right)<br/>
         <ul>
             <li>Print the schedule or the daily reports</li>
@@ -13,22 +13,42 @@
             <li>Switch to the drivers' <em>View</em> mode</li>
         </ul>
     </div>
-    <div class="help-img-text help-img-text-left" style="left: 170px; top: 195px;">Create a new shift</div>
-    <div class="help-img-text help-img-text-left" style="left: 70px; top: 265px;">Edit or delete a shift</div>
-    <div class="help-img-text help-img-text-left" style="left: 300px; top: 375px;">
+    <div class="help-img-text help-img-text-left" style="left: 170px; top: 200px;">Create a new shift</div>
+    <div class="help-img-text help-img-text-left" style="left: 70px; top: 270px;">Edit or delete a shift</div>
+    <div class="help-img-text help-img-text-left" style="left: 300px; top: 345px;">
         (From left to right)<br/>
         <ul>
             <li>Create a new trip or activity</li>
             <li>Select an available template to insert its contents into the schedule</li>
         </ul>
     </div>
-    <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 110px; top: 515px;">Edit or delete the trip or activity<br/>Trips and activities can be canceled from here<br/>For trips, there are shortcuts to copy the trip, create a return trip, or create a client</div>
-    <div class="help-img-text help-img-text-left" style="left: 55px; top: 635px;">Change the order of trips</div>
-    <div class="help-img-text help-img-text-right" style="right: 65px; top: 515px;">See additional information about a trip<br/>Clicking <em>"Show extra columns"</em> will also reveal this information</div>
-    <div class="help-img-text help-img-text-right" style="right: 420px; top: 620px;">Drivers and vehicles can be easily assigned by dispatchers</div>
+    <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 110px; top: 475px;">Edit or delete the trip or activity<br/>Trips and activities can be canceled from here<br/>For trips, there are shortcuts to copy the trip, create a return trip, or create a client</div>
+    <div class="help-img-text help-img-text-left" style="left: 55px; top: 640px;">Change the order of trips</div>
+    <div class="help-img-text help-img-text-right" style="right: 65px; top: 475px;">See additional information about a trip<br/>Clicking <em>"Show extra columns"</em> will also reveal this information</div>
+    <div class="help-img-text help-img-text-right" style="right: 480px; top: 560px;">Drivers and vehicles can be easily assigned by dispatchers</div>
 </div>
 
 <p>There are two types of entries that can be added to the schedule: <strong>activities</strong> and <strong>trips</strong>.</p>
 <p>Activities are suitable for things such as staff meetings, designated office time, etc. They consist of a <strong>Description</strong>, plus an optional <strong>Start Time</strong> and <strong>End Time</strong>.</p>
 <p>Trips are the primary focus of the schedule, describing a person's ride from one <strong>Address</strong> to a <strong>Destination</strong>. The information in a Trip can be divided into three parts: <em>Client Information</em>, <em>Trip Information</em>, and <em>Log Information</em>.</p>
+
+<div class="help-img">
+    <img src="/transit/static/img/help_schedule_new_trip.png" alt="The trip edit page"/>
+    <div class="help-img-text help-img-text-left" style="left: 730px; top: 120px;">Mark a trip as canceled</div>
+    <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 90px; top: 235px;">The name field has a dropdown with a list of all the available Clients. Selecting one will fill in all the available information for that Client.<br/>If the name entered isn't in the Client database, a warning will be displayed and the option to add them to the database will be enabled.</div>
+    <div class="help-img-text help-img-text-left" style="left: 170px; top: 390px;">Fill in the phone number from the Client information</div>
+    <div class="help-img-text help-img-text-left" style="max-width: 250px; left: 515px; top: 235px;">Times are entered in standard 12-hour format. Time entry is forgiving and aware of work hours, so simply entering "130" would convert to "1:30 PM".</div>
+    <div class="help-img-text help-img-text-left" style="left: 585px; top: 415px;">Fill in the home address from the Client information</div>
+    <div class="help-img-text help-img-text-left" style="left: 585px; top: 500px;">Fill in the phone number if the address matches information in the Destination database</div>
+    <div class="help-img-text help-img-text-right" style="left: 200px; top: 640px;">The address fields have a dropdown with a list of all the available Destinations. Selecting one will fill in the phone number if applicable.</div>
+    <div class="help-img-text help-img-text-right" style="max-width: 300px; left: 100px; top: 890px;">Tags are user-defined labels that can be applied to Trips. Each tag is separated by a comma ( , ).<br/>Clicking on one of the frequent tags will add it to this Trip's list of tags.</div>
+    <div class="help-img-text help-img-text-left" style="left: 900px; top: 235px;">While most of the Log Information will be filled in by the drivers, the assigned Driver and Vehicle for the Trip can be entered here.</div>
+    <div class="help-img-text help-img-text-left" style="max-width: 500px; left: 380px; top: 1085px;">
+        (From left to right)<br/>
+        <ul>
+            <li><em>Create a return trip</em>: When enabled, clicking <em>Save Changes</em> will also create a new Trip with the pick-up and destination swapped.</li>
+            <li><em>Add to Clients</em>: If the <em>name</em> entered doesn't match anyone in the Client database, enabling this option will create a new Client entry when clicking <em>Save Changes</em>.</li>
+        </ul>
+    </div>
+</div>
 {% endblock %}

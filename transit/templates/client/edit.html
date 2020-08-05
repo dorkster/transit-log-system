@@ -32,25 +32,46 @@
                     <div class="mb-2">
                         <label for="{{ form.address.id_for_label }}">
                             <strong>{{ form.address.label }}</strong>
-                        </label><br/>{{ form.address }}
-                        <input class="ml-4" type="checkbox" id="toggle_address" name="toggle_address">
-                        <label for="toggle_address">No address</label>
+                        </label>
+                        <div class="row">
+                            <div class="col-auto">
+                                {{ form.address }}
+                            </div>
+                            <div class="col-auto pt-2">
+                                <input class="ml-4" type="checkbox" id="toggle_address" name="toggle_address">
+                                <label for="toggle_address">No address</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="alert alert-danger d-none" id="alert_address"><span class="oi oi-circle-x mr-2"></span>Enter an address.</div>
                     <hr/>
                     <div class="mb-2">
                         <label for="{{ form.phone_home.id_for_label }}">
                             <strong>{{ form.phone_home.label }}</strong>
-                        </label><br/>{{ form.phone_home }}
-                        <input class="ml-4" type="checkbox" id="toggle_phone_home" name="toggle_phone_home">
-                        <label for="toggle_phone_home">No home phone</label>
+                        </label>
+                        <div class="row">
+                            <div class="col-auto">
+                                {{ form.phone_home }}
+                            </div>
+                            <div class="col-auto pt-2">
+                                <input class="ml-4" type="checkbox" id="toggle_phone_home" name="toggle_phone_home">
+                                <label for="toggle_phone_home">No home phone</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-2">
                         <label for="{{ form.phone_cell.id_for_label }}">
                             <strong>{{ form.phone_cell.label }}</strong>
-                        </label><br/>{{ form.phone_cell }}
-                        <input class="ml-4" type="checkbox" id="toggle_phone_cell" name="toggle_phone_cell">
-                        <label for="toggle_phone_cell">No cell phone</label>
+                        </label>
+                        <div class="row">
+                            <div class="col-auto">
+                                {{ form.phone_cell }}
+                            </div>
+                            <div class="col-auto pt-2">
+                                <input class="ml-4" type="checkbox" id="toggle_phone_cell" name="toggle_phone_cell">
+                                <label for="toggle_phone_cell">No cell phone</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="alert alert-danger d-none" id="alert_phone"><span class="oi oi-circle-x mr-2"></span>Enter a phone number.</div>
                     <hr/>

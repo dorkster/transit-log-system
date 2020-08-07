@@ -147,7 +147,8 @@ Show extra columns
         <td>Notes</td>
         <td>Trip Type</td>
         <td>Tags</td>
-        <td>Money</td>
+        <td>Fare</td>
+        <td>Money Collected</td>
         <td>Elderly?</td>
         <td>Ambulatory?</td>
         {% else %}
@@ -156,7 +157,7 @@ Show extra columns
     </thead>
     {% for trip in trips %}
     {% if trip.sort_index == 0 %}
-    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}21{% else %}15{% endif %}"></td></tr>
     {% endif %}
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
@@ -244,7 +245,7 @@ Show extra columns
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}16{% else %}11{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}17{% else %}11{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
             {{ trip.note }}
         </td>
         {% else %}
@@ -355,6 +356,11 @@ Show extra columns
                 {% endfor %}
             {% endif %}
         </td>
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_fare', row_movers)">
+            {% if trip.fare > 0 %}
+            ${{ trip.get_fare_str }}
+            {% endif %}
+        </td>
         {% if trip.collected_cash == 0 and trip.collected_check > 0 %}
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_collected_check', row_movers)">
         {% else %}
@@ -444,6 +450,14 @@ Show extra columns
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
                             </div>
                         </div>
+                        {% if trip.fare > 0 %}
+                        <div class="list-group-item p-1 list-group-item-danger">
+                            <div class="row">
+                                <div class="col text-muted">Fare</div>
+                                <div class="col-auto">${{ trip.get_fare_str }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
                         {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
                         <div class="list-group-item p-1 list-group-item-success">
                             <div class="row">
@@ -486,7 +500,7 @@ Show extra columns
         {% endif %}
         {% endif %}
     </tr>
-    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}20{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}21{% else %}15{% endif %}"></td></tr>
     {% endfor %}
 </table>
 {% else %}

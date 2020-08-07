@@ -74,6 +74,7 @@ class Trip(models.Model):
     is_activity = models.BooleanField(default=False, editable=False)
     collected_cash = models.IntegerField(default=0)
     collected_check = models.IntegerField(default=0)
+    fare = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -199,17 +200,20 @@ class Trip(models.Model):
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
 
-    def get_collected_cash_str(self):
-        if self.collected_cash == 0:
+    def get_money_string(self, val):
+        if val == 0:
             return '0.00'
-        s = str(self.collected_cash)
+        s = str(val)
         return s[:len(s)-2] + '.' + s[len(s)-2:]
 
+    def get_collected_cash_str(self):
+        return self.get_money_string(self.collected_cash)
+
     def get_collected_check_str(self):
-        if self.collected_check == 0:
-            return '0.00'
-        s = str(self.collected_check)
-        return s[:len(s)-2] + '.' + s[len(s)-2:]
+        return self.get_money_string(self.collected_check)
+
+    def get_fare_str(self):
+        return self.get_money_string(self.fare)
 
     def is_medical(self):
         if self.trip_type is None:
@@ -527,6 +531,7 @@ class TemplateTrip(models.Model):
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
     is_activity = models.BooleanField(default=False, editable=False)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
+    fare = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['parent', 'sort_index']
@@ -583,6 +588,16 @@ class TemplateTrip(models.Model):
             return site_settings.get_color('activity')
         else:
             return Driver.get_color(self.driver)
+
+    def get_money_string(self, val):
+        if val == 0:
+            return '0.00'
+        s = str(val)
+        return s[:len(s)-2] + '.' + s[len(s)-2:]
+
+    def get_fare_str(self):
+        return self.get_money_string(self.fare)
+
 
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

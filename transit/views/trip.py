@@ -156,6 +156,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
                 trip.status = form.cleaned_data['status']
                 trip.collected_cash = moneyParse(form.cleaned_data['collected_cash'])
                 trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
+                trip.fare = moneyParse(form.cleaned_data['fare'])
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -228,6 +229,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
                 'status': trip.status,
                 'collected_cash': moneyFormat(trip.collected_cash),
                 'collected_check': moneyFormat(trip.collected_check),
+                'fare': moneyFormat(trip.fare),
             }
             form = EditTripForm(initial=initial)
 

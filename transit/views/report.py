@@ -15,6 +15,8 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.workbook import Workbook
 from openpyxl.utils import get_column_letter
 
+from transit.common.util import *
+
 T_STR = 0
 T_FLOAT = 1
 
@@ -27,17 +29,7 @@ class Report():
         def __sub__(self, other):
             return Report.Money(self.value - other.value)
         def __str__(self):
-            abs_value = abs(self.value)
-            sign_str = ''
-            if (self.value < 0):
-                sign_str = '-'
-            if abs_value < 10:
-                return sign_str + '$0.0' + str(abs_value)
-            elif abs_value < 100:
-                return sign_str + '$0.' + str(abs_value)
-            else:
-                val_str = str(abs_value)
-                return sign_str + '$' + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
+            return int_to_money_string(self.value, show_currency=True)
         def to_float(self):
             return float(self.value) / 100
 

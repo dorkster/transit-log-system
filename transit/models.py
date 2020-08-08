@@ -2,6 +2,8 @@ import uuid, re, datetime
 from django.db import models
 from django.urls import reverse
 
+from .common.util import *
+
 class SingletonModel(models.Model):
     class Meta:
         abstract = True
@@ -46,7 +48,6 @@ class Trip(models.Model):
         (STATUS_CANCELED, 'Canceled'),
     ]
 
-    # TODO event? (i.e. Mealsite)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     date = models.DateField()
@@ -200,20 +201,14 @@ class Trip(models.Model):
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
 
-    def get_money_string(self, val):
-        if val == 0:
-            return '0.00'
-        s = str(val)
-        return s[:len(s)-2] + '.' + s[len(s)-2:]
-
     def get_collected_cash_str(self):
-        return self.get_money_string(self.collected_cash)
+        return int_to_money_string(self.collected_cash)
 
     def get_collected_check_str(self):
-        return self.get_money_string(self.collected_check)
+        return int_to_money_string(self.collected_check)
 
     def get_fare_str(self):
-        return self.get_money_string(self.fare)
+        return int_to_money_string(self.fare)
 
     def is_medical(self):
         if self.trip_type is None:
@@ -589,14 +584,8 @@ class TemplateTrip(models.Model):
         else:
             return Driver.get_color(self.driver)
 
-    def get_money_string(self, val):
-        if val == 0:
-            return '0.00'
-        s = str(val)
-        return s[:len(s)-2] + '.' + s[len(s)-2:]
-
     def get_fare_str(self):
-        return self.get_money_string(self.fare)
+        return int_to_money_string(self.fare)
 
 
 class ScheduleMessage(models.Model):

@@ -224,9 +224,22 @@
         {% for rider in unique_riders.names %}
         <tr>
             <td class="mytable-col-lg">
-                <a target="_blank" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
-                    {{rider.name}}
-                </a>
+                <div class="dropdown ajax-blocker">
+                    <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
+                    <div class="dropdown-menu shadow">
+                        <h5 class="pl-3 pr-3">{{rider.name}}</h5>
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                        </a>
+                        {% if rider.client_id %}
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
+                            <span class="oi oi-person mr-2"></span>Edit Client
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
             </td>
             <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
             <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
@@ -238,8 +251,66 @@
 <hr/>
 {% endif%}
 
+<h3>Fares &amp; Payments</h3>
+<table class="mytable mytable-striped">
+    <thead>
+        <td class="mytable-col-lg">Name</td>
+        <td class="mytable-col-md">Cash (driver collected)</td>
+        <td class="mytable-col-md">Check (driver collected)</td>
+        <td class="mytable-col-md">Cash (not driver collected)</td>
+        <td class="mytable-col-md">Check (not driver collected)</td>
+        <td class="mytable-col-md">Total Payments</td>
+        <td class="mytable-col-md">Total Fares</td>
+        <td class="mytable-col-md">Total Owed</td>
+    </thead>
+    <tbody class="mytable-hoverhi">
+        {% for rider in unique_riders.names %}
+        {% if rider.total_payments.value > 0 or rider.fares.value > 0 %}
+        <tr>
+            <td class="mytable-col-lg">
+                <div class="dropdown ajax-blocker">
+                    <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
+                    <div class="dropdown-menu shadow">
+                        <h5 class="pl-3 pr-3">{{rider.name}}</h5>
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                        </a>
+                        {% if rider.client_id %}
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
+                            <span class="oi oi-person mr-2"></span>Edit Client
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+            <td class="mytable-col-md {% if rider.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_cash }}</td>
+            <td class="mytable-col-md {% if rider.collected_check.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_check }}</td>
+            <td class="mytable-col-md {% if rider.paid_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_cash }}</td>
+            <td class="mytable-col-md {% if rider.paid_check.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_check }}</td>
+            <td class="mytable-col-md {% if rider.total_payments.value == 0 %}mytable-zero{%endif%}">{{ rider.total_payments }}</td>
+            <td class="mytable-col-md {% if rider.total_fares.value == 0 %}mytable-zero{%endif%}">{{ rider.total_fares }}</td>
+            <td class="mytable-col-md {% if rider.total_owed.value == 0 %}mytable-zero{%endif%}">{{ rider.total_owed }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+    <tr class="bg-success text-light text-bold">
+        <td class="mytable-col-lg">TOTAL</td>
+        <td class="mytable-col-md">{{ unique_riders.total_collected_cash }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_collected_check }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_paid_cash }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_paid_check }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_total_payments }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_total_fares }}</td>
+        <td class="mytable-col-md">{{ unique_riders.total_total_owed }}</td>
+    </tr>
+</table>
+<hr/>
+
 {% if money_trips %}
-<h3>Money Collected</h3>
+<h3>Money Collected by the Drivers</h3>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md">Date</td>

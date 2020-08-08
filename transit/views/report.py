@@ -24,14 +24,20 @@ class Report():
             self.value = default_value
         def __add__(self, other):
             return Report.Money(self.value + other.value)
+        def __sub__(self, other):
+            return Report.Money(self.value - other.value)
         def __str__(self):
-            if self.value < 10:
-                return '$0.0' + str(self.value)
-            elif self.value < 100:
-                return '$0.' + str(self.value)
+            abs_value = abs(self.value)
+            sign_str = ''
+            if (self.value < 0):
+                sign_str = '-'
+            if abs_value < 10:
+                return sign_str + '$0.0' + str(abs_value)
+            elif abs_value < 100:
+                return sign_str + '$0.' + str(abs_value)
             else:
-                val_str = str(self.value)
-                return '$' + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
+                val_str = str(abs_value)
+                return sign_str + '$' + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
         def to_float(self):
             return float(self.value) / 100
 
@@ -181,11 +187,19 @@ class Report():
 
     class UniqueRiderSummary():
         class Rider():
-            def __init__(self, name, elderly, ambulatory, trips=0):
+            def __init__(self, name):
                 self.name = name
-                self.elderly = elderly
-                self.ambulatory = ambulatory
-                self.trips = trips
+                self.client_id = None
+                self.trips = 1
+                self.elderly = None
+                self.ambulatory = None
+                self.collected_cash = Report.Money(0)
+                self.collected_check = Report.Money(0)
+                self.paid_cash = Report.Money(0)
+                self.paid_check = Report.Money(0)
+                self.total_payments = Report.Money(0)
+                self.total_fares = Report.Money(0)
+                self.total_owed = Report.Money(0)
             def __lt__(self, other):
                 return self.name < other.name
 
@@ -197,6 +211,14 @@ class Report():
             self.nonelderly_nonambulatory = 0
             self.unknown = 0
             self.total = 0
+            # fares & payments totals
+            self.total_collected_cash = Report.Money(0)
+            self.total_collected_check = Report.Money(0)
+            self.total_paid_cash = Report.Money(0)
+            self.total_paid_check = Report.Money(0)
+            self.total_total_payments = Report.Money(0)
+            self.total_total_fares = Report.Money(0)
+            self.total_total_owed = Report.Money(0)
 
         def __contains__(self, item):
             for i in self.names:
@@ -393,24 +415,34 @@ class Report():
 
                             found_unique_rider = True
                             j.trips += 1
+
+                            j.total_fares += Report.Money(i.fare)
+                            j.collected_cash += Report.Money(i.collected_cash)
+                            j.collected_check += Report.Money(i.collected_check)
+
                             break
                     if not found_unique_rider:
+                        rider = Report.UniqueRiderSummary.Rider(i.name)
+                        rider.elderly = i.elderly
+                        rider.ambulatory = i.ambulatory
+
+                        clients = Client.objects.filter(name=i.name)
+                        if len(clients) > 0:
+                            rider.client_id = clients[0].id
+
                         if i.elderly == None or i.ambulatory == None:
                             # try to get info from Clients
-                            clients = Client.objects.filter(name=i.name)
                             if len(clients) > 0:
-                                elderly = i.elderly
-                                ambulatory = i.ambulatory
-                                if elderly == None:
-                                    elderly = clients[0].elderly
-                                if ambulatory == None:
-                                    ambulatory = clients[0].ambulatory
-                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly, ambulatory, trips=1))
-                            else:
-                                # could not find client, add as unknown
-                                self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, elderly=None, ambulatory=None, trips=1))
-                        else:
-                            self.unique_riders.names.append(Report.UniqueRiderSummary.Rider(i.name, i.elderly, i.ambulatory, trips=1))
+                                if rider.elderly == None:
+                                    rider.elderly = clients[0].elderly
+                                if rider.ambulatory == None:
+                                    rider.ambulatory = clients[0].ambulatory
+
+                        rider.total_fares += Report.Money(i.fare)
+                        rider.collected_cash += Report.Money(i.collected_cash)
+                        rider.collected_check += Report.Money(i.collected_check)
+
+                        self.unique_riders.names.append(rider)
                         self.unique_riders.names = sorted(self.unique_riders.names)
 
             for i in range(0, len(report_day.shifts)):
@@ -491,6 +523,7 @@ class Report():
             self.driver_reports.append(driver_report)
 
         for rider in self.unique_riders.names:
+            # total elderly/ambulatory counts
             self.unique_riders.total += 1
             if rider.elderly == None or rider.ambulatory == None:
                 self.unique_riders.unknown += 1
@@ -502,6 +535,21 @@ class Report():
                 self.unique_riders.nonelderly_ambulatory += 1
             elif not rider.elderly and not rider.ambulatory:
                 self.unique_riders.nonelderly_nonambulatory += 1
+
+            # calculate total owed money
+            rider.total_payments = rider.collected_cash + rider.collected_check
+            if rider.total_payments.value != 0 or rider.total_fares.value != 0:
+                rider.total_owed = rider.total_fares - rider.total_payments
+                if (rider.total_owed.value < 0):
+                    rider.total_owed.value = 0
+
+            self.unique_riders.total_collected_cash += rider.collected_cash
+            self.unique_riders.total_collected_check += rider.collected_check
+            self.unique_riders.total_paid_cash += rider.paid_cash
+            self.unique_riders.total_paid_check += rider.paid_check
+            self.unique_riders.total_total_payments += rider.total_payments
+            self.unique_riders.total_total_fares += rider.total_fares
+            self.unique_riders.total_total_owed += rider.total_owed
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportMonth(request, year, month):
@@ -814,6 +862,74 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_riders.cell(j, i).fill = style_fill_header
             else:
                 ws_riders.cell(j, i).font = style_font_normal
+
+    #####
+    #### Fares & Payments
+    #####
+    ws_fares = wb.create_sheet('Fares & Payments')
+    row_header = 1
+
+    row_total = 0
+    for i in report.unique_riders.names:
+        if i.total_payments.value > 0 or i.total_fares.value > 0:
+            row_total += 1
+    row_total += 2
+
+    ws_fares.cell(row_header, 1, 'Name')
+    ws_fares.cell(row_header, 2, 'Cash (driver collected)')
+    ws_fares.cell(row_header, 3, 'Check (driver collected)')
+    ws_fares.cell(row_header, 4, 'Cash (not driver collected)')
+    ws_fares.cell(row_header, 5, 'Check (not driver collected)')
+    ws_fares.cell(row_header, 6, 'Total Payments')
+    ws_fares.cell(row_header, 7, 'Total Fares')
+    ws_fares.cell(row_header, 8, 'Total Owed')
+
+    ws_fares.cell(row_total, 1, 'TOTAL')
+    ws_fares.cell(row_total, 2, report.unique_riders.total_collected_cash.to_float())
+    ws_fares.cell(row_total, 3, report.unique_riders.total_collected_check.to_float())
+    ws_fares.cell(row_total, 4, report.unique_riders.total_paid_cash.to_float())
+    ws_fares.cell(row_total, 5, report.unique_riders.total_paid_check.to_float())
+    ws_fares.cell(row_total, 6, report.unique_riders.total_total_payments.to_float())
+    ws_fares.cell(row_total, 7, report.unique_riders.total_total_fares.to_float())
+    ws_fares.cell(row_total, 8, report.unique_riders.total_total_owed.to_float())
+
+    row = 0
+    for i in report.unique_riders.names:
+        if i.total_payments.value <= 0 and i.total_fares.value <= 0:
+            continue
+        ws_fares.cell(row + row_header + 1, 1, i.name)
+        ws_fares.cell(row + row_header + 1, 2, i.collected_cash.to_float())
+        ws_fares.cell(row + row_header + 1, 3, i.collected_check.to_float())
+        ws_fares.cell(row + row_header + 1, 4, i.paid_cash.to_float())
+        ws_fares.cell(row + row_header + 1, 5, i.paid_check.to_float())
+        ws_fares.cell(row + row_header + 1, 6, i.total_payments.to_float())
+        ws_fares.cell(row + row_header + 1, 7, i.total_fares.to_float())
+        ws_fares.cell(row + row_header + 1, 8, i.total_owed.to_float())
+        row += 1
+
+    # number formats
+    for i in range(row_header + 1, row_total + 1):
+        for j in range(2,9):
+            ws_fares.cell(i, j).number_format = '$0.00'
+
+    # apply styles
+    ws_fares.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 9):
+        if i == 1:
+            ws_fares.column_dimensions[get_column_letter(i)].width = style_colwidth_normal * 2
+        else:
+            ws_fares.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_total+1):
+            ws_fares.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_fares.cell(j, i).font = style_font_header
+                ws_fares.cell(j, i).alignment = style_alignment_header
+                ws_fares.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_fares.cell(j, i).font = style_font_total
+                ws_fares.cell(j, i).fill = style_fill_total
+            else:
+                ws_fares.cell(j, i).font = style_font_normal
 
     #####
     #### Money Collected

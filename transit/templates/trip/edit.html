@@ -132,10 +132,16 @@
                     <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.start_miles.id_for_label }}"><strong>{{ form.start_miles.label }}</strong></label><br/>{{ form.start_miles }}</div>
-                    <div class="mb-2"><label for="{{ form.start_time.id_for_label }}"><strong>{{ form.start_time.label }}</strong></label><br/>{{ form.start_time }}</div>
+                    <div class="mb-2"><label for="{{ form.start_time.id_for_label }}"><strong>{{ form.start_time.label }}</strong></label>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_start_time')"><span class="oi oi-clock"></span></a>
+                        <br/>{{ form.start_time }}
+                    </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.end_miles.id_for_label }}"><strong>{{ form.end_miles.label }}</strong></label><br/>{{ form.end_miles }}</div>
-                    <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label><br/>{{ form.end_time }}</div>
+                    <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_end_time')"><span class="oi oi-clock"></span></a>
+                        <br/>{{ form.end_time }}
+                    </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.fare.id_for_label }}"><strong>{{ form.fare.label }}</strong></label><br/>{{ form.fare }}</div>
                     <hr/>

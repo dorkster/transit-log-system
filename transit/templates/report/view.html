@@ -347,7 +347,7 @@
     </thead>
     <tbody class="mytable-hoverhi">
         {% for rider in unique_riders.names %}
-        {% if rider.total_payments.value > 0 or rider.fares.value > 0 %}
+        {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
         <tr>
             <td class="mytable-col-lg">
                 <div class="dropdown ajax-blocker">

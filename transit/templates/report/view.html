@@ -58,11 +58,56 @@
             </script>
         </div>
     </div>
+    <div class="row justify-content-end mt-3">
+        <div class="col-auto">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Jump to section...
+                </button>
+                <div class="dropdown-menu shadow dropdown-menu-right">
+                    {% if report_errors.errors %}
+                    <a href="#report_errors" class="dropdown-item text-danger">Errors</a>
+                    <div class="dropdown-divider"></div>
+                    {% endif %}
+                    <a href="#report_vehicle_totals" class="dropdown-item">Totals for All Vehicles</a>
+                    {% for v in vehicle_reports %}
+                    <a href="#report_vehicle_{{v.vehicle}}" class="dropdown-item">Vehicle: {{v.vehicle}}</a>
+                    {% endfor %}
+                    {% if unique_riders.names %}
+                    <div class="dropdown-divider"></div>
+                    <a href="#report_riders" class="dropdown-item">Elderly/Ambulatory Riders</a>
+                    {% endif %}
+                    {% if unique_riders.names or money_payments %}
+                    <div class="dropdown-divider"></div>
+                    <a href="#report_fares" class="dropdown-item">Fares &amp; Payments</a>
+                    {% endif %}
+                    {% if money_trips %}
+                    <a href="#report_collected_money" class="dropdown-item">Money Collected by the Drivers</a>
+                    {% endif %}
+                    {% if money_payments %}
+                    <a href="#report_payments" class="dropdown-item">Money Not Collected by the Drivers</a>
+                    {% endif %}
+                    {% if driver_reports %}
+                    <div class="dropdown-divider"></div>
+                    <a href="#report_drivers" class="dropdown-item">Per-Driver Summary</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <hr/>
 <div>
 {% if report_errors.errors %}
-<h3>Errors</h3>
+<a id="report_errors"></a>
+<div class="row">
+    <div class="col">
+        <h3>Errors</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <div style="max-width: 800px;">
     <ul class="list-group">
     {% for error in report_errors.errors %}
@@ -89,7 +134,15 @@
 <hr/>
 {% endif%}
 
-<h3>Totals for All Vehicles</h3>
+<a id="report_vehicle_totals"></a>
+<div class="row">
+    <div class="col">
+        <h3>Totals for All Vehicles</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md"></td>
@@ -122,7 +175,15 @@
 </table>
 <hr/>
 {% for v in vehicle_reports %}
-<h3>Vehicle: {{v.vehicle}}</h3>
+<a id="report_vehicle_{{v.vehicle}}"></a>
+<div class="row">
+    <div class="col">
+        <h3>Vehicle: {{v.vehicle}}</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 {% if v.days %}
 <table class="mytable mytable-striped">
     <thead>
@@ -193,7 +254,15 @@
 {% endfor %}
 
 {% if unique_riders.names %}
-<h3>Elderly/Ambulatory Riders</h3>
+<a id="report_riders"></a>
+<div class="row">
+    <div class="col">
+        <h3>Elderly/Ambulatory Riders</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md"></td>
@@ -255,7 +324,16 @@
 <hr/>
 {% endif%}
 
-<h3>Fares &amp; Payments</h3>
+{% if unique_riders.names or money_payments %}
+<a id="report_fares"></a>
+<div class="row">
+    <div class="col">
+        <h3>Fares &amp; Payments</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-lg">Name</td>
@@ -314,9 +392,18 @@
     </tr>
 </table>
 <hr/>
+{% endif %}
 
 {% if money_trips %}
-<h3>Money Collected by the Drivers</h3>
+<a id="report_collected_money"></a>
+<div class="row">
+    <div class="col">
+        <h3>Money Collected by the Drivers</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md">Date</td>
@@ -345,7 +432,15 @@
 {% endif %}
 
 {% if money_payments %}
-<h3>Money Not Collected by the Drivers</h3>
+<a id="report_payments"></a>
+<div class="row">
+    <div class="col">
+        <h3>Money Not Collected by the Drivers</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md">Date</td>
@@ -374,7 +469,15 @@
 {% endif %}
 
 {% if driver_reports %}
-<h3>Per-Driver Summary</h3>
+<a id="report_drivers"></a>
+<div class="row">
+    <div class="col">
+        <h3>Per-Driver Summary</h3>
+    </div>
+    <div class="col-auto">
+        <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+    </div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md">Driver</td>

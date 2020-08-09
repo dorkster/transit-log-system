@@ -1,6 +1,5 @@
 import uuid
 import datetime
-import re
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -13,23 +12,7 @@ from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 from django.contrib.auth.decorators import permission_required
 
-def moneyParse(value):
-    num_only = ''
-    matches = re.findall('\d*', value)
-    for i in matches:
-        num_only += i
-
-    if num_only == '':
-        return 0
-    else:
-        return int(num_only)
-
-def moneyFormat(value):
-    if value == 0:
-        return ''
-
-    s = str(value)
-    return s[:len(s)-2] + '.' + s[len(s)-2:]
+from transit.common.util import *
 
 @permission_required(['transit.view_templatetrip'])
 def templateTripList(request, parent):
@@ -135,7 +118,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 trip.elderly = form.cleaned_data['elderly']
                 trip.ambulatory = form.cleaned_data['ambulatory']
                 trip.note = form.cleaned_data['notes']
-                trip.fare = moneyParse(form.cleaned_data['fare'])
+                trip.fare = money_string_to_int(form.cleaned_data['fare'])
 
             # trip date changed, which means sort indexes need to be updated
             if old_parent != trip.parent:
@@ -202,7 +185,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 'ambulatory': trip.ambulatory,
                 'notes': trip.note,
                 'status': trip.status,
-                'fare': moneyFormat(trip.fare),
+                'fare': int_to_money_string(trip.fare, blank_zero=True),
             }
             form = EditTemplateTripForm(initial=initial)
 

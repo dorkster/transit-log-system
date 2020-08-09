@@ -1,5 +1,4 @@
 import datetime, uuid
-import re
 import json
 
 from django.shortcuts import render, get_object_or_404
@@ -13,23 +12,7 @@ from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivity
 
 from django.contrib.auth.decorators import permission_required
 
-def moneyParse(value):
-    num_only = ''
-    matches = re.findall('\d*', value)
-    for i in matches:
-        num_only += i
-    
-    if num_only == '':
-        return 0
-    else:
-        return int(num_only)
-
-def moneyFormat(value):
-    if value == 0:
-        return ''
-
-    s = str(value)
-    return s[:len(s)-2] + '.' + s[len(s)-2:]
+from transit.common.util import *
 
 def tripCreate(request, mode, year, month, day):
     trip = Trip()
@@ -154,9 +137,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
                 trip.end_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['notes']
                 trip.status = form.cleaned_data['status']
-                trip.collected_cash = moneyParse(form.cleaned_data['collected_cash'])
-                trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
-                trip.fare = moneyParse(form.cleaned_data['fare'])
+                trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
+                trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
+                trip.fare = money_string_to_int(form.cleaned_data['fare'])
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -227,9 +210,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
                 'end_time': trip.end_time,
                 'notes': trip.note,
                 'status': trip.status,
-                'collected_cash': moneyFormat(trip.collected_cash),
-                'collected_check': moneyFormat(trip.collected_check),
-                'fare': moneyFormat(trip.fare),
+                'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
+                'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
+                'fare': int_to_money_string(trip.fare, blank_zero=True),
             }
             form = EditTripForm(initial=initial)
 
@@ -302,8 +285,8 @@ def tripStart(request, id):
             trip.start_time = form.cleaned_data['time']
             trip.driver = form.cleaned_data['driver']
             trip.vehicle = form.cleaned_data['vehicle']
-            trip.collected_cash = moneyParse(form.cleaned_data['collected_cash'])
-            trip.collected_check = moneyParse(form.cleaned_data['collected_check'])
+            trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
+            trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
             trip.save()
 
             if form.cleaned_data['additional_pickups'] != '':
@@ -328,8 +311,8 @@ def tripStart(request, id):
             'time': auto_time,
             'driver': trip.driver,
             'vehicle': trip.vehicle,
-            'collected_cash': moneyFormat(trip.collected_cash),
-            'collected_check': moneyFormat(trip.collected_check),
+            'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
+            'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
         }
         form = tripStartForm(initial=initial)
 

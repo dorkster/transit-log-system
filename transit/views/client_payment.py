@@ -1,6 +1,5 @@
 import uuid
 import datetime
-import re
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -11,23 +10,7 @@ from transit.forms import EditClientPaymentForm
 
 from django.contrib.auth.decorators import permission_required
 
-def moneyParse(value):
-    num_only = ''
-    matches = re.findall('\d*', value)
-    for i in matches:
-        num_only += i
-
-    if num_only == '':
-        return 0
-    else:
-        return int(num_only)
-
-def moneyFormat(value):
-    if value == 0:
-        return ''
-
-    s = str(value)
-    return s[:len(s)-2] + '.' + s[len(s)-2:]
+from transit.common.util import *
 
 @permission_required(['transit.view_clientpayment'])
 def clientPaymentList(request, parent):
@@ -62,17 +45,16 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
 
         if form.is_valid():
             client_payment.date_paid = form.cleaned_data['date_paid']
-            # TODO money format
-            client_payment.cash = moneyParse(form.cleaned_data['cash'])
-            client_payment.check = moneyParse(form.cleaned_data['check'])
+            client_payment.cash = money_string_to_int(form.cleaned_data['cash'])
+            client_payment.check = money_string_to_int(form.cleaned_data['check'])
             client_payment.save()
 
             return HttpResponseRedirect(reverse('client-payments', kwargs={'parent':client_payment.parent.id}) + '#payment_' + str(client_payment.id))
     else:
         initial = {
             'date_paid': client_payment.date_paid,
-            'cash': moneyFormat(client_payment.cash),
-            'check': moneyFormat(client_payment.check),
+            'cash': int_to_money_string(client_payment.cash, blank_zero=True),
+            'check': int_to_money_string(client_payment.check, blank_zero=True),
         }
         form = EditClientPaymentForm(initial=initial)
 

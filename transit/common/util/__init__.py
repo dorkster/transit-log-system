@@ -1,4 +1,9 @@
-def int_to_money_string(val, show_currency=False):
+import re
+
+def int_to_money_string(val, show_currency=False, blank_zero=False):
+    if blank_zero and val == 0:
+        return ''
+
     currency_str = ''
     if show_currency:
         currency_str = '$'
@@ -15,3 +20,15 @@ def int_to_money_string(val, show_currency=False):
     else:
         val_str = str(abs_value)
         return sign_str + currency_str + val_str[0:len(val_str)-2] + '.' + val_str[len(val_str)-2:]
+
+def money_string_to_int(val):
+    num_only = ''
+    matches = re.findall('\d*', val)
+    for i in matches:
+        num_only += i
+
+    if num_only == '':
+        return 0
+    else:
+        return int(num_only)
+

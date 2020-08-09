@@ -101,11 +101,15 @@ def userGetGroup(request, group_name):
         permissions.append(Permission.objects.get(codename='add_vehicleissue'))
         permissions.append(Permission.objects.get(codename='change_vehicleissue'))
         permissions.append(Permission.objects.get(codename='view_vehicleissue'))
+        permissions.append(Permission.objects.get(codename='add_clientpayment'))
+        permissions.append(Permission.objects.get(codename='change_clientpayment'))
+        permissions.append(Permission.objects.get(codename='delete_clientpayment'))
+        permissions.append(Permission.objects.get(codename='view_clientpayment'))
 
     group.permissions.set(permissions)
     group.save()
 
-    return group
+    return {'group':group, 'permissions':permissions}
 
 @permission_required(['auth.view_user'])
 def userList(request):
@@ -169,13 +173,14 @@ def userCreateEdit(request, user, is_new):
 
                 account_type = int(form.cleaned_data['account_type'])
                 if account_type == 1:
-                    group = userGetGroup(request, 'Assistant')
+                    group_and_perms = userGetGroup(request, 'Assistant')
                 elif account_type == 2:
-                    group = userGetGroup(request, 'Basic')
+                    group_and_perms = userGetGroup(request, 'Basic')
                 else: # account_type == 0
-                    group = userGetGroup(request, 'Staff')
+                    group_and_perms = userGetGroup(request, 'Staff')
 
-                user.groups.set([group])
+                user.groups.set([group_and_perms['group']])
+                user.user_permissions.set(group_and_perms['permissions'])
 
             user.save()
             return HttpResponseRedirect(reverse('users'))

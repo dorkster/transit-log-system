@@ -163,6 +163,11 @@ class EditClientForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
+class EditClientPaymentForm(forms.Form):
+    date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    cash = forms.CharField(label='Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    check = forms.CharField(label='Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+
 class EditDestinationForm(forms.Form):
     address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))
     phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))

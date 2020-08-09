@@ -6,7 +6,7 @@ from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client
+from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment
 from transit.forms import DatePickerForm, DateRangePickerForm
 
 from django.contrib.auth.decorators import permission_required
@@ -217,6 +217,14 @@ class Report():
                 if i.name == item:
                     return True
 
+    class ReportPayment():
+        def __init__(self):
+            self.date = None
+            self.id = None
+            self.client = None
+            self.cash = Report.Money(0)
+            self.check = Report.Money(0)
+
     def __init__(self):
         self.report_all = []
         self.vehicle_reports = []
@@ -225,6 +233,8 @@ class Report():
         self.unique_riders = Report.UniqueRiderSummary()
         self.money_trips = []
         self.money_trips_summary = Report.ReportSummary()
+        self.money_payments = []
+        self.money_payments_summary = Report.ReportPayment()
         self.report_errors = Report.ReportErrors()
 
     def load(self, date_start, date_end, daily_log_shift=None):
@@ -437,6 +447,41 @@ class Report():
                         self.unique_riders.names.append(rider)
                         self.unique_riders.names = sorted(self.unique_riders.names)
 
+            # handle payments from Clients that didn't ride (so far)
+            for i in ClientPayment.objects.filter(date_paid=day_date):
+                found_unique_rider = False
+                for j in self.unique_riders.names:
+                    if j.name == i.parent.name:
+                        found_unique_rider = True
+
+                        j.paid_cash += Report.Money(i.cash)
+                        j.paid_check += Report.Money(i.check)
+
+                        break
+                if not found_unique_rider:
+                    rider = Report.UniqueRiderSummary.Rider(i.parent.name)
+                    rider.trips = 0
+                    rider.elderly = i.parent.elderly
+                    rider.ambulatory = i.parent.ambulatory
+                    rider.client_id = i.parent.id
+
+                    rider.paid_cash += Report.Money(i.cash)
+                    rider.paid_check += Report.Money(i.check)
+
+                    self.unique_riders.names.append(rider)
+                    self.unique_riders.names = sorted(self.unique_riders.names)
+
+                # create a summary of only non-driver payments
+                payment = Report.ReportPayment()
+                payment.date = i.date_paid
+                payment.id = i.id
+                payment.client = i.parent
+                payment.cash = Report.Money(i.cash)
+                payment.check = Report.Money(i.check)
+                self.money_payments.append(payment)
+                self.money_payments_summary.cash += payment.cash
+                self.money_payments_summary.check += payment.check
+
             for i in range(0, len(report_day.shifts)):
                 shift = report_day.shifts[i]
                 if shift.start_trip == None or shift.end_trip == None:
@@ -516,20 +561,21 @@ class Report():
 
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
-            self.unique_riders.total += 1
-            if rider.elderly == None or rider.ambulatory == None:
-                self.unique_riders.unknown += 1
-            elif rider.elderly and rider.ambulatory:
-                self.unique_riders.elderly_ambulatory += 1
-            elif rider.elderly and not rider.ambulatory:
-                self.unique_riders.elderly_nonambulatory += 1
-            elif not rider.elderly and rider.ambulatory:
-                self.unique_riders.nonelderly_ambulatory += 1
-            elif not rider.elderly and not rider.ambulatory:
-                self.unique_riders.nonelderly_nonambulatory += 1
+            if rider.trips > 0:
+                self.unique_riders.total += 1
+                if rider.elderly == None or rider.ambulatory == None:
+                    self.unique_riders.unknown += 1
+                elif rider.elderly and rider.ambulatory:
+                    self.unique_riders.elderly_ambulatory += 1
+                elif rider.elderly and not rider.ambulatory:
+                    self.unique_riders.elderly_nonambulatory += 1
+                elif not rider.elderly and rider.ambulatory:
+                    self.unique_riders.nonelderly_ambulatory += 1
+                elif not rider.elderly and not rider.ambulatory:
+                    self.unique_riders.nonelderly_nonambulatory += 1
 
             # calculate total owed money
-            rider.total_payments = rider.collected_cash + rider.collected_check
+            rider.total_payments = rider.collected_cash + rider.collected_check + rider.paid_cash + rider.paid_check
             if rider.total_payments.value != 0 or rider.total_fares.value != 0:
                 rider.total_owed = rider.total_fares - rider.total_payments
                 if (rider.total_owed.value < 0):
@@ -603,6 +649,8 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
         'unique_riders': report.unique_riders,
         'money_trips': report.money_trips,
         'money_trips_summary': report.money_trips_summary,
+        'money_payments': report.money_payments,
+        'money_payments_summary': report.money_payments_summary,
         'report_errors': report.report_errors,
     }
     return render(request, 'report/view.html', context)
@@ -811,8 +859,14 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory)
     ws_riders.cell(row_total, 6, report.unique_riders.unknown)
 
+    row_total_riders = 0
+    for i in report.unique_riders.names:
+        if i.trips > 0:
+            row_total_riders += 1
+    row_total_riders += 1
+
     row_header_riders = 4
-    for i in range(row_header_riders, row_header_riders + len(report.unique_riders.names) + 1):
+    for i in range(row_header_riders, row_header_riders + row_total_riders):
         ws_riders.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
         if i > row_header_riders:
             ws_riders.cell(i, 3).number_format = 'BOOLEAN'
@@ -823,11 +877,14 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_header_riders, 4, 'Ambulatory')
     ws_riders.cell(row_header_riders, 5, 'Total Trips')
 
-    for i in range(0, len(report.unique_riders.names)):
-        ws_riders.cell(row_header_riders + i + 1, 1, report.unique_riders.names[i].name)
-        ws_riders.cell(row_header_riders + i + 1, 3, report.unique_riders.names[i].elderly)
-        ws_riders.cell(row_header_riders + i + 1, 4, report.unique_riders.names[i].ambulatory)
-        ws_riders.cell(row_header_riders + i + 1, 5, report.unique_riders.names[i].trips)
+    row = 0
+    for i in report.unique_riders.names:
+        if i.trips > 0:
+            ws_riders.cell(row_header_riders + row + 1, 1, i.name)
+            ws_riders.cell(row_header_riders + row + 1, 3, i.elderly)
+            ws_riders.cell(row_header_riders + row + 1, 4, i.ambulatory)
+            ws_riders.cell(row_header_riders + row + 1, 5, i.trips)
+            row += 1
 
     # apply styles
     ws_riders.row_dimensions[row_header].height = style_rowheight_header
@@ -846,7 +903,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
             else:
                 ws_riders.cell(j, i).font = style_font_normal
     for i in range(1, 6):
-        for j in range(row_header_riders, row_header_riders + len(report.unique_riders.names) + 1):
+        for j in range(row_header_riders, row_header_riders + row_total_riders):
             ws_riders.cell(j, i).border = style_border_normal
             if j == row_header_riders:
                 ws_riders.cell(j, i).font = style_font_header
@@ -924,9 +981,9 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_fares.cell(j, i).font = style_font_normal
 
     #####
-    #### Money Collected
+    #### Money Collected by the Drivers
     #####
-    ws_money = wb.create_sheet('Money Collected')
+    ws_money = wb.create_sheet('Money Collected by the Drivers')
     row_header = 1
     row_total = len(report.money_trips) + 2
 
@@ -970,6 +1027,54 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_money.cell(j, i).fill = style_fill_total
             else:
                 ws_money.cell(j, i).font = style_font_normal
+
+    #####
+    #### Money Not Collected by the Drivers
+    #####
+    ws_payments = wb.create_sheet('Money Not Collected by the Drivers')
+    row_header = 1
+    row_total = len(report.money_payments) + 2
+
+    ws_payments.cell(row_header, 1, 'Date')
+    ws_payments.cell(row_header, 2, 'Name')
+    ws_payments.cell(row_header, 3, 'Cash')
+    ws_payments.cell(row_header, 4, 'Check')
+
+    ws_payments.cell(row_total, 1, 'TOTAL')
+    ws_payments.cell(row_total, 3, report.money_payments_summary.cash.to_float())
+    ws_payments.cell(row_total, 4, report.money_payments_summary.check.to_float())
+
+    for i in range(0, len(report.money_payments)):
+        ws_payments.cell(i + row_header + 1, 1, report.money_payments[i].date)
+        ws_payments.cell(i + row_header + 1, 2, report.money_payments[i].client.name)
+        ws_payments.cell(i + row_header + 1, 3, report.money_payments[i].cash.to_float())
+        ws_payments.cell(i + row_header + 1, 4, report.money_payments[i].check.to_float())
+
+    # number formats
+    for i in range(row_header + 1, row_total + 1):
+        if i < row_total:
+            ws_payments.cell(i, 1).number_format = 'MMM DD, YYYY'
+        ws_payments.cell(i, 3).number_format = '$0.00'
+        ws_payments.cell(i, 4).number_format = '$0.00'
+
+    # apply styles
+    ws_payments.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 5):
+        if i == 2:
+            ws_payments.column_dimensions[get_column_letter(i)].width = style_colwidth_normal * 2
+        else:
+            ws_payments.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_total+1):
+            ws_payments.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_payments.cell(j, i).font = style_font_header
+                ws_payments.cell(j, i).alignment = style_alignment_header
+                ws_payments.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_payments.cell(j, i).font = style_font_total
+                ws_payments.cell(j, i).fill = style_fill_total
+            else:
+                ws_payments.cell(j, i).font = style_font_normal
 
     #####
     #### Per-Driver Summary

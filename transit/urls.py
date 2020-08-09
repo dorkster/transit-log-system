@@ -62,6 +62,11 @@ urlpatterns = [
     path('clients/create-from-template-trip/<uuid:trip_id>', views.clientCreateFromTemplateTrip, name='client-create-from-template-trip'),
     path('clients/xlsx', views.clientXLSX, name='client-xlsx'),
 
+    path('clients/<uuid:parent>/payments/', views.clientPaymentList, name='client-payments'),
+    path('clients/<uuid:parent>/payments/create', views.clientPaymentCreate, name='client-payment-create'),
+    path('clients/<uuid:parent>/payments/<uuid:id>/edit', views.clientPaymentEdit, name='client-payment-edit'),
+    path('clients/<uuid:parent>/payments/<uuid:id>/delete', views.clientPaymentDelete, name='client-payment-delete'),
+
     path('destinations/', views.destinationList, name='destinations'),
     path('destinations/create', views.destinationCreate, name='destination-create'),
     path('destinations/<uuid:id>/edit', views.destinationEdit, name='destination-edit'),
@@ -123,6 +128,7 @@ urlpatterns = [
     path('ajax/schedule-read-only/', views.ajaxScheduleReadOnly, name='ajax-schedule-read-only'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
+    path('ajax/client-payment-list/<uuid:parent>/', views.ajaxClientPaymentList, name='ajax-client-payment-list'),
     path('ajax/destination-list/', views.ajaxDestinationList, name='ajax-destination-list'),
     path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),

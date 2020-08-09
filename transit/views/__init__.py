@@ -17,3 +17,4 @@ from .sitesettings import *
 from .help import *
 from .destination import *
 from .user_account import *
+from .client_payment import *

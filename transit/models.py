@@ -2,7 +2,7 @@ import uuid, re, datetime
 from django.db import models
 from django.urls import reverse
 
-from .common.util import *
+from transit.common.util import *
 
 class SingletonModel(models.Model):
     class Meta:
@@ -351,6 +351,31 @@ class Client(models.Model):
             else:
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
+
+class ClientPayment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey('Client', on_delete=models.CASCADE)
+    date_paid = models.DateField()
+    cash = models.IntegerField(default=0)
+    check = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['date_paid']
+
+    def get_class_name(self):
+        return 'Payment'
+
+    def __str__(self):
+        if self.parent:
+            return '[' + str(self.date_paid) + '] ' + str(self.parent.name) + ': Cash = $' + self.get_cash_str() + ' | Check = $' + self.get_check_str()
+        else:
+            return '[' + str(self.date_paid) + '] <None>'
+
+    def get_cash_str(self):
+        return int_to_money_string(self.cash)
+
+    def get_check_str(self):
+        return int_to_money_string(self.check)
 
 class Destination(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

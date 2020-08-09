@@ -222,6 +222,7 @@
     </thead>
     <tbody class="mytable-hoverhi">
         {% for rider in unique_riders.names %}
+        {% if rider.trips > 0 %}
         <tr>
             <td class="mytable-col-lg">
                 <div class="dropdown ajax-blocker">
@@ -234,6 +235,8 @@
                         </a>
                         {% if rider.client_id %}
                         <div class="dropdown-divider"></div>
+                        <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
+                        <div class="dropdown-divider"></div>
                         <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
                             <span class="oi oi-person mr-2"></span>Edit Client
                         </a>
@@ -245,6 +248,7 @@
             <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
             <td class="mytable-col-sm">{{rider.trips}}</td>
         </tr>
+        {% endif %}
         {% endfor %}
     </tbody>
 </table>
@@ -277,6 +281,8 @@
                             <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                         </a>
                         {% if rider.client_id %}
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
                         <div class="dropdown-divider"></div>
                         <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
                             <span class="oi oi-person mr-2"></span>Edit Client
@@ -333,6 +339,35 @@
         <td class="mytable-col-lg"></td>
         <td class="mytable-col-sm">{{ money_trips_summary.collected_cash}}</td>
         <td class="mytable-col-sm">{{ money_trips_summary.collected_check}}</td>
+    </tr>
+</table>
+<hr/>
+{% endif %}
+
+{% if money_payments %}
+<h3>Money Not Collected by the Drivers</h3>
+<table class="mytable mytable-striped">
+    <thead>
+        <td class="mytable-col-md">Date</td>
+        <td class="mytable-col-lg">Name</td>
+        <td class="mytable-col-sm">Cash</td>
+        <td class="mytable-col-sm">Check</td>
+    </thead>
+    <tbody class="mytable-hoverhi">
+        {% for money_payment in money_payments %}
+        <tr>
+            <td class="mytable-col-md"><a href="{% url 'client-payment-edit' money_payment.client.id money_payment.id %}">{{ money_payment.date }}</a></td>
+            <td class="mytable-col-lg">{{ money_payment.client.name }}</td>
+            <td class="mytable-col-sm {% if money_payment.cash.value == 0 %}mytable-zero{%endif%}">{{ money_payment.cash}}</td>
+            <td class="mytable-col-sm {% if money_payment.check.value == 0 %}mytable-zero{%endif%}">{{ money_payment.check}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tr class="bg-success text-light text-bold">
+        <td class="mytable-col-md">TOTAL</td>
+        <td class="mytable-col-lg"></td>
+        <td class="mytable-col-sm">{{ money_payments_summary.cash}}</td>
+        <td class="mytable-col-sm">{{ money_payments_summary.check}}</td>
     </tr>
 </table>
 <hr/>

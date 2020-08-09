@@ -1,0 +1,39 @@
+<h3>
+    <a href="{% url 'clients' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
+    Payments from {{ client.name }}
+    <a class="btn btn-success btn-sm" href="{% url 'client-payment-create' client.id %}"><span class="oi oi-plus mr-2"></span>New</a>
+</h3>
+<div class="alert alert-info">
+    <strong>NOTE:</strong> Payments listed here <strong>do not</strong> include money given directly to drivers. For that information, please refer to the <a class="alert-link" href="{% url 'report-this-month' %}">Reports</a>.
+</div>
+{% if client_payments %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td>Date Paid</td>
+        <td>Cash</td>
+        <td>Check</td>
+    </thead>
+    {% for client_payment in client_payments %}
+    <tr>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a href="{% url 'client-payment-edit' client.id client_payment.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Payment</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'client-payment-delete' client.id client_payment.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete Payment</a>
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ client_payment.date_paid }}</td>
+        <td class="mytable-col-md">${{ client_payment.get_cash_str }}</td>
+        <td class="mytable-col-md">${{ client_payment.get_check_str }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No payments were found for this client.</p>
+{% endif %}

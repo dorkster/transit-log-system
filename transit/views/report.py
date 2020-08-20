@@ -485,19 +485,8 @@ class Report():
             for i in range(0, len(report_day.shifts)):
                 shift = report_day.shifts[i]
 
-                # create dummy trips when a shift has no trips
+                # create dummy trip when a shift has no trips
                 if shift.start_trip == None and shift.end_trip == None:
-                    rt = Report.ReportTrip()
-                    rt.shift = i
-                    rt.start_miles[T_STR] = shift.start_miles[T_STR]
-                    rt.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    rt.end_miles[T_STR] = shift.start_miles[T_STR]
-                    rt.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    rt.start_time = shift.start_time
-                    rt.end_time = shift.start_time
-                    report_day.trips.append(rt)
-                    shift.start_trip = len(report_day.trips) - 1
-
                     rt = Report.ReportTrip()
                     rt.shift = i
                     rt.start_miles[T_STR] = shift.start_miles[T_STR]
@@ -507,7 +496,8 @@ class Report():
                     rt.start_time = shift.start_time
                     rt.end_time = shift.end_time
                     report_day.trips.append(rt)
-                    shift.end_trip = len(report_day.trips) - 1
+                    shift.start_trip = len(report_day.trips) - 1
+                    shift.end_trip = shift.start_trip
                 elif shift.start_trip == None or shift.end_trip == None:
                     # TODO create partial dummy trips?
                     continue

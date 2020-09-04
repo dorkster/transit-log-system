@@ -271,6 +271,7 @@
         <td class="mytable-col-md text-center">Non-Elderly Ambulatory</td>
         <td class="mytable-col-md text-center">Non-Elderly Non-Ambulatory</td>
         <td class="mytable-col-md text-center">Unknown</td>
+        <td class="mytable-col-md text-center">Staff</td>
     </thead>
     <tr class="bg-success text-light text-bold">
         <td class="mytable-col-md">TOTAL</td>
@@ -279,8 +280,10 @@
         <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_ambulatory }}</td>
         <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_nonambulatory }}</td>
         <td class="mytable-col-md text-center">{{ unique_riders.unknown }}</td>
+        <td class="mytable-col-md text-center">{{ unique_riders.staff }}</td>
     </tr>
 </table>
+<div class="small text-muted"><em>Staff members are not counted in the elderly/ambulatory totals.</em></div>
 <br/>
 <table class="mytable mytable-striped">
     <thead>
@@ -296,6 +299,9 @@
             <td class="mytable-col-lg">
                 <div class="dropdown ajax-blocker">
                     <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
+                    {% if rider.staff %}
+                    <span class="badge badge-secondary ml-1">Staff</span>
+                    {% endif %}
                     <div class="dropdown-menu shadow">
                         <h5 class="pl-3 pr-3">{{rider.name}}</h5>
                         <div class="dropdown-divider"></div>

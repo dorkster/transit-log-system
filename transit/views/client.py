@@ -64,6 +64,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.elderly = form.cleaned_data['elderly']
             unique_client.ambulatory = form.cleaned_data['ambulatory']
             unique_client.tags = form.cleaned_data['tags']
+            unique_client.staff = form.cleaned_data['staff']
 
             FrequentTag.addTags(unique_client.get_tag_list())
 
@@ -84,6 +85,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'elderly': client.elderly,
             'ambulatory': client.ambulatory,
             'tags': client.tags,
+            'staff': client.staff,
         }
         form = EditClientForm(initial=initial)
 

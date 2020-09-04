@@ -162,6 +162,7 @@ class EditClientForm(forms.Form):
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    staff = forms.ChoiceField(choices=BOOL_CHOICES, label='Is staff member?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditClientPaymentForm(forms.Form):
     date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))

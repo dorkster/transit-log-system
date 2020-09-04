@@ -192,6 +192,7 @@ class Report():
                 self.total_payments = Report.Money(0)
                 self.total_fares = Report.Money(0)
                 self.total_owed = Report.Money(0)
+                self.staff = False
             def __lt__(self, other):
                 return self.name < other.name
 
@@ -203,6 +204,7 @@ class Report():
             self.nonelderly_nonambulatory = 0
             self.unknown = 0
             self.total = 0
+            self.staff = 0
             # fares & payments totals
             self.total_collected_cash = Report.Money(0)
             self.total_collected_check = Report.Money(0)
@@ -431,6 +433,7 @@ class Report():
                         clients = Client.objects.filter(name=i.name)
                         if len(clients) > 0:
                             rider.client_id = clients[0].id
+                            rider.staff = clients[0].staff
 
                         if i.elderly == None or i.ambulatory == None:
                             # try to get info from Clients
@@ -577,17 +580,20 @@ class Report():
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
             if rider.trips > 0:
-                self.unique_riders.total += 1
-                if rider.elderly == None or rider.ambulatory == None:
-                    self.unique_riders.unknown += 1
-                elif rider.elderly and rider.ambulatory:
-                    self.unique_riders.elderly_ambulatory += 1
-                elif rider.elderly and not rider.ambulatory:
-                    self.unique_riders.elderly_nonambulatory += 1
-                elif not rider.elderly and rider.ambulatory:
-                    self.unique_riders.nonelderly_ambulatory += 1
-                elif not rider.elderly and not rider.ambulatory:
-                    self.unique_riders.nonelderly_nonambulatory += 1
+                if rider.staff:
+                    self.unique_riders.staff += 1
+                else:
+                    self.unique_riders.total += 1
+                    if rider.elderly == None or rider.ambulatory == None:
+                        self.unique_riders.unknown += 1
+                    elif rider.elderly and rider.ambulatory:
+                        self.unique_riders.elderly_ambulatory += 1
+                    elif rider.elderly and not rider.ambulatory:
+                        self.unique_riders.elderly_nonambulatory += 1
+                    elif not rider.elderly and rider.ambulatory:
+                        self.unique_riders.nonelderly_ambulatory += 1
+                    elif not rider.elderly and not rider.ambulatory:
+                        self.unique_riders.nonelderly_nonambulatory += 1
 
             # calculate total owed money
             rider.total_payments = rider.collected_cash + rider.collected_check + rider.paid_cash + rider.paid_check
@@ -866,6 +872,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_header, 4, 'Non-Elderly Ambulatory')
     ws_riders.cell(row_header, 5, 'Non-Elderly Non-Ambulatory')
     ws_riders.cell(row_header, 6, 'Unknown')
+    ws_riders.cell(row_header, 7, 'Staff')
 
     ws_riders.cell(row_total, 1, 'TOTAL')
     ws_riders.cell(row_total, 2, report.unique_riders.elderly_ambulatory)
@@ -873,6 +880,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory)
     ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory)
     ws_riders.cell(row_total, 6, report.unique_riders.unknown)
+    ws_riders.cell(row_total, 7, report.unique_riders.staff)
 
     row_total_riders = 0
     for i in report.unique_riders.names:
@@ -904,7 +912,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     # apply styles
     ws_riders.row_dimensions[row_header].height = style_rowheight_header
     ws_riders.row_dimensions[row_header_riders].height = style_rowheight_header
-    for i in range(1, 7):
+    for i in range(1, 8):
         ws_riders.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
         for j in range(row_header, row_total+1):
             ws_riders.cell(j, i).border = style_border_normal

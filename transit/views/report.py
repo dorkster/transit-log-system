@@ -240,6 +240,12 @@ class Report():
         self.report_errors = Report.ReportErrors()
 
     def load(self, date_start, date_end, daily_log_shift=None):
+        # refresh related fields
+        # without this, select_related can fail if new entries are used
+        all_drivers = Driver.objects.all()
+        all_vehicles = Vehicle.objects.all()
+        all_triptypes = TripType.objects.all()
+
         if date_start != date_end:
             daily_log_shift = None
 

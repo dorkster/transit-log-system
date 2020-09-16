@@ -683,6 +683,36 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
     return render(request, 'report/view.html', context)
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportPrint(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    date_start = datetime.date(start_year, start_month, start_day)
+    date_end = datetime.date(end_year, end_month, end_day)
+
+    if date_start > date_end:
+        swap_date = date_start
+        date_start = date_end
+        date_end = swap_date
+
+    report = Report()
+    report.load(date_start, date_end)
+
+    context = {
+        'date_start': date_start,
+        'date_end': date_end,
+        'vehicles': Vehicle.objects.filter(is_logged=True),
+        'reports': report.report_all,
+        'vehicle_reports': report.vehicle_reports,
+        'all_vehicles': report.all_vehicles,
+        'driver_reports': report.driver_reports,
+        'unique_riders': report.unique_riders,
+        'money_trips': report.money_trips,
+        'money_trips_summary': report.money_trips_summary,
+        'money_payments': report.money_payments,
+        'money_payments_summary': report.money_payments_summary,
+        'report_errors': report.report_errors,
+    }
+    return render(request, 'report/print.html', context)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportThisMonth(request):
     date = datetime.datetime.now().date()
     return reportMonth(request, date.year, date.month)

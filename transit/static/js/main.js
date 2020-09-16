@@ -203,3 +203,12 @@ function checkForm(form, ev) {
         $(form).data('submitted', true);
     return true;
 }
+
+function cookieRead(c) {
+    if (document.cookie.split(";").some( function(item) { return item.trim().indexOf(c) == 0 } )) {
+        return document.cookie.split(";").find(row => row.startsWith(c)).split("=")[1];
+    }
+    else {
+        return "";
+    }
+}

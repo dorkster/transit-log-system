@@ -1,130 +1,38 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+<style type="text/css">
+@media print {
+    #print-print, #print-close, #print-filter, #print-filter-hr {
+        display: none;
+    }
+}
+body.bg-light {
+    background: none !important;
+}
+nav {
+    display: none !important;
+}
+#notify_vehicle_issues {
+    display: none;
+}
+.footer {
+    display: none;
+}
+#global-notifications {
+    display: none !important;
+}
+</style>
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">
             <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
         </div>
-        <div class="col-auto p-1">
-            <a href="{% url 'report-print' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="btn btn-info" target="_blank">
-                <span class="oi oi-print mr-2"></span>Print
-            </a>
+        <div class="col-auto p-1" id="print-print">
+            <a href="#_" class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</a>
         </div>
-        <div class="col-auto p-1">
-            <a class="btn btn-primary" href="{% url 'report-xlsx' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
-        </div>
-        <div class="col-sm-auto p-1">
-            <div class="btn-group" role="group">
-                <a title="Previous month" class="btn btn-secondary" href="{{ month_prev }}">
-                    <span class="oi oi-chevron-left"></span>
-                </a>
-                <div class="btn-group" role="group" id="date_dropdown">
-                    <button title="Select a month" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="oi oi-calendar"></span>
-                    </button>
-                    <div class="dropdown-menu shadow dropdown-menu-right">
-                        <div class="p-2" style="white-space: nowrap;">
-                            <form action="" method="post" class="date-picker">
-                                {% csrf_token %}
-                                {{ date_picker }}
-                                <input type="submit" value="Go" class="btn btn-secondary align-top">
-                            </form>
-                        </div>
-                        <a class="dropdown-item" href="{% url 'report-this-month' %}">Go to this month</a>
-                        <div class="dropdown-divider"></div>
-                        <div class="p-2 small"><strong>Custom Date Range</strong></div>
-                        <div class="p-2" style="white-space: nowrap;">
-                            <form action="" method="post" class="date-picker">
-                                {% csrf_token %}
-                                <div class="mb-2">
-                                    {{ date_range_picker.date_start }}
-                                </div>
-                                <div class="mb-2">
-                                    {{ date_range_picker.date_end }}
-                                </div>
-                                <div>
-                                    <button class="btn btn-secondary align-top w-100" type="submit" name="date_range">Go</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <a title="Next month" class="btn btn-secondary" href="{{ month_next }}">
-                    <span class="oi oi-chevron-right"></span>
-                </a>
-            </div>
-            <script type="text/javascript">
-                // Keep the dropdown from closing when picking a date
-                $('#date_dropdown option, #date_dropdown select').click(function(e) {
-                    e.stopPropagation();
-                });
-                $("#id_date_day").attr("style", "display: none !important;");
-            </script>
-        </div>
-    </div>
-    <div class="row justify-content-end mt-3">
-        <div id="vis_all" class="col-auto">
-            <a href="#_" class="btn btn-warning btn-sm" onclick="visibleShowAll()"><span class="oi oi-eye mr-2"></span>Show all sections</a>
-        </div>
-        <div class="col-auto">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Jump to section...
-                </button>
-                <div class="dropdown-menu shadow dropdown-menu-right">
-                    {% if report_errors.errors %}
-                    <a href="#report_errors" class="dropdown-item text-danger">
-                        <input id="vis_errors" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Errors
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    {% endif %}
-                    <a href="#report_vehicle_totals" class="dropdown-item">
-                        <input id="vis_vehicle_totals" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Totals for All Vehicles
-                    </a>
-                    {% for v in vehicle_reports %}
-                    <a href="#report_vehicle_{{v.vehicle.id}}" class="dropdown-item">
-                        <input id="vis_vehicle_{{v.vehicle.id}}" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Vehicle: {{v.vehicle}}
-                    </a>
-                    {% endfor %}
-                    {% if unique_riders.names %}
-                    <div class="dropdown-divider"></div>
-                    <a href="#report_riders" class="dropdown-item">
-                        <input id="vis_riders" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Elderly/Ambulatory Riders
-                    </a>
-                    {% endif %}
-                    {% if unique_riders.names or money_payments %}
-                    <div class="dropdown-divider"></div>
-                    <a href="#report_fares" class="dropdown-item">
-                        <input id="vis_fares" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Fares &amp; Payments
-                    </a>
-                    {% endif %}
-                    {% if money_trips %}
-                    <a href="#report_collected_money" class="dropdown-item">
-                        <input id="vis_collected_money" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Money Collected by the Drivers
-                    </a>
-                    {% endif %}
-                    {% if money_payments %}
-                    <a href="#report_payments" class="dropdown-item">
-                        <input id="vis_payments" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Money Not Collected by the Drivers
-                    </a>
-                    {% endif %}
-                    {% if driver_reports %}
-                    <div class="dropdown-divider"></div>
-                    <a href="#report_drivers" class="dropdown-item">
-                        <input id="vis_drivers" type="checkbox" class="mr-2" onclick="visibleSave(true)">
-                        Per-Driver Summary
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="col-auto p-1" id="print-close">
+            <a href="#_" class="btn btn-secondary" onclick="window.close()"><span class="oi oi-x mr-2"></span>Close</a>
         </div>
     </div>
 </div>
@@ -135,9 +43,6 @@
     <div class="row">
         <div class="col">
             <h3>Errors</h3>
-        </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
         </div>
     </div>
     <div style="max-width: 800px;">
@@ -171,9 +76,6 @@
     <div class="row">
         <div class="col">
             <h3>Totals for All Vehicles</h3>
-        </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
         </div>
     </div>
     <table class="mytable mytable-striped">
@@ -213,9 +115,6 @@
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
-        </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
         </div>
     </div>
     {% if v.days %}
@@ -294,9 +193,6 @@
         <div class="col">
             <h3>Elderly/Ambulatory Riders</h3>
         </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
-        </div>
     </div>
     <table class="mytable mytable-striped">
         <thead>
@@ -372,9 +268,6 @@
         <div class="col">
             <h3>Fares &amp; Payments</h3>
         </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
-        </div>
     </div>
     <table class="mytable mytable-striped">
         <thead>
@@ -443,9 +336,6 @@
         <div class="col">
             <h3>Money Collected by the Drivers</h3>
         </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
-        </div>
     </div>
     <table class="mytable mytable-striped">
         <thead>
@@ -480,9 +370,6 @@
     <div class="row">
         <div class="col">
             <h3>Money Not Collected by the Drivers</h3>
-        </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
         </div>
     </div>
     <table class="mytable mytable-striped">
@@ -519,9 +406,6 @@
         <div class="col">
             <h3>Per-Driver Summary</h3>
         </div>
-        <div class="col-auto">
-            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
-        </div>
     </div>
     <table class="mytable mytable-striped">
         <thead>
@@ -551,6 +435,8 @@
 </div>
 {% block javascript %}
 <script type="text/javascript">
+    window.print();
+
     // set up the visibility array
     var visible = [];
     var visible_count = 7 + {{vehicles.count}};
@@ -605,36 +491,6 @@
             $("#vis_all").addClass("d-none");
         }
     }
-
-    function visibleSave(get_checkboxes) {
-        var cookie_str = "report_visibility=";
-
-        for (i = 0; i < visible_count; i++) {
-            if (get_checkboxes == true && $(visible[i][1]).length) {
-                if ($(visible[i][2]).is(":checked")) {
-                    visible[i][0] = 1;
-                }
-                else {
-                    visible[i][0] = 0;
-                }
-            }
-            cookie_str += visible[i][0].toString();
-        }
-        cookie_str += ";";
-
-        cookie_str += "path=/transit/report;";
-        document.cookie = cookie_str;
-
-        visibleApply();
-    }
-
-    function visibleShowAll() {
-        for (i = 0; i < visible_count; i++) {
-            visible[i][0] = 1;
-        }
-        visibleSave(false);
-    }
-
 </script>
 {% endblock %}
 {% endblock %}

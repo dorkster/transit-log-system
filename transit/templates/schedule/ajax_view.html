@@ -301,6 +301,11 @@
                                 {% endif %}
                             </div>
                             {% endif %}
+                            {% if trip.fare > 0 %}
+                            <div class="list-group-item list-group-item-danger p-0 pl-2" style="font-size: 120%">
+                                <strong>Fare: ${{ trip.get_fare_str }}</strong>
+                            </div>
+                            {% endif %}
                             {% if trip.note and not trip.is_activity %}
                             <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
                                 {{ trip.note }}

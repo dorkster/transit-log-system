@@ -89,6 +89,11 @@ urlpatterns = [
     path('triptypes/<uuid:id>/edit', views.triptypeEdit, name='triptype-edit'),
     path('triptypes/<uuid:id>/delete', views.triptypeDelete, name='triptype-delete'),
 
+    path('fares/', views.fareList, name='fares'),
+    path('fares/create', views.fareCreate, name='fare-create'),
+    path('fares/<uuid:id>/edit', views.fareEdit, name='fare-edit'),
+    path('fares/<uuid:id>/delete', views.fareDelete, name='fare-delete'),
+
     path('templates/', views.templateList, name='templates'),
     path('templates/create', views.templateCreate, name='template-create'),
     path('templates/<uuid:id>/edit', views.templateEdit, name='template-edit'),
@@ -134,6 +139,7 @@ urlpatterns = [
     path('ajax/driver-list/', views.ajaxDriverList, name='ajax-driver-list'),
     path('ajax/vehicle-list/', views.ajaxVehicleList, name='ajax-vehicle-list'),
     path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),
+    path('ajax/fare-list/', views.ajaxFareList, name='ajax-fare-list'),
     path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
     path('ajax/template-list/', views.ajaxTemplateList, name='ajax-template-list'),
     path('ajax/template-trip-list/<uuid:parent>/', views.ajaxTemplateTripList, name='ajax-template-trip-list'),

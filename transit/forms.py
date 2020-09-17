@@ -252,6 +252,10 @@ class vehicleMaintainForm(forms.Form):
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
 
+class EditFareForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+
 class SearchTripsForm(forms.Form):
     TRIP_STATUS_LEVELS = (
         (None, '---------'),

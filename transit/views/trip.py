@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag, SiteSettings, Destination
+from transit.models import Trip, Driver, Vehicle, Client, Shift, FrequentTag, SiteSettings, Destination, Fare
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
 
 from django.contrib.auth.decorators import permission_required
@@ -239,6 +239,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
         'is_new': is_new,
         'is_return_trip': is_return_trip,
         'frequent_tags': FrequentTag.objects.all()[:10],
+        'fares': Fare.objects.all(),
     }
 
     return render(request, 'trip/edit.html', context)

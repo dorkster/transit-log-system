@@ -128,7 +128,9 @@
                     <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
                     <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
                     <hr/>
-                    <div class="mb-2"><label for="{{ form.fare.id_for_label }}"><strong>{{ form.fare.label }}</strong></label><br/>{{ form.fare }}</div>
+                    <div class="mb-2"><label for="{{ form.fare.id_for_label }}"><strong>{{ form.fare.label }}</strong></label>
+                        <a title="Show the fare selection dialog" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="showFareDialog()"><span class="oi oi-dollar"></span></a>
+                        <br/>{{ form.fare }}</div>
                 </fieldset>
             </div>
             {% endif %}
@@ -194,6 +196,40 @@
         </div>
     </div>
 </form>
+
+{% if fares %}
+<div id="fare_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Please select a fare for this trip</h5>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    {% for fare in fares %}
+                    <a href="#_" class="list-group-item list-group-item-success list-group-item-action" onclick="setFare('{{fare.get_fare_str}}')">
+                        <div class="row">
+                            <div class="col">
+                                {{fare.name}}
+                            </div>
+                            <div class="col-2">
+                                <strong>${{fare.get_fare_str}}</strong>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <span class="oi oi-x mr-2"></span>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
@@ -329,6 +365,22 @@
     var destination_phone_input = document.getElementById("id_phone_destination");
     pickup_input.addEventListener("change", function() { onAddressChanged(this, pickup_phone_input); });
     destination_input.addEventListener("change", function() { onAddressChanged(this, destination_phone_input); });
+
+    {% if fares %}
+    function setFare(fare_str) {
+        $('#id_fare').val(fare_str);
+        $('#fare_modal').modal('hide');
+    }
+
+    function showFareDialog() {
+        $('#fare_modal').modal({backdrop: 'static', keyboard: false});
+        $('#fare_modal').modal('show');
+    }
+
+    {% if is_new and not is_return_trip %}
+    showFareDialog();
+    {% endif %}
+    {% endif %}
 {% endif %}
 </script>
 {% endblock %}

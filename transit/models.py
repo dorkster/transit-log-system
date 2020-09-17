@@ -743,6 +743,24 @@ class PreTrip(models.Model):
     def get_class_name(self):
         return 'Pre-Trip'
 
+class Fare(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
+    name = models.CharField(max_length=FieldSizes.MD)
+    fare = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_index']
+
+    def __str__(self):
+        return self.name + ": $" + self.get_fare_str()
+
+    def get_class_name(self):
+        return 'Fare'
+
+    def get_fare_str(self):
+        return int_to_money_string(self.fare)
+
 class SiteSettings(SingletonModel):
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)

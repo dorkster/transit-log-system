@@ -26,7 +26,7 @@
                 </button>
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'vehicle-edit' vehicle.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit vehicle</a>
-                    {% if perms.transit.can_delete_vehicle %}
+                    {% if perms.transit.delete_vehicle %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'vehicle-delete' vehicle.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete vehicle</a>
                     {% endif %}

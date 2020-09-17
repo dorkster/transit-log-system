@@ -122,7 +122,7 @@
                     <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
                     <div class="dropdown-divider"></div>
                     <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}<span class="oi oi-x mr-2"></span>Set as not resolved{% else %}<span class="oi oi-check mr-2"></span>Set as resolved{% endif %}</a>
-                    {% if perms.transit.can_delete_vehicleissue %}
+                    {% if perms.transit.delete_vehicleissue %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>
                     {% endif %}
@@ -162,7 +162,7 @@
         <td class="mytable-col-md">Vehicle</td>
         <td class="mytable-col-md">Driver</td>
         <td class="mytable-col-xl">Status</td>
-        {% if perms.transit.can_delete_pretrip %}
+        {% if perms.transit.delete_pretrip %}
         <td class="mytable-col-sm"></td>
         {% endif %}
     </thead>
@@ -183,7 +183,7 @@
             </ul>
             {% endif %}
         </td>
-        {% if perms.transit.can_delete_pretrip %}
+        {% if perms.transit.delete_pretrip %}
         <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
         {% endif %}
     </tr>

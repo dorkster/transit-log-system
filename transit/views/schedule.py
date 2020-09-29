@@ -19,15 +19,26 @@ def schedule(request, mode, year, month, day):
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':year, 'month':month, 'day':day}))
 
     day_date = datetime.date(year, month, day)
-    day_date_prev = day_date + datetime.timedelta(days=-1)
-    day_date_next = day_date + datetime.timedelta(days=1)
+
+    date_week = []
+    date_week_range_max = 10
+    for day_delta in range(-1, date_week_range_max):
+        date_week.append(day_date + datetime.timedelta(days=day_delta))
 
     site_settings = SiteSettings.load()
     if site_settings.skip_weekends:
-        if day_date.weekday() == 0:
-            day_date_prev = day_date + datetime.timedelta(days=-3)
-        if day_date.weekday() == 4:
-            day_date_next = day_date + datetime.timedelta(days=3)
+        # only skip weekends if the current day is a weekday
+        if date_week[1].weekday() != 5 and date_week[1].weekday() != 6:
+            # yesterday
+            if date_week[0].weekday() == 5:
+                date_week[0] = date_week[0] + datetime.timedelta(days=-1)
+            elif date_week[0].weekday() == 6:
+                date_week[0] = date_week[0] + datetime.timedelta(days=-2)
+            # future
+            for day_delta in range(2, date_week_range_max+1):
+                if date_week[day_delta].weekday() == 5:
+                    for skip_delta in range(day_delta, date_week_range_max+1):
+                        date_week[skip_delta] = date_week[skip_delta] + datetime.timedelta(days=2)
 
     query_trips = Trip.objects.filter(date=day_date)
     query_shifts = Shift.objects.filter(date=day_date)
@@ -45,8 +56,7 @@ def schedule(request, mode, year, month, day):
         'trips': query_trips,
         'shifts': query_shifts,
         'date_picker': date_picker,
-        'date_prev': reverse('schedule', kwargs={'mode':mode, 'year':day_date_prev.year, 'month':day_date_prev.month, 'day':day_date_prev.day}),
-        'date_next': reverse('schedule', kwargs={'mode':mode, 'year':day_date_next.year, 'month':day_date_next.month, 'day':day_date_next.day}),
+        'date_week': date_week,
     }
     if mode == 'view':
         return render(request, 'schedule/view.html', context=context)

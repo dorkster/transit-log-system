@@ -209,9 +209,12 @@
                     <div class="p-1">
                         <h4 class="card-title mb-0">
                             {% if trip.is_activity %}
-                            {{ trip.note }}
+                                {{ trip.note }}
                             {% else %}
-                            {{ trip.name }}
+                                {{ trip.name }}
+                                {% if trip.appointment_time %}
+                                <span class="oi oi-star small ml-1"></span>
+                                {% endif %}
                             {% endif %}
                         </h4>
                     </div>

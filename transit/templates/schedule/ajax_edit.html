@@ -159,7 +159,7 @@ Show extra columns
     {% if trip.sort_index == 0 %}
     <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}21{% else %}15{% endif %}"></td></tr>
     {% endif %}
-    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
+    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="trip_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
@@ -277,7 +277,7 @@ Show extra columns
         </td>
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.appointment_time %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.driver is None %}---------{% else %}{% for driver in drivers %}{% if trip.driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
                 </button>
                 <div class="dropdown-menu shadow">
@@ -290,7 +290,7 @@ Show extra columns
         </td>
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.is_medical %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.appointment_time %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if trip.vehicle is None %}---------{% else %}{% for vehicle in vehicles %}{% if trip.vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
                 </button>
                 <div class="dropdown-menu shadow">

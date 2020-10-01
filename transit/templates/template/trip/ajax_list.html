@@ -59,7 +59,7 @@ Show extra columns
     {% if trip.sort_index == 0 %}
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}16{% else %}11{% endif %}"></td></tr>
     {% endif %}
-    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
+    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <a id="trip_{{ trip.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>

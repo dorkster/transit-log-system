@@ -5,11 +5,30 @@ from django.urls import reverse
 from django.contrib.auth.models import User, Group, Permission
 from transit.forms import EditUserForm
 
-from django.contrib.auth .decorators import permission_required
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import password_validation
 
-@permission_required(['auth.change_group'])
-def userGetGroup(request, group_name):
+def userGroupIntToStr(group):
+    if group == 1:
+        return 'Assistant'
+    elif group == 2:
+        return 'Basic'
+    else:
+        # default
+        return 'Staff'
+
+def userGetGroupInt(user):
+    for i in user.groups.all():
+        if i.name == 'Assistant':
+            return 1
+        elif i.name == 'Basic':
+            return 2
+
+    # Staff (default)
+    return 0
+
+def userGetGroup(group_name):
     query = Group.objects.filter(name=group_name)
     if len(query) > 0:
         group = query[0]
@@ -114,7 +133,7 @@ def userGetGroup(request, group_name):
     group.permissions.set(permissions)
     group.save()
 
-    return {'group':group, 'permissions':permissions}
+    return group
 
 @permission_required(['auth.view_user'])
 def userList(request):
@@ -122,6 +141,20 @@ def userList(request):
         'user_accounts': User.objects.filter(is_staff=False),
     }
     return render(request, 'user/list.html', context=context)
+
+@user_passes_test(lambda u: u.is_superuser)
+def userUpdatePermissions(request):
+    users = User.objects.filter(is_staff=False)
+
+    for user in users:
+        group_id = userGetGroupInt(user)
+        group = userGetGroup(userGroupIntToStr(group_id))
+        user.groups.set([group])
+        # permissions are handled by group, so clear user permissions
+        user.user_permissions.set({})
+
+    return render(request, 'user/update_permissions.html', context={})
+
 
 def userCreate(request):
     user = User()
@@ -177,15 +210,12 @@ def userCreateEdit(request, user, is_new):
                 user.save()
 
                 account_type = int(form.cleaned_data['account_type'])
-                if account_type == 1:
-                    group_and_perms = userGetGroup(request, 'Assistant')
-                elif account_type == 2:
-                    group_and_perms = userGetGroup(request, 'Basic')
-                else: # account_type == 0
-                    group_and_perms = userGetGroup(request, 'Staff')
+                group = userGetGroup(userGroupIntToStr(account_type))
 
-                user.groups.set([group_and_perms['group']])
-                user.user_permissions.set(group_and_perms['permissions'])
+                user.groups.set([group])
+
+                # permissions are handled by group, so clear user permissions
+                user.user_permissions.set({})
 
             user.save()
             return HttpResponseRedirect(reverse('users'))
@@ -194,13 +224,7 @@ def userCreateEdit(request, user, is_new):
         account_type = 0
 
         if user.id:
-            for i in user.groups.all():
-                if i.name == 'Assistant':
-                    account_type = 1
-                    break
-                elif i.name == 'Basic':
-                    account_type = 2
-                    break
+            account_type = userGetGroupInt(user)
 
         initial = {
             'username': user.username,

@@ -619,52 +619,6 @@ class ScheduleMessage(models.Model):
     date = models.DateField()
     message = models.CharField(max_length=FieldSizes.LG, blank=True)
 
-class FrequentTag(models.Model):
-    tag = models.CharField(primary_key=True, max_length=FieldSizes.SM)
-    count = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ['-count']
-
-    def addTags(tag_list):
-        for i in tag_list:
-            i_tag = i.strip()
-            if i_tag == '':
-                continue
-
-            try:
-                f_tag = FrequentTag.objects.get(tag=i_tag)
-                f_tag.count += 1
-                f_tag.save()
-            except:
-                f_tag = FrequentTag()
-                f_tag.tag = i_tag
-                f_tag.count = 1
-                f_tag.save()
-
-    def removeTags(tag_list):
-        for i in tag_list:
-            i_tag = i.strip()
-            if i_tag == '':
-                continue
-
-            try:
-                f_tag = FrequentTag.objects.get(tag=i_tag)
-                f_tag.count -= 1
-                if f_tag.count <= 0:
-                    f_tag.delete()
-                else:
-                    f_tag.save()
-            except:
-                pass
-
-    def getStyle(self):
-        # TODO don't hard-code this
-        if self.tag == 'Wheelchair':
-            return 'badge-warning'
-        else:
-            return 'badge-info'
-
 class PreTrip(models.Model):
     CHECKLIST = {
         'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},

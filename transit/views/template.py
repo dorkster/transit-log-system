@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from transit.models import Template, TemplateTrip, FrequentTag
+from transit.models import Template, TemplateTrip
 from transit.forms import EditTemplateForm
 
 from django.contrib.auth.decorators import permission_required
@@ -78,7 +78,6 @@ def templateDelete(request, id):
 
         trip_query = TemplateTrip.objects.filter(parent=id)
         for i in trip_query:
-            FrequentTag.removeTags(i.get_tag_list())
             i.delete()
 
         template.delete()

@@ -334,6 +334,7 @@
 
                 var tags_input = document.getElementById("id_tags");
                 tags_input.value = clients[i].fields.tags;
+                createTagList();
 
                 address_datalist.children[0].value = clients[i].fields.address;
                 break;

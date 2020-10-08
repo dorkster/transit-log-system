@@ -8,7 +8,7 @@ from django.http import FileResponse
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Client, Trip, FrequentTag, TemplateTrip, SiteSettings
+from transit.models import Client, Trip, Tag, TemplateTrip, SiteSettings
 from transit.forms import EditClientForm
 
 from django.contrib.auth.decorators import permission_required
@@ -55,8 +55,6 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             else:
                 unique_client = client
 
-            FrequentTag.removeTags(unique_client.get_tag_list())
-
             unique_client.name = form.cleaned_data['name']
             unique_client.address = form.cleaned_data['address']
             unique_client.phone_home = form.cleaned_data['phone_home']
@@ -65,8 +63,6 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.ambulatory = form.cleaned_data['ambulatory']
             unique_client.tags = form.cleaned_data['tags']
             unique_client.staff = form.cleaned_data['staff']
-
-            FrequentTag.addTags(unique_client.get_tag_list())
 
             unique_client.save()
 
@@ -106,7 +102,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
         'form': form,
         'client': client,
         'is_new': is_new,
-        'frequent_tags': FrequentTag.objects.all()[:10],
+        'tags': Tag.objects.all(),
         'names': sorted(names),
         'addresses': sorted(addresses),
         'is_dupe': is_dupe,

@@ -161,7 +161,7 @@ class EditClientForm(forms.Form):
     phone_cell = forms.CharField(label='Phone (Cell)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
-    tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    tags = forms.CharField(required=False, widget=forms.HiddenInput())
     staff = forms.ChoiceField(choices=BOOL_CHOICES, label='Is staff member?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditClientPaymentForm(forms.Form):
@@ -216,7 +216,7 @@ class EditTemplateTripForm(forms.Form):
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     trip_type = forms.ModelChoiceField(TripType.objects, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    tags = forms.CharField(required=False, widget=forms.HiddenInput())
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))

@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
 
-from transit.models import Template, TemplateTrip, Client, FrequentTag, Trip, SiteSettings, Destination, Fare
+from transit.models import Template, TemplateTrip, Client, Tag, Trip, SiteSettings, Destination, Fare
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 from django.contrib.auth.decorators import permission_required
@@ -100,8 +100,6 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 if trip.pick_up_time == trip.appointment_time:
                     trip.appointment_time = ''
             else:
-                FrequentTag.removeTags(trip.get_tag_list())
-
                 trip.driver = form.cleaned_data['driver']
                 trip.vehicle = form.cleaned_data['vehicle']
                 trip.name = form.cleaned_data['name']
@@ -134,9 +132,6 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                     trip.sort_index = query[0].sort_index + 1
                 else:
                     trip.sort_index = 0
-
-            if not trip.is_activity:
-                FrequentTag.addTags(trip.get_tag_list())
 
             trip.save()
 
@@ -211,7 +206,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
         'destinations_json': serializers.serialize('json', Destination.objects.all()),
         'is_new': is_new,
         'is_return_trip': is_return_trip,
-        'frequent_tags': FrequentTag.objects.all()[:10],
+        'tags': Tag.objects.all(),
         'fares': Fare.objects.all(),
     }
 
@@ -224,8 +219,6 @@ def templateTripDelete(request, parent, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('template-trip-edit', kwargs={'parent':trip.parent.id, 'id':id}))
-
-        FrequentTag.removeTags(trip.get_tag_list())
 
         query = TemplateTrip.objects.filter(parent=trip.parent)
         for i in query:

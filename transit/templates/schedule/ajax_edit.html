@@ -342,7 +342,7 @@ Show extra columns
             {% endif %}
             {% endif %}
         </td>
-        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_tags', row_movers)">
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=tag_list', row_movers)">
             {% if trip.status > 0 %}
                 {% if trip.status == 1 %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>

@@ -80,28 +80,7 @@
                     <div class="alert alert-warning d-none" id="alert_info"><span class="oi oi-warning mr-2"></span>If possible, select the client's elderly / ambulatory status.</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.tags.id_for_label }}"><strong>{{ form.tags.label }}</strong></label><br/>{{ form.tags }}
-                        {% if frequent_tags %}
-                        <br/><span class="text-muted">Frequently used: </span>
-                        {% for tag in frequent_tags %}
-                        <span><a class="badge {{ tag.getStyle }}" href="#_" onclick="addFrequentTag('{{tag.tag}}')"><span class="oi oi-tag mr-1"></span>{{tag.tag}}</a> </span>
-                        <script type="text/javascript">
-                            function addFrequentTag(tag) {
-                                if ($('#id_tags').val() == "") {
-                                    $('#id_tags').val(tag);
-                                    return;
-                                }
-
-                                var split_tags = $('#id_tags').val().split(',');
-                                for (i in split_tags) {
-                                    if ($.trim(split_tags[i]) == tag)
-                                        return;
-                                }
-
-                                $('#id_tags').val($('#id_tags').val() + (", " + tag));
-                            }
-                        </script>
-                        {% endfor %}
-                        {% endif %}
+                        <div id="tag_list"></div>
                     </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.staff.id_for_label }}"><strong>{{ form.staff.label }}</strong></label><br/>{{ form.staff }}</div>
@@ -123,6 +102,33 @@
     </div>
 </form>
 
+<div id="tag_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Please select a tag to add to this client</h5>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-group-flush">
+                    {% if tags %}
+                    {% for tag in tags %}
+                    <div class="list-group-item">
+                        <a href="#_" class="btn btn-sm {{tag.get_button_style}} text-bold" onclick="addTag('{{tag.name}}')"><span class="oi oi-tag mr-2"></span>{{tag.name}}</a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>There are no tags.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <span class="oi oi-x mr-2"></span>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 <script type="text/javascript">
@@ -193,6 +199,63 @@
     $("#id_phone_cell").on("change", checkAlertPhone);
     $("#id_elderly").on("change", checkAlertInfo);
     $("#id_ambulatory").on("change", checkAlertInfo);
+
+    function addTag(tag) {
+        if ($('#id_tags').val() == "") {
+            $('#id_tags').val(tag);
+            createTagList();
+            $('#tag_modal').modal('hide');
+            return;
+        }
+
+        var split_tags = $('#id_tags').val().split(',');
+        for (i in split_tags) {
+            if ($.trim(split_tags[i]) == tag) {
+                createTagList();
+                $('#tag_modal').modal('hide');
+                return;
+            }
+        }
+
+        $('#id_tags').val($('#id_tags').val() + ("," + tag));
+
+        createTagList();
+        $('#tag_modal').modal('hide');
+    }
+    function removeTag(tag_index) {
+        var tag_str = "";
+        var split_tags = $('#id_tags').val().split(',');
+        for (i in split_tags) {
+            if (i == tag_index)
+                continue;
+
+            tag_str += $.trim(split_tags[i]);
+            if (i < split_tags.length - 1 && tag_str != "") {
+                tag_str += ",";
+            }
+        }
+        $('#id_tags').val(tag_str);
+
+        createTagList();
+    }
+
+    function showTagDialog() {
+        $('#tag_modal').modal('show');
+    }
+
+    function createTagList() {
+        $('#tag_list').html("");
+
+        var split_tags = $('#id_tags').val().split(',');
+        for (i in split_tags) {
+            split_tags[i] = $.trim(split_tags[i]);
+            if (split_tags[i] != "") {
+                $('#tag_list').append('<a class="btn btn-sm ' + getTagButtonStyle(split_tags[i]) + ' text-bold m-1" href="#_" onclick="removeTag(' + i.toString() + ')"><span class="oi oi-tag mr-2"></span>' + split_tags[i] + '<span class="ml-3 oi oi-x"></span></a>');
+            }
+        }
+        $('#tag_list').append('<a class="btn btn-sm btn-secondary" href="#_" onclick="showTagDialog()" title="Add a tag"><span class="oi oi-plus"></span></a> ');
+    }
+    createTagList();
 </script>
 {% endblock %}
 {% endblock %}

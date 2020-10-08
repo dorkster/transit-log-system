@@ -64,6 +64,7 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='delete_trip'))
         permissions.append(Permission.objects.get(codename='view_trip'))
         permissions.append(Permission.objects.get(codename='view_fare'))
+        permissions.append(Permission.objects.get(codename='view_tag'))
     elif group_name == 'Staff':
         permissions.append(Permission.objects.get(codename='add_group'))
         permissions.append(Permission.objects.get(codename='change_group'))
@@ -129,6 +130,10 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='change_fare'))
         permissions.append(Permission.objects.get(codename='delete_fare'))
         permissions.append(Permission.objects.get(codename='view_fare'))
+        permissions.append(Permission.objects.get(codename='add_tag'))
+        permissions.append(Permission.objects.get(codename='change_tag'))
+        permissions.append(Permission.objects.get(codename='delete_tag'))
+        permissions.append(Permission.objects.get(codename='view_tag'))
 
     group.permissions.set(permissions)
     group.save()

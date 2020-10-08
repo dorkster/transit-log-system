@@ -235,11 +235,15 @@
             </div>
             <div class="modal-body">
                 <div class="list-group list-group-flush">
-                    {% for tag in frequent_tags %}
+                    {% if tags %}
+                    {% for tag in tags %}
                     <div class="list-group-item">
-                        <a href="#_" class="btn btn-sm btn-info text-bold" onclick="addTag('{{tag.tag}}')"><span class="oi oi-tag mr-2"></span>{{tag.tag}}</a>
+                        <a href="#_" class="btn btn-sm {{tag.get_button_style}} text-bold" onclick="addTag('{{tag.name}}')"><span class="oi oi-tag mr-2"></span>{{tag.name}}</a>
                     </div>
                     {% endfor %}
+                    {% else %}
+                    <p>There are no tags.</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="modal-footer">
@@ -427,10 +431,6 @@
     {% endif %}
     {% endif %}
 
-    function showTagDialog() {
-        $('#tag_modal').modal('show');
-    }
-
     function addTag(tag) {
         if ($('#id_tags').val() == "") {
             $('#id_tags').val(tag);
@@ -470,6 +470,10 @@
         createTagList();
     }
 
+    function showTagDialog() {
+        $('#tag_modal').modal('show');
+    }
+
     function createTagList() {
         $('#tag_list').html("");
 
@@ -477,7 +481,7 @@
         for (i in split_tags) {
             split_tags[i] = $.trim(split_tags[i]);
             if (split_tags[i] != "") {
-                $('#tag_list').append('<a class="btn btn-sm btn-info text-bold m-1" href="#_" onclick="removeTag(' + i.toString() + ')"><span class="oi oi-tag mr-2"></span>' + split_tags[i] + '<span class="ml-3 oi oi-x"></span></a>');
+                $('#tag_list').append('<a class="btn btn-sm ' + getTagButtonStyle(split_tags[i]) + ' text-bold m-1" href="#_" onclick="removeTag(' + i.toString() + ')"><span class="oi oi-tag mr-2"></span>' + split_tags[i] + '<span class="ml-3 oi oi-x"></span></a>');
             }
         }
         $('#tag_list').append('<a class="btn btn-sm btn-secondary" href="#_" onclick="showTagDialog()" title="Add a tag"><span class="oi oi-plus"></span></a> ');

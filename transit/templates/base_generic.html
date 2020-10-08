@@ -64,6 +64,9 @@
                             {% if perms.transit.view_fare %}
                             <a class="dropdown-item" href="{% url 'fares' %}"><span class="oi oi-dollar mr-2"></span>Fares</a>
                             {% endif %}
+                            {% if perms.transit.view_tag %}
+                            <a class="dropdown-item" href="{% url 'tags' %}"><span class="oi oi-tag mr-2"></span>Tags</a>
+                            {% endif %}
                         </div>
                     </li>
                     {% if perms.transit.change_vehicle %}

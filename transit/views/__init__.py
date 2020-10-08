@@ -19,3 +19,4 @@ from .destination import *
 from .user_account import *
 from .client_payment import *
 from .fare import *
+from .tag import *

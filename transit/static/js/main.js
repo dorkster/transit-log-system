@@ -212,3 +212,10 @@ function cookieRead(c) {
         return "";
     }
 }
+
+function getTagButtonStyle(tag_name) {
+    if (tag_name == "Wheelchair")
+        return "btn-warning";
+    else
+        return "btn-info";
+}

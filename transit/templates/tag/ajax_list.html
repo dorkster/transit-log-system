@@ -1,0 +1,42 @@
+<h3>Tags <a class="btn btn-success btn-sm" href="{% url 'tag-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+{% if tags %}
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+</script>
+<table class="mytable mytable-striped-sort">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+    </thead>
+    {% for tag in tags %}
+    {% if tag.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    {% endif %}
+    <tr>
+        <td class="mytable-col-arrows">
+            <a id="tag_{{ tag.id }}"></a>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ tag.id }}')"><span class="oi oi-resize-height"></span></button>
+        </td>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a href="{% url 'tag-edit' tag.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Tag</a>
+                    {% if perms.transit.delete_tag %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'tag-delete' tag.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete Tag</a>
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ tag.name }}</td>
+    </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ tag.id }}')"><td colspan="4"></td></tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>There are no tags.</p>
+{% endif %}

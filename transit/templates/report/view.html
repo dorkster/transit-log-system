@@ -145,7 +145,7 @@
         {% for error in report_errors.errors %}
         <li class="list-group-item list-group-item-danger p-2 small">
             <strong class="text-danger">Error:</strong>
-            {% if error.error_shift %}
+            {% if error.error_shift and not error.error_trip %}
                 <span class="text-bold">{{ error.error_msg }}</span><br/>
                 <div class="mb-2">{{ error.error_shift }}</div>
                 <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#shift_{{ error.error_shift.id }}">View on schedule</a>

@@ -149,31 +149,58 @@ class Report():
             self.errors = []
 
         def add(self, date, error_code, error_shift=None, error_trip=None):
-            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code)})
+            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code, error_shift, error_trip)})
 
-        def getErrorMsg(self, error_code):
+        def getErrorMsg(self, error_code, error_shift=None, error_trip=None):
+            if (error_shift):
+                shift_start_miles = error_shift.start_miles
+                shift_end_miles = error_shift.end_miles
+                shift_start_time = error_shift.start_time
+                shift_end_time = error_shift.end_time
+            else:
+                shift_start_miles = shift_end_miles = shift_start_time = shift_end_time = ''
+
+            if (error_trip):
+                trip_start_miles = error_trip.start_miles
+                trip_end_miles = error_trip.end_miles
+                trip_start_time = error_trip.start_time
+                trip_end_time = error_trip.end_time
+            else:
+                trip_start_miles = trip_end_miles = trip_start_time = trip_end_time = ''
+
             if error_code == self.SHIFT_INCOMPLETE:
                 return 'Shift contains partial log data.'
+
             elif error_code == self.TRIP_INCOMPLETE:
                 return 'Trip contains partial log data.'
+
             elif error_code == self.TRIP_NO_SHIFT:
                 return 'Trip does not have a matching Shift.'
+
             elif error_code == self.TRIP_MILES_OOB:
-                return 'Trip mileage is not within Shift mileage.'
+                return 'Trip mileage ( ' + trip_start_miles + ' - ' + trip_end_miles + ' ) is not within Shift mileage ( ' + shift_start_miles + ' - ' + shift_end_miles + ' ).'
+
             elif error_code == self.TRIP_TIME_OOB:
-                return 'Trip time is not within Shift time.'
+                return 'Trip time ( ' + trip_start_time + ' - ' + trip_end_time + ' ) is not within Shift time ( ' + shift_start_time + ' - ' + shift_end_time + ' ).'
+
             elif error_code == self.SHIFT_PARSE:
                 return 'Unable to parse Shift data.'
+
             elif error_code == self.TRIP_PARSE:
                 return 'Unable to parse Trip data.'
+
             elif error_code == self.SHIFT_MILES_LESS:
-                return 'Shift end mileage is less than Shift start mileage.'
+                return 'Shift end mileage ( ' + shift_end_miles + ' ) is less than Shift start mileage ( ' + shift_start_miles + ' ).'
+
             elif error_code == self.SHIFT_TIME_LESS:
-                return 'Shift end time is earlier than Shift start time.'
+                return 'Shift end time ( ' + shift_end_time + ' ) is earlier than Shift start time ( ' + shift_start_time + ' ).'
+
             elif error_code == self.TRIP_MILES_LESS:
-                return 'Trip end mileage is less than Trip start mileage.'
+                return 'Trip end mileage ( ' + trip_end_miles + ' ) is less than Trip start mileage ( ' + trip_start_miles + ' ).'
+
             elif error_code == self.TRIP_TIME_LESS:
-                return 'Trip end time is earlier than Trip start time.'
+                return 'Trip end time ( ' + trip_end_time + ' ) is earlier than Trip start time ( ' + trip_start_time + ' ).'
+
             else:
                 return 'Unknown error'
 
@@ -395,10 +422,10 @@ class Report():
 
                 # check for trip errors
                 if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_trip=i)
+                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
 
                 if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_trip=i)
+                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
 
                 if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
                     self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)

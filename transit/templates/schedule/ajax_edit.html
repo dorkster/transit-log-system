@@ -32,7 +32,7 @@
     <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="shift_{{ shift.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -161,12 +161,11 @@ Show extra columns
     {% endif %}
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
-            <a id="trip_{{ trip.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="trip_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="trip_{{trip.id}}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -503,6 +502,14 @@ Show extra columns
     <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}21{% else %}15{% endif %}"></td></tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var hash = window.location.hash;
+    if (hash != "") {
+        if (hash.startsWith('#shift_') || hash.startsWith("#trip_")) {
+            $(hash).addClass('active');
+        }
+    }
+</script>
 {% else %}
 <p>There are no trips for this day.</p>
 {% endif %}

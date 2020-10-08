@@ -32,7 +32,8 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
         form = EditShiftForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+            url_hash = '' if is_new else '#shift_' + str(shift.id)
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('shift-delete', kwargs={'mode':mode, 'id':shift.id}))
 
@@ -68,7 +69,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
 
                 trip.save()
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + '#shift_' + str(shift.id))
     else:
         initial = {
             'date': shift.date,

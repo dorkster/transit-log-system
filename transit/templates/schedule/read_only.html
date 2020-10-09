@@ -20,7 +20,7 @@
         </div>
         <div class="col-auto p-1">
             <div class="btn-group" role="group">
-                <a title="Previous day" class="btn btn-secondary" href="{{ date_prev }}">
+                <a title="Previous day" class="btn btn-secondary" href="{% url 'schedule' 'read-only' date_week.0.year date_week.0.month date_week.0.day %}">
                     <span class="oi oi-chevron-left"></span>
                 </a>
                 <div class="btn-group" role="group" id="date_dropdown">
@@ -36,9 +36,19 @@
                             </form>
                         </div>
                         <a class="dropdown-item" href="{% url 'schedule-today' 'read-only' %}">Go to today</a>
+                        <div class="dropdown-divider"></div>
+                        {% for date_link in date_week %}
+                            {% if date_link is not date_week.1 %}
+                           <a class="dropdown-item" href="{% url 'schedule' 'read-only' date_link.year date_link.month date_link.day %}">
+                               <span>{{date_link|date:"l"}}, </span>
+                               <span><strong>{{date_link|date:"F j"}}, </strong></span>
+                               <span>{{date_link|date:"Y"}}</span>
+                           </a>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
-                <a title="Next day" class="btn btn-secondary" href="{{ date_next }}">
+                <a title="Next day" class="btn btn-secondary" href="{% url 'schedule' 'read-only' date_week.2.year date_week.2.month date_week.2.day %}">
                     <span class="oi oi-chevron-right"></span></span>
                 </a>
             </div>

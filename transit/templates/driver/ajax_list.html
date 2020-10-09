@@ -16,12 +16,11 @@
     {% endif %}
     <tr style="background: #{{ driver.get_color }};">
         <td class="mytable-col-arrows">
-            <a id="driver_{{ driver.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ driver.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="driver_{{ driver.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -39,4 +38,12 @@
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ driver.id }}')"><td colspan="4"></td></tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var hash = window.location.hash;
+    if (hash != "") {
+        if (hash.startsWith('#driver_')) {
+            $(hash).addClass('active');
+        }
+    }
+</script>
 {% endif %}

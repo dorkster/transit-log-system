@@ -61,12 +61,11 @@ Show extra columns
     {% endif %}
     <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
-            <a id="trip_{{ trip.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="trip_{{ trip.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -320,6 +319,14 @@ Show extra columns
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}16{% else %}11{% endif %}"></td></tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var hash = window.location.hash;
+    if (hash != "") {
+        if (hash.startsWith('#trip_')) {
+            setEditButtonStyleFromHash(hash);
+        }
+    }
+</script>
 {% else %}
 <p>No trips have been added to this template.</p>
 {% endif %}

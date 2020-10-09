@@ -49,7 +49,7 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
             vehicle.is_logged = form.cleaned_data['is_logged']
             vehicle.save()
 
-            return HttpResponseRedirect(reverse('vehicles') + '#vehicle' + str(vehicle.id))
+            return HttpResponseRedirect(reverse('vehicles') + '#vehicle_' + str(vehicle.id))
     else:
         initial = {
             'name': vehicle.name,

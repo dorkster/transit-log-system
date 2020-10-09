@@ -506,7 +506,7 @@ Show extra columns
     var hash = window.location.hash;
     if (hash != "") {
         if (hash.startsWith('#shift_') || hash.startsWith("#trip_")) {
-            $(hash).addClass('active');
+            setEditButtonStyleFromHash(hash);
         }
     }
 </script>

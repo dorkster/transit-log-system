@@ -151,9 +151,8 @@ Show extra columns
     {% for client in clients %}
     <tr>
         <td class="mytable-col-xs">
-            <a id="client_{{ client.id }}"></a>
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="client_{{ client.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -244,6 +243,14 @@ Show extra columns
     </tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var hash = window.location.hash;
+    if (hash != "") {
+        if (hash.startsWith('#client_')) {
+            setEditButtonStyleFromHash(hash);
+        }
+    }
+</script>
 {% else %}
 <p>There are no clients. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all clients.{% endif %}</p>
 {% endif %}

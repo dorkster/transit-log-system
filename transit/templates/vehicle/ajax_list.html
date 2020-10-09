@@ -16,12 +16,11 @@
     {% endif %}
     <tr>
         <td class="mytable-col-arrows">
-            <a id="vehicle_{{ vehicle_.id }}"></a>
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ vehicle.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="vehicle_{{ vehicle.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
@@ -39,4 +38,12 @@
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ vehicle.id }}')"><td colspan="4"></td></tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    var hash = window.location.hash;
+    if (hash != "") {
+        if (hash.startsWith('#vehicle_')) {
+            setEditButtonStyleFromHash(hash);
+        }
+    }
+</script>
 {% endif %}

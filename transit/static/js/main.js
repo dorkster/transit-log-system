@@ -219,3 +219,8 @@ function getTagButtonStyle(tag_name) {
     else
         return "btn-info";
 }
+
+function setEditButtonStyleFromHash(hash) {
+    $(hash).removeClass('btn-outline-dark');
+    $(hash).addClass('btn-outline-primary');
+}

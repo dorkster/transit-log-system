@@ -40,6 +40,9 @@ nav {
         </div>
         {% if shifts %}
         <div class="col-auto p-1" id="print-shiftselect">
+            {% if not current_shift %}
+            <span style="font-size: 1em;" class="badge badge-danger">No shift selected<span class="oi oi-arrow-right ml-2"></span></span>
+            {% endif %}
             <span class="dropdown">
                 <button class="btn btn-outline-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if current_shift %}

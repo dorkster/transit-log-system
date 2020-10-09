@@ -419,6 +419,8 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
     shifts = shifts.exclude(end_miles='')
     report = Report()
 
+    if len(shifts) == 1:
+        id = shifts[0].id
     if id == None:
         current_shift = None
         context = {

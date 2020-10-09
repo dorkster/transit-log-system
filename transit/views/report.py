@@ -55,6 +55,7 @@ class Report():
             self.trip_type = None
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
+            self.other_employment = False
 
     class ReportDay():
         query_vehicles = Vehicle.objects.all()
@@ -100,6 +101,7 @@ class Report():
             self.trip_types = {}
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
+            self.other_employment = 0
 
             for i in self.query_triptypes:
                 self.trip_types[i] = 0
@@ -118,6 +120,7 @@ class Report():
                 r.trip_types[i] += other.trip_types[i]
             r.collected_cash += other.collected_cash
             r.collected_check += other.collected_check
+            r.other_employment += other.other_employment
             return r
 
     class ReportOutputVehicles():
@@ -412,6 +415,8 @@ class Report():
                 report_trip.collected_cash = Report.Money(i.collected_cash)
                 report_trip.collected_check = Report.Money(i.collected_check)
 
+                report_trip.other_employment = i.check_tag('Employment')
+
                 report_day.trips.append(report_trip)
 
                 if shift.start_trip == None or report_trip.start_miles[T_FLOAT] < report_day.trips[shift.start_trip].start_miles[T_FLOAT]:
@@ -561,6 +566,8 @@ class Report():
                         report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type] += 1
                     report_day.by_vehicle[shift.shift.vehicle].collected_cash += trip.collected_cash
                     report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
+                    if trip.other_employment:
+                        report_day.by_vehicle[shift.shift.vehicle].other_employment += 1
                 report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
 
                 # per-driver log
@@ -578,6 +585,8 @@ class Report():
                         report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type] += 1
                     report_day.by_driver[shift.shift.driver].collected_cash += trip.collected_cash
                     report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
+                    if trip.other_employment:
+                        report_day.by_driver[shift.shift.driver].other_employment += 1
                 report_day.by_driver[shift.shift.driver].fuel += shift.fuel
 
             self.report_all.append(report_day)

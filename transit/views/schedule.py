@@ -467,6 +467,8 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
 
     money_total = money_cash + money_check
 
+    trips_employment = report_summary.other_employment
+
     context = {
         'date': day_date,
         'shifts': shifts,
@@ -481,6 +483,7 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
         'money_cash': money_cash,
         'money_check': money_check,
         'money_total': money_total,
+        'trips_employment': trips_employment,
     }
 
     return render(request, 'schedule/print_daily_log.html', context)

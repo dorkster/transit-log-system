@@ -215,6 +215,13 @@ class Trip(models.Model):
             return False
         return self.trip_type.name == 'Medical'
 
+    def check_tag(self, tag_str):
+        tags = self.tags.split(',')
+        for i in range(0, len(tags)):
+            if tags[i].strip() == tag_str:
+                return True
+        return False
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)

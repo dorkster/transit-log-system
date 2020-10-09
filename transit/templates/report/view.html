@@ -148,16 +148,16 @@
             {% if error.error_shift and not error.error_trip %}
                 <span class="text-bold">{{ error.error_msg }}</span><br/>
                 <div class="mb-2">{{ error.error_shift }}</div>
-                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#shift_{{ error.error_shift.id }}">View on schedule</a>
-                <a class="btn btn-sm btn-danger" href="{% url 'report-shift-edit' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day error.error_shift.id %}">Edit Shift</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#shift_{{ error.error_shift.id }}"><span class="oi oi-spreadsheet mr-2"></span>View on schedule</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'report-shift-edit' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day error.error_shift.id %}"><span class="oi oi-pencil mr-2"></span>Edit Shift</a>
             {% elif error.error_trip %}
                 <span class="text-bold">{{ error.error_msg }}</span><br/>
                 <div class="mb-2">{{ error.error_trip }}</div>
-                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}">View on schedule</a>
-                <a class="btn btn-sm btn-danger" href="{% url 'report-trip-edit' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day error.error_trip.id %}">Edit Trip</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}#trip_{{ error.error_trip.id }}"><span class="oi oi-spreadsheet mr-2"></span>View on schedule</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'report-trip-edit' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day error.error_trip.id %}"><span class="oi oi-pencil mr-2"></span>Edit Trip</a>
             {% else %}
                 <span class="text-bold">{{ error.error_msg }}</span><br/>
-                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}">View schedule</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'schedule' 'edit' error.date.year error.date.month error.date.day %}"><span class="oi oi-spreadsheet mr-2"></span>View schedule</a>
             {% endif %}
         </li>
         {% endfor %}

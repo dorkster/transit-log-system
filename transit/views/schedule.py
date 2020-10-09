@@ -419,72 +419,68 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
     shifts = shifts.exclude(end_miles='')
     report = Report()
 
-    if len(shifts) == 1:
-        id = shifts[0].id
     if id == None:
         current_shift = None
-        context = {
-            'date': day_date,
-            'shifts': shifts,
-            'current_shift': current_shift,
-        }
+        report.load(day_date, day_date)
+        if len(report.report_all) > 0:
+            report_summary = report.all_vehicles
     else:
         current_shift = get_object_or_404(Shift, id=id)
         report.load(day_date, day_date, daily_log_shift=id)
         if len(report.report_all) > 0:
             report_summary = report.report_all[0].by_vehicle[current_shift.vehicle]
 
-        try:
-            trips_medical = report_summary.trip_types[TripType.objects.get(name='Medical')]
-        except:
-            trips_medical = 0
+    try:
+        trips_medical = report_summary.trip_types[TripType.objects.get(name='Medical')]
+    except:
+        trips_medical = 0
 
-        try:
-            trips_nutrition = report_summary.trip_types[TripType.objects.get(name='Nutrition')]
-        except:
-            trips_nutrition = 0
+    try:
+        trips_nutrition = report_summary.trip_types[TripType.objects.get(name='Nutrition')]
+    except:
+        trips_nutrition = 0
 
-        try:
-            trips_social = report_summary.trip_types[TripType.objects.get(name='Social/Recreation')]
-        except:
-            trips_social = 0
+    try:
+        trips_social = report_summary.trip_types[TripType.objects.get(name='Social/Recreation')]
+    except:
+        trips_social = 0
 
-        try:
-            trips_shopping = report_summary.trip_types[TripType.objects.get(name='Shopping')]
-        except:
-            trips_shopping = 0
+    try:
+        trips_shopping = report_summary.trip_types[TripType.objects.get(name='Shopping')]
+    except:
+        trips_shopping = 0
 
-        try:
-            trips_other = report_summary.trip_types[TripType.objects.get(name='Other')]
-        except:
-            trips_other = 0
+    try:
+        trips_other = report_summary.trip_types[TripType.objects.get(name='Other')]
+    except:
+        trips_other = 0
 
-        try:
-            money_cash = report_summary.collected_cash
-        except:
-            money_cash = Report.Money(0)
+    try:
+        money_cash = report_summary.collected_cash
+    except:
+        money_cash = Report.Money(0)
 
-        try:
-            money_check = report_summary.collected_check
-        except:
-            money_check = Report.Money(0)
+    try:
+        money_check = report_summary.collected_check
+    except:
+        money_check = Report.Money(0)
 
-        money_total = money_cash + money_check
+    money_total = money_cash + money_check
 
-        context = {
-            'date': day_date,
-            'shifts': shifts,
-            'current_shift': current_shift,
-            'report': report,
-            'trips_medical': trips_medical,
-            'trips_nutrition': trips_nutrition,
-            'trips_social': trips_social,
-            'trips_shopping': trips_shopping,
-            'trips_other': trips_other,
-            'trips_total': trips_medical + trips_nutrition + trips_social + trips_shopping + trips_other,
-            'money_cash': money_cash,
-            'money_check': money_check,
-            'money_total': money_total,
-        }
+    context = {
+        'date': day_date,
+        'shifts': shifts,
+        'current_shift': current_shift,
+        'report': report,
+        'trips_medical': trips_medical,
+        'trips_nutrition': trips_nutrition,
+        'trips_social': trips_social,
+        'trips_shopping': trips_shopping,
+        'trips_other': trips_other,
+        'trips_total': trips_medical + trips_nutrition + trips_social + trips_shopping + trips_other,
+        'money_cash': money_cash,
+        'money_check': money_check,
+        'money_total': money_total,
+    }
 
     return render(request, 'schedule/print_daily_log.html', context)

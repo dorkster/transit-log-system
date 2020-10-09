@@ -41,17 +41,18 @@ nav {
         {% if shifts %}
         <div class="col-auto p-1" id="print-shiftselect">
             {% if not current_shift %}
-            <span style="font-size: 1em;" class="badge badge-danger">No shift selected<span class="oi oi-arrow-right ml-2"></span></span>
+            <span style="font-size: 1em;" class="badge badge-warning">Click here to view a single shift<span class="oi oi-arrow-right ml-2"></span></span>
             {% endif %}
             <span class="dropdown">
                 <button class="btn btn-outline-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if current_shift %}
                     {{ current_shift.driver }} / {{ current_shift.vehicle }}
                     {% else %}
-                    Select a shift...
+                    All Shifts
                     {% endif %}
                 </button>
                 <div class="dropdown-menu dropdown-menu-right shadow">
+                    <a class="dropdown-item {% if current_shift == None %}active{% endif %}" href="{% url 'schedule-print-daily-log' date.year date.month date.day %}">All Shifts</a>
                     {% for shift in shifts %}
                     <a class="dropdown-item {% if shift.id == current_shift.id %}active{% endif %}" href="{% url 'schedule-print-daily-log-shift' date.year date.month date.day shift.id %}">
                         {{ shift.driver }} / {{ shift.vehicle }}
@@ -61,11 +62,9 @@ nav {
             </span>
         </div>
         {% endif %}
-        {% if current_shift %}
         <div class="col-auto p-1" id="print-print">
             <a href="#_" class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</a>
         </div>
-        {% endif %}
         <div class="col-auto p-1" id="print-close">
             <a href="#_" class="btn btn-secondary" onclick="window.close()"><span class="oi oi-x mr-2"></span>Close</a>
         </div>
@@ -74,33 +73,34 @@ nav {
 <hr class="mt-0" />
 <div class="container ml-0">
 {% if shifts %}
-    {% if current_shift %}
+    {% for shift in shifts %}
     <div class="row">
         <div class="col">
             <h5>Driver</h5>
             <div class="blank-field">
-                {{ current_shift.driver }}
+                {{ shift.driver }}
             </div>
         </div>
         <div class="col">
             <h5>Vehicle</h5>
             <div class="blank-field">
-                {{ current_shift.vehicle }}
+                {{ shift.vehicle }}
             </div>
         </div>
         <div class="col">
             <h5>Start Mileage</h5>
             <div class="blank-field">
-                {{ current_shift.start_miles }}
+                {{ shift.start_miles }}
             </div>
         </div>
         <div class="col">
             <h5>End Mileage</h5>
             <div class="blank-field">
-                {{ current_shift.end_miles }}
+                {{ shift.end_miles }}
             </div>
         </div>
     </div>
+    {% endfor %}
     <hr/>
     <div class="row mb-4">
         <div class="col">
@@ -289,9 +289,6 @@ nav {
             </div>
         </div>
     </div>
-    {% else %}
-    <p>Please select a shift from the dropdown above.</p>
-    {% endif %}
 {% else %}
 <p>There are no completed shifts for this day.</p>
 {% endif %}

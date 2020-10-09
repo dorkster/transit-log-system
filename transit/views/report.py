@@ -190,16 +190,16 @@ class Report():
                 return 'Unable to parse Trip data.'
 
             elif error_code == self.SHIFT_MILES_LESS:
-                return 'Shift end mileage ( ' + shift_end_miles + ' ) is less than Shift start mileage ( ' + shift_start_miles + ' ).'
+                return 'Shift start mileage ( ' + shift_start_miles + ' ) is greater than Shift end mileage ( ' + shift_end_miles + ' ).'
 
             elif error_code == self.SHIFT_TIME_LESS:
-                return 'Shift end time ( ' + shift_end_time + ' ) is earlier than Shift start time ( ' + shift_start_time + ' ).'
+                return 'Shift start time ( ' + shift_start_time + ' ) is later than Shift end time ( ' + shift_end_time + ' ).'
 
             elif error_code == self.TRIP_MILES_LESS:
-                return 'Trip end mileage ( ' + trip_end_miles + ' ) is less than Trip start mileage ( ' + trip_start_miles + ' ).'
+                return 'Trip start mileage ( ' + trip_start_miles + ' ) is greater than Trip end mileage ( ' + trip_end_miles + ' ).'
 
             elif error_code == self.TRIP_TIME_LESS:
-                return 'Trip end time ( ' + trip_end_time + ' ) is earlier than Trip start time ( ' + trip_start_time + ' ).'
+                return 'Trip start time ( ' + trip_start_time + ' ) is later than Trip end time ( ' + trip_end_time + ' ).'
 
             else:
                 return 'Unknown error'

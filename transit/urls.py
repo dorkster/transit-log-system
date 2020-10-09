@@ -122,6 +122,8 @@ urlpatterns = [
     path('report/last-month', views.reportLastMonth, name='report-last-month'),
     path('report/xlsx/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportXLSX, name='report-xlsx'),
     path('report/print/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportPrint, name='report-print'),
+    path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-trip/<uuid:id>', views.tripEditFromReport, name='report-trip-edit'),
+    path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-shift/<uuid:id>', views.shiftEditFromReport, name='report-shift-edit'),
 
     path('vehicle-status/', views.vehicleStatus, name='vehicle-status'),
     path('vehicle-status/issues/create', views.vehicleIssueCreate, name='vehicle-issue-create'),

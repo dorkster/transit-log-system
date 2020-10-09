@@ -26,14 +26,23 @@ def shiftEdit(request, mode, id):
     shift = get_object_or_404(Shift, id=id)
     return shiftCreateEditCommon(request, mode, shift, is_new=False)
 
+def shiftEditFromReport(request, start_year, start_month, start_day, end_year, end_month, end_day, id):
+    date_start = {'year':start_year, 'month':start_month, 'day':start_day}
+    date_end = {'year':end_year, 'month':end_month, 'day':end_day}
+    shift = get_object_or_404(Shift, id=id)
+    return shiftCreateEditCommon(request, 'edit', shift, is_new=False, report_start=date_start, report_end=date_end)
+
 @permission_required(['transit.change_shift'])
-def shiftCreateEditCommon(request, mode, shift, is_new):
+def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, report_end=None):
     if request.method == 'POST':
         form = EditShiftForm(request.POST)
 
         if 'cancel' in request.POST:
-            url_hash = '' if is_new else '#shift_' + str(shift.id)
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + url_hash)
+            if report_start and report_end:
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
+            else:
+                url_hash = '' if is_new else '#shift_' + str(shift.id)
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('shift-delete', kwargs={'mode':mode, 'id':shift.id}))
 
@@ -69,7 +78,10 @@ def shiftCreateEditCommon(request, mode, shift, is_new):
 
                 trip.save()
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + '#shift_' + str(shift.id))
+            if report_start and report_end:
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
+            else:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + '#shift_' + str(shift.id))
     else:
         initial = {
             'date': shift.date,

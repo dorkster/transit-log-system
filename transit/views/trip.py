@@ -31,6 +31,12 @@ def tripEdit(request, mode, id):
     trip = get_object_or_404(Trip, id=id)
     return tripCreateEditCommon(request, mode, trip, is_new=False)
 
+def tripEditFromReport(request, start_year, start_month, start_day, end_year, end_month, end_day, id):
+    date_start = {'year':start_year, 'month':start_month, 'day':start_day}
+    date_end = {'year':end_year, 'month':end_month, 'day':end_day}
+    trip = get_object_or_404(Trip, id=id)
+    return tripCreateEditCommon(request, 'edit', trip, is_new=False, report_start=date_start, report_end=date_end)
+
 def tripCreateReturn(request, mode, id):
     origin_trip = get_object_or_404(Trip, id=id)
     trip = Trip()
@@ -79,7 +85,7 @@ def tripCreateFromClient(request, mode, id):
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
 @permission_required(['transit.change_trip'])
-def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
+def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, report_start=None, report_end=None):
     if is_new == True:
         query = Trip.objects.filter(date=trip.date).order_by('-sort_index')
         if len(query) > 0:
@@ -89,8 +95,11 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
             trip.sort_index = 0
 
     if 'cancel' in request.POST:
-        url_hash = '' if is_new else '#trip_' + str(trip.id)
-        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + url_hash)
+        if report_start and report_end:
+            return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
+        else:
+            url_hash = '' if is_new else '#trip_' + str(trip.id)
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + url_hash)
     elif 'delete' in request.POST:
         return HttpResponseRedirect(reverse('trip-delete', kwargs={'mode':mode, 'id':trip.id}))
 
@@ -170,7 +179,10 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False):
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('trip-create-return', kwargs={'mode':mode, 'id':trip.id}))
 
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
+            if report_start and report_end:
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
+            else:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         if trip.is_activity:
             initial = {

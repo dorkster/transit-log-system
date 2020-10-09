@@ -74,6 +74,7 @@ nav {
 <div class="container ml-0">
 {% if shifts %}
     {% for shift in shifts %}
+    {% if current_shift == None or current_shift == shift %}
     <div class="row">
         <div class="col">
             <h5>Driver</h5>
@@ -100,6 +101,7 @@ nav {
             </div>
         </div>
     </div>
+    {% endif %}
     {% endfor %}
     <hr/>
     <div class="row mb-4">

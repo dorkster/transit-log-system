@@ -6,7 +6,7 @@ from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment
+from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment, Tag
 from transit.forms import DatePickerForm, DateRangePickerForm
 
 from django.contrib.auth.decorators import permission_required
@@ -53,6 +53,7 @@ class Report():
             self.end_miles = { T_STR:None, T_FLOAT: None }
             self.end_time = None
             self.trip_type = None
+            self.tags = []
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
             self.other_employment = False
@@ -88,6 +89,7 @@ class Report():
 
     class ReportSummary():
         query_triptypes = TripType.objects.all()
+        query_tags = Tag.objects.all()
 
         def __init__(self):
             self.service_miles = 0
@@ -99,12 +101,16 @@ class Report():
             self.pmt = 0
             self.fuel = 0
             self.trip_types = {}
+            self.tags = {}
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
             self.other_employment = 0
 
             for i in self.query_triptypes:
                 self.trip_types[i] = 0
+
+            for i in self.query_tags:
+                self.tags[i.name] = 0
 
         def __add__(self, other):
             r = self
@@ -118,6 +124,11 @@ class Report():
             r.fuel += other.fuel
             for i in self.query_triptypes:
                 r.trip_types[i] += other.trip_types[i]
+            for i in other.tags:
+                if i in r.tags:
+                    r.tags[i] += other.tags[i]
+                else:
+                    r.tags[i] = other.tags[i]
             r.collected_cash += other.collected_cash
             r.collected_check += other.collected_check
             r.other_employment += other.other_employment
@@ -488,6 +499,9 @@ class Report():
                         self.unique_riders.names.append(rider)
                         self.unique_riders.names = sorted(self.unique_riders.names)
 
+                if i.tags != "":
+                    report_trip.tags = i.get_tag_list()
+
             # handle payments from Clients that didn't ride (so far)
             for i in ClientPayment.objects.filter(date_paid=day_date):
                 found_unique_rider = False
@@ -568,6 +582,12 @@ class Report():
                     report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
                     if trip.other_employment:
                         report_day.by_vehicle[shift.shift.vehicle].other_employment += 1
+                    for tag in trip.tags:
+                        if tag in report_day.by_vehicle[shift.shift.vehicle].tags:
+                            report_day.by_vehicle[shift.shift.vehicle].tags[tag] += 1
+                        else:
+                            print(tag)
+                            report_day.by_vehicle[shift.shift.vehicle].tags[tag] = 1
                 report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
 
                 # per-driver log
@@ -587,6 +607,11 @@ class Report():
                     report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
                     if trip.other_employment:
                         report_day.by_driver[shift.shift.driver].other_employment += 1
+                    for tag in trip.tags:
+                        if tag in report_day.by_driver[shift.shift.driver].tags:
+                            report_day.by_driver[shift.shift.driver].tags[tag] += 1
+                        else:
+                            report_day.by_driver[shift.shift.driver].tags[tag] = 1
                 report_day.by_driver[shift.shift.driver].fuel += shift.fuel
 
             self.report_all.append(report_day)

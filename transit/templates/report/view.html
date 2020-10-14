@@ -97,6 +97,10 @@
                         Elderly/Ambulatory Riders
                     </a>
                     {% endif %}
+                    <a href="#report_tags" class="dropdown-item">
+                        <input id="vis_tags" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        Trip Types and Tags
+                    </a>
                     {% if unique_riders.names or money_payments %}
                     <div class="dropdown-divider"></div>
                     <a href="#report_fares" class="dropdown-item">
@@ -366,6 +370,47 @@
 </div>
 {% endif%}
 
+<div id="report_tags">
+    <div class="row">
+        <div class="col">
+            <h3>Trip Types and Tags</h3>
+        </div>
+        <div class="col-auto">
+            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+        </div>
+    </div>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-lg">Trip Type</td>
+            <td class="mytable-col-sm">Total Trips</td>
+        </thead>
+        <tbody class="mytable-hoverhi">
+            {% for key, value in all_vehicles.trip_types.items %}
+            <tr>
+                <td class="mytable-col-lg">{{key}}</td>
+                <td class="mytable-col-sm {% if value == 0 %}mytable-zero{%endif%}">{{value}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-lg">Tag</td>
+            <td class="mytable-col-sm">Total Trips</td>
+        </thead>
+        <tbody class="mytable-hoverhi">
+            {% for key, value in all_vehicles.tags.items %}
+            <tr>
+                <td class="mytable-col-lg">{{key}}</td>
+                <td class="mytable-col-sm {% if value == 0 %}mytable-zero{%endif%}">{{value}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr/>
+</div>
+
 {% if unique_riders.names or money_payments %}
 <div id="report_fares">
     <div class="row">
@@ -548,12 +593,13 @@
     <hr/>
 </div>
 {% endif %}
+
 </div>
 {% block javascript %}
 <script type="text/javascript">
     // set up the visibility array
     var visible = [];
-    var visible_count = 7 + {{vehicles.count}};
+    var visible_count = 8 + {{vehicles.count}};
     // value (1 = visible), div id, checkbox id
     visible.push([1, "#report_errors", "#vis_errors"]);
     visible.push([1, "#report_vehicle_totals", "#vis_vehicle_totals"]);
@@ -561,6 +607,7 @@
     visible.push([1, "#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}"]);
     {% endfor %}
     visible.push([1, "#report_riders", "#vis_riders"]);
+    visible.push([1, "#report_tags", "#vis_tags"]);
     visible.push([1, "#report_fares", "#vis_fares"]);
     visible.push([1, "#report_collected_money", "#vis_collected_money"]);
     visible.push([1, "#report_payments", "#vis_payments"]);

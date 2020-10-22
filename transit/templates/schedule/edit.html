@@ -7,8 +7,13 @@
             <h3 class="alert alert-info text-dark p-1">{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h3>
         </div>
         <div class="col-auto p-1">
+            <a href="{% url 'report' date.year date.month date.day date.year date.month date.day %}" class="btn btn-info" title="View the report for this particular day">
+                    <span class="oi oi-graph mr-2"></span>Report
+            </a>
+        </div>
+        <div class="col-auto p-1">
             <span class="dropdown">
-                <a href="#_" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a href="#_" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Print the schedule or daily log">
                     <span class="oi oi-print mr-2"></span>Print
                 </a>
                 <div class="dropdown-menu shadow dropdown-menu-right">
@@ -61,7 +66,7 @@
         </div>
         {% if perms.transit.change_vehicle %}
         <div class="col-auto p-1">
-            <a href="{% url 'schedule' 'view' date.year date.month date.day %}" class="btn btn-info"><span class="oi oi-task mr-2"></span>View</a>
+            <a href="{% url 'schedule' 'view' date.year date.month date.day %}" class="btn btn-info" title="Switch to the drivers' view"><span class="oi oi-task mr-2"></span>View</a>
         </div>
         {% endif %}
     </div>

@@ -314,6 +314,12 @@
                     {% if not trip.is_activity %}
                     <div class="text-right p-1 card-footer w-100">
                         {% if trip.status == 0 %}
+                            {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
+                            <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
+                                Cash: ${{ trip.get_collected_cash_str }}<br/>
+                                Check: ${{ trip.get_collected_check_str }}
+                            </span>
+                            {% endif %}
                             {% if trip.start_miles %}
                             <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
                                 {{ trip.start_miles }}<br/>

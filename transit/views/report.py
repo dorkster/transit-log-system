@@ -1033,6 +1033,47 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_riders.cell(j, i).font = style_font_normal
 
     #####
+    #### Trip Types and Tags
+    #####
+    ws_tags = wb.create_sheet('Trip Types and Tags')
+    row_header = 1
+    ws_tags.cell(row_header, 1, 'Trip Type')
+    ws_tags.cell(row_header, 2, 'Total Trips')
+
+    row_trip_type = 1
+    for trip_type in TripType.objects.all():
+        ws_tags.cell(row_header + row_trip_type, 1, str(trip_type))
+        ws_tags.cell(row_header + row_trip_type, 2, report.all_vehicles.trip_types[trip_type])
+        row_trip_type += 1
+
+    row_header_tags = row_trip_type + 2
+    ws_tags.cell(row_header_tags, 1, 'Tag')
+    ws_tags.cell(row_header_tags, 2, 'Total Trips')
+
+    row_tag = 1
+    for tag in Tag.objects.all():
+        ws_tags.cell(row_header_tags + row_tag, 1, str(tag))
+        ws_tags.cell(row_header_tags + row_tag, 2, report.all_vehicles.tags[str(tag)])
+        row_tag += 1
+
+    # apply styles
+    ws_tags.row_dimensions[row_header].height = style_rowheight_header
+    ws_tags.row_dimensions[row_header_tags].height = style_rowheight_header
+    ws_tags.column_dimensions[get_column_letter(1)].width = style_colwidth_normal * 2
+    ws_tags.column_dimensions[get_column_letter(2)].width = style_colwidth_normal
+    for i in range(1, 3):
+        for j in range(row_header, row_header_tags + row_tag):
+            if j == row_header + row_trip_type:
+                continue
+            ws_tags.cell(j, i).border = style_border_normal
+            if j == row_header or j == row_header_tags:
+                ws_tags.cell(j, i).font = style_font_header
+                ws_tags.cell(j, i).alignment = style_alignment_header
+                ws_tags.cell(j, i).fill = style_fill_header
+            else:
+                ws_tags.cell(j, i).font = style_font_normal
+
+    #####
     #### Fares & Payments
     #####
     ws_fares = wb.create_sheet('Fares & Payments')

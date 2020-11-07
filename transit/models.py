@@ -76,6 +76,7 @@ class Trip(models.Model):
     collected_cash = models.IntegerField(default=0)
     collected_check = models.IntegerField(default=0)
     fare = models.IntegerField(default=0)
+    passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
 
     class Meta:
         ordering = ['-date', 'sort_index']

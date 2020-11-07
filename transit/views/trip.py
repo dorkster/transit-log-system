@@ -54,6 +54,7 @@ def tripCreateReturn(request, mode, id):
     trip.ambulatory = origin_trip.ambulatory
     trip.driver = origin_trip.driver
     trip.vehicle = origin_trip.vehicle
+    trip.passenger = origin_trip.passenger
 
     return tripCreateEditCommon(request, mode, trip, is_new=True, is_return_trip=True)
 
@@ -147,6 +148,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
                 trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
                 trip.fare = money_string_to_int(form.cleaned_data['fare'])
+                trip.passenger = form.cleaned_data['passenger']
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -220,6 +222,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
                 'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
                 'fare': int_to_money_string(trip.fare, blank_zero=True),
+                'passenger': trip.passenger,
             }
             form = EditTripForm(initial=initial)
 

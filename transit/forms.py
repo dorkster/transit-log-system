@@ -119,6 +119,7 @@ class EditTripForm(forms.Form):
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 

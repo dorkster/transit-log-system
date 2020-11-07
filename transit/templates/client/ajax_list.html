@@ -173,16 +173,16 @@ Show extra columns
         {% if show_extra_columns %}
         <td class="mytable-col-xs">
             {% if client.elderly %}
-            <span class="oi oi-check"></span>
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
             {% elif client.elderly is False %}
-            <span class="oi oi-x"></span>
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
             {% endif %}
         </td>
         <td class="mytable-col-xs">
             {% if client.ambulatory %}
-            <span class="oi oi-check"></span>
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
             {% elif client.ambulatory is False %}
-            <span class="oi oi-x"></span>
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
             {% endif %}
         </td>
         <td class="mytable-col-md">
@@ -209,9 +209,9 @@ Show extra columns
                                 <div class="col text-muted">Elderly?</div>
                                 <div class="col-auto">
                                     {% if client.elderly %}
-                                    <span class="oi oi-check"></span>
+                                    <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
                                     {% elif client.elderly is False %}
-                                    <span class="oi oi-x"></span>
+                                    <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -221,9 +221,9 @@ Show extra columns
                                 <div class="col text-muted">Ambulatory?</div>
                                 <div class="col-auto">
                                     {% if client.ambulatory %}
-                                    <span class="oi oi-check"></span>
+                                    <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
                                     {% elif client.ambulatory is False %}
-                                    <span class="oi oi-x"></span>
+                                    <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
                                     {% endif %}
                                 </div>
                             </div>

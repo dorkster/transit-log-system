@@ -50,6 +50,7 @@ def templateTripCreateReturn(request, parent, id):
     trip.tags = origin_trip.tags
     trip.elderly = origin_trip.elderly
     trip.ambulatory = origin_trip.ambulatory
+    trip.passenger = origin_trip.passenger
 
     return templateTripCreateEditCommon(request, trip, is_new=True, is_return_trip=True)
 
@@ -117,6 +118,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 trip.ambulatory = form.cleaned_data['ambulatory']
                 trip.note = form.cleaned_data['notes']
                 trip.fare = money_string_to_int(form.cleaned_data['fare'])
+                trip.passenger = form.cleaned_data['passenger']
 
             # trip date changed, which means sort indexes need to be updated
             if old_parent != trip.parent:
@@ -181,6 +183,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 'notes': trip.note,
                 'status': trip.status,
                 'fare': int_to_money_string(trip.fare, blank_zero=True),
+                'passenger': trip.passenger,
             }
             form = EditTemplateTripForm(initial=initial)
 

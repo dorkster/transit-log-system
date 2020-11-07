@@ -222,6 +222,7 @@ class EditTemplateTripForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 

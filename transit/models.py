@@ -561,6 +561,7 @@ class TemplateTrip(models.Model):
     is_activity = models.BooleanField(default=False, editable=False)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
     fare = models.IntegerField(default=0)
+    passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
 
     class Meta:
         ordering = ['parent', 'sort_index']

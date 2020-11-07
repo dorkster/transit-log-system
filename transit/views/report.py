@@ -1144,7 +1144,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     #####
     #### Money Collected by the Drivers
     #####
-    ws_money = wb.create_sheet('Money Collected by the Drivers')
+    ws_money = wb.create_sheet('Driver-collected Money')
     row_header = 1
     row_total = len(report.money_trips) + 2
 
@@ -1192,7 +1192,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     #####
     #### Money Not Collected by the Drivers
     #####
-    ws_payments = wb.create_sheet('Money Not Collected by the Drivers')
+    ws_payments = wb.create_sheet('Non-Driver-collected Money')
     row_header = 1
     row_total = len(report.money_payments) + 2
 

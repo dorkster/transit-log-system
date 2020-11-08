@@ -175,15 +175,26 @@ nav {
     <div class="row mb-4">
         <div class="col">
             <h4 class="text-center">Types of Passenger Trips</h4>
+            <p class="text-center text-muted small">Note: Trip counts are divided into three values: trips with passengers, trips without passengers, and a grand total.</p>
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md">
             Medical (Dr. appts., blood pressure clinic, podiatry, etc.)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ trips_medical }}
+                <span class="text-muted small">{{ trips_medical.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_medical.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_medical.total }}
             </div>
         </div>
     </div>
@@ -191,9 +202,19 @@ nav {
         <div class="col-md">
             Nutrition (meal site, food pantry)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ trips_nutrition }}
+                <span class="text-muted small">{{ trips_nutrition.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_nutrition.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_nutrition.total }}
             </div>
         </div>
     </div>
@@ -201,9 +222,19 @@ nav {
         <div class="col-md">
             Social/Recreation (adult day health, movie, lunch bunch)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ trips_social }}
+                <span class="text-muted small">{{ trips_social.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_social.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_social.total }}
             </div>
         </div>
     </div>
@@ -211,9 +242,19 @@ nav {
         <div class="col-md">
             Shopping (groceries, etc.)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ trips_shopping }}
+                <span class="text-muted small">{{ trips_shopping.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_shopping.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_shopping.total }}
             </div>
         </div>
     </div>
@@ -221,9 +262,19 @@ nav {
         <div class="col-md">
             Other (errands, barber/hairdresser, bank, etc.)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ trips_other }}
+                <span class="text-muted small">{{ trips_other.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_other.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_other.total }}
             </div>
         </div>
     </div>
@@ -232,9 +283,19 @@ nav {
             <div class="col-md">
                 Employment
             </div>
-            <div class="col-2">
+            <div class="col-1 pl-5 pr-1">
                 <div class="blank-field">
-                    {{ trips_employment }}
+                    <span class="text-muted small">{{ trips_employment.passenger }}</span>
+                </div>
+            </div>
+            <div class="col-1 pl-5 pr-1">
+                <div class="blank-field">
+                    <span class="text-muted small">{{ trips_employment.no_passenger }}</span>
+                </div>
+            </div>
+            <div class="col-1 pl-5 pr-1">
+                <div class="blank-field">
+                    {{ trips_employment.total }}
                 </div>
             </div>
         </div>
@@ -242,7 +303,15 @@ nav {
             <div class="col-md">
                 Education (talks, SHINE, lawyer, tax, classes)
             </div>
-            <div class="col-2">
+            <div class="col-1 pl-5 pr-1">
+                <div class="blank-field">
+                </div>
+            </div>
+            <div class="col-1 pl-5 pr-1">
+                <div class="blank-field">
+                </div>
+            </div>
+            <div class="col-1 pl-5 pr-1">
                 <div class="blank-field">
                 </div>
             </div>
@@ -252,9 +321,19 @@ nav {
         <div class="col-md">
             <strong>Total Trips</strong>
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                <strong>{{ trips_total }}</strong>
+                <span class="text-muted small">{{ trips_total.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ trips_total.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ trips_total.total }}
             </div>
         </div>
     </div>

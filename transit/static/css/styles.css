@@ -16,6 +16,11 @@
     cursor: pointer;
 }
 
+.mytable-col-xxs {
+    text-align: center !important;
+    width: 2em;
+}
+
 .mytable-col-xs {
     text-align: center !important;
     width: 4em;

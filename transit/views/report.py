@@ -33,6 +33,30 @@ class Report():
         def to_float(self):
             return float(self.value) / 100
 
+    class TripCount():
+        def __init__(self):
+            self.passenger = 0
+            self.no_passenger = 0
+            self.total = 0
+        def __add__(self, other):
+            r = Report.TripCount()
+            r.passenger = self.passenger + other.passenger
+            r.no_passenger = self.no_passenger + other.no_passenger
+            r.total = self.total + other.total
+            return r
+        def addTrips(self, value, is_passenger):
+            if is_passenger is False:
+                self.no_passenger += value
+            else:
+                self.passenger += value
+            self.total = self.passenger + self.no_passenger
+        def setTrips(self, value, is_passenger):
+            if is_passenger is False:
+                self.no_passenger = value
+            else:
+                self.passenger = value
+            self.total = self.passenger + self.no_passenger
+
     class ReportShift():
         def __init__(self):
             self.shift = None
@@ -104,13 +128,13 @@ class Report():
             self.tags = {}
             self.collected_cash = Report.Money(0)
             self.collected_check = Report.Money(0)
-            self.other_employment = 0
+            self.other_employment = Report.TripCount()
 
             for i in self.query_triptypes:
-                self.trip_types[i] = 0
+                self.trip_types[i] = Report.TripCount()
 
             for i in self.query_tags:
-                self.tags[i.name] = 0
+                self.tags[i.name] = Report.TripCount()
 
         def __add__(self, other):
             r = self
@@ -223,7 +247,8 @@ class Report():
             def __init__(self, name):
                 self.name = name
                 self.client_id = None
-                self.trips = 1
+                self.trips = Report.TripCount()
+                self.trips.total = 1
                 self.elderly = None
                 self.ambulatory = None
                 self.collected_cash = Report.Money(0)
@@ -467,7 +492,7 @@ class Report():
                                 j.ambulatory = i.ambulatory
 
                             found_unique_rider = True
-                            j.trips += 1
+                            j.trips.addTrips(1, i.passenger)
 
                             j.total_fares += Report.Money(i.fare)
                             j.collected_cash += Report.Money(i.collected_cash)
@@ -492,6 +517,7 @@ class Report():
                                 if rider.ambulatory == None:
                                     rider.ambulatory = clients[0].ambulatory
 
+                        rider.trips.setTrips(1, i.passenger)
                         rider.total_fares += Report.Money(i.fare)
                         rider.collected_cash += Report.Money(i.collected_cash)
                         rider.collected_check += Report.Money(i.collected_check)
@@ -577,17 +603,18 @@ class Report():
                         continue
                     report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
                     if trip.trip_type != None:
-                        report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type] += 1
+                        report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
                     report_day.by_vehicle[shift.shift.vehicle].collected_cash += trip.collected_cash
                     report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
                     if trip.other_employment:
-                        report_day.by_vehicle[shift.shift.vehicle].other_employment += 1
+                        report_day.by_vehicle[shift.shift.vehicle].other_employment.addTrips(1, trip.trip.passenger)
                     for tag in trip.tags:
                         if tag in report_day.by_vehicle[shift.shift.vehicle].tags:
-                            report_day.by_vehicle[shift.shift.vehicle].tags[tag] += 1
+                            report_day.by_vehicle[shift.shift.vehicle].tags[tag].addTrips(1, trip.trip.passenger)
                         else:
                             print(tag)
-                            report_day.by_vehicle[shift.shift.vehicle].tags[tag] = 1
+                            report_day.by_vehicle[shift.shift.vehicle].tags[tag] = Report.TripCount()
+                            report_day.by_vehicle[shift.shift.vehicle].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
 
                 # per-driver log
@@ -602,16 +629,17 @@ class Report():
                         continue
                     report_day.by_driver[shift.shift.driver].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
                     if trip.trip_type != None:
-                        report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type] += 1
+                        report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
                     report_day.by_driver[shift.shift.driver].collected_cash += trip.collected_cash
                     report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
                     if trip.other_employment:
-                        report_day.by_driver[shift.shift.driver].other_employment += 1
+                        report_day.by_driver[shift.shift.driver].other_employment.addTrips(1, trip.trip.passenger)
                     for tag in trip.tags:
                         if tag in report_day.by_driver[shift.shift.driver].tags:
-                            report_day.by_driver[shift.shift.driver].tags[tag] += 1
+                            report_day.by_driver[shift.shift.driver].tags[tag].addTrips(1, trip.trip.passenger)
                         else:
-                            report_day.by_driver[shift.shift.driver].tags[tag] = 1
+                            report_day.by_driver[shift.shift.driver].tags[tag] = Report.TripCount()
+                            report_day.by_driver[shift.shift.driver].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_driver[shift.shift.driver].fuel += shift.fuel
 
             self.report_all.append(report_day)
@@ -646,7 +674,7 @@ class Report():
 
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
-            if rider.trips > 0:
+            if rider.trips.total > 0:
                 if rider.staff:
                     self.unique_riders.staff += 1
                 else:
@@ -805,6 +833,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     style_border_normal_side = Side(border_style='thin', color='FF000000')
     style_border_normal = Border(left=style_border_normal_side, right=style_border_normal_side, top=style_border_normal_side, bottom=style_border_normal_side)
     style_colwidth_normal = 13
+    style_colwidth_small = style_colwidth_normal / 3
 
     style_font_header = Font(name='Arial', size=10, bold=True)
     style_alignment_header = Alignment(horizontal='center', vertical='center', wrap_text=True)
@@ -841,8 +870,11 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     triptype_col=8
     for i in TripType.objects.all():
         ws_vehicle_total.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
-        ws_vehicle_total.cell(row_total, triptype_col, report.all_vehicles.trip_types[i])
-        triptype_col += 1
+        ws_vehicle_total.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
+        ws_vehicle_total.cell(row_total, triptype_col, report.all_vehicles.trip_types[i].passenger)
+        ws_vehicle_total.cell(row_total, triptype_col+1, report.all_vehicles.trip_types[i].no_passenger)
+        ws_vehicle_total.cell(row_total, triptype_col+2, report.all_vehicles.trip_types[i].total)
+        triptype_col += 3
 
     ws_vehicle_total.cell(row_header, triptype_col, 'Cash Collected')
     ws_vehicle_total.cell(row_header, triptype_col+1, 'Check Collected')
@@ -862,7 +894,10 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     # apply styles
     ws_vehicle_total.row_dimensions[row_header].height = style_rowheight_header
     for i in range(1, triptype_col+2):
-        ws_vehicle_total.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        if i >= 8 and i < triptype_col:
+            ws_vehicle_total.column_dimensions[get_column_letter(i)].width = style_colwidth_small
+        else:
+            ws_vehicle_total.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
         for j in range(row_header, row_total+1):
             ws_vehicle_total.cell(j, i).border = style_border_normal
             if j == row_header:
@@ -902,8 +937,11 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
             triptype_col=8
             for i in TripType.objects.all():
                 ws_vehicle.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
-                ws_vehicle.cell(day_row, triptype_col, vr.days[day]['data'].trip_types[i])
-                triptype_col += 1
+                ws_vehicle.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
+                ws_vehicle.cell(day_row, triptype_col, vr.days[day]['data'].trip_types[i].passenger)
+                ws_vehicle.cell(day_row, triptype_col+1, vr.days[day]['data'].trip_types[i].no_passenger)
+                ws_vehicle.cell(day_row, triptype_col+2, vr.days[day]['data'].trip_types[i].total)
+                triptype_col += 3
 
             ws_vehicle.cell(row_header, triptype_col, 'Cash Collected')
             ws_vehicle.cell(row_header, triptype_col+1, 'Check Collected')
@@ -920,9 +958,10 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
 
         triptype_col=8
         for i in TripType.objects.all():
-            ws_vehicle.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
-            ws_vehicle.cell(row_total, triptype_col, vr.totals.trip_types[i])
-            triptype_col += 1
+            ws_vehicle.cell(row_total, triptype_col, vr.totals.trip_types[i].passenger)
+            ws_vehicle.cell(row_total, triptype_col+1, vr.totals.trip_types[i].no_passenger)
+            ws_vehicle.cell(row_total, triptype_col+2, vr.totals.trip_types[i].total)
+            triptype_col += 3
 
         ws_vehicle.cell(row_header, triptype_col, 'Cash Collected')
         ws_vehicle.cell(row_header, triptype_col+1, 'Check Collected')
@@ -945,7 +984,10 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
         # apply styles
         ws_vehicle.row_dimensions[row_header].height = style_rowheight_header
         for i in range(1, triptype_col+2):
-            ws_vehicle.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+            if i >= 8 and i < triptype_col:
+                ws_vehicle.column_dimensions[get_column_letter(i)].width = style_colwidth_small
+            else:
+                ws_vehicle.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
             for j in range(row_header, row_total+1):
                 ws_vehicle.cell(j, i).border = style_border_normal
                 if j == row_header:
@@ -981,7 +1023,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
 
     row_total_riders = 0
     for i in report.unique_riders.names:
-        if i.trips > 0:
+        if i.trips.total > 0:
             row_total_riders += 1
     row_total_riders += 1
 
@@ -995,15 +1037,19 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_header_riders, 1, 'Name')
     ws_riders.cell(row_header_riders, 3, 'Elderly')
     ws_riders.cell(row_header_riders, 4, 'Ambulatory')
-    ws_riders.cell(row_header_riders, 5, 'Total Trips')
+    ws_riders.cell(row_header_riders, 5, 'Trips on vehicle')
+    ws_riders.cell(row_header_riders, 6, 'Trips not on vehicle')
+    ws_riders.cell(row_header_riders, 7, 'Total Trips')
 
     row = 0
     for i in report.unique_riders.names:
-        if i.trips > 0:
+        if i.trips.total > 0:
             ws_riders.cell(row_header_riders + row + 1, 1, i.name)
             ws_riders.cell(row_header_riders + row + 1, 3, i.elderly)
             ws_riders.cell(row_header_riders + row + 1, 4, i.ambulatory)
-            ws_riders.cell(row_header_riders + row + 1, 5, i.trips)
+            ws_riders.cell(row_header_riders + row + 1, 5, i.trips.passenger)
+            ws_riders.cell(row_header_riders + row + 1, 6, i.trips.no_passenger)
+            ws_riders.cell(row_header_riders + row + 1, 7, i.trips.total)
             row += 1
 
     # apply styles
@@ -1022,7 +1068,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_riders.cell(j, i).fill = style_fill_total
             else:
                 ws_riders.cell(j, i).font = style_font_normal
-    for i in range(1, 6):
+    for i in range(1, 8):
         for j in range(row_header_riders, row_header_riders + row_total_riders):
             ws_riders.cell(j, i).border = style_border_normal
             if j == row_header_riders:
@@ -1038,30 +1084,39 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_tags = wb.create_sheet('Trip Types and Tags')
     row_header = 1
     ws_tags.cell(row_header, 1, 'Trip Type')
-    ws_tags.cell(row_header, 2, 'Total Trips')
+    ws_tags.cell(row_header, 2, 'Trips on vehicle')
+    ws_tags.cell(row_header, 3, 'Trips not on vehicle')
+    ws_tags.cell(row_header, 4, 'Total Trips')
 
     row_trip_type = 1
     for trip_type in TripType.objects.all():
         ws_tags.cell(row_header + row_trip_type, 1, str(trip_type))
-        ws_tags.cell(row_header + row_trip_type, 2, report.all_vehicles.trip_types[trip_type])
+        ws_tags.cell(row_header + row_trip_type, 2, report.all_vehicles.trip_types[trip_type].passenger)
+        ws_tags.cell(row_header + row_trip_type, 3, report.all_vehicles.trip_types[trip_type].no_passenger)
+        ws_tags.cell(row_header + row_trip_type, 4, report.all_vehicles.trip_types[trip_type].total)
         row_trip_type += 1
 
     row_header_tags = row_trip_type + 2
     ws_tags.cell(row_header_tags, 1, 'Tag')
-    ws_tags.cell(row_header_tags, 2, 'Total Trips')
+    ws_tags.cell(row_header_tags, 2, 'Trips on vehicle')
+    ws_tags.cell(row_header_tags, 3, 'Trips not on vehicle')
+    ws_tags.cell(row_header_tags, 4, 'Total Trips')
 
     row_tag = 1
     for tag in Tag.objects.all():
         ws_tags.cell(row_header_tags + row_tag, 1, str(tag))
-        ws_tags.cell(row_header_tags + row_tag, 2, report.all_vehicles.tags[str(tag)])
+        ws_tags.cell(row_header_tags + row_tag, 2, report.all_vehicles.tags[str(tag)].passenger)
+        ws_tags.cell(row_header_tags + row_tag, 3, report.all_vehicles.tags[str(tag)].no_passenger)
+        ws_tags.cell(row_header_tags + row_tag, 4, report.all_vehicles.tags[str(tag)].total)
         row_tag += 1
 
     # apply styles
     ws_tags.row_dimensions[row_header].height = style_rowheight_header
     ws_tags.row_dimensions[row_header_tags].height = style_rowheight_header
     ws_tags.column_dimensions[get_column_letter(1)].width = style_colwidth_normal * 2
-    ws_tags.column_dimensions[get_column_letter(2)].width = style_colwidth_normal
-    for i in range(1, 3):
+    for i in range(1, 5):
+        if i > 1:
+            ws_tags.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
         for j in range(row_header, row_header_tags + row_tag):
             if j == row_header + row_trip_type:
                 continue

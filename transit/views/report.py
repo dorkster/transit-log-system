@@ -6,7 +6,7 @@ from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment, Tag
+from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment, Tag, Destination
 from transit.forms import DatePickerForm, DateRangePickerForm
 
 from django.contrib.auth.decorators import permission_required
@@ -242,6 +242,19 @@ class Report():
             else:
                 return 'Unknown error'
 
+    class FrequentDestination():
+        def __init__(self):
+            self.address = None
+            self.trips = Report.TripCount()
+            self.avg_mileage = 0
+        def __lt__(self, other):
+            return self.trips.total < other.trips.total
+        def averageMiles(self, miles):
+            if self.avg_mileage == 0:
+                self.avg_mileage = miles
+            else:
+                self.avg_mileage = (self.avg_mileage + miles) / 2
+
     class UniqueRiderSummary():
         class Rider():
             def __init__(self, name):
@@ -303,6 +316,7 @@ class Report():
         self.money_trips_summary = Report.ReportSummary()
         self.money_payments = []
         self.money_payments_summary = Report.ReportPayment()
+        self.frequent_destinations = []
         self.report_errors = Report.ReportErrors()
 
     def load(self, date_start, date_end, daily_log_shift=None):
@@ -311,6 +325,9 @@ class Report():
         all_drivers = Driver.objects.all()
         all_vehicles = Vehicle.objects.all()
         all_triptypes = TripType.objects.all()
+
+        # also cache destinations
+        all_destinations = Destination.objects.all()
 
         if date_start != date_end:
             daily_log_shift = None
@@ -528,6 +545,21 @@ class Report():
                 if i.tags != "":
                     report_trip.tags = i.get_tag_list()
 
+                frequent_destination = all_destinations.filter(address=i.destination)
+                if len(frequent_destination) > 0:
+                    found_frequent_destination = False
+                    for j in self.frequent_destinations:
+                        if j.address == i.destination:
+                            found_frequent_destination = True
+                            j.trips.addTrips(1, i.passenger)
+                            j.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                    if not found_frequent_destination:
+                        temp_fd = Report.FrequentDestination()
+                        temp_fd.address = i.destination
+                        temp_fd.trips.addTrips(1, i.passenger)
+                        temp_fd.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                        self.frequent_destinations.append(temp_fd)
+
             # handle payments from Clients that didn't ride (so far)
             for i in ClientPayment.objects.filter(date_paid=day_date):
                 found_unique_rider = False
@@ -612,7 +644,6 @@ class Report():
                         if tag in report_day.by_vehicle[shift.shift.vehicle].tags:
                             report_day.by_vehicle[shift.shift.vehicle].tags[tag].addTrips(1, trip.trip.passenger)
                         else:
-                            print(tag)
                             report_day.by_vehicle[shift.shift.vehicle].tags[tag] = Report.TripCount()
                             report_day.by_vehicle[shift.shift.vehicle].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
@@ -705,6 +736,9 @@ class Report():
             self.unique_riders.total_total_fares += rider.total_fares
             self.unique_riders.total_total_owed += rider.total_owed
 
+        # sort frequent destinations by total trips
+        self.frequent_destinations.sort(reverse=True)
+
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportMonth(request, year, month):
     date_start = datetime.date(year, month, 1)
@@ -767,6 +801,7 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
         'money_trips_summary': report.money_trips_summary,
         'money_payments': report.money_payments,
         'money_payments_summary': report.money_payments_summary,
+        'frequent_destinations': report.frequent_destinations,
         'report_errors': report.report_errors,
     }
     return render(request, 'report/view.html', context)
@@ -797,6 +832,7 @@ def reportPrint(request, start_year, start_month, start_day, end_year, end_month
         'money_trips_summary': report.money_trips_summary,
         'money_payments': report.money_payments,
         'money_payments_summary': report.money_payments_summary,
+        'frequent_destinations': report.frequent_destinations,
         'report_errors': report.report_errors,
     }
     return render(request, 'report/print.html', context)

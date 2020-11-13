@@ -101,6 +101,12 @@
                         <input id="vis_tags" type="checkbox" class="mr-2" onclick="visibleSave(true)">
                         Trip Types and Tags
                     </a>
+                    {% if frequent_destinations %}
+                    <a href="#report_destinations" class="dropdown-item">
+                        <input id="vis_destinations" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        Frequent Destinations
+                    </a>
+                    {% endif %}
                     {% if unique_riders.names or money_payments %}
                     <div class="dropdown-divider"></div>
                     <a href="#report_fares" class="dropdown-item">
@@ -430,6 +436,40 @@
     <hr/>
 </div>
 
+{% if frequent_destinations %}
+<div id="report_destinations">
+    <div class="row">
+        <div class="col">
+            <h3>Frequent Destinations</h3>
+        </div>
+        <div class="col-auto">
+            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+        </div>
+    </div>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-lg">Address</td>
+            <td class="mytable-col-sm">Trips on vehicle</td>
+            <td class="mytable-col-sm">Trips not on vehicle</td>
+            <td class="mytable-col-sm">Total Trips</td>
+            <td class="mytable-col-sm">Average Mileage</td>
+        </thead>
+        <tbody class="mytable-hoverhi">
+            {% for destination in frequent_destinations %}
+            <tr>
+                <td class="mytable-col-lg">{{ destination.address }}</td>
+                <td class="mytable-col-sm {% if destination.trips.passenger == 0 %}mytable-zero{%endif%}">{{destination.trips.passenger}}</td>
+                <td class="mytable-col-sm {% if destination.trips.no_passenger == 0 %}mytable-zero{%endif%}">{{destination.trips.no_passenger}}</td>
+                <td class="mytable-col-sm {% if destination.trips.total == 0 %}mytable-zero{%endif%}">{{destination.trips.total}}</td>
+                <td class="mytable-col-sm {% if destination.avg_mileage == 0 %}mytable-zero{%endif%}">{{destination.avg_mileage|floatformat:1}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr/>
+</div>
+{% endif %}
+
 {% if unique_riders.names or money_payments %}
 <div id="report_fares">
     <div class="row">
@@ -618,7 +658,7 @@
 <script type="text/javascript">
     // set up the visibility array
     var visible = [];
-    var visible_count = 8 + {{vehicles.count}};
+    var visible_count = 9 + {{vehicles.count}};
     // value (1 = visible), div id, checkbox id
     visible.push([1, "#report_errors", "#vis_errors"]);
     visible.push([1, "#report_vehicle_totals", "#vis_vehicle_totals"]);
@@ -627,6 +667,7 @@
     {% endfor %}
     visible.push([1, "#report_riders", "#vis_riders"]);
     visible.push([1, "#report_tags", "#vis_tags"]);
+    visible.push([1, "#report_destinations", "#vis_destinations"]);
     visible.push([1, "#report_fares", "#vis_fares"]);
     visible.push([1, "#report_collected_money", "#vis_collected_money"]);
     visible.push([1, "#report_payments", "#vis_payments"]);

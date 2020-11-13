@@ -1165,6 +1165,43 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                 ws_tags.cell(j, i).font = style_font_normal
 
     #####
+    #### Frequent Destinations
+    #####
+    ws_destinations = wb.create_sheet('Frequent Destinations')
+    row_header = 1
+    ws_destinations.cell(row_header, 1, 'Address')
+    ws_destinations.cell(row_header, 2, 'Trips on vehicle')
+    ws_destinations.cell(row_header, 3, 'Trips not on vehicle')
+    ws_destinations.cell(row_header, 4, 'Total Trips')
+    ws_destinations.cell(row_header, 5, 'Average Mileage')
+
+    row_dest = 1
+    for destination in report.frequent_destinations:
+        ws_destinations.cell(row_header + row_dest, 1, destination.address)
+        ws_destinations.cell(row_header + row_dest, 2, destination.trips.passenger)
+        ws_destinations.cell(row_header + row_dest, 3, destination.trips.no_passenger)
+        ws_destinations.cell(row_header + row_dest, 4, destination.trips.total)
+        ws_destinations.cell(row_header + row_dest, 5, destination.avg_mileage)
+        # avg mileage number format
+        ws_destinations.cell(row_header + row_dest, 5).number_format = '0.0'
+        row_dest += 1
+
+    # apply styles
+    ws_destinations.row_dimensions[row_header].height = style_rowheight_header
+    ws_destinations.column_dimensions[get_column_letter(1)].width = style_colwidth_normal * 2
+    for i in range(1, 6):
+        if i > 1:
+            ws_destinations.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+        for j in range(row_header, row_header + row_dest):
+            ws_destinations.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_destinations.cell(j, i).font = style_font_header
+                ws_destinations.cell(j, i).alignment = style_alignment_header
+                ws_destinations.cell(j, i).fill = style_fill_header
+            else:
+                ws_destinations.cell(j, i).font = style_font_normal
+
+    #####
     #### Fares & Payments
     #####
     ws_fares = wb.create_sheet('Fares & Payments')

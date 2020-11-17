@@ -277,13 +277,13 @@ class Report():
 
         def __init__(self):
             self.names = []
-            self.elderly_ambulatory = 0
-            self.elderly_nonambulatory = 0
-            self.nonelderly_ambulatory = 0
-            self.nonelderly_nonambulatory = 0
-            self.unknown = 0
-            self.total = 0
-            self.staff = 0
+            self.elderly_ambulatory = Report.TripCount()
+            self.elderly_nonambulatory = Report.TripCount()
+            self.nonelderly_ambulatory = Report.TripCount()
+            self.nonelderly_nonambulatory = Report.TripCount()
+            self.unknown = Report.TripCount()
+            self.total = Report.TripCount()
+            self.staff = Report.TripCount()
             # fares & payments totals
             self.total_collected_cash = Report.Money(0)
             self.total_collected_check = Report.Money(0)
@@ -707,19 +707,19 @@ class Report():
             # total elderly/ambulatory counts
             if rider.trips.total > 0:
                 if rider.staff:
-                    self.unique_riders.staff += 1
+                    self.unique_riders.staff.addTrips(1, (rider.trips.passenger > 0))
                 else:
-                    self.unique_riders.total += 1
+                    self.unique_riders.total.addTrips(1, (rider.trips.passenger > 0))
                     if rider.elderly == None or rider.ambulatory == None:
-                        self.unique_riders.unknown += 1
+                        self.unique_riders.unknown.addTrips(1, (rider.trips.passenger > 0))
                     elif rider.elderly and rider.ambulatory:
-                        self.unique_riders.elderly_ambulatory += 1
+                        self.unique_riders.elderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
                     elif rider.elderly and not rider.ambulatory:
-                        self.unique_riders.elderly_nonambulatory += 1
+                        self.unique_riders.elderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
                     elif not rider.elderly and rider.ambulatory:
-                        self.unique_riders.nonelderly_ambulatory += 1
+                        self.unique_riders.nonelderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
                     elif not rider.elderly and not rider.ambulatory:
-                        self.unique_riders.nonelderly_nonambulatory += 1
+                        self.unique_riders.nonelderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
 
             # calculate total owed money
             rider.total_payments = rider.collected_cash + rider.collected_check + rider.paid_cash + rider.paid_check
@@ -1037,11 +1037,11 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
                     ws_vehicle.cell(j, i).font = style_font_normal
 
     #####
-    #### Unique/Ambulatory rider summary
+    #### Unique rider summary
     #####
     ws_riders = wb.create_sheet('Rider Summary')
     row_header = 1
-    row_total = 2
+    row_total = 4
     ws_riders.cell(row_header, 2, 'Elderly Ambulatory')
     ws_riders.cell(row_header, 3, 'Elderly Non-Ambulatory')
     ws_riders.cell(row_header, 4, 'Non-Elderly Ambulatory')
@@ -1049,13 +1049,29 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_riders.cell(row_header, 6, 'Unknown')
     ws_riders.cell(row_header, 7, 'Staff')
 
+    ws_riders.cell(row_header+1, 1, 'On vehicle')
+    ws_riders.cell(row_header+1, 2, report.unique_riders.elderly_ambulatory.passenger)
+    ws_riders.cell(row_header+1, 3, report.unique_riders.elderly_nonambulatory.passenger)
+    ws_riders.cell(row_header+1, 4, report.unique_riders.nonelderly_ambulatory.passenger)
+    ws_riders.cell(row_header+1, 5, report.unique_riders.nonelderly_nonambulatory.passenger)
+    ws_riders.cell(row_header+1, 6, report.unique_riders.unknown.passenger)
+    ws_riders.cell(row_header+1, 7, report.unique_riders.staff.passenger)
+
+    ws_riders.cell(row_header+2, 1, 'Not on vehicle')
+    ws_riders.cell(row_header+2, 2, report.unique_riders.elderly_ambulatory.no_passenger)
+    ws_riders.cell(row_header+2, 3, report.unique_riders.elderly_nonambulatory.no_passenger)
+    ws_riders.cell(row_header+2, 4, report.unique_riders.nonelderly_ambulatory.no_passenger)
+    ws_riders.cell(row_header+2, 5, report.unique_riders.nonelderly_nonambulatory.no_passenger)
+    ws_riders.cell(row_header+2, 6, report.unique_riders.unknown.no_passenger)
+    ws_riders.cell(row_header+2, 7, report.unique_riders.staff.no_passenger)
+
     ws_riders.cell(row_total, 1, 'TOTAL')
-    ws_riders.cell(row_total, 2, report.unique_riders.elderly_ambulatory)
-    ws_riders.cell(row_total, 3, report.unique_riders.elderly_nonambulatory)
-    ws_riders.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory)
-    ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory)
-    ws_riders.cell(row_total, 6, report.unique_riders.unknown)
-    ws_riders.cell(row_total, 7, report.unique_riders.staff)
+    ws_riders.cell(row_total, 2, report.unique_riders.elderly_ambulatory.total)
+    ws_riders.cell(row_total, 3, report.unique_riders.elderly_nonambulatory.total)
+    ws_riders.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory.total)
+    ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory.total)
+    ws_riders.cell(row_total, 6, report.unique_riders.unknown.total)
+    ws_riders.cell(row_total, 7, report.unique_riders.staff.total)
 
     row_total_riders = 0
     for i in report.unique_riders.names:
@@ -1063,7 +1079,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
             row_total_riders += 1
     row_total_riders += 1
 
-    row_header_riders = 4
+    row_header_riders = row_total + 2
     for i in range(row_header_riders, row_header_riders + row_total_riders):
         ws_riders.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
         if i > row_header_riders:

@@ -107,15 +107,26 @@ nav {
     <div class="row mb-4">
         <div class="col">
             <h4 class="text-center">Riders</h4>
+            <p class="text-center text-muted small">Note: Rider counts are divided into three values: riders that have been on a vehicle at least once, those who haven't (e.g. deliveries), and a grand total.</p>
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md">
             Elderly Ambulatory riders
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.elderly_ambulatory }}
+                <span class="text-muted small">{{ report.unique_riders.elderly_ambulatory.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.elderly_ambulatory.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.elderly_ambulatory.total }}
             </div>
         </div>
     </div>
@@ -123,9 +134,19 @@ nav {
         <div class="col-md">
             Elderly Non-Ambulatory riders (wheel chair)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.elderly_nonambulatory }}
+                <span class="text-muted small">{{ report.unique_riders.elderly_nonambulatory.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.elderly_nonambulatory.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.elderly_nonambulatory.total }}
             </div>
         </div>
     </div>
@@ -133,9 +154,19 @@ nav {
         <div class="col-md">
             Non-Elderly Ambulatory riders
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.nonelderly_ambulatory }}
+                <span class="text-muted small">{{ report.unique_riders.nonelderly_ambulatory.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.nonelderly_ambulatory.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.nonelderly_ambulatory.total }}
             </div>
         </div>
     </div>
@@ -143,20 +174,40 @@ nav {
         <div class="col-md">
             Non-Elderly Non-Ambulatory riders (wheel chair)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.nonelderly_nonambulatory }}
+                <span class="text-muted small">{{ report.unique_riders.nonelderly_nonambulatory.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.nonelderly_nonambulatory.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.nonelderly_nonambulatory.total }}
             </div>
         </div>
     </div>
-    {% if report.unique_riders.unknown > 0 %}
+    {% if report.unique_riders.unknown.total > 0 %}
     <div class="row mb-3">
         <div class="col-md">
             Unknown riders (missing data)
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.unknown }}
+                <span class="text-muted small">{{ report.unique_riders.unknown.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.unknown.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.unknown.total }}
             </div>
         </div>
     </div>
@@ -165,9 +216,19 @@ nav {
         <div class="col-md">
             <strong>Total Riders</strong>
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <div class="blank-field">
-                <strong>{{ report.unique_riders.total }}</strong>
+                <span class="text-muted small">{{ report.unique_riders.total.passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                <span class="text-muted small">{{ report.unique_riders.total.no_passenger }}</span>
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="blank-field">
+                {{ report.unique_riders.total.total }}
             </div>
         </div>
     </div>

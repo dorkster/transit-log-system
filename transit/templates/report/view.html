@@ -325,14 +325,32 @@
             <td class="mytable-col-md text-center">Unknown</td>
             <td class="mytable-col-md text-center">Staff</td>
         </thead>
+        <tr>
+            <td class="mytable-col-md">On vehicle</td>
+            <td class="mytable-col-sm {% if unique_riders.elderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_ambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.elderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_nonambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.nonelderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_ambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.unknown.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.staff.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.passenger}}</td>
+        </tr>
+        <tr>
+            <td class="mytable-col-md">Not on vehicle</td>
+            <td class="mytable-col-sm {% if unique_riders.elderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_ambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.elderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_nonambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.nonelderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_ambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.staff.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.no_passenger}}</td>
+        </tr>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.elderly_ambulatory }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.elderly_nonambulatory }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_ambulatory }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_nonambulatory }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.unknown }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.staff }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.elderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.elderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.unknown.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.staff.total }}</td>
         </tr>
     </table>
     <div class="small text-muted"><em>Staff members are not counted in the elderly/ambulatory totals.</em></div>
@@ -375,9 +393,9 @@
                 </td>
                 <td class="mytable-col-sm">{% if rider.elderly %}<span class="oi oi-check"></span>{% elif rider.elderly == False %}<span class="oi oi-x"></span>{% endif %}</td>
                 <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
-                <td class="mytable-col-sm">{{rider.trips.passenger}}</td>
-                <td class="mytable-col-sm">{{rider.trips.no_passenger}}</td>
-                <td class="mytable-col-sm">{{rider.trips.total}}</td>
+                <td class="mytable-col-sm {% if rider.trips.passenger == 0 %}mytable-zero{% endif %}">{{rider.trips.passenger}}</td>
+                <td class="mytable-col-sm {% if rider.trips.no_passenger == 0 %}mytable-zero{% endif %}">{{rider.trips.no_passenger}}</td>
+                <td class="mytable-col-sm {% if rider.trips.total == 0 %}mytable-zero{% endif %}">{{rider.trips.total}}</td>
             </tr>
             {% endif %}
             {% endfor %}

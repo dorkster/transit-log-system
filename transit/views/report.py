@@ -388,9 +388,13 @@ class Report():
 
                 if report_shift.start_miles[T_FLOAT] > report_shift.end_miles[T_FLOAT]:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
+                    report_shift.end_miles[T_FLOAT] = report_shift.start_miles[T_FLOAT]
+                    report_shift.end_miles[T_STR] = report_shift.start_miles[T_STR]
 
                 if report_shift.start_time > report_shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
+                    report_shift.end_time[T_FLOAT] = report_shift.start_time[T_FLOAT]
+                    report_shift.end_time[T_STR] = report_shift.start_time[T_STR]
 
                 report_day.shifts.append(report_shift)
 
@@ -464,6 +468,40 @@ class Report():
                     report_trip.end_time = fallback_time
                     self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
 
+                # check for trip errors
+                # TODO abstract the float/str stuff to make this cleaner
+                if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+                    if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT]:
+                        report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                        report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
+                    if report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                        report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
+                        report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
+
+                if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
+                    if report_trip.start_time[T_FLOAT] < shift.start_time[T_FLOAT]:
+                        report_trip.start_time[T_FLOAT] = shift.start_time[T_FLOAT]
+                        report_trip.start_time[T_STR] = shift.start_time[T_STR]
+                    if report_trip.end_time[T_FLOAT] > shift.end_time[T_FLOAT]:
+                        report_trip.end_time[T_FLOAT] = shift.end_time[T_FLOAT]
+                        report_trip.end_time[T_STR] = shift.end_time[T_STR]
+
+                if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
+                    report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
+                    report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
+
+                if report_trip.start_time > report_trip.end_time:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
+                    report_trip.start_time[T_FLOAT] = shift.start_time[T_FLOAT]
+                    report_trip.start_time[T_STR] = shift.start_time[T_STR]
+                    report_trip.end_time[T_FLOAT] = shift.start_time[T_FLOAT]
+                    report_trip.end_time[T_STR] = shift.start_time[T_STR]
+
                 report_trip.trip_type = i.trip_type
                 report_trip.collected_cash = Report.Money(i.collected_cash)
                 report_trip.collected_check = Report.Money(i.collected_check)
@@ -477,19 +515,6 @@ class Report():
 
                 if shift.end_trip == None or report_trip.end_miles[T_FLOAT] > report_day.trips[shift.end_trip].end_miles[T_FLOAT]:
                     report_day.shifts[report_trip.shift].end_trip = len(report_day.trips) - 1;
-
-                # check for trip errors
-                if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
-
-                if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
-
-                if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
-
-                if report_trip.start_time > report_trip.end_time:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
 
 
                 if daily_log_shift == None or (daily_log_shift != None and daily_log_shift == shift.shift.id):

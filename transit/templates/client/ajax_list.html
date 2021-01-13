@@ -152,7 +152,7 @@ Show extra columns
                 </div>
             </div>
         </td>
-        <td class="mytable-col-lg">{{ client.name }}</td>
+        <td class="mytable-col-lg">{{ client.name }}{% if client.staff %}<span class="badge badge-secondary ml-1">Staff</span>{% endif %}</td>
         <td class="mytable-col-lg">{{ client.address }}</td>
         <td class="mytable-col-md">{{ client.phone_home }}</td>
         <td class="mytable-col-md">{{ client.phone_cell }}</td>

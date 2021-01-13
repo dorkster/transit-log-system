@@ -470,6 +470,8 @@ class Report():
 
                 # check for trip errors
                 # TODO abstract the float/str stuff to make this cleaner
+                # TODO the above execptions add errors to the report without adding the trip to the various trip counts
+                # BUT, the below errors still count the trips where possible. Not sure which is preferable, but it's probably bad that both behaviors exist?
                 if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
                     self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
                     if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT]:
@@ -481,12 +483,10 @@ class Report():
 
                 if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
-                    if report_trip.start_time[T_FLOAT] < shift.start_time[T_FLOAT]:
-                        report_trip.start_time[T_FLOAT] = shift.start_time[T_FLOAT]
-                        report_trip.start_time[T_STR] = shift.start_time[T_STR]
-                    if report_trip.end_time[T_FLOAT] > shift.end_time[T_FLOAT]:
-                        report_trip.end_time[T_FLOAT] = shift.end_time[T_FLOAT]
-                        report_trip.end_time[T_STR] = shift.end_time[T_STR]
+                    if report_trip.start_time < shift.start_time:
+                        report_trip.start_time = shift.start_time
+                    if report_trip.end_time > shift.end_time:
+                        report_trip.end_time = shift.end_time
 
                 if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
                     self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
@@ -497,10 +497,8 @@ class Report():
 
                 if report_trip.start_time > report_trip.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
-                    report_trip.start_time[T_FLOAT] = shift.start_time[T_FLOAT]
-                    report_trip.start_time[T_STR] = shift.start_time[T_STR]
-                    report_trip.end_time[T_FLOAT] = shift.start_time[T_FLOAT]
-                    report_trip.end_time[T_STR] = shift.start_time[T_STR]
+                    report_trip.start_time = shift.start_time
+                    report_trip.end_time = shift.start_time
 
                 report_trip.trip_type = i.trip_type
                 report_trip.collected_cash = Report.Money(i.collected_cash)

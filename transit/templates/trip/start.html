@@ -50,29 +50,6 @@
             </a>
             {% endfor %}
         </div>
-        <script type="text/javascript">
-            function toggleAdditionalPickup(item_id) {
-                var list_item = document.getElementById(item_id);
-                if (list_item) {
-                    var additional_pickups = {};
-                    var json_field = document.getElementById("id_additional_pickups");
-                    if (json_field && json_field.value)
-                        additional_pickups = JSON.parse(json_field.value);
-
-                    if (list_item.classList.contains("active")) {
-                        list_item.classList.remove("active", "border", "border-white");
-                        additional_pickups[list_item.dataset.id] = false;
-                    }
-                    else {
-                        list_item.classList.add("active", "border", "border-white");
-                        additional_pickups[list_item.dataset.id] = true;
-                    }
-
-                    if (json_field)
-                        json_field.value = JSON.stringify(additional_pickups);
-                }
-            }
-        </script>
         {% endif %}
         <hr/>
         <div class="d-flex flex-wrap mt-2">
@@ -84,9 +61,32 @@
     </div>
 </form>
 
-{% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 <script type="text/javascript">
+    {% if additional_pickups %}
+    function toggleAdditionalPickup(item_id) {
+        var list_item = document.getElementById(item_id);
+        if (list_item) {
+            var additional_pickups = {};
+            var json_field = document.getElementById("id_additional_pickups");
+            if (json_field && json_field.value)
+                additional_pickups = JSON.parse(json_field.value);
+
+            if (list_item.classList.contains("active")) {
+                list_item.classList.remove("active", "border", "border-white");
+                additional_pickups[list_item.dataset.id] = false;
+            }
+            else {
+                list_item.classList.add("active", "border", "border-white");
+                additional_pickups[list_item.dataset.id] = true;
+            }
+
+            if (json_field)
+                json_field.value = JSON.stringify(additional_pickups);
+        }
+    }
+    {% endif %}
+
     var start_miles = {};
     {% for key,val in start_miles.items %}
     start_miles["{{ key }}"] = "{{ val }}";
@@ -200,7 +200,6 @@
 
     $("#id_driver").change(ajaxSetVehicleFromDriver);
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

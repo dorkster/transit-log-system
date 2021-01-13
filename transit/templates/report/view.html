@@ -54,13 +54,6 @@
                     <span class="oi oi-chevron-right"></span>
                 </a>
             </div>
-            <script type="text/javascript">
-                // Keep the dropdown from closing when picking a date
-                $('#date_dropdown option, #date_dropdown select').click(function(e) {
-                    e.stopPropagation();
-                });
-                $("#id_date_day").attr("style", "display: none !important;");
-            </script>
         </div>
     </div>
     <div class="row justify-content-end mt-3">
@@ -672,8 +665,13 @@
 {% endif %}
 
 </div>
-{% block javascript %}
 <script type="text/javascript">
+    // Keep the dropdown from closing when picking a date
+    $('#date_dropdown option, #date_dropdown select').click(function(e) {
+        e.stopPropagation();
+    });
+    $("#id_date_day").attr("style", "display: none !important;");
+
     // set up the visibility array
     var visible = [];
     var visible_count = 9 + {{vehicles.count}};
@@ -761,7 +759,6 @@
     }
 
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

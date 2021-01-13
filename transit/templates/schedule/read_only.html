@@ -52,12 +52,6 @@
                     <span class="oi oi-chevron-right"></span></span>
                 </a>
             </div>
-            <script type="text/javascript">
-                // Keep the dropdown from closing when picking a date
-                $('#date_dropdown option, #date_dropdown select').click(function(e) {
-                    e.stopPropagation();
-                })
-            </script>
         </div>
     </div>
 </div>
@@ -66,8 +60,12 @@
 <div id="schedule-read-only">
 </div>
 
-{% block javascript %}
 <script type="text/javascript">
+    // Keep the dropdown from closing when picking a date
+    $('#date_dropdown option, #date_dropdown select').click(function(e) {
+        e.stopPropagation();
+    })
+
     var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-read-only' %}", "#schedule-read-only");
     ajax_loader.extra_data["year"] = {{date.year}};
     ajax_loader.extra_data["month"] = {{date.month}};
@@ -77,7 +75,6 @@
     ajax_loader.run();
     ajax_loader.start(10000);
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

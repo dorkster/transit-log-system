@@ -1,8 +1,5 @@
 <h3>Drivers <a class="btn btn-success btn-sm" href="{% url 'driver-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if drivers %}
-<script type="text/javascript">
-    var row_mover = new RowMover("RowMover", ajax_loader);
-</script>
 <table class="mytable">
     <thead>
         <td></td>
@@ -45,11 +42,7 @@
     {% endfor %}
 </table>
 <script type="text/javascript">
-    var hash = window.location.hash;
-    if (hash != "") {
-        if (hash.startsWith('#driver_')) {
-            $(hash).addClass('active');
-        }
-    }
+    var row_mover = new RowMover("RowMover", ajax_loader);
+    setEditButtonStyleFromHash('#driver', window.location.hash, 1);
 </script>
 {% endif %}

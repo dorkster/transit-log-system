@@ -2,7 +2,6 @@
 
 {% block auth_content %}
 {% load static %}
-<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 <h2>
     {% if is_new %}
     New Destination
@@ -43,6 +42,7 @@
         </div>
     </div>
 </form>
+<script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 {% endblock %}
 
 {% block content %}

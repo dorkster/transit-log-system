@@ -57,12 +57,6 @@
                     <span class="oi oi-chevron-right"></span></span>
                 </a>
             </div>
-            <script type="text/javascript">
-                // Keep the dropdown from closing when picking a date
-                $('#date_dropdown option, #date_dropdown select').click(function(e) {
-                    e.stopPropagation();
-                })
-            </script>
         </div>
         {% if perms.transit.change_vehicle %}
         <div class="col-auto p-1">
@@ -76,8 +70,12 @@
 <div id="schedule-edit">
 </div>
 
-{% block javascript %}
 <script type="text/javascript">
+    // Keep the dropdown from closing when picking a date
+    $('#date_dropdown option, #date_dropdown select').click(function(e) {
+        e.stopPropagation();
+    })
+
     var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-edit' %}", "#schedule-edit");
     ajax_loader.extra_data["year"] = {{date.year}};
     ajax_loader.extra_data["month"] = {{date.month}};
@@ -93,7 +91,6 @@
         }
     }
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

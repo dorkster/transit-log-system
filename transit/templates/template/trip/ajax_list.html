@@ -17,14 +17,7 @@
     <div class="col-auto">
     </div>
 </div>
-<script type="text/javascript">
-    var row_movers = [];
-</script>
 {% if trips %}
-<script type="text/javascript">
-    var row_mover = new RowMover("RowMover", ajax_loader);
-    row_movers.push(row_mover);
-</script>
 <a class="small" href="#_" onclick="(function(){ row_mover.clear(); ajax_loader.run('', 'toggle_extra_columns', ''); })();">
 {% if show_extra_columns %}
 Hide extra columns
@@ -342,12 +335,13 @@ Show extra columns
     {% endfor %}
 </table>
 <script type="text/javascript">
-    var hash = window.location.hash;
-    if (hash != "") {
-        if (hash.startsWith('#trip_')) {
-            setEditButtonStyleFromHash(hash);
-        }
-    }
+    var row_movers = [];
+    {% if trips %}
+    var row_mover = new RowMover("RowMover", ajax_loader);
+    row_movers.push(row_mover);
+    {% endif %}
+
+    setEditButtonStyleFromHash('#trip_', window.location.hash);
 </script>
 {% else %}
 <p>No trips have been added to this template.</p>

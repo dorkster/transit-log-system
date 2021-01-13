@@ -220,7 +220,29 @@ function getTagButtonStyle(tag_name) {
         return "btn-info";
 }
 
-function setEditButtonStyleFromHash(hash) {
-    $(hash).removeClass('btn-outline-dark');
-    $(hash).addClass('btn-outline-primary');
+function setEditButtonStyleFromHash(prefix, hash, style = 0) {
+    if (hash != "" && hash.startsWith(prefix)) {
+        if (style == 1) {
+            $(hash).addClass('active');
+        }
+        else {
+            $(hash).removeClass('btn-outline-dark');
+            $(hash).addClass('btn-outline-primary');
+        }
+    }
+}
+
+function setSearchModal(form_id, modal_id, search_id, search_text, search_func) {
+    $(form_id).on('submit', function(e){
+        e.preventDefault();
+        $(modal_id).modal('hide');
+        search_func(search_id);
+    });
+    $(modal_id).on('show.bs.modal', function(){
+        $(search_id).val(search_text);
+    });
+    $(modal_id).on('shown.bs.modal', function(){
+        $(search_id).focus();
+        $(search_id).select();
+    });
 }

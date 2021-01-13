@@ -1,8 +1,5 @@
 <h3>Tags <a class="btn btn-success btn-sm" href="{% url 'tag-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if tags %}
-<script type="text/javascript">
-    var row_mover = new RowMover("RowMover", ajax_loader);
-</script>
 <table class="mytable mytable-striped-sort">
     <thead>
         <td></td>
@@ -37,12 +34,8 @@
     {% endfor %}
 </table>
 <script type="text/javascript">
-    var hash = window.location.hash;
-    if (hash != "") {
-        if (hash.startsWith('#tag_')) {
-            setEditButtonStyleFromHash(hash);
-        }
-    }
+    var row_mover = new RowMover("RowMover", ajax_loader);
+    setEditButtonStyleFromHash('#tag_', window.location.hash);
 </script>
 {% else %}
 <p>There are no tags.</p>

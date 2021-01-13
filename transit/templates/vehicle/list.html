@@ -5,7 +5,6 @@
 <div id="vehicle_list">
 </div>
 
-{% block javascript %}
 <script type="text/javascript">
     var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-list' %}", "#vehicle_list");
 
@@ -13,7 +12,6 @@
     ajax_loader.run();
     ajax_loader.start(10000);
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

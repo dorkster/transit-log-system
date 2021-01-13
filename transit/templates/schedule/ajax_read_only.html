@@ -149,20 +149,6 @@
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-                $('#filter_search_form').on('submit', function(e){
-                    e.preventDefault();
-                    $('#modal_filter_search').modal('hide');
-                    ajax_loader.run('', 'filter_search', $('#filter_search').val());
-                });
-                $('#modal_filter_search').on('show.bs.modal', function(){
-                    $('#filter_search').val('{{filter_search}}');
-                });
-                $('#modal_filter_search').on('shown.bs.modal', function(){ 
-                    $('#filter_search').focus();
-                    $('#filter_search').select();
-                });
-            </script>
     {% if filter_search %}
     <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
     {% endif %}
@@ -461,6 +447,9 @@ Show extra columns
     </tr>
     {% endfor %}
 </table>
+<script type="text/javascript">
+    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>
 {% else %}
 <p>There are no trips for this day.</p>
 {% endif %}

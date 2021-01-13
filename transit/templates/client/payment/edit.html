@@ -38,7 +38,6 @@
         </div>
     </div>
 </form>
-{% block javascript %}
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
 <script type="text/javascript">
     function checkPayment() {
@@ -66,7 +65,6 @@
     $("#id_cash").on("change", checkPayment);
     $("#id_check").on("change", checkPayment);
 </script>
-{% endblock %}
 {% endblock %}
 
 {% block content %}

@@ -1,6 +1,7 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+{% load static %}
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">
@@ -57,8 +58,8 @@
         </div>
     </div>
     <div class="row justify-content-end mt-3">
-        <div id="vis_all" class="col-auto">
-            <a href="#_" class="btn btn-warning btn-sm" onclick="visibleShowAll()"><span class="oi oi-eye mr-2"></span>Show all sections</a>
+        <div id="vis_all" class="col-auto d-none">
+            <a href="#_" class="btn btn-warning btn-sm" onclick="visibleShowAll(visible)"><span class="oi oi-eye mr-2"></span>Show all sections</a>
         </div>
         <div class="col-auto">
             <div class="dropdown">
@@ -68,61 +69,61 @@
                 <div class="dropdown-menu shadow dropdown-menu-right">
                     {% if report_errors.errors %}
                     <a href="#report_errors" class="dropdown-item text-danger">
-                        <input id="vis_errors" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_errors" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Errors
                     </a>
                     <div class="dropdown-divider"></div>
                     {% endif %}
                     <a href="#report_vehicle_totals" class="dropdown-item">
-                        <input id="vis_vehicle_totals" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_vehicle_totals" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Totals for All Vehicles
                     </a>
                     {% for v in vehicle_reports %}
                     <a href="#report_vehicle_{{v.vehicle.id}}" class="dropdown-item">
-                        <input id="vis_vehicle_{{v.vehicle.id}}" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_vehicle_{{v.vehicle.id}}" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Vehicle: {{v.vehicle}}
                     </a>
                     {% endfor %}
                     {% if unique_riders.names %}
                     <div class="dropdown-divider"></div>
                     <a href="#report_riders" class="dropdown-item">
-                        <input id="vis_riders" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_riders" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Elderly/Ambulatory Riders
                     </a>
                     {% endif %}
                     <a href="#report_tags" class="dropdown-item">
-                        <input id="vis_tags" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_tags" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Trip Types and Tags
                     </a>
                     {% if frequent_destinations %}
                     <a href="#report_destinations" class="dropdown-item">
-                        <input id="vis_destinations" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_destinations" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Frequent Destinations
                     </a>
                     {% endif %}
                     {% if unique_riders.names or money_payments %}
                     <div class="dropdown-divider"></div>
                     <a href="#report_fares" class="dropdown-item">
-                        <input id="vis_fares" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_fares" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Fares &amp; Payments
                     </a>
                     {% endif %}
                     {% if money_trips %}
                     <a href="#report_collected_money" class="dropdown-item">
-                        <input id="vis_collected_money" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_collected_money" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Money Collected by the Drivers
                     </a>
                     {% endif %}
                     {% if money_payments %}
                     <a href="#report_payments" class="dropdown-item">
-                        <input id="vis_payments" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_payments" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Money Not Collected by the Drivers
                     </a>
                     {% endif %}
                     {% if driver_reports %}
                     <div class="dropdown-divider"></div>
                     <a href="#report_drivers" class="dropdown-item">
-                        <input id="vis_drivers" type="checkbox" class="mr-2" onclick="visibleSave(true)">
+                        <input id="vis_drivers" type="checkbox" class="mr-2" onclick="visibleSave(visible, true)">
                         Per-Driver Summary
                     </a>
                     {% endif %}
@@ -665,98 +666,26 @@
 {% endif %}
 
 </div>
+<script type="text/javascript" src="{% static 'js/report/common.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/report/view.js' %}"></script>
 <script type="text/javascript">
-    // Keep the dropdown from closing when picking a date
-    $('#date_dropdown option, #date_dropdown select').click(function(e) {
-        e.stopPropagation();
-    });
-    $("#id_date_day").attr("style", "display: none !important;");
+    fixDatePicker();
 
-    // set up the visibility array
-    var visible = [];
-    var visible_count = 9 + {{vehicles.count}};
-    // value (1 = visible), div id, checkbox id
-    visible.push([1, "#report_errors", "#vis_errors"]);
-    visible.push([1, "#report_vehicle_totals", "#vis_vehicle_totals"]);
+    var visible = new ReportVisibility();
+    visible.addSection("#report_errors", "#vis_errors");
+    visible.addSection("#report_vehicle_totals", "#vis_vehicle_totals");
     {% for v in vehicles %}
-    visible.push([1, "#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}"]);
+    visible.addSection("#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}");
     {% endfor %}
-    visible.push([1, "#report_riders", "#vis_riders"]);
-    visible.push([1, "#report_tags", "#vis_tags"]);
-    visible.push([1, "#report_destinations", "#vis_destinations"]);
-    visible.push([1, "#report_fares", "#vis_fares"]);
-    visible.push([1, "#report_collected_money", "#vis_collected_money"]);
-    visible.push([1, "#report_payments", "#vis_payments"]);
-    visible.push([1, "#report_drivers", "#vis_drivers"]);
+    visible.addSection("#report_riders", "#vis_riders");
+    visible.addSection("#report_tags", "#vis_tags");
+    visible.addSection("#report_destinations", "#vis_destinations");
+    visible.addSection("#report_fares", "#vis_fares");
+    visible.addSection("#report_collected_money", "#vis_collected_money");
+    visible.addSection("#report_payments", "#vis_payments");
+    visible.addSection("#report_drivers", "#vis_drivers");
 
-    visibleLoad();
-
-    function visibleLoad() {
-        var cookie_str = cookieRead("report_visibility");
-
-        for (i = 0; i < visible_count; i++) {
-            visible[i][0] = 1;
-        }
-        for (i = 0; i < cookie_str.length; i++) {
-            visible[i][0] = parseInt(cookie_str.charAt(i));
-        }
-
-        visibleApply();
-    }
-
-    function visibleApply() {
-        var show_all_btn = false;
-
-        for (i = 0; i < visible_count; i++) {
-            if ($(visible[i][1]).length) {
-                if (visible[i][0] == 1) {
-                    $(visible[i][2]).prop("checked", true);
-                    $(visible[i][1]).removeClass("d-none");
-                }
-                else {
-                    $(visible[i][2]).prop("checked", false);
-                    $(visible[i][1]).addClass("d-none");
-                    show_all_btn = true;
-                }
-            }
-        }
-
-        if (show_all_btn == true) {
-            $("#vis_all").removeClass("d-none");
-        }
-        else {
-            $("#vis_all").addClass("d-none");
-        }
-    }
-
-    function visibleSave(get_checkboxes) {
-        var cookie_str = "report_visibility=";
-
-        for (i = 0; i < visible_count; i++) {
-            if (get_checkboxes == true && $(visible[i][1]).length) {
-                if ($(visible[i][2]).is(":checked")) {
-                    visible[i][0] = 1;
-                }
-                else {
-                    visible[i][0] = 0;
-                }
-            }
-            cookie_str += visible[i][0].toString();
-        }
-        cookie_str += ";";
-
-        cookie_str += "path=/transit/report;";
-        document.cookie = cookie_str;
-
-        visibleApply();
-    }
-
-    function visibleShowAll() {
-        for (i = 0; i < visible_count; i++) {
-            visible[i][0] = 1;
-        }
-        visibleSave(false);
-    }
+    visibleLoad(visible);
 
 </script>
 {% endblock %}

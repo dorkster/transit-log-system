@@ -1,6 +1,7 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+{% load static %}
 <style type="text/css">
 @media print {
     #print-print, #print-close, #print-filter, #print-filter-hr {
@@ -540,65 +541,25 @@ nav {
 </div>
 {% endif %}
 </div>
+<script type="text/javascript" src="{% static 'js/report/common.js' %}"></script>
 <script type="text/javascript">
     window.print();
 
-    // set up the visibility array
-    var visible = [];
-    var visible_count = 9 + {{vehicles.count}};
-    // value (1 = visible), div id, checkbox id
-    visible.push([1, "#report_errors", "#vis_errors"]);
-    visible.push([1, "#report_vehicle_totals", "#vis_vehicle_totals"]);
+    var visible = new ReportVisibility();
+    visible.addSection("#report_errors", "#vis_errors");
+    visible.addSection("#report_vehicle_totals", "#vis_vehicle_totals");
     {% for v in vehicles %}
-    visible.push([1, "#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}"]);
+    visible.addSection("#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}");
     {% endfor %}
-    visible.push([1, "#report_riders", "#vis_riders"]);
-    visible.push([1, "#report_tags", "#vis_tags"]);
-    visible.push([1, "#report_destinations", "#vis_destinations"]);
-    visible.push([1, "#report_fares", "#vis_fares"]);
-    visible.push([1, "#report_collected_money", "#vis_collected_money"]);
-    visible.push([1, "#report_payments", "#vis_payments"]);
-    visible.push([1, "#report_drivers", "#vis_drivers"]);
+    visible.addSection("#report_riders", "#vis_riders");
+    visible.addSection("#report_tags", "#vis_tags");
+    visible.addSection("#report_destinations", "#vis_destinations");
+    visible.addSection("#report_fares", "#vis_fares");
+    visible.addSection("#report_collected_money", "#vis_collected_money");
+    visible.addSection("#report_payments", "#vis_payments");
+    visible.addSection("#report_drivers", "#vis_drivers");
 
-    visibleLoad();
-
-    function visibleLoad() {
-        var cookie_str = cookieRead("report_visibility");
-
-        for (i = 0; i < visible_count; i++) {
-            visible[i][0] = 1;
-        }
-        for (i = 0; i < cookie_str.length; i++) {
-            visible[i][0] = parseInt(cookie_str.charAt(i));
-        }
-
-        visibleApply();
-    }
-
-    function visibleApply() {
-        var show_all_btn = false;
-
-        for (i = 0; i < visible_count; i++) {
-            if ($(visible[i][1]).length) {
-                if (visible[i][0] == 1) {
-                    $(visible[i][2]).prop("checked", true);
-                    $(visible[i][1]).removeClass("d-none");
-                }
-                else {
-                    $(visible[i][2]).prop("checked", false);
-                    $(visible[i][1]).addClass("d-none");
-                    show_all_btn = true;
-                }
-            }
-        }
-
-        if (show_all_btn == true) {
-            $("#vis_all").removeClass("d-none");
-        }
-        else {
-            $("#vis_all").addClass("d-none");
-        }
-    }
+    visibleLoad(visible);
 </script>
 {% endblock %}
 

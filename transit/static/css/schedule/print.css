@@ -1,0 +1,45 @@
+@media print {
+    #print-print, #print-close, #print-filter, #print-filter-hr, #print-shiftselect {
+        display: none;
+    }
+}
+
+body.bg-light {
+    background: none !important;
+}
+
+nav {
+    display: none !important;
+}
+
+#notify_vehicle_issues {
+    display: none;
+}
+
+.mytable {
+    font-size: 8pt;
+}
+
+.mytable tr td {
+    height: 3.5em;
+}
+
+.mytable thead td {
+    height: auto;
+}
+
+.footer {
+    display: none;
+}
+
+#global-notifications {
+    display: none !important;
+}
+
+.blank-field {
+    width: 100%;
+    border-bottom: 1px solid #343a40;
+    min-height: 1.5em;
+    text-align: center;
+    font-size: 110%;
+}

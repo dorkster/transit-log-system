@@ -1,6 +1,7 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+{% load static %}
 <div class="container-fluid mt-4 mb-3">
     <div class="row justify-content-between">
         <div class="col-md p-1">
@@ -51,11 +52,9 @@
 <div id="schedule-view">
 </div>
 
+<script type="text/javascript" src="{% static 'js/schedule/common.js' %}"></script>
 <script type="text/javascript">
-    // Keep the dropdown from closing when picking a date
-    $('#date_dropdown option, #date_dropdown select').click(function(e) {
-        e.stopPropagation();
-    })
+    fixDatePicker();
 
     var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-view' %}", "#schedule-view");
     ajax_loader.extra_data["year"] = {{date.year}};

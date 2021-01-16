@@ -106,7 +106,7 @@
             <span class="dropdown-header">There are no available templates.</span>
             {% endif %}
             {% for template in templates %}
-            <a class="dropdown-item" href="#_" onclick="loadTemplate('{{template}}', '{{template.id}}')">{{template}}</a>
+            <a class="dropdown-item" href="#_" onclick="loadTemplate(ajax_loader, '{{template}}', '{{template.id}}')">{{template}}</a>
             {% endfor %}
         </div>
     </span>

@@ -1,40 +1,19 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/schedule/print.css' %}">
 <style type="text/css">
 @media print {
     @page {
         size: landscape;
     }
-    #print-print, #print-close, #print-filter, #print-filter-hr {
-        display: none;
-    }
-}
-body.bg-light {
-    background: none !important;
-}
-nav {
-    display: none !important;
-}
-#notify_vehicle_issues {
-    display: none;
-}
-.mytable {
-    font-size: 8pt;
-}
-.mytable tr td {
-    height: 3.5em;
-}
-.mytable thead td {
-    height: auto;
-}
-.footer {
-    display: none;
-}
-#global-notifications {
-    display: none !important;
 }
 </style>
+{% endblock %}
+
 <div class="container-fluid">
     <div class="row justify-content-between">
         <div class="col-md p-1">
@@ -283,55 +262,13 @@ nav {
     <p>There are no trips for this day.</p>
     {% endif %}
 </div>
+<script type="text/javascript" src="{% static 'js/schedule/print.js' %}"></script>
 <script type="text/javascript">
     {% if show_dialog %}
     window.print();
     {% endif %}
 
     setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { printFilter('search', $(s).val()); });
-
-    function printFilter(field, data) {
-        if (field == "reset") {
-            $("#id_driver").val("");
-            $("#id_vehicle").val("");
-            $("#id_search").val("");
-            $("#id_hide_completed").val("");
-            $("#id_hide_canceled").val("");
-            $("#id_hide_nolog").val("");
-        }
-        else if (field == "driver") {
-            $("#id_driver").val(data);
-        }
-        else if (field == "vehicle") {
-            $("#id_vehicle").val(data);
-        }
-        else if (field == "search") {
-            $("#id_search").val(data);
-        }
-        else if (field == "toggle_completed") {
-            var current_val = $("#id_hide_completed").val();
-            if (current_val == "" || current_val == "0")
-                $("#id_hide_completed").val("1");
-            else
-                $("#id_hide_completed").val("0");
-        }
-        else if (field == "toggle_canceled") {
-            var current_val = $("#id_hide_canceled").val();
-            if (current_val == "" || current_val == "0")
-                $("#id_hide_canceled").val("1");
-            else
-                $("#id_hide_canceled").val("0");
-        }
-        else if (field == "toggle_nolog") {
-            var current_val = $("#id_hide_nolog").val();
-            if (current_val == "" || current_val == "0")
-                $("#id_hide_nolog").val("1");
-            else
-                $("#id_hide_nolog").val("0");
-        }
-
-        $("#filter_form").submit();
-    }
 </script>
 {% endblock %}
 

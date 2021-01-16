@@ -1,4 +1,5 @@
 import datetime
+import subprocess
 
 from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift
 
@@ -40,3 +41,10 @@ def notifications(request):
         'notify_vehicle_inspections': vehicle_inspections,
         'notify_vehicle_oil_changes': vehicle_oil_changes,
     }
+
+def version(request):
+    version_str = subprocess.run(['git', 'describe', '--tags'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+    return {
+        'version': version_str,
+    }
+

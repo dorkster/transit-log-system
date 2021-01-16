@@ -60,10 +60,6 @@ class formWidgetAttrs():
     big_mile_trip = big_mile.copy()
     big_mile_trip['oninput'] = 'showFullMiles(this)'
 
-    big_mile_shift = big_mile.copy()
-    big_mile_shift['onchange'] = mile_shift['onchange']
-    big_mile_shift['oninput'] = 'showFullMiles(this)'
-
     fuel = default.copy()
     fuel['onchange'] = 'validateFuel(this)'
     fuel['inputmode'] = 'decimal'
@@ -135,7 +131,7 @@ class EditShiftForm(forms.Form):
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
 
 class shiftStartEndForm(forms.Form):
-    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_shift))
+    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
 
 class shiftFuelForm(forms.Form):

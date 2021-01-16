@@ -2,28 +2,11 @@
 
 {% block auth_content %}
 {% load static %}
-<style type="text/css">
-@media print {
-    #print-print, #print-close, #print-filter, #print-filter-hr {
-        display: none;
-    }
-}
-body.bg-light {
-    background: none !important;
-}
-nav {
-    display: none !important;
-}
-#notify_vehicle_issues {
-    display: none;
-}
-.footer {
-    display: none;
-}
-#global-notifications {
-    display: none !important;
-}
-</style>
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/report/print.css' %}">
+{% endblock %}
+
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">

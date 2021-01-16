@@ -1,0 +1,25 @@
+@media print {
+    #print-print, #print-close, #print-filter, #print-filter-hr {
+        display: none;
+    }
+}
+
+body.bg-light {
+    background: none !important;
+}
+
+nav {
+    display: none !important;
+}
+
+#notify_vehicle_issues {
+    display: none;
+}
+
+.footer {
+    display: none;
+}
+
+#global-notifications {
+    display: none !important;
+}

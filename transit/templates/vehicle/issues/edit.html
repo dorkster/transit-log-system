@@ -52,34 +52,11 @@
     </div>
 </form>
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
-{{ clients_json|json_script:"clients-tag" }}
+<script type="text/javascript" src="{% static 'js/vehicle/issues/edit.js' %}"></script>
 <script type="text/javascript">
-    var resolved_input = document.getElementById("id_is_resolved");
-    function setResolvedColor() {
-        if (resolved_input.value == "True")
-            resolved_input.classList.add("bg-success", "text-light");
-        else
-            resolved_input.classList.remove("bg-success", "text-light");
-    }
-    if (resolved_input) {
-        resolved_input.addEventListener("change", setResolvedColor);
-        setResolvedColor();
-    }
-
-    var priority_select = document.getElementById("id_priority");
-    function setPrioritySelectColor() {
-        var default_classname = "form-control form-control-width-fix";
-        if (priority_select.value == "2")
-            priority_select.className = default_classname + " bg-danger text-light";
-        else if (priority_select.value == "1")
-            priority_select.className = default_classname + " bg-warning";
-        else
-            priority_select.className = default_classname;
-    }
-    if (priority_select) {
-        priority_select.addEventListener("change", setPrioritySelectColor);
-        setPrioritySelectColor();
-    }
+    setResolvedColor();
+    setPrioritySelectColor();
+    setupFormEvents();
 </script>
 {% endblock %}
 

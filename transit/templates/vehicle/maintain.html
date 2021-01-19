@@ -26,18 +26,11 @@
     </div>
 </form>
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/vehicle/maintain.js' %}"></script>
 <script type="text/javascript">
-    function checkDate() {
-        if ($("#id_inspection_date_month").val() == "" && $("#id_inspection_date_year").val() == "") {
-            $("#id_inspection_date_day").val("");
-        }
-        else {
-            $("#id_inspection_date_day").val(1);
-        }
-    }
-    $("#id_inspection_date_month").on("change", checkDate);
-    $("#id_inspection_date_year").on("change", checkDate);
-    checkDate();
+    setupFormEvents();
+    updateDateDay();
+    // hide the day in the date picker
     $("#id_inspection_date_day").attr("style", "display: none !important;");
 </script>
 {% endblock %}

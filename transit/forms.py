@@ -57,9 +57,6 @@ class formWidgetAttrs():
     big_mile['class'] += ' form-control-lg'
     big_mile['size'] = '15'
 
-    big_mile_trip = big_mile.copy()
-    big_mile_trip['oninput'] = 'showFullMiles(this)'
-
     fuel = default.copy()
     fuel['onchange'] = 'validateFuel(this)'
     fuel['inputmode'] = 'decimal'
@@ -138,7 +135,7 @@ class shiftFuelForm(forms.Form):
     fuel = forms.CharField(label='Fuel (gal)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.fuel))
 
 class tripStartForm(forms.Form):
-    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
+    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.all(), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
@@ -147,7 +144,7 @@ class tripStartForm(forms.Form):
     additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class tripEndForm(forms.Form):
-    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile_trip))
+    miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
 

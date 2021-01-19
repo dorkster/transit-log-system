@@ -22,7 +22,7 @@
                     <div id="mile_suggestion" class="mb-3" style="font-size: 120%; display: none;">
                         <span class="text-danger">
                             <em>Did you mean: <span id="mile_suggestion_prefix"></span><strong><span id="mile_suggestion_suffix"></span></strong>?</em>
-                            <a id="mile_suggestion_button" href="#_" class="ml-2 btn btn-success" data-suggestion="" onclick="useSuggestion(this, mile_input)">Yes</a>
+                            <a id="mile_suggestion_button" href="#_" class="ml-2 btn btn-success" data-suggestion="" onclick="useSuggestion(this, mile_data)">Yes</a>
                         </span>
                     </div>
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
@@ -62,143 +62,22 @@
 </form>
 
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/trip/start_end.js' %}"></script>
 <script type="text/javascript">
-    {% if additional_pickups %}
-    function toggleAdditionalPickup(item_id) {
-        var list_item = document.getElementById(item_id);
-        if (list_item) {
-            var additional_pickups = {};
-            var json_field = document.getElementById("id_additional_pickups");
-            if (json_field && json_field.value)
-                additional_pickups = JSON.parse(json_field.value);
+    var ajax_set_vehicle_from_driver_url = "{% url 'ajax-set-vehicle-from-driver' %}";
+    var trip_date = { "year": "{{ trip.date.year }}", "month": "{{ trip.date.month }}", "day": "{{ trip.date.day }}" };
 
-            if (list_item.classList.contains("active")) {
-                list_item.classList.remove("active", "border", "border-white");
-                additional_pickups[list_item.dataset.id] = false;
-            }
-            else {
-                list_item.classList.add("active", "border", "border-white");
-                additional_pickups[list_item.dataset.id] = true;
-            }
+    var mile_data = { "start": {}, "prev": {} };
 
-            if (json_field)
-                json_field.value = JSON.stringify(additional_pickups);
-        }
-    }
-    {% endif %}
-
-    var start_miles = {};
     {% for key,val in start_miles.items %}
-    start_miles["{{ key }}"] = "{{ val }}";
+    mile_data["start"]["{{ key }}"] = "{{ val }}";
     {% endfor %}
-    var prev_miles = {};
     {% for key,val in prev_miles.items %}
-    prev_miles["{{ key }}"] = "{{ val }}";
+    mile_data["prev"]["{{ key }}"] = "{{ val }}";
     {% endfor %}
 
-    function showFullMiles(input) {
-        var shift_start_miles = "";
-        var shift_prev_miles = "";
-        var vehicle_index = $("#id_vehicle").prop("selectedIndex");
-        if (vehicle_index != 0) {
-            var current_vehicle = document.getElementById("id_vehicle").options[vehicle_index].text;
-            shift_start_miles = start_miles[current_vehicle];
-            shift_prev_miles = prev_miles[current_vehicle];
-        }
-
-        $("#full_miles_desc").html("");
-
-        var new_miles = validateMilesString(input.value, false);
-        var prefix_miles = "";
-        if (new_miles != "") {
-            prefix_miles = shift_start_miles.substring(0, shift_start_miles.length - new_miles.length);
-            $("#full_miles_desc").append('<span class="text-info">Match to the odometer:</span>');
-        }
-        var combined_miles = prefix_miles + new_miles;
-
-        $("#full_miles").html("");
-        $("#full_miles").append('<span class="text-muted">' + prefix_miles + '</span><strong>' + new_miles + '</strong>');
-
-        $("#mile_suggestion").hide();
-        if (shift_prev_miles != "" && combined_miles != "") {
-            if (parseFloat(combined_miles) < parseFloat(shift_prev_miles)) {
-                var prev_prefix_miles = shift_prev_miles.substring(0, shift_prev_miles.length - new_miles.length);
-
-                if ((combined_miles == prev_prefix_miles + new_miles) || (parseFloat(prev_prefix_miles + new_miles) < parseFloat(shift_prev_miles))) {
-                    if (prev_prefix_miles == "") {
-                        prev_prefix_miles = "1";
-                    }
-                    else {
-                        prev_prefix_miles = (parseFloat(prev_prefix_miles) + 1).toString();
-                    }
-                }
-
-                var suggest_prefix = "";
-                var suggest_suffix = "";
-
-                var suggest_miles = prev_prefix_miles + new_miles;
-                if (suggest_miles.length > combined_miles.length) {
-                    suggest_suffix = suggest_miles;
-                }
-                else {
-                    for (var i = 0; i < suggest_miles.length; i++) {
-                        if (suggest_miles.charAt(i) == combined_miles.charAt(i)) {
-                            suggest_prefix += suggest_miles.charAt(i);
-                        }
-                        else {
-                            break;
-                        }
-                    }
-                    suggest_suffix = suggest_miles.substring(suggest_prefix.length, suggest_miles.length);
-                }
-
-                $("#full_miles").append('<span class="text-danger"><strong><span class="ml-3 oi oi-warning"></span></strong></span>');
-                $("#mile_suggestion").show();
-                $("#mile_suggestion_prefix").html(suggest_prefix);
-                $("#mile_suggestion_suffix").html(suggest_suffix);
-                $("#mile_suggestion_button").data("suggestion", suggest_suffix);
-            }
-        }
-    }
-
-    function useSuggestion(button, input) {
-        input.value = $(button).data("suggestion");
-        showFullMiles(input);
-    }
-
-    var mile_input = document.getElementById("id_miles");
-    mile_input.addEventListener("change", function() { showFullMiles(mile_input); });
-
-    var vehicle_input = document.getElementById("id_vehicle");
-    vehicle_input.addEventListener("change", function() { showFullMiles(mile_input); });
-
-    showFullMiles(mile_input);
-
-    function ajaxSetVehicleFromDriver() {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-set-vehicle-from-driver' %}",
-            data: {
-                "year":"{{ trip.date.year }}",
-                "month":"{{ trip.date.month }}",
-                "day":"{{ trip.date.day }}",
-                "driver":$("#id_driver option:selected").val(),
-            }
-        })
-        .done(function(response) {
-            if (response.vehicle != "") {
-                $("#id_vehicle option").filter(function() {
-                    return $(this).val() == response.vehicle;
-                }).prop("selected", true);
-            }
-            else {
-                $("#id_vehicle").prop("selectedIndex", 0);
-            }
-            showFullMiles(mile_input);
-        });
-    }
-
-    $("#id_driver").change(ajaxSetVehicleFromDriver);
+    setupFormEvents(mile_data, trip_date);
+    showFullMiles(mile_data);
 </script>
 {% endblock %}
 

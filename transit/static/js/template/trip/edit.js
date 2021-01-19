@@ -1,65 +1,49 @@
 function setStatusColor() {
-    var status_input = document.getElementById("id_status")
-    if (status_input.value > 0) {
-        status_input.classList.add("bg-danger", "text-light");
+    if ($("#id_status").val() > 0) {
+        $("#id_status").addClass("bg-danger text-light");
     }
     else {
-        status_input.classList.remove("bg-danger", "text-light");
+        $("#id_status").removeClass("bg-danger text-light");
     }
 }
 
 function setupFormEvents() {
-    var status_input = document.getElementById("id_status")
-    status_input.addEventListener("change", setStatusColor);
+    $("#id_status").on("change", setStatusColor);
 }
 
 function setupFormEventsTrip() {
-    var name_input = document.getElementById("id_name");
-    name_input.addEventListener("change", onNameChanged);
-
-    var pickup_input = document.getElementById("id_address");
-    var destination_input = document.getElementById("id_destination");
-    var pickup_phone_input = document.getElementById("id_phone_address");
-    var destination_phone_input = document.getElementById("id_phone_destination");
-    pickup_input.addEventListener("change", function() { onAddressChanged(this, pickup_phone_input); });
-    destination_input.addEventListener("change", function() { onAddressChanged(this, destination_phone_input); });
+    $("#id_name").on("change", onNameChanged);
+    $("#id_address").on("change", function() { onAddressChanged(0); });
+    $("#id_destination").on("change", function() { onAddressChanged(1); });
 }
 
 function onNameChanged() {
-    var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
-
-    var name_input = document.getElementById("id_name");
     var address_datalist = document.getElementById("addresses");
     address_datalist.children[0].value = "";
 
     var found_client = false;
     for (i in clients) {
-        if (clients[i].fields.name == name_input.value) {
+        if (clients[i].fields.name == $("#id_name").val()) {
             found_client = true;
 
-            var phone_home_input = document.getElementById("id_phone_home");
-            phone_home_input.value = clients[i].fields.phone_home;
-            var phone_cell_input = document.getElementById("id_phone_cell");
-            phone_cell_input.value = clients[i].fields.phone_cell;
+            $("#id_phone_home").val(clients[i].fields.phone_home);
+            $("#id_phone_cell").val(clients[i].fields.phone_cell);
 
-            var elderly_input = document.getElementById("id_elderly");
             if (clients[i].fields.elderly == null)
-                elderly_input.selectedIndex = 0;
+                $("#id_elderly").prop("selectedIndex", 0);
             else if (clients[i].fields.elderly == true)
-                elderly_input.selectedIndex = 1;
+                $("#id_elderly").prop("selectedIndex", 1);
             else if (clients[i].fields.elderly == false)
-                elderly_input.selectedIndex = 2;
+                $("#id_elderly").prop("selectedIndex", 2);
 
-            var ambulatory_input = document.getElementById("id_ambulatory");
             if (clients[i].fields.ambulatory == null)
-                ambulatory_input.selectedIndex = 0;
+                $("#id_ambulatory").prop("selectedIndex", 0);
             else if (clients[i].fields.ambulatory == true)
-                ambulatory_input.selectedIndex = 1;
+                $("#id_ambulatory").prop("selectedIndex", 1);
             else if (clients[i].fields.ambulatory == false)
-                ambulatory_input.selectedIndex = 2;
+                $("#id_ambulatory").prop("selectedIndex", 2);
 
-            var tags_input = document.getElementById("id_tags");
-            tags_input.value = clients[i].fields.tags;
+            $("#id_tags").val(clients[i].fields.tags);
             createTagList();
 
             address_datalist.children[0].value = clients[i].fields.address;
@@ -67,75 +51,76 @@ function onNameChanged() {
         }
     }
 
-    if (!found_client && name_input.value != "") {
-        if (!confirm("Unable to find '" + name_input.value + "' in the Clients database. Do you still want to continue?")) {
-            name_input.value = "";
+    if (!found_client && $("#id_name").val() != "") {
+        if (!confirm("Unable to find '" + $("#id_name").val() + "' in the Clients database. Do you still want to continue?")) {
+            $("#id_name").val("");
         }
     }
 
     var add_client_btn = document.getElementById("add_client_btn");
     if (add_client_btn) {
-        if (found_client || name_input.value == "") {
-            document.getElementById("id_add_client").value = "True";
+        if (found_client || $("#id_name").val() == "") {
+            $("#id_add_client").val("True");
             toggleAddClient(add_client_btn);
             add_client_btn.classList.add("disabled");
         }
         else {
-            document.getElementById("id_add_client").value = "False";
+            $("#id_add_client").val("False");
             toggleAddClient(add_client_btn);
             add_client_btn.classList.remove("disabled");
         }
     }
 }
 
-function getClientPhone(input, phone_type) {
-    var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
+function getClientPhone(target) {
+    var phone_input = (target == 1 ? "#id_phone_cell" : "#id_phone_home");
 
-    var name_input = document.getElementById("id_name");
-    $("#" + input).val("");
+    $(phone_input).val("");
     for (i in clients) {
-        if (clients[i].fields.name == name_input.value) {
-            if (phone_type == "home")
-                $("#" + input).val(clients[i].fields.phone_home);
-            else if (phone_type == "cell")
-                $("#" + input).val(clients[i].fields.phone_cell);
+        if (clients[i].fields.name == $("#id_name").val()) {
+            if (target == 1)
+                $(phone_input).val(clients[i].fields.phone_cell);
+            else
+                $(phone_input).val(clients[i].fields.phone_home);
 
             break;
         }
     }
 }
 
-function getClientAddress(address_input, phone_input) {
-    var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
+function getClientAddress(target) {
+    var address_input = (target == 1 ? "#id_destination" : "#id_address");
+    var phone_input = (target == 1 ? "#id_phone_destination" : "#id_phone_address");
 
-    var name_input = document.getElementById("id_name");
-    $("#" + address_input).val("");
-    $("#" + phone_input).val("");
+    $(address_input).val("");
+    $(phone_input).val("");
     for (i in clients) {
-        if (clients[i].fields.name == name_input.value) {
-            $("#" + address_input).val(clients[i].fields.address);
+        if (clients[i].fields.name == $("#id_name").val()) {
+            $(address_input).val(clients[i].fields.address);
         }
     }
 }
 
-function onAddressChanged(address_input, phone_input) {
-    var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
+function onAddressChanged(target) {
+    var address_input = (target == 1 ? "#id_destination" : "#id_address");
+    var phone_input = (target == 1 ? "#id_phone_destination" : "#id_phone_address");
 
     for (i in destinations) {
-        if (destinations[i].fields.address == address_input.value) {
-            phone_input.value = destinations[i].fields.phone;
+        if (destinations[i].fields.address == $(address_input).val()) {
+            $(phone_input).val(destinations[i].fields.phone);
             break;
         }
     }
 }
 
-function getDestinationPhone(address_input, phone_input) {
-    var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
+function getDestinationPhone(target) {
+    var address_input = (target == 1 ? "#id_destination" : "#id_address");
+    var phone_input = (target == 1 ? "#id_phone_destination" : "#id_phone_address");
 
-    $("#" + phone_input).val("");
+    $(phone_input).val("");
     for (i in destinations) {
-        if (destinations[i].fields.address == $("#" + address_input).val()) {
-            $("#" + phone_input).val(destinations[i].fields.phone);
+        if (destinations[i].fields.address == $(address_input).val()) {
+            $(phone_input).val(destinations[i].fields.phone);
             break;
         }
     }

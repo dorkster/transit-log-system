@@ -59,11 +59,11 @@
                     <legend>Client Information</legend>
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
                     <div class="mb-2"><label for="{{ form.phone_home.id_for_label }}"><strong>{{ form.phone_home.label }}</strong></label>
-                        <a title="Get the client's home phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_home', 'home')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the client's home phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(0)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_home }}
                     </div>
                     <div class="mb-2"><label for="{{ form.phone_cell.id_for_label }}"><strong>{{ form.phone_cell.label }}</strong></label>
-                        <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_cell', 'cell')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(1)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_cell }}
                     </div>
                     <hr/>
@@ -80,18 +80,18 @@
                     <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address', 'id_phone_address')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress(0)"><span class="oi oi-home"></span></a>
                         <br/>{{ form.address }}</div>
                     <div class="mb-2"><label for="{{ form.phone_address.id_for_label }}"><strong>{{ form.phone_address.label }}</strong></label>
-                        <a title="Get the pick-up phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_address', 'id_phone_address')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the pick-up phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone(0)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_address }}
                     </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination', 'id_phone_destination')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress(1)"><span class="oi oi-home"></span></a>
                         <br/>{{ form.destination }}</div>
                     <div class="mb-2"><label for="{{ form.phone_destination.id_for_label }}"><strong>{{ form.phone_destination.label }}</strong></label>
-                        <a title="Get the destination phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_destination', 'id_phone_destination')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the destination phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone(1)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_destination }}
                     </div>
                     <hr/>
@@ -208,13 +208,16 @@
     setupFormEvents();
 
     {% if not trip.is_activity %}
-        setupFormEventsTrip();
+    var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
+    var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
 
-        {% if fares and is_new and not is_return_trip %}
-        showFareDialog();
-        {% endif %}
+    setupFormEventsTrip();
 
-        createTagList();
+    {% if fares and is_new and not is_return_trip %}
+    showFareDialog();
+    {% endif %}
+
+    createTagList();
     {% endif %}
 </script>
 {% endblock %}

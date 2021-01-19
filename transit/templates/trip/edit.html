@@ -62,11 +62,11 @@
                     <legend>Client Information</legend>
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
                     <div class="mb-2"><label for="{{ form.phone_home.id_for_label }}"><strong>{{ form.phone_home.label }}</strong></label>
-                        <a title="Get the client's home phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_home', 'home')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the client's home phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(0)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_home }}
                     </div>
                     <div class="mb-2"><label for="{{ form.phone_cell.id_for_label }}"><strong>{{ form.phone_cell.label }}</strong></label>
-                        <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone('id_phone_cell', 'cell')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(1)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_cell }}
                     </div>
                     <hr/>
@@ -83,18 +83,18 @@
                     <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_address', 'id_phone_address')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress(9)"><span class="oi oi-home"></span></a>
                         <br/>{{ form.address }}</div>
                     <div class="mb-2"><label for="{{ form.phone_address.id_for_label }}"><strong>{{ form.phone_address.label }}</strong></label>
-                        <a title="Get the pick-up phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_address', 'id_phone_address')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the pick-up phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone(0)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_address }}
                     </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.destination.id_for_label }}"><strong>{{ form.destination.label }}</strong></label>
-                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress('id_destination', 'id_phone_destination')"><span class="oi oi-home"></span></a>
+                        <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the client's home address" onclick="getClientAddress(1)"><span class="oi oi-home"></span></a>
                         <br/>{{ form.destination }}</div>
                     <div class="mb-2"><label for="{{ form.phone_destination.id_for_label }}"><strong>{{ form.phone_destination.label }}</strong></label>
-                        <a title="Get the destination phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone('id_destination', 'id_phone_destination')"><span class="oi oi-phone"></span></a>
+                        <a title="Get the destination phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getDestinationPhone(1)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_destination }}
                     </div>
                     <hr/>
@@ -217,280 +217,27 @@
     </div>
 </div>
 <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/trip/edit.js' %}"></script>
 {{ clients_json|json_script:"clients-tag" }}
 {{ destinations_json|json_script:"destinations-tag" }}
 <script type="text/javascript">
-    {% if is_new and not trip.is_activity and not is_return_trip %}
-    function toggleReturnTrip(btn) {
-        var field = document.getElementById("id_create_return_trip");
-        if (field) {
-            if (field.value == "False") {
-                field.value = "True";
-                btn.classList.remove("btn-outline-dark");
-                btn.classList.add("btn-primary");
-                btn.firstChild.classList.remove("oi-circle-x");
-                btn.firstChild.classList.add("oi-circle-check");
-            }
-            else {
-                field.value = "False";
-                btn.classList.remove("btn-primary");
-                btn.classList.add("btn-outline-dark");
-                btn.firstChild.classList.remove("oi-circle-check");
-                btn.firstChild.classList.add("oi-circle-x");
-            }
-        }
-    }
-    function toggleAddClient(btn) {
-        var field = document.getElementById("id_add_client");
-        if (field) {
-            if (field.value == "False") {
-                field.value = "True";
-                btn.classList.remove("btn-outline-dark");
-                btn.classList.add("btn-primary");
-                btn.firstChild.classList.remove("oi-circle-x");
-                btn.firstChild.classList.add("oi-circle-check");
-            }
-            else {
-                field.value = "False";
-                btn.classList.remove("btn-primary");
-                btn.classList.add("btn-outline-dark");
-                btn.firstChild.classList.remove("oi-circle-check");
-                btn.firstChild.classList.add("oi-circle-x");
-            }
-        }
-    }
-    {% endif %}
-
-    var status_input = document.getElementById("id_status")
-    function setStatusColor() {
-        if (status_input.value > 0) {
-            status_input.classList.add("bg-danger", "text-light");
-        }
-        else {
-            status_input.classList.remove("bg-danger", "text-light");
-        }
-    }
-    status_input.addEventListener("change", setStatusColor);
     setStatusColor();
-
     focusFromParam();
+    setupFormEvents();
 
-{% if not trip.is_activity %}
-    function ajaxSetVehicleFromDriver() {
-        $.ajax({
-            type: "GET",
-            url: "{% url 'ajax-set-vehicle-from-driver' %}",
-            data: {
-                "year":$("#id_date_year").val(),
-                "month":$("#id_date_month").val(),
-                "day":$("#id_date_day").val(),
-                "driver":$("#id_driver option:selected").val(),
-            }
-        })
-        .done(function(response) {
-            if (response.vehicle != "") {
-                $("#id_vehicle option").filter(function() {
-                    return $(this).val() == response.vehicle;
-                }).prop("selected", true);
-            }
-            else {
-                $("#id_vehicle").prop("selectedIndex", 0);
-            }
-        });
-    }
-
-    $("#id_driver").change(ajaxSetVehicleFromDriver);
-
+    {% if not trip.is_activity %}
+    var ajax_set_vehicle_from_driver_url = "{% url 'ajax-set-vehicle-from-driver' %}";
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
-
-    var name_input = document.getElementById("id_name");
-    function onNameChanged() {
-        var address_datalist = document.getElementById("addresses");
-        address_datalist.children[0].value = "";
-
-        var found_client = false;
-        for (i in clients) {
-            if (clients[i].fields.name == name_input.value) {
-                found_client = true;
-
-                var phone_home_input = document.getElementById("id_phone_home");
-                phone_home_input.value = clients[i].fields.phone_home;
-                var phone_cell_input = document.getElementById("id_phone_cell");
-                phone_cell_input.value = clients[i].fields.phone_cell;
-
-                var elderly_input = document.getElementById("id_elderly");
-                if (clients[i].fields.elderly == null)
-                    elderly_input.selectedIndex = 0;
-                else if (clients[i].fields.elderly == true)
-                    elderly_input.selectedIndex = 1;
-                else if (clients[i].fields.elderly == false)
-                    elderly_input.selectedIndex = 2;
-
-                var ambulatory_input = document.getElementById("id_ambulatory");
-                if (clients[i].fields.ambulatory == null)
-                    ambulatory_input.selectedIndex = 0;
-                else if (clients[i].fields.ambulatory == true)
-                    ambulatory_input.selectedIndex = 1;
-                else if (clients[i].fields.ambulatory == false)
-                    ambulatory_input.selectedIndex = 2;
-
-                var tags_input = document.getElementById("id_tags");
-                tags_input.value = clients[i].fields.tags;
-                createTagList();
-
-                address_datalist.children[0].value = clients[i].fields.address;
-                break;
-            }
-        }
-
-        if (!found_client && name_input.value != "") {
-            if (!confirm("Unable to find '" + name_input.value + "' in the Clients database. Do you still want to continue?")) {
-                name_input.value = "";
-            }
-        }
-
-        {% if is_new and not trip.is_activity and not is_return_trip %}
-        if (found_client || name_input.value == "") {
-            var add_client_btn = document.getElementById("add_client_btn");
-            document.getElementById("id_add_client").value = "True";
-            toggleAddClient(add_client_btn);
-            add_client_btn.classList.add("disabled");
-        }
-        else {
-            var add_client_btn = document.getElementById("add_client_btn");
-            document.getElementById("id_add_client").value = "False";
-            toggleAddClient(add_client_btn);
-            add_client_btn.classList.remove("disabled");
-        }
-        {% endif %}
-    }
-    name_input.addEventListener("change", onNameChanged);
-
-    function getClientPhone(input, phone_type) {
-        $("#" + input).val("");
-        for (i in clients) {
-            if (clients[i].fields.name == name_input.value) {
-                if (phone_type == "home")
-                    $("#" + input).val(clients[i].fields.phone_home);
-                else if (phone_type == "cell")
-                    $("#" + input).val(clients[i].fields.phone_cell);
-
-                break;
-            }
-        }
-    }
-
-    function getClientAddress(address_input, phone_input) {
-        $("#" + address_input).val("");
-        $("#" + phone_input).val("");
-        for (i in clients) {
-            if (clients[i].fields.name == name_input.value) {
-                $("#" + address_input).val(clients[i].fields.address);
-            }
-        }
-    }
-
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
 
-    var pickup_input = document.getElementById("id_address");
-    var destination_input = document.getElementById("id_destination");
-    function onAddressChanged(address_input, phone_input) {
-        for (i in destinations) {
-            if (destinations[i].fields.address == address_input.value) {
-                phone_input.value = destinations[i].fields.phone;
-                break;
-            }
-        }
-    }
+    setupFormEventsTrip();
 
-    function getDestinationPhone(address_input, phone_input) {
-        $("#" + phone_input).val("");
-        for (i in destinations) {
-            if (destinations[i].fields.address == $("#" + address_input).val()) {
-                $("#" + phone_input).val(destinations[i].fields.phone);
-                break;
-            }
-        }
-    }
-
-    var pickup_phone_input = document.getElementById("id_phone_address");
-    var destination_phone_input = document.getElementById("id_phone_destination");
-    pickup_input.addEventListener("change", function() { onAddressChanged(this, pickup_phone_input); });
-    destination_input.addEventListener("change", function() { onAddressChanged(this, destination_phone_input); });
-
-    {% if fares %}
-    function setFare(fare_str) {
-        $('#id_fare').val(fare_str);
-        $('#fare_modal').modal('hide');
-    }
-
-    function showFareDialog() {
-        $('#fare_modal').modal({backdrop: 'static', keyboard: false});
-        $('#fare_modal').modal('show');
-    }
-
-    {% if is_new and not is_return_trip %}
+    {% if fares and is_new and not is_return_trip %}
     showFareDialog();
     {% endif %}
-    {% endif %}
 
-    function addTag(tag) {
-        if ($('#id_tags').val() == "") {
-            $('#id_tags').val(tag);
-            createTagList();
-            $('#tag_modal').modal('hide');
-            return;
-        }
-
-        var split_tags = $('#id_tags').val().split(',');
-        for (i in split_tags) {
-            if ($.trim(split_tags[i]) == tag) {
-                createTagList();
-                $('#tag_modal').modal('hide');
-                return;
-            }
-        }
-
-        $('#id_tags').val($('#id_tags').val() + ("," + tag));
-
-        createTagList();
-        $('#tag_modal').modal('hide');
-    }
-    function removeTag(tag_index) {
-        var tag_str = "";
-        var split_tags = $('#id_tags').val().split(',');
-        for (i in split_tags) {
-            if (i == tag_index)
-                continue;
-
-            tag_str += $.trim(split_tags[i]);
-            if (i < split_tags.length - 1 && tag_str != "") {
-                tag_str += ",";
-            }
-        }
-        $('#id_tags').val(tag_str);
-
-        createTagList();
-    }
-
-    function showTagDialog() {
-        $('#tag_modal').modal('show');
-    }
-
-    function createTagList() {
-        $('#tag_list').html("");
-
-        var split_tags = $('#id_tags').val().split(',');
-        for (i in split_tags) {
-            split_tags[i] = $.trim(split_tags[i]);
-            if (split_tags[i] != "") {
-                $('#tag_list').append('<a class="btn btn-sm ' + getTagButtonStyle(split_tags[i]) + ' text-bold m-1" href="#_" onclick="removeTag(' + i.toString() + ')"><span class="oi oi-tag mr-2"></span>' + split_tags[i] + '<span class="ml-3 oi oi-x"></span></a>');
-            }
-        }
-        $('#tag_list').append('<a class="btn btn-sm btn-secondary" href="#_" onclick="showTagDialog()" title="Add a tag"><span class="oi oi-plus"></span></a> ');
-    }
     createTagList();
-{% endif %}
+    {% endif %}
 </script>
 {% endblock %}
 

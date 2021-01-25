@@ -155,13 +155,16 @@
     </div>
 </div>
 {% if trips %}
-<a class="small" href="#_" onclick="(function(){ ajax_loader.run('', 'toggle_extra_columns', ''); })();">
+<div class="container m-0 p-0 mb-1">
+<a class="btn btn-outline-primary btn-sm small" href="#_" onclick="ajax_loader.run('', 'toggle_extra_columns', '')">
 {% if show_extra_columns %}
-Hide extra columns
+<span class="oi oi-collapse-left mr-2"></span>Hide extra columns
 {% else %}
-Show extra columns
+<span class="oi oi-collapse-right mr-2"></span>Show extra columns
 {% endif %}
 </a>
+</div>
+
 <table class="mytable">
     <thead>
         <td>Pick up</td>

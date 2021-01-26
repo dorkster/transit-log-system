@@ -596,7 +596,7 @@ class Report():
                         break
                 if not found_unique_rider:
                     rider = Report.UniqueRiderSummary.Rider(i.parent.name)
-                    rider.trips = 0
+                    rider.trips.setTrips(0, False)
                     rider.elderly = i.parent.elderly
                     rider.ambulatory = i.parent.ambulatory
                     rider.client_id = i.parent.id

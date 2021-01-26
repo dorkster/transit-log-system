@@ -99,7 +99,7 @@ def schedulePrint(request, year, month, day):
         query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
 
     if filter_search != '':
-        query_trips = query_trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | (Q(is_activity=True) & Q(note__icontains=filter_search)))
+        query_trips = query_trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
     if filter_driver != '':
         query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
@@ -367,7 +367,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
 
         if filter_search != '':
-            trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | (Q(is_activity=True) & Q(note__icontains=filter_search)))
+            trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
         if filter_driver != '':
             trips = trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))

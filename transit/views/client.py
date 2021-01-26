@@ -234,7 +234,7 @@ def ajaxClientList(request):
         clients = clients.filter(staff=False)
 
     if filter_search != '':
-        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
     filtered_count = len(clients)
 
@@ -309,7 +309,7 @@ def clientXLSX(request):
         clients = clients.filter(staff=False)
 
     if filter_search != '':
-        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
     if sort_mode == SORT_NAME:
         clients = clients.order_by('name')

@@ -90,47 +90,47 @@
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
+                {% if sort_mode == 0 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Name
-                {% if sort_mode == 0 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">
+                {% if sort_mode == 1 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Address
-                {% if sort_mode == 1 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
+                {% if sort_mode == 2 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Phone (Home)
-                {% if sort_mode == 2 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
+                {% if sort_mode == 3 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Phone (Cell)
-                {% if sort_mode == 3 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
         {% if show_extra_columns %}
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '4')">
+                {% if sort_mode == 4 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Elderly?
-                {% if sort_mode == 4 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '5')">
+                {% if sort_mode == 5 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Ambulatory?
-                {% if sort_mode == 5 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
-        <td>
+        <td class="text-nowrap">
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '6')">
+                {% if sort_mode == 6 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Tags
-                {% if sort_mode == 6 %}<span class="oi oi-sort-ascending"></span>{% endif %}
             </a>
         </td>
         {% else %}

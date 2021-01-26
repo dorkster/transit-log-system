@@ -171,6 +171,9 @@ def ajaxClientList(request):
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
 
+    prev_sort_mode = request.session.get('clients_sort', None)
+    prev_sort_dir = request.session.get('clients_sort_dir', None)
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])
@@ -197,6 +200,16 @@ def ajaxClientList(request):
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_search = request.session.get('clients_search', '')
     sort_mode = request.session.get('clients_sort', SORT_NAME)
+
+    sort_mode_dir = 0 if prev_sort_dir == None else prev_sort_dir
+    if request_action == 'sort':
+        if prev_sort_dir == None:
+            sort_mode_dir = 0
+        elif prev_sort_mode == sort_mode:
+            sort_mode_dir = 0 if prev_sort_dir == 1 else 1
+        else:
+            sort_mode_dir = 0
+        request.session['clients_sort_dir'] = sort_mode_dir
 
     clients = Client.objects.all()
     unfiltered_count = len(clients)
@@ -231,6 +244,9 @@ def ajaxClientList(request):
     elif sort_mode == SORT_TAGS:
         clients = clients.order_by('tags', 'name')
 
+    if sort_mode_dir == 1:
+        clients = clients.reverse()
+
     context = {
         'clients': clients,
         'filter_elderly': filter_elderly,
@@ -241,6 +257,7 @@ def ajaxClientList(request):
         'unfiltered_count': unfiltered_count,
         'show_extra_columns': request.session.get('clients_extra_columns', False),
         'sort_mode': sort_mode,
+        'sort_mode_dir': sort_mode_dir,
     }
     return render(request, 'client/ajax_list.html', context=context)
 
@@ -254,10 +271,14 @@ def clientXLSX(request):
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
 
+    prev_sort_mode = request.session.get('clients_sort', None)
+    prev_sort_dir = request.session.get('clients_sort_dir', None)
+
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_search = request.session.get('clients_search', '')
     sort_mode = request.session.get('clients_sort', SORT_NAME)
+    sort_mode_dir = request.session.get('clients_sort_dir', 0)
 
     clients = Client.objects.all()
 
@@ -288,6 +309,9 @@ def clientXLSX(request):
         clients = clients.order_by('ambulatory', 'name')
     elif sort_mode == SORT_TAGS:
         clients = clients.order_by('tags', 'name')
+
+    if sort_mode_dir == 1:
+        clients = clients.reverse()
 
     temp_file = tempfile.NamedTemporaryFile()
 

@@ -185,11 +185,14 @@ def ajaxClientList(request):
         request.session['clients_elderly'] = int(request_data)
     elif request_action == 'filter_ambulatory':
         request.session['clients_ambulatory'] = int(request_data)
+    elif request_action == 'filter_staff':
+        request.session['clients_staff'] = int(request_data)
     elif request_action == 'filter_search':
         request.session['clients_search'] = request_data
     elif request_action == 'filter_reset':
         request.session['clients_elderly'] = 0
         request.session['clients_ambulatory'] = 0
+        request.session['clients_staff'] = 0
         request.session['clients_search'] = ''
     elif request_action == 'toggle_extra_columns':
         request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
@@ -198,6 +201,7 @@ def ajaxClientList(request):
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
+    filter_staff = request.session.get('clients_staff', 0)
     filter_search = request.session.get('clients_search', '')
     sort_mode = request.session.get('clients_sort', SORT_NAME)
 
@@ -223,6 +227,11 @@ def ajaxClientList(request):
         clients = clients.filter(ambulatory=True)
     elif filter_ambulatory == 2:
         clients = clients.filter(ambulatory=False)
+
+    if filter_staff == 1:
+        clients = clients.filter(staff=True)
+    elif filter_staff == 2:
+        clients = clients.filter(staff=False)
 
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))
@@ -251,8 +260,9 @@ def ajaxClientList(request):
         'clients': clients,
         'filter_elderly': filter_elderly,
         'filter_ambulatory': filter_ambulatory,
+        'filter_staff': filter_staff,
         'filter_search': filter_search,
-        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_search != ''),
+        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_staff > 0 or filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'show_extra_columns': request.session.get('clients_extra_columns', False),
@@ -276,6 +286,7 @@ def clientXLSX(request):
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
+    filter_staff = request.session.get('clients_staff', 0)
     filter_search = request.session.get('clients_search', '')
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -291,6 +302,11 @@ def clientXLSX(request):
         clients = clients.filter(ambulatory=True)
     elif filter_ambulatory == 2:
         clients = clients.filter(ambulatory=False)
+
+    if filter_staff == 1:
+        clients = clients.filter(staff=True)
+    elif filter_staff == 2:
+        clients = clients.filter(staff=False)
 
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search))

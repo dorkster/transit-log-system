@@ -146,6 +146,12 @@ def destinationCreateFromTemplateTrip(request, trip_id, use_address):
 
 @permission_required(['transit.view_destination'])
 def ajaxDestinationList(request):
+    SORT_ADDRESS = 0
+    SORT_PHONE = 1
+
+    sort_mode = request.session.get('destinations_sort', SORT_ADDRESS)
+    sort_mode_dir = request.session.get('destinations_sort_dir', 0)
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])
@@ -157,6 +163,15 @@ def ajaxDestinationList(request):
         request.session['destinations_search'] = request_data
     elif request_action == 'filter_reset':
         request.session['destinations_search'] = ''
+    elif request_action == 'sort':
+        new_sort_mode = int(request_data)
+        if sort_mode == new_sort_mode:
+            sort_mode_dir = 1 if sort_mode_dir == 0 else 0
+        else:
+            sort_mode_dir = 0
+        sort_mode = new_sort_mode
+        request.session['destinations_sort'] = new_sort_mode
+        request.session['destinations_sort_dir'] = sort_mode_dir
 
     filter_search = request.session.get('destinations_search', '')
 
@@ -168,12 +183,22 @@ def ajaxDestinationList(request):
 
     filtered_count = len(destinations)
 
+    if sort_mode == SORT_ADDRESS:
+        destinations = destinations.order_by('address')
+    elif sort_mode == SORT_PHONE:
+        destinations = destinations.order_by('phone', 'address')
+
+    if sort_mode_dir == 1:
+        destinations = destinations.reverse()
+
     context = {
         'destinations': destinations,
         'filter_search': filter_search,
         'is_filtered': (filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
+        'sort_mode': sort_mode,
+        'sort_mode_dir': sort_mode_dir,
     }
     return render(request, 'destination/ajax_list.html', context=context)
 

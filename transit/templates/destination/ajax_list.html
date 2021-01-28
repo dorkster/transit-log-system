@@ -49,8 +49,18 @@
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
-        <td>Address</td>
-        <td>Phone</td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
+                {% if sort_mode == 0 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Address
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">
+                {% if sort_mode == 1 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Phone
+            </a>
+        </td>
     </thead>
     {% for destination in destinations %}
     <tr>

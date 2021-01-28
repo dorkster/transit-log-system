@@ -171,8 +171,8 @@ def ajaxClientList(request):
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
 
-    prev_sort_mode = request.session.get('clients_sort', None)
-    prev_sort_dir = request.session.get('clients_sort_dir', None)
+    sort_mode = request.session.get('clients_sort', SORT_NAME)
+    sort_mode_dir = request.session.get('clients_sort_dir', 0)
 
     request_id = ''
     if request.GET['target_id'] != '':
@@ -197,23 +197,19 @@ def ajaxClientList(request):
     elif request_action == 'toggle_extra_columns':
         request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
     elif request_action == 'sort':
-        request.session['clients_sort'] = int(request_data)
+        new_sort_mode = int(request_data)
+        if sort_mode == new_sort_mode:
+            sort_mode_dir = 1 if sort_mode_dir == 0 else 0
+        else:
+            sort_mode_dir = 0
+        sort_mode = new_sort_mode
+        request.session['clients_sort'] = new_sort_mode
+        request.session['clients_sort_dir'] = sort_mode_dir
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
     filter_search = request.session.get('clients_search', '')
-    sort_mode = request.session.get('clients_sort', SORT_NAME)
-
-    sort_mode_dir = 0 if prev_sort_dir == None else prev_sort_dir
-    if request_action == 'sort':
-        if prev_sort_dir == None:
-            sort_mode_dir = 0
-        elif prev_sort_mode == sort_mode:
-            sort_mode_dir = 0 if prev_sort_dir == 1 else 1
-        else:
-            sort_mode_dir = 0
-        request.session['clients_sort_dir'] = sort_mode_dir
 
     clients = Client.objects.all()
     unfiltered_count = len(clients)
@@ -281,15 +277,13 @@ def clientXLSX(request):
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
 
-    prev_sort_mode = request.session.get('clients_sort', None)
-    prev_sort_dir = request.session.get('clients_sort_dir', None)
+    sort_mode = request.session.get('clients_sort', SORT_NAME)
+    sort_mode_dir = request.session.get('clients_sort_dir', 0)
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
     filter_search = request.session.get('clients_search', '')
-    sort_mode = request.session.get('clients_sort', SORT_NAME)
-    sort_mode_dir = request.session.get('clients_sort_dir', 0)
 
     clients = Client.objects.all()
 

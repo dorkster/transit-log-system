@@ -10,9 +10,24 @@
 <table class="mytable mytable-striped">
     <thead>
         <td></td>
-        <td>Date Paid</td>
-        <td>Cash</td>
-        <td>Check</td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
+                {% if sort_mode == 0 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Date Paid
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">
+                {% if sort_mode == 1 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Cash
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
+                {% if sort_mode == 2 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Check
+            </a>
+        </td>
     </thead>
     {% for client_payment in client_payments %}
     <tr>

@@ -89,8 +89,10 @@ def templateDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
-@permission_required(['transit.view_template'])
 def ajaxTemplateList(request):
+    if not request.user.has_perm('transit.view_template'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])

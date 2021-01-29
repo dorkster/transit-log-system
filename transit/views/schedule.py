@@ -197,8 +197,10 @@ def ajaxScheduleView(request):
 def ajaxScheduleReadOnly(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_read_only.html', has_filter=True)
 
-@permission_required(['transit.view_trip'])
 def ajaxScheduleCommon(request, template, has_filter=False):
+    if not request.user.has_perm('transit.view_trip'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
 
     request_id = ''

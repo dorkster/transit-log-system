@@ -2,6 +2,8 @@ import uuid
 
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from transit.models import VehicleIssue, Vehicle, PreTrip, Driver
 
@@ -11,8 +13,10 @@ from django.contrib.auth.decorators import permission_required
 def vehicleStatus(request):
     return render(request, 'vehicle/status/view.html', context={})
 
-@permission_required(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip'])
 def ajaxVehicleStatus(request):
+    if not request.user.has_perms(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip']):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])

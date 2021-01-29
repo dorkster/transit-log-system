@@ -144,8 +144,10 @@ def destinationCreateFromTemplateTrip(request, trip_id, use_address):
     destination.phone = target_phone
     return destinationCreateEditCommon(request, destination, is_new=True, src_template_trip=trip)
 
-@permission_required(['transit.view_destination'])
 def ajaxDestinationList(request):
+    if not request.user.has_perm('transit.view_destination'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     SORT_ADDRESS = 0
     SORT_PHONE = 1
 

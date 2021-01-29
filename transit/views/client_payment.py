@@ -83,8 +83,10 @@ def clientPaymentDelete(request, parent, id):
 
     return render(request, 'model_delete.html', context)
 
-@permission_required(['transit.view_clientpayment'])
 def ajaxClientPaymentList(request, parent):
+    if not request.user.has_perm('transit.view_clientpayment'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     SORT_DATE_PAID = 0
     SORT_CASH = 1
     SORT_CHECK = 2

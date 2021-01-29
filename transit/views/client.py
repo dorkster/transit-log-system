@@ -161,8 +161,10 @@ def clientCreateFromTemplateTrip(request, trip_id):
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
 
-@permission_required(['transit.view_client'])
 def ajaxClientList(request):
+    if not request.user.has_perm('transit.view_client'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     SORT_NAME = 0
     SORT_ADDRESS = 1
     SORT_PHONE_HOME = 2

@@ -238,8 +238,10 @@ def templateTripDelete(request, parent, id):
 
     return render(request, 'model_delete.html', context)
 
-@permission_required(['transit.view_templatetrip'])
 def ajaxTemplateTripList(request, parent):
+    if not request.user.has_perm('transit.view_templatetrip'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])

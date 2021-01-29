@@ -9,6 +9,7 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(template_name='user/logged_out.html'), name='logout'),
     path('accounts/password-change/', auth_views.PasswordChangeView.as_view(template_name='user/password_change.html'), name='password_change'),
     path('accounts/password-change-done/', auth_views.PasswordChangeDoneView.as_view(template_name='user/password_change_done.html'), name='password_change_done'),
+    path('accounts/login-redirect/', auth_views.LoginView.as_view(template_name='user/login_redirect.html'), name='login_redirect'),
 
     path('accounts/', views.userList, name='users'),
     path('accounts/update-permissions', views.userUpdatePermissions, name='users-update-permissions'),

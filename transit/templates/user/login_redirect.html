@@ -1,0 +1,7 @@
+<script type="text/javascript">
+{% if user.is_authenticated %}
+window.location.replace("{% url 'index' %}");
+{% else %}
+window.location.replace("{% url 'login' %}");
+{% endif %}
+</script>

@@ -87,8 +87,10 @@ def tagDelete(request, id):
 
     return render(request, 'model_delete.html', context)
 
-@permission_required(['transit.view_tag'])
 def ajaxTagList(request):
+    if not request.user.has_perm('transit.view_tag'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
     request_id = ''
     if request.GET['target_id'] != '':
         request_id = uuid.UUID(request.GET['target_id'])

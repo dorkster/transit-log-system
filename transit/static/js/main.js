@@ -33,7 +33,7 @@ function AjaxLoader(url, div_id) {
     }
 
     self.run = function(target_id="", target_action="", target_data="") {
-        $('.ajax-loading').fadeIn("fast");
+        $('.ajax-loading').stop(true, true).fadeIn("fast");
 
         $.ajax({
             type: "GET",
@@ -61,11 +61,11 @@ function AjaxLoader(url, div_id) {
                                 hash_element.scrollIntoView({block: "center"});
                         }
                 }
-                $('.ajax-loading').fadeOut();
+                $('.ajax-loading').stop(true, true).fadeOut();
                 self.restart();
             }
             else {
-                $('.ajax-loading').fadeOut();
+                $('.ajax-loading').stop(true, true).fadeOut();
                 self.stop();
                 // when the ajax blocker is hidden, fire a new ajax request
                 $('.modal.ajax-blocker.show').one('hidden.bs.modal', function(){ self.restart(); })

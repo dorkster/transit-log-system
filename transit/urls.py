@@ -138,6 +138,8 @@ urlpatterns = [
     path('import/', views.excelImport, name='excel-import'),
     path('search/', views.search, name='search'),
 
+    path('event-log/', views.loggedEventList, name='loggedevent-list'),
+
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/schedule-read-only/', views.ajaxScheduleReadOnly, name='ajax-schedule-read-only'),
@@ -153,4 +155,5 @@ urlpatterns = [
     path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
     path('ajax/template-list/', views.ajaxTemplateList, name='ajax-template-list'),
     path('ajax/template-trip-list/<uuid:parent>/', views.ajaxTemplateTripList, name='ajax-template-trip-list'),
+    path('ajax/loggedevent-list/', views.ajaxLoggedEventList, name='ajax-loggedevent-list'),
 ]

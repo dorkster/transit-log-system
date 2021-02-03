@@ -745,6 +745,15 @@ class Tag(models.Model):
         else:
             return 'btn-info'
 
+class LoggedEvent(models.Model):
+    TYPE_UNKNOWN = 0
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    username = models.CharField(default='{unknown user}', max_length=FieldSizes.MD, blank=False)
+    ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
+    event_type = models.IntegerField(default=TYPE_UNKNOWN)
+    event_desc = models.CharField(default='', max_length=FieldSizes.XL, blank=True)
+
 class SiteSettings(SingletonModel):
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)

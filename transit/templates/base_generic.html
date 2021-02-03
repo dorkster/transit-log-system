@@ -110,6 +110,8 @@
                             <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
+                            <a class="dropdown-item" href="{% url 'loggedevent-list' %}"><span class="oi oi-browser mr-2"></span>Event Log</a>
+                            <div class="dropdown-divider"></div>
                             {% if perms.auth.view_user %}
                             <a class="dropdown-item" href="{% url 'users' %}"><span class="oi oi-people mr-2"></span>Manage Users</a>
                             {% endif %}

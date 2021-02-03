@@ -1,0 +1,23 @@
+<h3>Event Log</h3>
+{% if logged_events %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td>Date &amp; Time</td>
+        <td>Username</td>
+        <td>IP Address</td>
+        <td>Type</td>
+        <td>Description</td>
+    </thead>
+    {% for event in logged_events %}
+    <tr>
+        <td class="mytable-col-lg">{{ event.timestamp }}</td>
+        <td class="mytable-col-lg">{{ event.username }}</td>
+        <td class="mytable-col-lg">{{ event.ip_address }}</td>
+        <td class="mytable-col-md">{{ event.event_type }}</td>
+        <td class="mytable-col-lg">{{ event.event_desc }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>There are no logged events. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all destinations.{% endif %}</p>
+{% endif %}

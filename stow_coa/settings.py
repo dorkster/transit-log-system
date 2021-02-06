@@ -19,20 +19,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)')
-
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = os.environ.get('DJANGO_DEBUG', '') == 'True'
 
-# TODO Use domain name (and localhost) here!!!
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['stow-ma-coa.org']
+    ALLOWED_HOSTS = [os.environ.get('DJANGO_ALLOWED_HOST', '')]
 
+# SECURITY WARNING: keep the secret key used in production secret!
+if DEBUG:
+    SECRET_KEY = 'su1tw^4je357w$4l=^uh-=7!_5t$vl6m-bq=ug6&=)0f6giue)'
+else:
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 
 # Application definition
 
@@ -94,18 +93,10 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator' },
+    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator' },
+    { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator' },
+    { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator' },
 ]
 
 
@@ -138,3 +129,11 @@ LOGIN_URL = '/transit/accounts/login/'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
+
+# Handled on web server
+#SECURE_SSL_REDIRECT = True
+
+# Requires HTTPS, so disable in debug mode
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

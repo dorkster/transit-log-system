@@ -17,6 +17,9 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.workbook import Workbook
 from openpyxl.utils import get_column_letter
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_client'])
 def clientList(request):
     context = {
@@ -49,9 +52,11 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
         if form.is_valid():
+            is_existing_client = False
             existing_clients = Client.objects.filter(name=form.cleaned_data['name'])
             if len(existing_clients) > 0:
                 unique_client = existing_clients[0]
+                is_existing_client = True
             else:
                 unique_client = client
 
@@ -65,6 +70,11 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.staff = form.cleaned_data['staff']
 
             unique_client.save()
+
+            if is_new and not is_existing_client:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_CLIENT, str(unique_client))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_CLIENT, str(unique_client))
 
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
@@ -117,6 +127,8 @@ def clientDelete(request, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('client-edit', kwargs={'id':id}))
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_CLIENT, str(client))
 
         client.delete()
         return HttpResponseRedirect(reverse('clients'))

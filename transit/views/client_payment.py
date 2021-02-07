@@ -12,6 +12,9 @@ from django.contrib.auth.decorators import permission_required
 
 from transit.common.util import *
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_clientpayment'])
 def clientPaymentList(request, parent):
     context = {
@@ -49,6 +52,11 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
             client_payment.check = money_string_to_int(form.cleaned_data['check'])
             client_payment.save()
 
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_CLIENT_PAYMENT, str(client_payment))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_CLIENT_PAYMENT, str(client_payment))
+
             return HttpResponseRedirect(reverse('client-payments', kwargs={'parent':client_payment.parent.id}) + '#payment_' + str(client_payment.id))
     else:
         initial = {
@@ -73,6 +81,8 @@ def clientPaymentDelete(request, parent, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('client-payment-edit', kwargs={'parent':client_payment.parent.id, 'id':id}))
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_CLIENT_PAYMENT, str(client_payment))
 
         client_payment.delete()
         return HttpResponseRedirect(reverse('client-payments', kwargs={'parent':parent}))

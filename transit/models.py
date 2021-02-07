@@ -746,13 +746,99 @@ class Tag(models.Model):
             return 'btn-info'
 
 class LoggedEvent(models.Model):
-    TYPE_UNKNOWN = 0
+    ACTION_UNKNOWN = 0
+    ACTION_CREATE = 1
+    ACTION_EDIT = 2
+    ACTION_DELETE = 3
+    ACTION_LOG_START = 4
+    ACTION_LOG_END = 5
+    ACTION_LOG_FUEL = 6
+    ACTION_STATUS = 7
+
+    MODEL_UNKNOWN = 0
+    MODEL_CLIENT = 1
+    MODEL_CLIENT_PAYMENT = 2
+    MODEL_DESTINATION = 3
+    MODEL_DRIVER = 4
+    MODEL_FARE = 5
+    MODEL_SHIFT = 6
+    MODEL_TAG = 7
+    MODEL_TEMPLATE = 8
+    MODEL_TEMPLATE_TRIP = 9
+    MODEL_TEMPLATE_TRIP_ACTIVITY = 10
+    MODEL_TRIP = 11
+    MODEL_TRIP_ACTIVITY = 12
+    MODEL_TRIPTYPE = 13
+    MODEL_USER = 14
+    MODEL_VEHICLE = 15
+    MODEL_VEHICLE_MAINTAIN = 16
+    MODEL_VEHICLE_ISSUE = 17
+    MODEL_PRETRIP = 18
 
     timestamp = models.DateTimeField(auto_now_add=True)
     username = models.CharField(default='{unknown user}', max_length=FieldSizes.MD, blank=False)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
-    event_type = models.IntegerField(default=TYPE_UNKNOWN)
+    event_action = models.IntegerField(default=ACTION_UNKNOWN)
+    event_model = models.IntegerField(default=MODEL_UNKNOWN)
     event_desc = models.CharField(default='', max_length=FieldSizes.XL, blank=True)
+
+    def get_model_str(self):
+        if self.event_model == self.MODEL_CLIENT:
+            return "Client"
+        elif self.event_model == self.MODEL_CLIENT_PAYMENT:
+            return "Client Payment"
+        elif self.event_model == self.MODEL_DESTINATION:
+            return "Destination"
+        elif self.event_model == self.MODEL_DRIVER:
+            return "Driver"
+        elif self.event_model == self.MODEL_FARE:
+            return "Fare"
+        elif self.event_model == self.MODEL_SHIFT:
+            return "Shift"
+        elif self.event_model == self.MODEL_TAG:
+            return "Tag"
+        elif self.event_model == self.MODEL_TEMPLATE:
+            return "Template"
+        elif self.event_model == self.MODEL_TEMPLATE_TRIP:
+            return "Template Trip"
+        elif self.event_model == self.MODEL_TEMPLATE_TRIP_ACTIVITY:
+            return "Template Activity"
+        elif self.event_model == self.MODEL_TRIP:
+            return "Trip"
+        elif self.event_model == self.MODEL_TRIP_ACTIVITY:
+            return "Activity"
+        elif self.event_model == self.MODEL_TRIPTYPE:
+            return "Trip Type"
+        elif self.event_model == self.MODEL_USER:
+            return "User"
+        elif self.event_model == self.MODEL_VEHICLE:
+            return "Vehicle"
+        elif self.event_model == self.MODEL_VEHICLE_MAINTAIN:
+            return "Vehicle Maintainence"
+        elif self.event_model == self.MODEL_VEHICLE_ISSUE:
+            return "Vehicle Issue"
+        elif self.event_model == self.MODEL_PRETRIP:
+            return "Pre-Trip"
+        else: # MODEL_UNKNOWN
+            return "Unknown"
+
+    def get_action_str(self):
+        if self.event_action == self.ACTION_CREATE:
+            return "Create"
+        elif self.event_action == self.ACTION_EDIT:
+            return "Edit"
+        elif self.event_action == self.ACTION_DELETE:
+            return "Delete"
+        elif self.event_action == self.ACTION_LOG_START:
+            return "Start Log"
+        elif self.event_action == self.ACTION_LOG_END:
+            return "End Log"
+        elif self.event_action == self.ACTION_LOG_FUEL:
+            return "Log Fuel"
+        elif self.event_action == self.ACTION_STATUS:
+            return "Set Status"
+        else: # ACTION_UNKNOWN
+            return "Unknown"
 
 class SiteSettings(SingletonModel):
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)

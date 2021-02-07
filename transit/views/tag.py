@@ -11,6 +11,9 @@ from django.contrib.auth.decorators import permission_required
 
 from transit.common.util import *
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_tag'])
 def tagList(request):
     context = {
@@ -49,6 +52,11 @@ def tagCreateEditCommon(request, tag, is_new):
             tag.name = form.cleaned_data['name']
             tag.save()
 
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_TAG, str(tag))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_TAG, str(tag))
+
             return HttpResponseRedirect(reverse('tags') + '#tag_' + str(tag.id))
     else:
         initial = {
@@ -77,6 +85,8 @@ def tagDelete(request, id):
             if i.sort_index > tag.sort_index:
                 i.sort_index -= 1;
                 i.save()
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_TAG, str(tag))
 
         tag.delete()
         return HttpResponseRedirect(reverse('tags'))

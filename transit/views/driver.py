@@ -9,6 +9,9 @@ from transit.forms import EditDriverForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_driver'])
 def driverList(request):
     context = {
@@ -49,6 +52,11 @@ def driverCreateEditCommon(request, driver, is_new):
             driver.is_logged = form.cleaned_data['is_logged']
             driver.save()
 
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_DRIVER, str(driver))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_DRIVER, str(driver))
+
             return HttpResponseRedirect(reverse('drivers') + '#driver_' + str(driver.id))
     else:
         initial = {
@@ -79,6 +87,8 @@ def driverDelete(request, id):
             if i.sort_index > driver.sort_index:
                 i.sort_index -= 1;
                 i.save()
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_DRIVER, str(driver))
 
         driver.delete()
         return HttpResponseRedirect(reverse('drivers'))

@@ -10,6 +10,9 @@ from transit.forms import EditDestinationForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_destination'])
 def destinationList(request):
     context = {
@@ -42,15 +45,22 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             return HttpResponseRedirect(reverse('destination-delete', kwargs={'id':destination.id}))
 
         if form.is_valid():
+            is_existing_destination = False
             existing_destinations = Destination.objects.filter(address=form.cleaned_data['address'])
             if len(existing_destinations) > 0:
                 unique_destination = existing_destinations[0]
+                is_existing_destination = True
             else:
                 unique_destination = destination
 
             unique_destination.address = form.cleaned_data['address']
             unique_destination.phone = form.cleaned_data['phone']
             unique_destination.save()
+
+            if is_new and not is_existing_destination:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_DESTINATION, str(unique_destination))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_DESTINATION, str(unique_destination))
 
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
@@ -92,6 +102,8 @@ def destinationDelete(request, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('destination-edit', kwargs={'id':id}))
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_DESTINATION, str(destination))
 
         destination.delete()
         return HttpResponseRedirect(reverse('destinations'))

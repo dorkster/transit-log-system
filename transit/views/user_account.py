@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import password_validation
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 def userGroupIntToStr(group):
     if group == 1:
         return 'Assistant'
@@ -215,6 +218,12 @@ def userCreateEdit(request, user, is_new):
                 user.user_permissions.set({})
 
             user.save()
+
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_USER, str(user))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_USER, str(user))
+
             return HttpResponseRedirect(reverse('users'))
 
     else:
@@ -258,6 +267,7 @@ def userDelete(request, username):
             return HttpResponseRedirect(reverse('user-edit', kwargs={'username':user.username}))
 
         if can_delete:
+            log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_USER, str(user))
             user.delete()
         return HttpResponseRedirect(reverse('users'))
 

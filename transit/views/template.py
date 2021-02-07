@@ -9,6 +9,9 @@ from transit.forms import EditTemplateForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 @permission_required(['transit.view_template'])
 def templateList(request):
     context = {
@@ -47,6 +50,11 @@ def templateCreateEditCommon(request, template, is_new):
             template.name = form.cleaned_data['name']
             template.save()
 
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_TEMPLATE, str(template))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_TEMPLATE, str(template))
+
             return HttpResponseRedirect(reverse('templates') + '#template_' + str(template.id))
     else:
         initial = {
@@ -79,6 +87,8 @@ def templateDelete(request, id):
         trip_query = TemplateTrip.objects.filter(parent=id)
         for i in trip_query:
             i.delete()
+
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_TEMPLATE, str(template))
 
         template.delete()
         return HttpResponseRedirect(reverse('templates'))

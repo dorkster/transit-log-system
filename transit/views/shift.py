@@ -9,6 +9,9 @@ from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent
+
 def shiftCreate(request, mode, year, month, day):
     shift = Shift()
     shift.date = datetime.date(year, month, day)
@@ -63,6 +66,11 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             shift.note = form.cleaned_data['notes']
             shift.save()
 
+            if is_new:
+                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_SHIFT, str(shift))
+            else:
+                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_SHIFT, str(shift))
+
             new_day_trips = Trip.objects.filter(date=shift.date)
             for trip in new_day_trips:
                 if trip.driver is None and trip.vehicle is None:
@@ -113,6 +121,8 @@ def shiftDelete(request, mode, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('shift-edit', kwargs={'mode':mode, 'id':id}))
 
+        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_SHIFT, str(shift))
+
         shift.delete()
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':date.year, 'month':date.month, 'day':date.day}))
 
@@ -158,6 +168,8 @@ def shiftStart(request, id):
                 shift.start_miles = form.cleaned_data['miles']
             shift.start_time = form.cleaned_data['time']
             shift.save()
+
+            log_event(request, LoggedEvent.ACTION_LOG_START, LoggedEvent.MODEL_SHIFT, str(shift))
 
             site_settings = SiteSettings.load()
             if site_settings.reset_filter_on_shift_change:
@@ -207,6 +219,8 @@ def shiftEnd(request, id):
                 shift.end_miles = form.cleaned_data['miles']
             shift.end_time = form.cleaned_data['time']
             shift.save()
+
+            log_event(request, LoggedEvent.ACTION_LOG_END, LoggedEvent.MODEL_SHIFT, str(shift))
 
             site_settings = SiteSettings.load()
             if site_settings.reset_filter_on_shift_change:
@@ -271,6 +285,8 @@ def shiftFuel(request, id):
         if form.is_valid():
             shift.fuel = form.cleaned_data['fuel']
             shift.save()
+
+            log_event(request, LoggedEvent.ACTION_LOG_FUEL, LoggedEvent.MODEL_SHIFT, str(shift))
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:

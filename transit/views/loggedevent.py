@@ -73,6 +73,7 @@ def ajaxLoggedEventList(request):
         'unfiltered_count': unfiltered_count,
         'actions': actions,
         'targets': targets,
+        'current_ip': request.META['REMOTE_ADDR'],
     }
     return render(request, 'loggedevent/ajax_list.html', context=context)
 

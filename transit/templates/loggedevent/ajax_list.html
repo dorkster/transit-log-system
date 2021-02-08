@@ -1,4 +1,29 @@
-<h3>Event Log</h3>
+<h3>Event Log <a href="" class="btn btn-primary btn-sm" onclick="ajax_loader.run()"><span class="oi oi-reload mr-2"></span>Refresh</a></h3>
+<div class="container ml-0 border p-2 mb-3" style="background: #eee;">
+    <div class="row">
+        <div class="col">
+            <h5>Filter{% if filtered_count < unfiltered_count %} ({{filtered_count}}/{{unfiltered_count}} visible){% endif %}</h5>
+        </div>
+        {% if is_filtered %}
+        <div class="col-auto">
+            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_action is None %}All Actions{% else %}{% for action in actions %}{% if filter_action == action.id %}{{ action.name }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_action is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '')">All Actions</a>
+                {% for action in actions %}
+                <a class="dropdown-item {% if filter_action == action.id %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '{{action.id}}')">{{action.name}}</a>
+                {% endfor %}
+            </div>
+        </span>
+    </div>
+</div>
 {% if logged_events %}
 <table class="mytable mytable-striped">
     <thead>
@@ -20,6 +45,17 @@
     </tr>
     {% endfor %}
 </table>
+{% if logged_events.paginator.num_pages > 1 %}
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="{% if logged_events.has_previous %}?page={{ logged_events.previous_page_number }}{% endif %}">&laquo;</a></li>
+        {% for page in logged_events.paginator.page_range %}
+        <li class="page-item {% if logged_events.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="{% if logged_events.has_next %}?page={{ logged_events.next_page_number }}{% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
+{% endif %}
 {% else %}
 <p>There are no logged events. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all destinations.{% endif %}</p>
 {% endif %}

@@ -129,6 +129,7 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='change_tag'))
         permissions.append(Permission.objects.get(codename='delete_tag'))
         permissions.append(Permission.objects.get(codename='view_tag'))
+        permissions.append(Permission.objects.get(codename='view_loggedevent'))
 
     group.permissions.set(permissions)
     group.save()

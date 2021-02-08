@@ -19,7 +19,9 @@ function AjaxLoader(url, div_id) {
     var self = this;
     self.start = function(delay=self.interval_delay) {
         self.interval_delay = delay;
-        self.interval = setInterval(function() { self.run(); }, delay);
+        if (delay > 0) {
+            self.interval = setInterval(function() { self.run(); }, delay);
+        }
     }
     self.stop = function() {
         if (self.interval != null)

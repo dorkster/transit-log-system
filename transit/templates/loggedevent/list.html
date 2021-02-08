@@ -6,11 +6,17 @@
 </div>
 
 <script type="text/javascript">
-    var ajax_loader = new AjaxLoader("{%url 'ajax-loggedevent-list' %}", "#loggedevent_list");
+    var params = new URLSearchParams(location.search);
 
-    // Fetch the initial data and repeat every 10 seconds
+    var page = params.get('page');
+    if (page == null)
+        page = 1;
+
+    var ajax_loader = new AjaxLoader("{%url 'ajax-loggedevent-list' %}?page=" + page, "#loggedevent_list");
+
+    // Fetch the initial data
     ajax_loader.run();
-    ajax_loader.start(10000);
+    ajax_loader.start(0);
 </script>
 {% endblock %}
 

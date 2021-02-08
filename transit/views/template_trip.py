@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.util import *
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_templatetrip'])
 def templateTripList(request, parent):
@@ -140,11 +140,11 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
             trip.save()
 
-            log_model = LoggedEvent.MODEL_TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TEMPLATE_TRIP
+            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, log_model, str(trip))
+                log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, log_model, str(trip))
+                log_event(request, LoggedEventAction.EDIT, log_model, str(trip))
 
             if is_new and not is_return_trip and not trip.is_activity:
                 if form.cleaned_data['add_client'] == True:
@@ -156,7 +156,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                     client.elderly = form.cleaned_data['elderly']
                     client.ambulatory = form.cleaned_data['ambulatory']
                     client.save()
-                    log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_CLIENT, str(client))
+                    log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
 
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('template-trip-create-return', kwargs={'parent':trip.parent.id, 'id':trip.id}))
@@ -239,8 +239,8 @@ def templateTripDelete(request, parent, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_model = LoggedEvent.MODEL_TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TEMPLATE_TRIP
-        log_event(request, LoggedEvent.ACTION_DELETE, log_model, str(trip))
+        log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
+        log_event(request, LoggedEventAction.DELETE, log_model, str(trip))
 
         trip.delete()
         return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':parent}))
@@ -298,8 +298,8 @@ def ajaxTemplateTripList(request, parent):
             elif request_data == '1':
                 trip.status = Trip.STATUS_CANCELED
             trip.save()
-            log_model = LoggedEvent.MODEL_TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TEMPLATE_TRIP
-            log_event(request, LoggedEvent.ACTION_STATUS, log_model, str(trip))
+            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
+            log_event(request, LoggedEventAction.STATUS, log_model, str(trip))
 
     if request_action == 'toggle_extra_columns':
         request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)

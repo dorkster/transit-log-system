@@ -10,7 +10,7 @@ from transit.models import VehicleIssue, Vehicle, PreTrip, Driver
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip'])
 def vehicleStatus(request):
@@ -32,7 +32,7 @@ def ajaxVehicleStatus(request):
             issue = get_object_or_404(VehicleIssue, id=request_id)
             issue.is_resolved = not issue.is_resolved
             issue.save()
-            log_event(request, LoggedEvent.ACTION_STATUS, LoggedEvent.MODEL_VEHICLE_ISSUE, str(issue))
+            log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
     if request_action == 'filter_toggle_resolved':
         request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
     elif request_action == 'filter_driver':

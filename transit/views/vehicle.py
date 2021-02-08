@@ -11,7 +11,7 @@ from transit.forms import EditVehicleForm, vehicleMaintainForm, vehiclePreTripFo
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_vehicle'])
 def vehicleList(request):
@@ -53,9 +53,9 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
             vehicle.save()
 
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_VEHICLE, str(vehicle))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE, str(vehicle))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_VEHICLE, str(vehicle))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE, str(vehicle))
 
             return HttpResponseRedirect(reverse('vehicles') + '#vehicle_' + str(vehicle.id))
     else:
@@ -87,7 +87,7 @@ def vehicleDelete(request, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_VEHICLE, str(vehicle))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.VEHICLE, str(vehicle))
 
         vehicle.delete()
         return HttpResponseRedirect(reverse('vehicles'))
@@ -157,7 +157,7 @@ def vehicleMaintainEdit(request, id):
             vehicle.inspection_date = form.cleaned_data['inspection_date']
             vehicle.save()
 
-            log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_VEHICLE_MAINTAIN, str(vehicle))
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_MAINTAIN, str(vehicle))
 
             return HttpResponseRedirect(reverse('vehicle-status'))
     else:
@@ -216,7 +216,7 @@ def vehiclePreTripCreate(request, shift_id):
                 pretrip.cl_interior = cl['cl_interior']['status']
 
                 pretrip.save()
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_PRETRIP, str(pretrip))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.PRETRIP, str(pretrip))
 
                 # open vehicle issues as needed
                 for key in cl:
@@ -231,7 +231,7 @@ def vehiclePreTripCreate(request, shift_id):
                         issue.pretrip = pretrip
                         issue.pretrip_field = key
                         issue.save()
-                        log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_VEHICLE_ISSUE, str(issue))
+                        log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE_ISSUE, str(issue))
 
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     else:
@@ -252,7 +252,7 @@ def vehiclePreTripDelete(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('vehicle-status'))
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_PRETRIP, str(pretrip))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.PRETRIP, str(pretrip))
 
         pretrip.delete()
         return HttpResponseRedirect(reverse('vehicle-status'))

@@ -835,40 +835,11 @@ class Tag(models.Model):
             return 'btn-info'
 
 class LoggedEvent(models.Model):
-    ACTION_UNKNOWN = 0
-    ACTION_CREATE = 1
-    ACTION_EDIT = 2
-    ACTION_DELETE = 3
-    ACTION_LOG_START = 4
-    ACTION_LOG_END = 5
-    ACTION_LOG_FUEL = 6
-    ACTION_STATUS = 7
-
-    MODEL_UNKNOWN = 0
-    MODEL_CLIENT = 1
-    MODEL_CLIENT_PAYMENT = 2
-    MODEL_DESTINATION = 3
-    MODEL_DRIVER = 4
-    MODEL_FARE = 5
-    MODEL_SHIFT = 6
-    MODEL_TAG = 7
-    MODEL_TEMPLATE = 8
-    MODEL_TEMPLATE_TRIP = 9
-    MODEL_TEMPLATE_TRIP_ACTIVITY = 10
-    MODEL_TRIP = 11
-    MODEL_TRIP_ACTIVITY = 12
-    MODEL_TRIPTYPE = 13
-    MODEL_USER = 14
-    MODEL_VEHICLE = 15
-    MODEL_VEHICLE_MAINTAIN = 16
-    MODEL_VEHICLE_ISSUE = 17
-    MODEL_PRETRIP = 18
-
     timestamp = models.DateTimeField(auto_now_add=True)
     username = models.CharField(default='{unknown user}', max_length=FieldSizes.MD, blank=False)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
-    event_action = models.IntegerField(default=ACTION_UNKNOWN)
-    event_model = models.IntegerField(default=MODEL_UNKNOWN)
+    event_action = models.IntegerField(default=LoggedEventAction.UNKNOWN)
+    event_model = models.IntegerField(default=LoggedEventModel.UNKNOWN)
     event_desc = models.CharField(default='', max_length=FieldSizes.XL, blank=True)
 
     def get_model_str(self):

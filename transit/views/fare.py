@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.util import *
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_fare'])
 def fareList(request):
@@ -54,9 +54,9 @@ def fareCreateEditCommon(request, fare, is_new):
             fare.save()
 
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_FARE, str(fare))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.FARE, str(fare))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_FARE, str(fare))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.FARE, str(fare))
 
             return HttpResponseRedirect(reverse('fares') + '#fare_' + str(fare.id))
     else:
@@ -88,7 +88,7 @@ def fareDelete(request, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_FARE, str(fare))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.FARE, str(fare))
 
         fare.delete()
         return HttpResponseRedirect(reverse('fares'))

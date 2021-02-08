@@ -12,7 +12,7 @@ from transit.views.report import Report
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_trip'])
 def schedule(request, mode, year, month, day):
@@ -286,8 +286,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             elif request_data == '2':
                 trip.status = Trip.STATUS_NO_SHOW
             trip.save()
-            log_model = LoggedEvent.MODEL_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TRIP
-            log_event(request, LoggedEvent.ACTION_STATUS, log_model, str(trip))
+            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
+            log_event(request, LoggedEventAction.STATUS, log_model, str(trip))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
             template_trips = TemplateTrip.objects.filter(parent=parent_template)

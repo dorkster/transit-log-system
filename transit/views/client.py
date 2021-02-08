@@ -18,7 +18,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.utils import get_column_letter
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_client'])
 def clientList(request):
@@ -72,9 +72,9 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.save()
 
             if is_new and not is_existing_client:
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_CLIENT, str(unique_client))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(unique_client))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_CLIENT, str(unique_client))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(unique_client))
 
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
@@ -128,7 +128,7 @@ def clientDelete(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('client-edit', kwargs={'id':id}))
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_CLIENT, str(client))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.CLIENT, str(client))
 
         client.delete()
         return HttpResponseRedirect(reverse('clients'))

@@ -10,7 +10,7 @@ from transit.forms import EditVehicleIssueForm
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 def vehicleIssueCreate(request):
     vehicle_issue = VehicleIssue()
@@ -44,9 +44,9 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             vehicle_issue.save()
 
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_VEHICLE_ISSUE, str(vehicle_issue))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE_ISSUE, str(vehicle_issue))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_VEHICLE_ISSUE, str(vehicle_issue))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(vehicle_issue))
 
             return HttpResponseRedirect(reverse('vehicle-status'))
     else:
@@ -76,7 +76,7 @@ def vehicleIssueDelete(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('vehicle-issue-edit', kwargs={'id':id}))
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_VEHICLE_ISSUE, str(vehicle_issue))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.VEHICLE_ISSUE, str(vehicle_issue))
 
         vehicle_issue.delete()
         return HttpResponseRedirect(reverse('vehicle-status'))

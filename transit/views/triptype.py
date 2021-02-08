@@ -10,7 +10,7 @@ from transit.forms import EditTripTypeForm
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_triptype'])
 def triptypeList(request):
@@ -51,9 +51,9 @@ def triptypeCreateEditCommon(request, triptype, is_new):
             triptype.save()
 
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_TRIPTYPE, str(triptype))
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.TRIPTYPE, str(triptype))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, LoggedEvent.MODEL_TRIPTYPE, str(triptype))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIPTYPE, str(triptype))
 
             return HttpResponseRedirect(reverse('triptypes') + '#triptype_' + str(triptype.id))
     else:
@@ -84,7 +84,7 @@ def triptypeDelete(request, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_event(request, LoggedEvent.ACTION_DELETE, LoggedEvent.MODEL_TRIPTYPE, str(triptype))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.TRIPTYPE, str(triptype))
 
         triptype.delete()
         return HttpResponseRedirect(reverse('triptypes'))

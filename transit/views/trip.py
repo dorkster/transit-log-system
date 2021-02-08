@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.util import *
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 def tripCreate(request, mode, year, month, day):
     trip = Trip()
@@ -170,11 +170,11 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
             trip.save()
 
-            log_model = LoggedEvent.MODEL_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TRIP
+            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
             if is_new:
-                log_event(request, LoggedEvent.ACTION_CREATE, log_model, str(trip))
+                log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
-                log_event(request, LoggedEvent.ACTION_EDIT, log_model, str(trip))
+                log_event(request, LoggedEventAction.EDIT, log_model, str(trip))
 
             if is_new and not is_return_trip and not trip.is_activity:
                 if form.cleaned_data['add_client'] == True:
@@ -186,7 +186,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                     client.elderly = form.cleaned_data['elderly']
                     client.ambulatory = form.cleaned_data['ambulatory']
                     client.save()
-                    log_event(request, LoggedEvent.ACTION_CREATE, LoggedEvent.MODEL_CLIENT, str(client))
+                    log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
 
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('trip-create-return', kwargs={'mode':mode, 'id':trip.id}))
@@ -279,8 +279,8 @@ def tripDelete(request, mode, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_model = LoggedEvent.MODEL_TRIP_ACTIVITY if trip.is_activity else LoggedEvent.MODEL_TRIP
-        log_event(request, LoggedEvent.ACTION_DELETE, log_model, str(trip))
+        log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
+        log_event(request, LoggedEventAction.DELETE, log_model, str(trip))
 
         trip.delete()
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':date.year, 'month':date.month, 'day':date.day}))
@@ -310,7 +310,7 @@ def tripStart(request, id):
             trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
             trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
             trip.save()
-            log_event(request, LoggedEvent.ACTION_LOG_START, LoggedEvent.MODEL_TRIP, str(trip))
+            log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.TRIP, str(trip))
 
             if form.cleaned_data['additional_pickups'] != '':
                 additional_pickups = json.loads(form.cleaned_data['additional_pickups'])
@@ -322,7 +322,7 @@ def tripStart(request, id):
                         a_trip.driver = form.cleaned_data['driver']
                         a_trip.vehicle = form.cleaned_data['vehicle']
                         a_trip.save()
-                        log_event(request, LoggedEvent.ACTION_LOG_START, LoggedEvent.MODEL_TRIP, str(a_trip))
+                        log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.TRIP, str(a_trip))
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
@@ -415,7 +415,7 @@ def tripEnd(request, id):
             trip.end_miles = form.cleaned_data['miles']
             trip.end_time = form.cleaned_data['time']
             trip.save()
-            log_event(request, LoggedEvent.ACTION_LOG_END, LoggedEvent.MODEL_TRIP, str(trip))
+            log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(trip))
 
             if form.cleaned_data['additional_pickups'] != '':
                 additional_pickups = json.loads(form.cleaned_data['additional_pickups'])
@@ -425,7 +425,7 @@ def tripEnd(request, id):
                         a_trip.end_miles = form.cleaned_data['miles']
                         a_trip.end_time = form.cleaned_data['time']
                         a_trip.save()
-                        log_event(request, LoggedEvent.ACTION_LOG_END, LoggedEvent.MODEL_TRIP, str(a_trip))
+                        log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(a_trip))
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:

@@ -105,8 +105,6 @@
                             {% if user.is_superuser %}
                             <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>View Admin Control Panel</a>
                             <div class="dropdown-divider"></div>
-                            {% endif %}
-                            {% if perms.transit.change_shift and perms.transit.change_trip and perms.auth.change_user %}
                             <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}

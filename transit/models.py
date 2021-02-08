@@ -33,6 +33,95 @@ class FieldSizes():
     FUEL = 4
     COLOR = 8
 
+class LoggedEventAction():
+    UNKNOWN = 0
+    CREATE = 1
+    EDIT = 2
+    DELETE = 3
+    LOG_START = 4
+    LOG_END = 5
+    LOG_FUEL = 6
+    STATUS = 7
+
+    def get_str(val):
+        if val == LoggedEventAction.CREATE:
+            return "Create"
+        elif val == LoggedEventAction.EDIT:
+            return "Edit"
+        elif val == LoggedEventAction.DELETE:
+            return "Delete"
+        elif val == LoggedEventAction.LOG_START:
+            return "Start Log"
+        elif val == LoggedEventAction.LOG_END:
+            return "End Log"
+        elif val == LoggedEventAction.LOG_FUEL:
+            return "Log Fuel"
+        elif val == LoggedEventAction.STATUS:
+            return "Set Status"
+        else: # UNKNOWN
+            return "Unknown"
+
+class LoggedEventModel():
+    UNKNOWN = 0
+    CLIENT = 1
+    CLIENT_PAYMENT = 2
+    DESTINATION = 3
+    DRIVER = 4
+    FARE = 5
+    SHIFT = 6
+    TAG = 7
+    TEMPLATE = 8
+    TEMPLATE_TRIP = 9
+    TEMPLATE_TRIP_ACTIVITY = 10
+    TRIP = 11
+    TRIP_ACTIVITY = 12
+    TRIPTYPE = 13
+    USER = 14
+    VEHICLE = 15
+    VEHICLE_MAINTAIN = 16
+    VEHICLE_ISSUE = 17
+    PRETRIP = 18
+
+    def get_str(val):
+        if val == LoggedEventModel.CLIENT:
+            return "Client"
+        elif val == LoggedEventModel.CLIENT_PAYMENT:
+            return "Client Payment"
+        elif val == LoggedEventModel.DESTINATION:
+            return "Destination"
+        elif val == LoggedEventModel.DRIVER:
+            return "Driver"
+        elif val == LoggedEventModel.FARE:
+            return "Fare"
+        elif val == LoggedEventModel.SHIFT:
+            return "Shift"
+        elif val == LoggedEventModel.TAG:
+            return "Tag"
+        elif val == LoggedEventModel.TEMPLATE:
+            return "Template"
+        elif val == LoggedEventModel.TEMPLATE_TRIP:
+            return "Template Trip"
+        elif val == LoggedEventModel.TEMPLATE_TRIP_ACTIVITY:
+            return "Template Activity"
+        elif val == LoggedEventModel.TRIP:
+            return "Trip"
+        elif val == LoggedEventModel.TRIP_ACTIVITY:
+            return "Activity"
+        elif val == LoggedEventModel.TRIPTYPE:
+            return "Trip Type"
+        elif val == LoggedEventModel.USER:
+            return "User"
+        elif val == LoggedEventModel.VEHICLE:
+            return "Vehicle"
+        elif val == LoggedEventModel.VEHICLE_MAINTAIN:
+            return "Vehicle Maintainence"
+        elif val == LoggedEventModel.VEHICLE_ISSUE:
+            return "Vehicle Issue"
+        elif val == LoggedEventModel.PRETRIP:
+            return "Pre-Trip"
+        else: # UNKNOWN
+            return "Unknown"
+
 class Trip(models.Model):
     STATUS_NORMAL = 0
     STATUS_CANCELED = 1
@@ -783,62 +872,10 @@ class LoggedEvent(models.Model):
     event_desc = models.CharField(default='', max_length=FieldSizes.XL, blank=True)
 
     def get_model_str(self):
-        if self.event_model == self.MODEL_CLIENT:
-            return "Client"
-        elif self.event_model == self.MODEL_CLIENT_PAYMENT:
-            return "Client Payment"
-        elif self.event_model == self.MODEL_DESTINATION:
-            return "Destination"
-        elif self.event_model == self.MODEL_DRIVER:
-            return "Driver"
-        elif self.event_model == self.MODEL_FARE:
-            return "Fare"
-        elif self.event_model == self.MODEL_SHIFT:
-            return "Shift"
-        elif self.event_model == self.MODEL_TAG:
-            return "Tag"
-        elif self.event_model == self.MODEL_TEMPLATE:
-            return "Template"
-        elif self.event_model == self.MODEL_TEMPLATE_TRIP:
-            return "Template Trip"
-        elif self.event_model == self.MODEL_TEMPLATE_TRIP_ACTIVITY:
-            return "Template Activity"
-        elif self.event_model == self.MODEL_TRIP:
-            return "Trip"
-        elif self.event_model == self.MODEL_TRIP_ACTIVITY:
-            return "Activity"
-        elif self.event_model == self.MODEL_TRIPTYPE:
-            return "Trip Type"
-        elif self.event_model == self.MODEL_USER:
-            return "User"
-        elif self.event_model == self.MODEL_VEHICLE:
-            return "Vehicle"
-        elif self.event_model == self.MODEL_VEHICLE_MAINTAIN:
-            return "Vehicle Maintainence"
-        elif self.event_model == self.MODEL_VEHICLE_ISSUE:
-            return "Vehicle Issue"
-        elif self.event_model == self.MODEL_PRETRIP:
-            return "Pre-Trip"
-        else: # MODEL_UNKNOWN
-            return "Unknown"
+        return LoggedEventModel.get_str(self.event_model)
 
     def get_action_str(self):
-        if self.event_action == self.ACTION_CREATE:
-            return "Create"
-        elif self.event_action == self.ACTION_EDIT:
-            return "Edit"
-        elif self.event_action == self.ACTION_DELETE:
-            return "Delete"
-        elif self.event_action == self.ACTION_LOG_START:
-            return "Start Log"
-        elif self.event_action == self.ACTION_LOG_END:
-            return "End Log"
-        elif self.event_action == self.ACTION_LOG_FUEL:
-            return "Log Fuel"
-        elif self.event_action == self.ACTION_STATUS:
-            return "Set Status"
-        else: # ACTION_UNKNOWN
-            return "Unknown"
+        return LoggedEventAction.get_str(self.event_action)
 
 class SiteSettings(SingletonModel):
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)

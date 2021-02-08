@@ -13,12 +13,23 @@
     <div class="mt-2">
         <span class="dropdown ajax-blocker">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_action is None %}All Actions{% else %}{% for action in actions %}{% if filter_action == action.id %}{{ action.name }}{% endif %}{% endfor %}{% endif %}
+                {% if filter_action is None %}All Actions{% else %}{% for action in actions %}{% if filter_action == action.id %}Action: {{ action.name }}{% endif %}{% endfor %}{% endif %}
             </button>
             <div class="dropdown-menu shadow">
                 <a class="dropdown-item {% if filter_action is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '')">All Actions</a>
                 {% for action in actions %}
                 <a class="dropdown-item {% if filter_action == action.id %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '{{action.id}}')">{{action.name}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_target is None %}All Targets{% else %}{% for target in targets %}{% if filter_target == target.id %}Target: {{ target.name }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_target is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_target', '')">All Targets</a>
+                {% for target in targets %}
+                <a class="dropdown-item {% if filter_target == target.id %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_target', '{{target.id}}')">{{target.name}}</a>
                 {% endfor %}
             </div>
         </span>

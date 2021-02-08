@@ -34,6 +34,9 @@ def ajaxLoggedEventList(request):
     elif request_action == 'filter_reset':
         request.session['eventlog_filter_action'] = ''
         request.session['eventlog_filter_target'] = ''
+    elif request_action == 'clear_log':
+        for i in LoggedEvent.objects.all():
+            i.delete()
 
     filter_action = request.session.get('eventlog_filter_action', '')
     filter_target = request.session.get('eventlog_filter_target', '')

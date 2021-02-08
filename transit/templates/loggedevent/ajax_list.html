@@ -67,6 +67,18 @@
         <li class="page-item"><a class="page-link" href="{% if logged_events.has_next %}?page={{ logged_events.next_page_number }}{% endif %}">&raquo;</a></li>
     </ul>
 </nav>
+{% if user.is_superuser %}
+<hr/>
+<h3>For Administrators</h3>
+<a class="btn btn-danger btn-sm" href="#_" onclick="clearLog()"><span class="oi oi-delete mr-2"></span>Clear Log</a>
+<script type="text/javascript">
+    function clearLog() {
+        if (confirm("Delete ALL events from the log? This can not be undone!")) {
+            ajax_loader.run('', 'clear_log', '');
+        }
+    }
+</script>
+{% endif %}
 {% endif %}
 {% else %}
 <p>There are no logged events. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all events.{% endif %}</p>

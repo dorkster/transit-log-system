@@ -28,7 +28,6 @@ urlpatterns = [
     path('schedule/edit/print/<int:year>/<int:month>/<int:day>', views.schedulePrint, name='schedule-print'),
     path('schedule/edit/message/<int:year>/<int:month>/<int:day>', views.scheduleMessage, name='schedule-message'),
     path('schedule/edit/print-daily-log/<int:year>/<int:month>/<int:day>', views.schedulePrintDailyLog, name='schedule-print-daily-log'),
-    path('schedule/edit/print-daily-log/<int:year>/<int:month>/<int:day>/shift/<uuid:id>', views.schedulePrintDailyLogShift, name='schedule-print-daily-log-shift'),
 
     path('schedule/<slug:mode>/trips/create/<int:year>/<int:month>/<int:day>', views.tripCreate, name='trip-create'),
     path('schedule/<slug:mode>/trips/create/today', views.tripCreateToday, name='trip-create-today'),
@@ -143,6 +142,7 @@ urlpatterns = [
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/schedule-read-only/', views.ajaxScheduleReadOnly, name='ajax-schedule-read-only'),
+    path('ajax/schedule-print-daily-log/<int:year>/<int:month>/<int:day>', views.ajaxSchedulePrintDailyLog, name='ajax-schedule-print-daily-log'),
     path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
     path('ajax/client-payment-list/<uuid:parent>/', views.ajaxClientPaymentList, name='ajax-client-payment-list'),

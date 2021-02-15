@@ -417,9 +417,27 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 
 
 def schedulePrintDailyLog(request, year, month, day):
-    return schedulePrintDailyLogShift(request, year, month, day, id=None)
+    request.session['schedule_print_daily_log_id'] = None
+    context = {
+        'year': year,
+        'month': month,
+        'day': day,
+    }
+    return render(request, 'schedule/print_daily_log.html', context=context)
 
-def schedulePrintDailyLogShift(request, year, month, day, id):
+def ajaxSchedulePrintDailyLog(request, year, month, day):
+    request_id = ''
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
+
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
+
+    if request_action == 'select_id':
+        request.session['schedule_print_daily_log_id'] = request_data
+    elif request_action == 'select_all':
+        request.session['schedule_print_daily_log_id'] = None
+
     day_date = datetime.date(year, month, day)
 
     shifts = Shift.objects.filter(date=day_date)
@@ -427,14 +445,16 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
     shifts = shifts.exclude(end_miles='')
     report = Report()
 
-    if id == None:
+    shift_id = request.session.get('schedule_print_daily_log_id', None)
+
+    if shift_id == None:
         current_shift = None
         report.load(day_date, day_date)
         if len(report.report_all) > 0:
             report_summary = report.all_vehicles
     else:
-        current_shift = get_object_or_404(Shift, id=id)
-        report.load(day_date, day_date, daily_log_shift=id)
+        current_shift = get_object_or_404(Shift, id=shift_id)
+        report.load(day_date, day_date, daily_log_shift=shift_id)
         if len(report.report_all) > 0:
             report_summary = report.report_all[0].by_vehicle[current_shift.vehicle]
 
@@ -494,4 +514,4 @@ def schedulePrintDailyLogShift(request, year, month, day, id):
         'trips_employment': trips_employment,
     }
 
-    return render(request, 'schedule/print_daily_log.html', context)
+    return render(request, 'schedule/ajax_print_daily_log.html', context)

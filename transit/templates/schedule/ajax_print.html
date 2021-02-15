@@ -1,0 +1,248 @@
+<div class="container-fluid">
+    <div class="row justify-content-between">
+        <div class="col-md p-1">
+            <h5>{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h5>
+        </div>
+        <div class="col-auto p-1" id="print-print">
+            <button class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</button>
+        </div>
+    </div>
+</div>
+<hr class="mt-0" />
+{% if message %}
+<div class="alert alert-info p-1">
+    <div class="row">
+        <div class="col">
+            <strong style="font-size: 1.3em">{{ message }}</strong>
+        </div>
+    </div>
+</div>
+<hr/>
+{% endif %}
+<div>
+    <h5>Shifts</h5>
+    {% if shifts %}
+    <table class="mytable">
+        <thead>
+            <td>Driver</td>
+            <td>Vehicle</td>
+            <td>Start Miles</td>
+            <td>Start Time</td>
+            <td>End Miles</td>
+            <td>End Time</td>
+            <td>Fuel (gal)</td>
+            <td>Notes</td>
+        </thead>
+        {% for shift in shifts %}
+        <tr style="background: #{{ shift.get_driver_color }};">
+            <td class="mytable-col-md">{{ shift.driver }}</td>
+            <td class="mytable-col-md">{{ shift.vehicle }}</td>
+            <td class="mytable-col-md text-center">
+                {% if shift.check_start_miles %}
+                {{ shift.start_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-md text-center">
+                {% if shift.check_start_time %}
+                {{ shift.start_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-md text-center">
+                {% if shift.check_end_miles %}
+                {{ shift.end_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-md text-center">
+                {% if shift.check_end_time %}
+                {{ shift.end_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">{{ shift.fuel }}</td>
+            <td class="mytable-col-lg">{{ shift.note }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>There are no shifts for this day.</p>
+    {% endif %}
+    <hr/>
+    <div id="print-filter" class="container ml-0 border p-2 mb-3" style="background: #eee;">
+        <div class="row">
+            <div class="col">
+                <h5>Filter{% if filtered_count < unfiltered_count %} ({{filtered_count}}/{{unfiltered_count}} visible){% endif %}</h5>
+            </div>
+            {% if is_filtered %}
+            <div class="col-auto">
+                <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="mt-2">
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu shadow">
+                    <button class="dropdown-item {% if filter_driver is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</button>
+                    {% for driver in drivers %}
+                    <button class="dropdown-item {% if filter_driver == driver %}active{% endif %}" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</Button>
+                    {% endfor %}
+                </div>
+            </span>
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+                </button>
+                <div class="dropdown-menu shadow">
+                    <button class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                    {% for vehicle in vehicles %}
+                    <button class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                    {% endfor %}
+                </div>
+            </span>
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Show...
+                </button>
+                <div class="dropdown-menu shadow dropdown-menu-right">
+                    <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_completed', '')"><span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed</button>
+                    <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')"><span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled</button>
+                    <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')"><span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged</button>
+                </div>
+            </span>
+        </div>
+        <div class="mt-2">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
+                    <span class="oi oi-magnifying-glass mr-2"></span>Search
+                </button>
+
+                <!-- Modal -->
+                <div class="modal ajax-blocker" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form id="filter_search_form">
+                                <div class="modal-body">
+                                    <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="oi oi-magnifying-glass mr-2"></span>Search
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+        {% if filter_search %}
+        <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
+        {% endif %}
+        </div>
+    </div>
+    <hr id="print-filter-hr" />
+    <h5>Trips</h5>
+    {% if trips %}
+    <table class="mytable">
+        <thead>
+            <td>Pick up</td>
+            <td>Appt. time</td>
+            <td>Name</td>
+            <td>Address</td>
+            <td>Phone #</td>
+            <td>Destination</td>
+            <td>Driver</td>
+            <td>Vehicle</td>
+            <td>Start Miles</td>
+            <td>Start Time</td>
+            <td>End Miles</td>
+            <td>End Time</td>
+            <td>Notes</td>
+        </thead>
+        {% for trip in trips %}
+        <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
+            {% if trip.is_activity %}
+            <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
+            <td colspan=11 class="text-center">{{ trip.note }}</td>
+            {% else %}
+            <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
+            <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
+            <td class="mytable-col-lg">{{ trip.name }}</td>
+            <td class="mytable-col-lg">
+                {{ trip.address }}
+                {% if trip.phone_address and trip.address %}<br/>Phone #: {{ trip.phone_address }}{% endif %}
+            </td>
+            <td class="mytable-col-md" style="white-space: nowrap;">
+                {% if trip.phone_home and trip.phone_cell %}
+                {{ trip.phone_home }}<br/>{{ trip.phone_cell }}
+                {% elif not trip.phone_home and trip.phone_cell %}
+                {{ trip.phone_cell }}
+                {% elif trip.phone_home and not trip.phone_cell %}
+                {{ trip.phone_home }}
+                {% endif %}
+            </td>
+            <td class="mytable-col-lg">
+                {{ trip.destination }}
+                {% if trip.phone_destination and trip.destination %}<br/>Phone #: {{ trip.phone_destination }}{% endif %}
+            </td>
+            <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
+            <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
+            <td class="mytable-col-sm">
+                {% if trip.check_start_miles %}
+                {{ trip.start_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_start_time %}
+                {{ trip.start_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_end_miles %}
+                {{ trip.end_miles }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-sm">
+                {% if trip.check_end_time %}
+                {{ trip.end_time }}
+                {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+                {% endif %}
+            </td>
+            <td class="mytable-col-md">
+                {% if trip.note %}{{ trip.note }}{% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>There are no trips for this day.</p>
+    {% endif %}
+</div>
+<script type="text/javascript">
+    {% if show_dialog %}
+    window.print();
+    {% endif %}
+    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>

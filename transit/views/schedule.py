@@ -68,8 +68,50 @@ def schedule(request, mode, year, month, day):
     else:
         return render(request, 'schedule/edit.html', context=context)
 
+def schedulePrintFilterReset(request):
+    request.session['schedule_print_filter_completed'] = False
+    request.session['schedule_print_filter_canceled'] = False
+    request.session['schedule_print_filter_nolog'] = False
+    request.session['schedule_print_filter_search'] = ''
+    request.session['schedule_print_filter_driver'] = ''
+    request.session['schedule_print_filter_vehicle'] = ''
+
 @permission_required(['transit.view_shift', 'transit.view_trip'])
 def schedulePrint(request, year, month, day):
+    schedulePrintFilterReset(request)
+    context = {
+        'year': year,
+        'month': month,
+        'day': day,
+    }
+    return render(request, 'schedule/print.html', context=context)
+
+def ajaxSchedulePrint(request, year, month, day):
+    if not request.user.has_perm('transit.view_shift') or not request.user.has_perm('transit.view_trip'):
+        return HttpResponseRedirect(reverse('login_redirect'))
+
+    request_id = ''
+    if request.GET['target_id'] != '':
+        request_id = uuid.UUID(request.GET['target_id'])
+
+    request_action = request.GET['target_action']
+    request_data = request.GET['target_data']
+
+    if request_action == 'filter_toggle_completed':
+        request.session['schedule_print_filter_completed'] = not request.session['schedule_print_filter_completed']
+    elif request_action == 'filter_toggle_canceled':
+        request.session['schedule_print_filter_canceled'] = not request.session['schedule_print_filter_canceled']
+    elif request_action == 'filter_toggle_nolog':
+        request.session['schedule_print_filter_nolog'] = not request.session['schedule_print_filter_nolog']
+    elif request_action == 'filter_search':
+        request.session['schedule_print_filter_search'] = request_data
+    elif request_action == 'filter_driver':
+        request.session['schedule_print_filter_driver'] = request_data
+    elif request_action == 'filter_vehicle':
+        request.session['schedule_print_filter_vehicle'] = request_data
+    elif request_action == 'filter_reset':
+        schedulePrintFilterReset(request)
+
     day_date = datetime.date(year, month, day)
 
     query_trips = Trip.objects.filter(date=day_date)
@@ -81,14 +123,12 @@ def schedulePrint(request, year, month, day):
     else:
         message = ''
 
-    filter_form = SchedulePrintFilterForm(request.GET)
-
-    filter_hide_canceled = True if request.GET.get('hide_canceled') == '1' else False
-    filter_hide_completed = True if request.GET.get('hide_completed') == '1' else False
-    filter_hide_nolog = True if request.GET.get('hide_nolog') == '1' else False
-    filter_search = '' if request.GET.get('search') == None else request.GET.get('search')
-    filter_driver = '' if request.GET.get('driver') == None else request.GET.get('driver')
-    filter_vehicle = '' if request.GET.get('vehicle') == None else request.GET.get('vehicle')
+    filter_hide_canceled = request.session.get('schedule_print_filter_canceled', False)
+    filter_hide_completed = request.session.get('schedule_print_filter_completed', False)
+    filter_hide_nolog = request.session.get('schedule_print_filter_nolog', False)
+    filter_search = request.session.get('schedule_print_filter_search', '')
+    filter_driver = request.session.get('schedule_print_filter_driver', '')
+    filter_vehicle = request.session.get('schedule_print_filter_vehicle', '')
 
     unfiltered_count = len(query_trips)
 
@@ -106,18 +146,16 @@ def schedulePrint(request, year, month, day):
 
     if filter_driver != '':
         query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
+        query_shifts = query_shifts.filter(driver__id=filter_driver)
 
     if filter_vehicle != '':
         query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | Q(is_activity=True))
+        query_shifts = query_shifts.filter(vehicle__id=filter_vehicle)
 
     filtered_count = len(query_trips)
 
-    # if the GET request is populated, the filter has been used. So we don't want to auto-show the print dialog
-    show_dialog = True
-    for i in request.GET:
-        if i == 'driver':
-            show_dialog = False
-            break
+    # don't auto-show the print dialog if a filter has been set
+    show_dialog = (request_action == '')
 
     context = {
         'date': day_date,
@@ -126,7 +164,6 @@ def schedulePrint(request, year, month, day):
         'message': message,
         'drivers': Driver.objects.all(),
         'vehicles': Vehicle.objects.all(),
-        'filter_form': filter_form,
         'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
@@ -138,7 +175,7 @@ def schedulePrint(request, year, month, day):
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'show_dialog': show_dialog,
     }
-    return render(request, 'schedule/print.html', context=context)
+    return render(request, 'schedule/ajax_print.html', context=context)
 
 @permission_required(['transit.change_schedulemessage'])
 def scheduleMessage(request, year, month, day):

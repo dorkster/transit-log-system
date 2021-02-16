@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, SiteSettings, TripType
-from transit.forms import DatePickerForm, EditScheduleMessageForm, SchedulePrintFilterForm
+from transit.forms import DatePickerForm, EditScheduleMessageForm
 from transit.views.report import Report
 
 from django.contrib.auth.decorators import permission_required

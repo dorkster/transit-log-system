@@ -305,10 +305,3 @@ class EditUserForm(forms.Form):
 
         return cleaned_data
 
-class SchedulePrintFilterForm(forms.Form):
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.HiddenInput())
-    vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.HiddenInput())
-    search = forms.CharField(required=False, widget=forms.HiddenInput())
-    hide_canceled = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput())
-    hide_completed = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput())
-    hide_nolog = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput())

@@ -17,9 +17,9 @@
                 {% if filter_action is None %}All Actions{% else %}{% for action in actions %}{% if filter_action == action.id %}Action: {{ action.name }}{% endif %}{% endfor %}{% endif %}
             </button>
             <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_action is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '')">All Actions</a>
+                <button class="dropdown-item {% if filter_action is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_action', '')">All Actions</button>
                 {% for action in actions %}
-                <a class="dropdown-item {% if filter_action == action.id %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_action', '{{action.id}}')">{{action.name}}</a>
+                <button class="dropdown-item {% if filter_action == action.id %}active{% endif %}" onclick="ajax_loader.run('', 'filter_action', '{{action.id}}')">{{action.name}}</button>
                 {% endfor %}
             </div>
         </span>
@@ -28,12 +28,57 @@
                 {% if filter_target is None %}All Targets{% else %}{% for target in targets %}{% if filter_target == target.id %}Target: {{ target.name }}{% endif %}{% endfor %}{% endif %}
             </button>
             <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_target is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_target', '')">All Targets</a>
+                <button class="dropdown-item {% if filter_target is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_target', '')">All Targets</button>
                 {% for target in targets %}
-                <a class="dropdown-item {% if filter_target == target.id %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_target', '{{target.id}}')">{{target.name}}</a>
+                <button class="dropdown-item {% if filter_target == target.id %}active{% endif %}" onclick="ajax_loader.run('', 'filter_target', '{{target.id}}')">{{target.name}}</button>
                 {% endfor %}
             </div>
         </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_username is None %}All Users{% else %}{% for user in users %}{% if filter_username == user.username %}User: {{ user.username }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_username is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_username', '')">All Users</button>
+                {% for user in users %}
+                <button class="dropdown-item {% if filter_username == user.username %}active{% endif %}" onclick="ajax_loader.run('', 'filter_username', '{{ user.username }}')">{{ user.username }}</button>
+                {% endfor %}
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
+                <span class="oi oi-magnifying-glass mr-2"></span>Search
+            </button>
+
+            <!-- Modal -->
+            <div class="modal ajax-blocker" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_filter_search_title">Filter events by description</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="filter_search_form">
+                            <div class="modal-body">
+                                <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="oi oi-magnifying-glass mr-2"></span>Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    {% if filter_search %}
+    <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
+    {% endif %}
     </div>
 </div>
 {% if logged_events %}
@@ -68,6 +113,9 @@
     </ul>
 </nav>
 {% endif %}
+<script type="text/javascript">
+    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>
 {% if user.is_superuser %}
 <hr/>
 <h3>For Administrators</h3>

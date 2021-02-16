@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator
 
+from django.contrib.auth.models import User
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 from django.contrib.auth.decorators import permission_required
@@ -31,17 +32,25 @@ def ajaxLoggedEventList(request):
         request.session['eventlog_filter_action'] = request_data
     elif request_action == 'filter_target':
         request.session['eventlog_filter_target'] = request_data
+    elif request_action == 'filter_username':
+        request.session['eventlog_filter_username'] = request_data
+    elif request_action == 'filter_search':
+        request.session['eventlog_filter_search'] = request_data
     elif request_action == 'filter_reset':
         request.session['eventlog_filter_action'] = ''
         request.session['eventlog_filter_target'] = ''
+        request.session['eventlog_filter_username'] = ''
+        request.session['eventlog_filter_search'] = ''
     elif request_action == 'clear_log':
         for i in LoggedEvent.objects.all():
             i.delete()
 
     filter_action = request.session.get('eventlog_filter_action', '')
     filter_target = request.session.get('eventlog_filter_target', '')
+    filter_username = request.session.get('eventlog_filter_username', '')
+    filter_search = request.session.get('eventlog_filter_search', '')
 
-    # TODO filtering
+    # TODO filter by date?
     logged_events = LoggedEvent.objects.all()
 
     unfiltered_count = len(logged_events)
@@ -51,6 +60,12 @@ def ajaxLoggedEventList(request):
 
     if filter_target != '':
         logged_events = logged_events.filter(event_model=filter_target)
+
+    if filter_username != '':
+        logged_events = logged_events.filter(username=filter_username)
+
+    if filter_search != '':
+        logged_events = logged_events.filter(event_desc__icontains=filter_search)
 
     filtered_count = len(logged_events)
 
@@ -71,9 +86,12 @@ def ajaxLoggedEventList(request):
         'logged_events': logged_events_paginated,
         'filter_action': None if filter_action == '' else int(filter_action),
         'filter_target': None if filter_target == '' else int(filter_target),
-        'is_filtered': (filter_action != '' or filter_target != ''),
+        'filter_username': None if filter_username == '' else filter_username,
+        'filter_search': filter_search,
+        'is_filtered': (filter_action != '' or filter_target != '' or filter_username != '' or filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
+        'users': User.objects.all(),
         'actions': actions,
         'targets': targets,
         'current_ip': request.META['REMOTE_ADDR'],

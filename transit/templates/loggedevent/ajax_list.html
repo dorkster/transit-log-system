@@ -84,12 +84,42 @@
 {% if logged_events %}
 <table class="mytable mytable-striped">
     <thead>
-        <td>Date &amp; Time</td>
-        <td>Username</td>
-        <td>IP Address</td>
-        <td>Action</td>
-        <td>Target</td>
-        <td>Description</td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
+                {% if sort_mode == 0 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Date &amp; Time
+            </a>
+        </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '1')">
+                {% if sort_mode == 1 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Username
+            </a>
+        </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
+                {% if sort_mode == 2 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                IP Address
+            </a>
+        </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
+                {% if sort_mode == 3 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Action
+            </a>
+        </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '4')">
+                {% if sort_mode == 4 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Target
+            </a>
+        </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '5')">
+                {% if sort_mode == 5 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Description
+            </a>
+        </td>
     </thead>
     {% for event in logged_events %}
     <tr>

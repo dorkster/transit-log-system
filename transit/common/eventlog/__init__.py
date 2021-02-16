@@ -5,7 +5,7 @@ from transit.models import LoggedEvent
 def log_event(request, event_action, event_model, event_desc):
     logged_events = LoggedEvent.objects.all()
 
-    while logged_events.count() >= 1000:
+    while logged_events.count() >= 10000:
         logged_events[0].delete()
 
     event = LoggedEvent()

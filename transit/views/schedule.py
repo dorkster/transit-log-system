@@ -490,8 +490,8 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
         if len(report.report_all) > 0:
             report_summary = report.all_vehicles
     else:
-        current_shift = get_object_or_404(Shift, id=shift_id)
-        report.load(day_date, day_date, daily_log_shift=shift_id)
+        current_shift = get_object_or_404(Shift, id=uuid.UUID(shift_id))
+        report.load(day_date, day_date, daily_log_shift=uuid.UUID(shift_id))
         if len(report.report_all) > 0:
             report_summary = report.report_all[0].by_vehicle[current_shift.vehicle]
 

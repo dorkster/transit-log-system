@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        {% block title %}<title>Stow, MA Council on Aging Transportation</title>{% endblock %}
+        <title>{% block title %}{% block title_section %}{% endblock %}{% if settings and settings.page_title %}{{ settings.page_title }}{% elif settings and settings.short_page_title %}{{ settings.short_page_title }}{% else %}Transportation Log System{% endif %}{% endblock %}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {# <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> #}
@@ -18,7 +18,7 @@
     </head>
     <body class="bg-light">
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <a class="navbar-brand" href="{% url 'index' %}">Stow COA Transit Dept.</a>
+            <a class="navbar-brand" href="{% url 'index' %}">{% if settings and settings.short_page_title %}{{ settings.short_page_title }}{% elif settings and settings.page_title %}{{ settings.page_title }}{% else %}Transportation Log System{% endif %}</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>

@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'transit.context_processors.sitesettings',
                 'transit.context_processors.notifications',
                 'transit.context_processors.version',
             ],

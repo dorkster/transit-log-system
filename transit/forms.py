@@ -282,6 +282,8 @@ class SiteSettingsForm(forms.Form):
     autocomplete_history_days = forms.IntegerField(min_value=0, label='Address autocomplete history days', help_text='If no Destinations have been defined, address fields will use the past X days of Trips to generate suggestions.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     reset_filter_on_shift_change = forms.ChoiceField(choices=BOOL_CHOICES, label='Reset Schedule filter when starting/ending Shift', widget=forms.Select(attrs=formWidgetAttrs.default))
     skip_weekends = forms.ChoiceField(choices=BOOL_CHOICES, label='Skip weekends in the Schedule date picker', widget=forms.Select(attrs=formWidgetAttrs.default))
+    page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditUserForm(forms.Form):
     USER_ACCOUNT_TYPES = [

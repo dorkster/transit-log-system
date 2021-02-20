@@ -3,6 +3,11 @@ import subprocess
 
 from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift
 
+def sitesettings(request):
+    return {
+        'settings': SiteSettings.load(),
+    }
+
 def notifications(request):
     vehicle_inspections = []
     vehicle_oil_changes = []
@@ -34,7 +39,6 @@ def notifications(request):
     vehicle_issues = VehicleIssue.objects.filter(priority__gt=VehicleIssue.PRIORITY_LOW, is_resolved=False)
     vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False)
     return {
-        'settings': SiteSettings.load(),
         'notifications': (len(vehicle_issues) > 0 or len(vehicle_issues_low) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0),
         'notify_vehicle_issues': vehicle_issues,
         'notify_vehicle_issues_low': vehicle_issues_low,

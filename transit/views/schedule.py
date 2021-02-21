@@ -303,23 +303,19 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                     trip.vehicle = None
 
             trip.save()
-            if trip.driver:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Driver -> ' + trip.driver.name + ' | ' + str(trip))
-            else:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Driver -> --------- | ' + str(trip))
-
+            if trip.driver != prev_driver:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Driver -> ' + trip.get_driver_str() + ' | ' + str(trip))
         elif request_action == 'set_vehicle':
             trip = get_object_or_404(Trip, id=request_id)
+            prev_vehicle = trip.vehicle
             if request_data == '---------':
                 trip.vehicle = None;
             else:
                 vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
                 trip.vehicle = vehicle
             trip.save()
-            if trip.vehicle:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Vehicle -> ' + vehicle.name + ' | ' + str(trip))
-            else:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Vehicle -> --------- | ' + str(trip))
+            if trip.vehicle != prev_vehicle:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Vehicle -> ' + trip.get_vehicle_str() + ' | ' + str(trip))
         elif request_action == 'toggle_canceled':
             trip = get_object_or_404(Trip, id=request_id)
             if request_data == '0':
@@ -330,7 +326,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.status = Trip.STATUS_NO_SHOW
             trip.save()
             log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
-            log_event(request, LoggedEventAction.STATUS, log_model, str(trip))
+            log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
             template_trips = TemplateTrip.objects.filter(parent=parent_template)

@@ -312,6 +312,24 @@ class Trip(models.Model):
                 return True
         return False
 
+    def get_driver_str(self):
+        if self.driver:
+            return self.driver.name
+        else:
+            return '---------'
+
+    def get_vehicle_str(self):
+        if self.vehicle:
+            return self.vehicle.name
+        else:
+            return '---------'
+
+    def get_status_str(self):
+        if self.is_activity:
+            return self.STATUS_LEVELS_ACTIVITY[self.status][1]
+        else:
+            return self.STATUS_LEVELS[self.status][1]
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)

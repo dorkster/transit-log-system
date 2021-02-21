@@ -7,6 +7,9 @@ from transit.forms import SiteSettingsForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
+
 @permission_required(['transit.change_sitesettings'])
 def sitesettingsEdit(request):
     settings = SiteSettings.load()
@@ -27,6 +30,7 @@ def sitesettingsEdit(request):
                 settings.page_title = form.cleaned_data['page_title']
                 settings.short_page_title = form.cleaned_data['short_page_title']
             settings.save()
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.UNKNOWN, 'Updated site settings')
             updated = True
     else:
         initial = {

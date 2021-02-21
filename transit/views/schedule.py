@@ -303,6 +303,10 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                     trip.vehicle = None
 
             trip.save()
+            if trip.driver:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Driver -> ' + trip.driver.name + ' | ' + str(trip))
+            else:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Driver -> --------- | ' + str(trip))
 
         elif request_action == 'set_vehicle':
             trip = get_object_or_404(Trip, id=request_id)
@@ -312,6 +316,10 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 vehicle = get_object_or_404(Vehicle, id=uuid.UUID(request_data))
                 trip.vehicle = vehicle
             trip.save()
+            if trip.vehicle:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Vehicle -> ' + vehicle.name + ' | ' + str(trip))
+            else:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, 'Set Vehicle -> --------- | ' + str(trip))
         elif request_action == 'toggle_canceled':
             trip = get_object_or_404(Trip, id=request_id)
             if request_data == '0':
@@ -358,7 +366,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.fare = temp_trip.fare
                 trip.passenger = temp_trip.passenger
                 trip.save()
-            log_event(request, LoggedEventAction.CREATE, LoggedEventModel.TRIP, '[' + str(date) + '] - Inserted Template: ' + str(parent_template))
+            log_event(request, LoggedEventAction.CREATE, LoggedEventModel.TRIP, 'Insert Template -> ' + str(parent_template) + ' | [' + str(date) + ']')
 
     if request_action == 'filter_toggle_completed':
         request.session['schedule_view_hide_completed'] = not request.session.get('schedule_view_hide_completed', False)
@@ -382,12 +390,12 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     elif request.user.is_superuser and request_action == 'delete_all_shifts':
         for i in Shift.objects.filter(date=date):
             i.delete()
-        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.SHIFT, '[' + str(date) + '] - Deleted all Shifts')
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.SHIFT, 'Delete all Shifts | [' + str(date) + ']')
     elif request.user.is_superuser and request_action == 'delete_all_trips':
         for i in Trip.objects.filter(date=date):
             # no need to update sort_index when deleting all trips
             i.delete()
-        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.TRIP, '[' + str(date) + '] - Deleted all Trips')
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.TRIP, 'Delete all Trips | [' + str(date) + ']')
     elif request_action == 'toggle_extra_columns':
         request.session['schedule_edit_extra_columns'] = not request.session.get('schedule_edit_extra_columns', False)
 

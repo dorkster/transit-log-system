@@ -21,6 +21,7 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 def templateTripList(request, parent):
     context = {
         'parent':parent,
+        'template': Template.objects.get(id=parent),
         'template_trips': TemplateTrip.objects.filter(parent=parent),
     }
     return render(request, 'template/trip/list.html', context=context)

@@ -658,6 +658,8 @@ class TemplateTrip(models.Model):
     def __str__(self):
         if self.is_activity:
             output = ''
+            if self.pick_up_time:
+                output += str(self.pick_up_time) + ' - '
             if self.appointment_time: 
                 output += str(self.appointment_time) + ' - '
             output += self.note

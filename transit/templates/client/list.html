@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Clients | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 {% include "ajax_loading.html" %}

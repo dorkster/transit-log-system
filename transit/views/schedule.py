@@ -80,9 +80,7 @@ def schedulePrintFilterReset(request):
 def schedulePrint(request, year, month, day):
     schedulePrintFilterReset(request)
     context = {
-        'year': year,
-        'month': month,
-        'day': day,
+        'date': datetime.date(year, month, day),
     }
     return render(request, 'schedule/print.html', context=context)
 
@@ -456,9 +454,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 def schedulePrintDailyLog(request, year, month, day):
     request.session['schedule_print_daily_log_id'] = None
     context = {
-        'year': year,
-        'month': month,
-        'day': day,
+        'date': datetime.date(year, month, day),
     }
     return render(request, 'schedule/print_daily_log.html', context=context)
 

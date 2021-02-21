@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Users | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 <h3>Users</h3>

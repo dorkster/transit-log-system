@@ -1,7 +1,11 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}{% if is_new %}New Client{% else %}Client Edit | {{client}}{% endif %} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 {% load static %}
+
 <h2>
     {% if is_new %}
     New Client

@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Delete {{ model.get_class_name }} | {{ model }} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 <h2>Delete {{ model.get_class_name }}</h2>

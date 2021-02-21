@@ -1,8 +1,11 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Message of the Day | {{ date|date:"l, F d, Y"}} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 <h2>
-    Message for: {{ date|date:"l"}}, {{ date|date:"F d" }}, {{ date|date:"Y" }}
+    Message of the Day for: {{ date|date:"l"}}, {{ date|date:"F d" }}, {{ date|date:"Y" }}
 </h2>
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}

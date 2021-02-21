@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Print Daily Log | {{ date|date:"l, F d, Y"}} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 {% load static %}
@@ -19,7 +22,7 @@
 </div>
 
 <script type="text/javascript">
-    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-print-daily-log' year month day %}", "#print_content");
+    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-print-daily-log' date.year date.month date.day %}", "#print_content");
 
     // Fetch the initial data
     ajax_loader.run();

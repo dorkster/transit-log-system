@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}{% if is_new %}New {% if trip.is_activity %}Activity{% else %}Trip{% endif %}{% else %}{% if trip.is_activity %}Activity{% else %}Trip{% endif %} Edit | {{trip}}{% endif %} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 {% load static %}

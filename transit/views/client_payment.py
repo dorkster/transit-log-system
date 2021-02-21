@@ -19,6 +19,7 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 def clientPaymentList(request, parent):
     context = {
         'parent':parent,
+        'client': Client.objects.get(id=parent),
         'client_payments': ClientPayment.objects.filter(parent=parent),
     }
     return render(request, 'client/payment/list.html', context=context)

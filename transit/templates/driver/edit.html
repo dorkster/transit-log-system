@@ -1,4 +1,7 @@
 {% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}{% if is_new %}New Driver{% else %}Driver Edit | {{driver}}{% endif %} | {% endif %}
+{% endblock %}
 
 {% block auth_content %}
 <h2>

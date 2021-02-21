@@ -10,6 +10,8 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.eventlog import *
+
 @permission_required(['transit.view_loggedevent'])
 def loggedEventList(request):
     context = {
@@ -54,6 +56,7 @@ def ajaxLoggedEventList(request):
     elif request_action == 'clear_log':
         for i in LoggedEvent.objects.all():
             i.delete()
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.UNKNOWN, 'Cleared Event Log')
     elif request_action == 'sort':
         new_sort_mode = int(request_data)
         if sort_mode == new_sort_mode:

@@ -127,8 +127,8 @@
         <td class="mytable-col-md">{{ event.username }}</td>
         <td class="mytable-col-md">{% if event.ip_address %}{{ event.ip_address }}{% endif %}</td>
         <td class="mytable-col-md">{{ event.get_action_str }}</td>
-        <td class="mytable-col-lg">{{ event.get_model_str }}</td>
-        <td class="mytable-col-xl">{{ event.event_desc }}</td>
+        <td class="mytable-col-md">{{ event.get_model_str }}</td>
+        <td class="mytable-col-xxl">{{ event.event_desc }}</td>
     </tr>
     {% endfor %}
 </table>

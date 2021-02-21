@@ -316,7 +316,7 @@ class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.SM)
-    color = models.CharField(max_length=FieldSizes.COLOR, blank=True)
+    color = models.CharField(default='FFFFFF', max_length=FieldSizes.COLOR, blank=True)
     is_logged = models.BooleanField(default=True)
 
     class Meta:
@@ -329,7 +329,7 @@ class Driver(models.Model):
         return 'Driver'
 
     def get_color(self):
-        color = '00000000'
+        color = 'FFFFFF00'
         if self and self.color != '':
             color = self.color
         

@@ -1,6 +1,10 @@
 {% extends "base_generic.html" %}
 
 {% block auth_content %}
+{% if normal_users == 0 %}<div class="alert alert-danger">No non-admin users found. <a class="alert-link" href="{% url 'user-create' %}">Create a new User</a></div>{% endif %}
+{% if drivers == 0 %}<div class="alert alert-danger">No Drivers found. <a class="alert-link" href="{% url 'driver-create' %}">Create a new Driver</a></div>{% endif %}
+{% if vehicles == 0 %}<div class="alert alert-danger">No Vehicles found. <a class="alert-link" href="{% url 'vehicle-create' %}">Create a new Vehicle</a></div>{% endif %}
+{% if triptypes == 0 %}<div class="alert alert-danger">No Trip Types found. <a class="alert-link" href="{% url 'triptype-create' %}">Create a new Trip Type</a></div>{% endif %}
 <h2>Welcome, {{ user }}!</h2>
 <div class="container ml-0">
     <div class="card-group">
@@ -72,5 +76,62 @@
 {% endblock %}
 
 {% block content %}
+{% if super_users == 0 %}
+<div class="alert alert-danger">No admin accounts found. Please create one now.</div>
+<h2>Setup: Create admin account</h2>
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>General Information</legend>
+                    <div class="mb-2">
+                        <label for="{{ form.username.id_for_label }}"><strong>{{ form.username.label }}</strong></label><br/>{{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.username.errors }}
+                    </div>
+                    {% endif %}
+                </fieldset>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Password</legend>
+                    <div class="mb-2"><label for="{{ form.password.id_for_label }}"><strong>{{ form.password.label }}</strong></label><br/>{{ form.password }}</div>
+                    {% if form.password.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.password.errors }}
+                    </div>
+                    {% endif %}
+                    <ul class="mt-2 mb-2 small text-muted">
+                        <li>The password can't be too similar to the user's other personal information.</li>
+                        <li>The password must contain at least 8 characters.</li>
+                        <li>The password can't be a commonly used password.</li>
+                        <li>The password can't be entirely numeric.</li>
+                    </ul>
+                    <div class="mb-2"><label for="{{ form.password_confirm.id_for_label }}"><strong>{{ form.password_confirm.label }}</strong></label><br/>{{ form.password_confirm }}</div>
+                    {% if form.password_confirm.errors %}
+                    <div class="text-danger small mt-2 mb-2">
+                    {{ form.password_confirm.errors }}
+                    </div>
+                    {% endif %}
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save &amp; Continue</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% if users > 0 %}
 <p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endif %}
 {% endblock %}

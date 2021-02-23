@@ -291,10 +291,66 @@ def tripDelete(request, mode, id):
 
     return render(request, 'model_delete.html', context)
 
+def getStartAndPrevMiles(date, start_miles, prev_miles, vehicles, all_trips):
+    # get the starting mileage for all vehicles
+    all_previous_shifts = Shift.objects.exclude(start_miles='').exclude(end_miles='')
+    for vehicle in vehicles.filter(is_logged=True):
+        start_miles[str(vehicle)] = ''
+        previous_shift = None
+        previous_shifts = all_previous_shifts.filter(vehicle=vehicle)
+        for i in previous_shifts:
+            try:
+                if previous_shift == None or float(i.end_miles) >= float(previous_shift.end_miles):
+                    previous_shift = i
+            except:
+                continue
+
+        if previous_shift != None:
+            start_miles[str(vehicle)] = previous_shift.end_miles
+
+    day_shifts = Shift.objects.filter(date=date)
+    for shift in day_shifts:
+        if shift.start_miles != '':
+            try:
+                if float(shift.start_miles) > float(start_miles[str(shift.vehicle)]):
+                    start_miles[str(shift.vehicle)] = shift.start_miles
+            except:
+                continue
+
+    # get the previous trip milage for all vehicles
+    for vehicle in vehicles:
+        if str(vehicle) in start_miles:
+            start_miles_str = start_miles[str(vehicle)]
+        else:
+            start_miles_str = start_miles[str(vehicle)] = ''
+        prev_miles[str(vehicle)] = start_miles_str
+        vehicle_trips = all_trips.filter(vehicle=vehicle)
+        for vehicle_trip in vehicle_trips:
+            if vehicle_trip.end_miles != '':
+                mile_str = vehicle_trip.end_miles
+            elif vehicle_trip.start_miles != '':
+                mile_str = vehicle_trip.start_miles
+            else:
+                continue
+
+            if len(mile_str) < len(start_miles_str):
+                mile_str = start_miles_str[0:len(start_miles_str) - len(mile_str)] + mile_str
+
+            try:
+                if mile_str != '' and float(mile_str) > float(prev_miles[str(vehicle)]):
+                    prev_miles[str(vehicle)] = mile_str
+            except:
+                continue
+
 @permission_required(['transit.change_trip'])
 def tripStart(request, id):
     trip = get_object_or_404(Trip, id=id)
     date = trip.date
+
+    start_miles = dict()
+    prev_miles = dict()
+    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
+    getStartAndPrevMiles(date, start_miles, prev_miles, Vehicle.objects.all(), all_trips)
 
     if request.method == 'POST':
         form = tripStartForm(request.POST)
@@ -324,6 +380,32 @@ def tripStart(request, id):
                         a_trip.save()
                         log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.TRIP, str(a_trip))
 
+            # check to see if a matching Shift exists. If not, create it
+            trip_shifts = Shift.objects.filter(date=trip.date, driver=trip.driver, vehicle=trip.vehicle)
+            trip_shift = None
+            if trip_shifts.exists():
+                if trip_shifts[0].start_miles == '' and trip_shifts[0].start_time == '':
+                    trip_shift = trip_shifts[0]
+            else:
+                trip_shift = Shift()
+                trip_shift.date = trip.date
+                trip_shift.driver = trip.driver
+                trip_shift.vehicle = trip.vehicle
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.SHIFT, str(trip_shift))
+
+            if trip_shift and trip_shift.vehicle.is_logged:
+                if str(trip_shift.vehicle) in start_miles:
+                    shift_start_miles = start_miles[str(trip_shift.vehicle)]
+                else:
+                    shift_start_miles = start_miles[str(trip_shift.vehicle)] = ''
+                if len(trip.start_miles) < len(shift_start_miles):
+                    trip_shift.start_miles = shift_start_miles[0:len(shift_start_miles)-len(trip.start_miles)] + trip.start_miles
+                else:
+                    trip_shift.start_miles = trip.start_miles
+                trip_shift.start_time = trip.start_time
+                trip_shift.save()
+                log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.SHIFT, str(trip_shift))
+
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         auto_time = trip.start_time
@@ -340,26 +422,6 @@ def tripStart(request, id):
         }
         form = tripStartForm(initial=initial)
 
-    start_miles = dict()
-    for vehicle in Vehicle.objects.all():
-        start_miles[str(vehicle)] = ''
-
-    day_shifts = Shift.objects.filter(date=trip.date)
-    for shift in day_shifts:
-        if start_miles[str(shift.vehicle)] == '':
-            try:
-                test_float = float(shift.start_miles)
-                start_miles[str(shift.vehicle)] = shift.start_miles
-            except:
-                continue
-
-        try:
-            if shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles):
-                start_miles[str(shift.vehicle)] = shift.start_miles
-        except:
-            continue
-
-    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []
     if trip.address != '':
         for i in all_trips:
@@ -367,28 +429,6 @@ def tripStart(request, id):
                 continue
             if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
                 additional_pickups.append(i)
-
-    prev_miles = dict()
-    for vehicle in Vehicle.objects.all():
-        start_miles_str = start_miles[str(vehicle)]
-        prev_miles[str(vehicle)] = start_miles_str
-        vehicle_trips = all_trips.filter(vehicle=vehicle)
-        for vehicle_trip in vehicle_trips:
-            if vehicle_trip.end_miles != '':
-                mile_str = vehicle_trip.end_miles
-            elif vehicle_trip.start_miles != '':
-                mile_str = vehicle_trip.start_miles
-            else:
-                continue
-
-            if len(mile_str) < len(start_miles_str):
-                mile_str = start_miles_str[0:len(start_miles_str) - len(mile_str)] + mile_str
-
-            try:
-                if mile_str != '' and float(mile_str) > float(prev_miles[str(vehicle)]):
-                    prev_miles[str(vehicle)] = mile_str
-            except:
-                continue
 
     context = {
         'form': form,
@@ -404,6 +444,11 @@ def tripStart(request, id):
 def tripEnd(request, id):
     trip = get_object_or_404(Trip, id=id)
     date = trip.date
+
+    start_miles = dict()
+    prev_miles = dict()
+    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
+    getStartAndPrevMiles(date, start_miles, prev_miles, Vehicle.objects.filter(id=trip.vehicle.id, is_logged=True), all_trips)
 
     if request.method == 'POST':
         form = tripEndForm(request.POST)
@@ -439,26 +484,6 @@ def tripEnd(request, id):
         }
         form = tripEndForm(initial=initial)
 
-    start_miles = dict()
-    for vehicle in Vehicle.objects.all():
-        start_miles[str(vehicle)] = ''
-
-    query = Shift.objects.filter(date=trip.date)
-    for shift in query:
-        if start_miles[str(shift.vehicle)] == '':
-            try:
-                test_float = float(shift.start_miles)
-                start_miles[str(shift.vehicle)] = shift.start_miles
-            except:
-                continue
-
-        try:
-            if shift.start_miles != '' and float(start_miles[str(shift.vehicle)]) > float(shift.start_miles):
-                start_miles[str(shift.vehicle)] = shift.start_miles
-        except:
-            continue
-
-    all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     additional_pickups = []
     if trip.destination != '':
         for i in all_trips:
@@ -466,28 +491,6 @@ def tripEnd(request, id):
                 continue
             if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
                 additional_pickups.append(i)
-
-    prev_miles = dict()
-    for vehicle in Vehicle.objects.all():
-        start_miles_str = start_miles[str(vehicle)]
-        prev_miles[str(vehicle)] = start_miles_str
-        vehicle_trips = all_trips.filter(vehicle=vehicle)
-        for vehicle_trip in vehicle_trips:
-            if vehicle_trip.end_miles != '':
-                mile_str = vehicle_trip.end_miles
-            elif vehicle_trip.start_miles != '':
-                mile_str = vehicle_trip.start_miles
-            else:
-                continue
-
-            if len(mile_str) < len(start_miles_str):
-                mile_str = start_miles_str[0:len(start_miles_str) - len(mile_str)] + mile_str
-
-            try:
-                if mile_str != '' and float(mile_str) > float(prev_miles[str(vehicle)]):
-                    prev_miles[str(vehicle)] = mile_str
-            except:
-                continue
 
     context = {
         'form': form,

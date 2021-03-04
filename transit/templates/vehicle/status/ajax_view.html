@@ -143,12 +143,15 @@
     <ul class="pagination">
         <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_previous %}?issue_page={{ vehicle_issues.previous_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&laquo;</a></li>
         {% for page in vehicle_issues.paginator.page_range %}
+        {% if page > issue_page_ranges.page_start and page <= issue_page_ranges.page_end %}
         <li class="page-item {% if vehicle_issues.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ page }}&pretrip_page={{ pretrips.number }}#issues">{{ page }}</a></li>
+        {% endif %}
         {% endfor %}
         <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_next %}?issue_page={{ vehicle_issues.next_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&raquo;</a></li>
     </ul>
 </nav>
 {% endif %}
+<p>Showing results {{ issue_page_ranges.item_count_start }}-{{ issue_page_ranges.item_count_end }} of {{ vehicle_issues.paginator.count }}</p>
 {% else %}
 <p>There are no reported vehicle issues.</p>
 {% endif %}
@@ -194,12 +197,15 @@
     <ul class="pagination">
         <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.previous_page_number }}{% endif %}#pretrips">&laquo;</a></li>
         {% for page in pretrips.paginator.page_range %}
+        {% if page > pretrip_page_ranges.page_start and page <= pretrip_page_ranges.page_end %}
         <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ vehicle_issues.number }}&pretrip_page={{ page }}#pretrips">{{ page }}</a></li>
+        {% endif %}
         {% endfor %}
         <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.next_page_number }}{% endif %}#pretrips">&raquo;</a></li>
     </ul>
 </nav>
 {% endif %}
+<p>Showing results {{ pretrip_page_ranges.item_count_start }}-{{ pretrip_page_ranges.item_count_end }} of {{ pretrips.paginator.count }}</p>
 {% else %}
 <p>There are no logged pre-trip reports.</p>
 {% endif %}

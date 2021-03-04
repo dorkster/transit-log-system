@@ -137,12 +137,15 @@
     <ul class="pagination">
         <li class="page-item"><a class="page-link" href="{% if logged_events.has_previous %}?page={{ logged_events.previous_page_number }}{% endif %}">&laquo;</a></li>
         {% for page in logged_events.paginator.page_range %}
+        {% if page > page_ranges.page_start and page <= page_ranges.page_end %}
         <li class="page-item {% if logged_events.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+        {% endif %}
         {% endfor %}
         <li class="page-item"><a class="page-link" href="{% if logged_events.has_next %}?page={{ logged_events.next_page_number }}{% endif %}">&raquo;</a></li>
     </ul>
 </nav>
 {% endif %}
+<p>Showing results {{ page_ranges.item_count_start }}-{{ page_ranges.item_count_end }} of {{ logged_events.paginator.count }}</p>
 <script type="text/javascript">
     setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
 </script>

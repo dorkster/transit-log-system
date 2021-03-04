@@ -11,6 +11,7 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
+from transit.common.util import *
 
 @permission_required(['transit.view_loggedevent'])
 def loggedEventList(request):
@@ -109,8 +110,12 @@ def ajaxLoggedEventList(request):
     if sort_mode_dir == 1:
         logged_events = logged_events.reverse()
 
-    logged_event_pages = Paginator(logged_events, 25)
+    results_per_page = 25
+
+    logged_event_pages = Paginator(logged_events, results_per_page)
     logged_events_paginated = logged_event_pages.get_page(request.GET.get('page'))
+
+    page_ranges = get_paginated_ranges(page=logged_events_paginated, page_range=10, items_per_page=results_per_page)
 
     actions = []
     for i in range(LoggedEventAction.CREATE, LoggedEventAction.STATUS + 1):
@@ -122,6 +127,7 @@ def ajaxLoggedEventList(request):
 
     context = {
         'logged_events': logged_events_paginated,
+        'page_ranges': page_ranges,
         'filter_action': None if filter_action == '' else int(filter_action),
         'filter_target': None if filter_target == '' else int(filter_target),
         'filter_username': None if filter_username == '' else filter_username,

@@ -10,6 +10,8 @@ from transit.forms import SearchTripsForm
 
 from django.contrib.auth.decorators import permission_required
 
+from transit.common.util import *
+
 @permission_required(['transit.view_trip'])
 def search(request):
     name = request.GET.get('name')
@@ -182,22 +184,18 @@ def search(request):
 
     trips = trips.order_by('-date', '-sort_index')
 
-    result_pages = Paginator(trips, 25)
-    result_page = request.GET.get('page')
-    if result_page is None:
-        result_page = 1
-    results_paginated = result_pages.get_page(result_page)
+    results_per_page = 25
 
-    page_range = 5
+    result_pages = Paginator(trips, results_per_page)
+    results_paginated = result_pages.get_page(request.GET.get('page'))
+
+    page_ranges = get_paginated_ranges(page=results_paginated, page_range=5, items_per_page=results_per_page)
 
     form = SearchTripsForm(request.GET)
     context = {
         'form': form,
         'searched': searched,
         'results': results_paginated if searched else Trip.objects.none(),
-        'page_range_start': results_paginated.number - page_range - 1,
-        'page_range_end': results_paginated.number + page_range,
-        'result_start': ((results_paginated.number - 1) * 25) + 1,
-        'result_end': results_paginated.number * 25 if results_paginated.number * 25 < results_paginated.paginator.count else results_paginated.paginator.count,
+        'page_ranges': page_ranges,
     }
     return render(request, 'search.html', context=context)

@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
+from transit.common.util import *
+
 @permission_required(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip'])
 def vehicleStatus(request):
     return render(request, 'vehicle/status/view.html', context={})
@@ -74,16 +76,19 @@ def ajaxVehicleStatus(request):
 
     issue_filtered_count = len(vehicle_issues)
 
-    pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), 50)
-    pretrip_page = request.GET.get('pretrip_page')
-    pretrips_paginated = pretrip_pages.get_page(pretrip_page)
+    pretrips_per_page = 50
+    pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), pretrips_per_page)
+    pretrips_paginated = pretrip_pages.get_page(request.GET.get('pretrip_page'))
+    pretrip_page_ranges = get_paginated_ranges(page=pretrips_paginated, page_range=5, items_per_page=pretrips_per_page)
 
-    issue_pages = Paginator(vehicle_issues, 25)
-    issue_page = request.GET.get('issue_page')
-    issues_paginated = issue_pages.get_page(issue_page)
+    issues_per_page = 25
+    issue_pages = Paginator(vehicle_issues, issues_per_page)
+    issues_paginated = issue_pages.get_page(request.GET.get('issue_page'))
+    issue_page_ranges = get_paginated_ranges(page=issues_paginated, page_range=5, items_per_page=issues_per_page)
 
     context = {
         'vehicle_issues': issues_paginated,
+        'issue_page_ranges': issue_page_ranges,
         'filter_show_resolved': filter_show_resolved,
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
@@ -94,6 +99,7 @@ def ajaxVehicleStatus(request):
         'issue_unfiltered_count': issue_unfiltered_count,
         'logged_vehicles': Vehicle.objects.filter(is_logged=True),
         'pretrips': pretrips_paginated,
+        'pretrip_page_ranges': pretrip_page_ranges,
         'drivers': Driver.objects.filter(is_logged=True),
         'vehicles': Vehicle.objects.filter(is_logged=True),
         'categories': VehicleIssue.ISSUE_CATEGORIES,

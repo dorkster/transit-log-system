@@ -1,5 +1,7 @@
 import re
 
+from django.core.paginator import Paginator
+
 def int_to_money_string(val, show_currency=False, blank_zero=False):
     if blank_zero and val == 0:
         return ''
@@ -31,4 +33,21 @@ def money_string_to_int(val):
         return 0
     else:
         return int(num_only)
+
+def get_paginated_ranges(page, page_range, items_per_page):
+    page_start = page.number - page_range - 1
+    if page_start > page.paginator.num_pages - (page_range*2) - 1:
+        page_start = page.paginator.num_pages - (page_range*2) - 1
+
+    page_end = page.number + page_range
+    if page_end < (page_range*2) + 1:
+        page_end = (page_range*2) + 1
+
+    item_count_start = ((page.number - 1) * items_per_page) + 1
+
+    item_count_end = page.paginator.count
+    if page.number * items_per_page < page.paginator.count:
+        item_count_end = page.number * items_per_page
+
+    return {'page_start': page_start, 'page_end': page_end, 'item_count_start': item_count_start, 'item_count_end': item_count_end }
 

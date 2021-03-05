@@ -192,6 +192,7 @@
             <td class="mytable-col-md text-center">Non-Elderly Non-Ambulatory</td>
             <td class="mytable-col-md text-center">Unknown</td>
             <td class="mytable-col-md text-center">Staff</td>
+            <td class="mytable-col-md text-center">Total</td>
         </thead>
         <tr>
             <td class="mytable-col-md">On vehicle</td>
@@ -201,6 +202,7 @@
             <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.passenger}}</td>
             <td class="mytable-col-sm {% if unique_riders.unknown.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.passenger}}</td>
             <td class="mytable-col-sm {% if unique_riders.staff.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.all.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all.passenger}}</td>
         </tr>
         <tr>
             <td class="mytable-col-md">Not on vehicle</td>
@@ -210,6 +212,7 @@
             <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.no_passenger}}</td>
             <td class="mytable-col-sm {% if unique_riders.unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.no_passenger}}</td>
             <td class="mytable-col-sm {% if unique_riders.staff.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.no_passenger}}</td>
+            <td class="mytable-col-sm {% if unique_riders.all.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all.no_passenger}}</td>
         </tr>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
@@ -219,6 +222,7 @@
             <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_nonambulatory.total }}</td>
             <td class="mytable-col-md text-center">{{ unique_riders.unknown.total }}</td>
             <td class="mytable-col-md text-center">{{ unique_riders.staff.total }}</td>
+            <td class="mytable-col-md text-center">{{ unique_riders.all.total }}</td>
         </tr>
     </table>
     <div class="small text-muted"><em>Staff members are not counted in the elderly/ambulatory totals.</em></div>
@@ -298,6 +302,12 @@
                 <td class="mytable-col-sm {% if value.total == 0 %}mytable-zero{%endif%}">{{value.total}}</td>
             </tr>
             {% endfor %}
+            <tr class="bg-success text-light text-bold">
+                <td class="mytable-col-lg">TOTAL</td>
+                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.passenger }}</td>
+                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.no_passenger }}</td>
+                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.total }}</td>
+            </tr>
         </tbody>
     </table>
     <br/>

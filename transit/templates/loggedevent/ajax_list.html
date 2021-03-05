@@ -1,5 +1,5 @@
 <h3>Event Log <a href="" class="btn btn-primary btn-sm" onclick="ajax_loader.run()"><span class="oi oi-reload mr-2"></span>Refresh</a></h3>
-<p class="text-muted small">Your current IP address is: <strong>{{ current_ip }}</strong></p>
+<p class="text-muted small">Events that match your current IP address will be shown in bold. Your current IP address is: <strong>{{ current_ip }}</strong></p>
 <div class="container ml-0 border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">
@@ -122,7 +122,7 @@
         </td>
     </thead>
     {% for event in logged_events %}
-    <tr>
+    <tr {% if event.ip_address and current_ip == event.ip_address %}style="font-weight:bold;"{% endif %}>
         <td class="mytable-col-lg">{{ event.timestamp }}</td>
         <td class="mytable-col-md">{{ event.username }}</td>
         <td class="mytable-col-md">{% if event.ip_address %}{{ event.ip_address }}{% endif %}</td>

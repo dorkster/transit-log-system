@@ -73,8 +73,10 @@
             {% for key, value in all_vehicles.trip_types.items %}
             <td class="mytable-col-sm" colspan=3>Trip Type: {{key}}</td>
             {% endfor %}
+            <td class="mytable-col-sm" colspan=3>Total Trips</td>
             <td class="mytable-col-sm">Cash Collected</td>
             <td class="mytable-col-sm">Checks Collected</td>
+            <td class="mytable-col-sm">Total Money Collected</td>
         </thead>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
@@ -89,8 +91,12 @@
             <td class="mytable-col-xxs small">{{value.no_passenger}}</td>
             <td class="mytable-col-xxs">{{value.total}}</td>
             {% endfor %}
+            <td class="mytable-col-xxs small">{{all_vehicles.trip_types_total.passenger}}</td>
+            <td class="mytable-col-xxs small">{{all_vehicles.trip_types_total.no_passenger}}</td>
+            <td class="mytable-col-xxs">{{all_vehicles.trip_types_total.total}}</td>
             <td class="mytable-col-sm">{{all_vehicles.collected_cash}}</td>
             <td class="mytable-col-sm">{{all_vehicles.collected_check}}</td>
+            <td class="mytable-col-sm">{{all_vehicles.total_collected_money}}</td>
         </tr>
     </table>
     <hr/>
@@ -115,8 +121,10 @@
             {% for key, value in v.totals.trip_types.items %}
             <td class="mytable-col-sm" colspan=3>Trip Type: {{key}}</td>
             {% endfor %}
+            <td class="mytable-col-sm" colspan=3>Total Trips</td>
             <td class="mytable-col-sm">Cash Collected</td>
             <td class="mytable-col-sm">Checks Collected</td>
+            <td class="mytable-col-sm">Total Money Collected</td>
         </thead>
         <tbody class="mytable-hoverhi">
             {% for day in v.days %}
@@ -133,8 +141,12 @@
                 <td class="mytable-col-xxs small {% if value.no_passenger == 0 %}mytable-zero{%endif%}">{{value.no_passenger}}</td>
                 <td class="mytable-col-xxs {% if value.total == 0 %}mytable-zero{%endif%}">{{value.total}}</td>
                 {% endfor %}
+                <td class="mytable-col-xxs small {% if day.data.trip_types_total.passenger == 0 %}mytable-zero{%endif%}">{{day.data.trip_types_total.passenger}}</td>
+                <td class="mytable-col-xxs small {% if day.data.trip_types_total.no_passenger == 0 %}mytable-zero{%endif%}">{{day.data.trip_types_total.no_passenger}}</td>
+                <td class="mytable-col-xxs {% if day.data.trip_types_total.total == 0 %}mytable-zero{%endif%}">{{day.data.trip_types_total.total}}</td>
                 <td class="mytable-col-sm {% if day.data.collected_cash.value == 0 %}mytable-zero{%endif%}">{{day.data.collected_cash}}</td>
                 <td class="mytable-col-sm {% if day.data.collected_check.value == 0 %}mytable-zero{%endif%}">{{day.data.collected_check}}</td>
+                <td class="mytable-col-sm {% if day.data.total_collected_money.value == 0 %}mytable-zero{%endif%}">{{day.data.total_collected_money}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -149,8 +161,10 @@
             {% for key, value in v.totals.trip_types.items %}
             <td class="mytable-col-sm" colspan=3>Trip Type: {{key}}</td>
             {% endfor %}
+            <td class="mytable-col-sm" colspan=3>Total Trips</td>
             <td class="mytable-col-sm">Cash Collected</td>
             <td class="mytable-col-sm">Checks Collected</td>
+            <td class="mytable-col-sm">Total Money Collected</td>
         </thead>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
@@ -165,8 +179,12 @@
             <td class="mytable-col-xxs small">{{value.no_passenger}}</td>
             <td class="mytable-col-xxs">{{value.total}}</td>
             {% endfor %}
+            <td class="mytable-col-xxs small">{{v.totals.trip_types_total.passenger}}</td>
+            <td class="mytable-col-xxs small">{{v.totals.trip_types_total.no_passenger}}</td>
+            <td class="mytable-col-xxs">{{v.totals.trip_types_total.total}}</td>
             <td class="mytable-col-sm">{{v.totals.collected_cash}}</td>
             <td class="mytable-col-sm">{{v.totals.collected_check}}</td>
+            <td class="mytable-col-sm">{{v.totals.total_collected_money}}</td>
         </tr>
     </table>
     {% else %}

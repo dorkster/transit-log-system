@@ -6,6 +6,7 @@
 {% block auth_content %}
 <h2>Import Excel (xlsx) files</h2>
 {% if not import_done %}
+<div class="alert alert-danger">This importer expects an Excel file in a very specific format. If you don't know what you're doing, <strong>don't use this tool</strong>!</div>
 <form class="mb-4" action="" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     {{ form.as_p }}

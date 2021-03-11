@@ -435,8 +435,10 @@ class Report():
                             break
 
                 if report_trip.shift == None:
-                    # if i.vehicle.is_logged:
-                    #     self.report_errors.add(day_date, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
+                    if i.driver and i.vehicle and i.vehicle.is_logged:
+                        unknown_trip_shifts = shifts.filter(driver=i.driver, vehicle=i.vehicle)
+                        if not unknown_trip_shifts.exists():
+                            self.report_errors.add(day_date, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
                     continue
 
                 shift = report_day.shifts[report_trip.shift]

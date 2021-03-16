@@ -29,9 +29,9 @@ I like to define some environment variables for site-specific things, so this pr
     DJANGO_ALLOWED_HOST
     DJANGO_SECRET_KEY
 
-- Set `DJANGO_DEBUG` to `True` when working in a development environment
+- Set `DJANGO_DEBUG` to `True` when working in a development environment. Do **NOT** use this in production, as the exposed debug secret key is used.
 - Set `DJANGO_ALLOWED_HOST` to your domain name
-- Set `DJANGO_SECRET_KEY` to your site's secret key
+- Set `DJANGO_SECRET_KEY` to your site's secret key. Do **NOT** use the key in `stow_coa/settings.py`, which is exclusivly for development.
 
 Also, TLS uses the Django [sessions middleware](https://docs.djangoproject.com/en/3.1/topics/http/sessions/), so it is recommended to have a scheduled task run that executes `manage.py clearsessions`.
 

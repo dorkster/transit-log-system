@@ -87,6 +87,11 @@ class DateRangePickerForm(forms.Form):
     date_end = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
 class EditTripForm(forms.Form):
+    try:
+        triptypes_exist = TripType.objects.count() > 0
+    except:
+        triptypes_exist = False
+
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(label='Pick-Up Address', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.address))
@@ -98,7 +103,7 @@ class EditTripForm(forms.Form):
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
-    trip_type = forms.ModelChoiceField(TripType.objects, required=(TripType.objects.count() > 0), widget=forms.Select(attrs=formWidgetAttrs.default))
+    trip_type = forms.ModelChoiceField(TripType.objects, required=(triptypes_exist), widget=forms.Select(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
@@ -196,6 +201,11 @@ class EditTemplateForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditTemplateTripForm(forms.Form):
+    try:
+        triptypes_exist = TripType.objects.count() > 0
+    except:
+        triptypes_exist = False
+
     parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     name = forms.CharField(widget=forms.TextInput(attrs=formWidgetAttrs.name))
     address = forms.CharField(label='Pick-Up Address', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.address))
@@ -209,7 +219,7 @@ class EditTemplateTripForm(forms.Form):
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
-    trip_type = forms.ModelChoiceField(TripType.objects, required=(TripType.objects.count() > 0), widget=forms.Select(attrs=formWidgetAttrs.default))
+    trip_type = forms.ModelChoiceField(TripType.objects, required=(triptypes_exist), widget=forms.Select(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))

@@ -487,6 +487,13 @@ class Report():
                     if report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
                         report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
                         report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
+                elif report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
+                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
+                    report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
+                    report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
+
 
                 if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
@@ -494,15 +501,7 @@ class Report():
                         report_trip.start_time = shift.start_time
                     if report_trip.end_time > shift.end_time:
                         report_trip.end_time = shift.end_time
-
-                if report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
-                    report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
-                    report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
-
-                if report_trip.start_time > report_trip.end_time:
+                elif report_trip.start_time > report_trip.end_time:
                     self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
                     report_trip.start_time = shift.start_time
                     report_trip.end_time = shift.start_time

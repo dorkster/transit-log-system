@@ -102,12 +102,6 @@
                             <span class="oi oi-person"></span> {{ user.get_username }}
                         </a>
                         <div class="dropdown-menu shadow dropdown-menu-right">
-                            {% if user.is_superuser %}
-                            <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>View Admin Control Panel</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
-                            <div class="dropdown-divider"></div>
-                            {% endif %}
                             {% if perms.transit.view_loggedevent %}
                             <a class="dropdown-item" href="{% url 'loggedevent-list' %}"><span class="oi oi-browser mr-2"></span>Event Log</a>
                             <div class="dropdown-divider"></div>
@@ -120,6 +114,11 @@
                             <a class="dropdown-item" href="{% url 'settings' %}"><span class="oi oi-cog mr-2"></span>Settings</a>
                             {% endif %}
                             <div class="dropdown-divider"></div>
+                            {% if user.is_superuser %}
+                            <a class="dropdown-item" href="/admin"><span class="oi oi-monitor mr-2"></span>Django Control Panel</a>
+                            <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
                             <a class="dropdown-item" href="{% url 'logout' %}"><span class="oi oi-account-logout mr-2"></span>Logout</a>
                         </div>
                     </li>

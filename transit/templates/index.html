@@ -28,13 +28,7 @@
         {% endif %}
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">
-                    {% if perms.auth.change_user %}
-                    Administrative Staff
-                    {% else %}
-                    Staff
-                    {% endif %}
-                </h3>
+                <h3 class="card-title">Staff</h3>
                 <div class="list-group">
                     {% if perms.transit.change_trip %}
                     <a class="list-group-item list-group-item-action list-group-item-primary" href="{% url 'schedule-today' 'edit' %}">

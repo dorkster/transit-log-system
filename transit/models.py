@@ -870,6 +870,7 @@ class Tag(models.Model):
             return 'btn-info'
 
 class LoggedEvent(models.Model):
+    id = models.AutoField(primary_key=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     username = models.CharField(default='{unknown user}', max_length=FieldSizes.MD, blank=False)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
@@ -884,6 +885,7 @@ class LoggedEvent(models.Model):
         return LoggedEventAction.get_str(self.event_action)
 
 class SiteSettings(SingletonModel):
+    id = models.AutoField(primary_key=True)
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
     autocomplete_history_days = models.IntegerField(default=30)

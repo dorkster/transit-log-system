@@ -83,6 +83,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.ambulatory = form.cleaned_data['ambulatory']
             unique_client.tags = form.cleaned_data['tags']
             unique_client.staff = form.cleaned_data['staff']
+            unique_client.is_active = form.cleaned_data['is_active']
 
             unique_client.save()
 
@@ -107,6 +108,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'ambulatory': client.ambulatory,
             'tags': client.tags,
             'staff': client.staff,
+            'is_active': client.is_active,
         }
         form = EditClientForm(initial=initial)
 
@@ -199,6 +201,7 @@ def ajaxClientList(request):
     SORT_ELDERLY = 4
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
+    SORT_IS_ACTIVE = 7
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -216,12 +219,15 @@ def ajaxClientList(request):
         request.session['clients_ambulatory'] = int(request_data)
     elif request_action == 'filter_staff':
         request.session['clients_staff'] = int(request_data)
+    elif request_action == 'filter_active':
+        request.session['clients_active'] = int(request_data)
     elif request_action == 'filter_search':
         request.session['clients_search'] = request_data
     elif request_action == 'filter_reset':
         request.session['clients_elderly'] = 0
         request.session['clients_ambulatory'] = 0
         request.session['clients_staff'] = 0
+        request.session['clients_active'] = 0
         request.session['clients_search'] = ''
     elif request_action == 'toggle_extra_columns':
         request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
@@ -238,6 +244,7 @@ def ajaxClientList(request):
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
+    filter_active = request.session.get('clients_active', 0)
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
@@ -258,6 +265,11 @@ def ajaxClientList(request):
     elif filter_staff == 2:
         clients = clients.filter(staff=False)
 
+    if filter_active == 1:
+        clients = clients.filter(is_active=True)
+    elif filter_active == 2:
+        clients = clients.filter(is_active=False)
+
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
@@ -277,6 +289,8 @@ def ajaxClientList(request):
         clients = clients.order_by('ambulatory', 'name')
     elif sort_mode == SORT_TAGS:
         clients = clients.order_by('tags', 'name')
+    elif sort_mode == SORT_IS_ACTIVE:
+        clients = clients.order_by('is_active', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -286,8 +300,9 @@ def ajaxClientList(request):
         'filter_elderly': filter_elderly,
         'filter_ambulatory': filter_ambulatory,
         'filter_staff': filter_staff,
+        'filter_active': filter_active,
         'filter_search': filter_search,
-        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_staff > 0 or filter_search != ''),
+        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_staff > 0 or filter_active > 0 or filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'show_extra_columns': request.session.get('clients_extra_columns', False),
@@ -305,6 +320,7 @@ def clientXLSX(request):
     SORT_ELDERLY = 4
     SORT_AMBULATORY = 5
     SORT_TAGS = 6
+    SORT_IS_ACTIVE = 7
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -312,6 +328,7 @@ def clientXLSX(request):
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
+    filter_active = request.session.get('clients_active', 0)
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
@@ -331,6 +348,11 @@ def clientXLSX(request):
     elif filter_staff == 2:
         clients = clients.filter(staff=False)
 
+    if filter_active == 1:
+        clients = clients.filter(is_active=True)
+    elif filter_active == 2:
+        clients = clients.filter(is_active=False)
+
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
@@ -348,6 +370,8 @@ def clientXLSX(request):
         clients = clients.order_by('ambulatory', 'name')
     elif sort_mode == SORT_TAGS:
         clients = clients.order_by('tags', 'name')
+    elif sort_mode == SORT_IS_ACTIVE:
+        clients = clients.order_by('is_active', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -379,6 +403,7 @@ def clientXLSX(request):
     ws.cell(row_header, 5, 'Elderly?')
     ws.cell(row_header, 6, 'Ambulatory?')
     ws.cell(row_header, 7, 'Tags')
+    ws.cell(row_header, 8, 'Is active?')
 
     for i in range(0, len(clients)):
         ws.cell(i+2, 1, clients[i].name)
@@ -388,14 +413,16 @@ def clientXLSX(request):
         ws.cell(i+2, 5, clients[i].elderly)
         ws.cell(i+2, 6, clients[i].ambulatory)
         ws.cell(i+2, 7, clients[i].tags)
+        ws.cell(i+2, 8, clients[i].is_active)
 
         # display elderly/ambulatory as booleans
         ws.cell(i+2, 5).number_format = 'BOOLEAN'
         ws.cell(i+2, 6).number_format = 'BOOLEAN'
+        ws.cell(i+2, 8).number_format = 'BOOLEAN'
 
     # apply styles
     ws.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 8):
+    for i in range(1, 9):
         if i == 1 or i == 2 or i == 7:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:

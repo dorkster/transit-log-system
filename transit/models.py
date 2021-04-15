@@ -455,6 +455,7 @@ class Client(models.Model):
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     tags = models.CharField(max_length=FieldSizes.XL, blank=True)
     staff = models.BooleanField(verbose_name='Is staff member?', default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['name']

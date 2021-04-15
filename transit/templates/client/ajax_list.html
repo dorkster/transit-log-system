@@ -50,6 +50,16 @@
                 <a class="dropdown-item {% if filter_staff == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_staff', '2')">Non-Staff</a>
             </div>
         </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_active == 1 %}Active{% elif filter_active == 2 %}Non-Active{% else %}All Statuses{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_active == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '0')">All Statuses</a>
+                <a class="dropdown-item {% if filter_active == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '1')">Active</a>
+                <a class="dropdown-item {% if filter_active == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '2')">Non-Active</a>
+            </div>
+        </span>
     </div>
     <div class="mt-2">
             <!-- Button trigger modal -->
@@ -143,6 +153,12 @@
                 Tags
             </a>
         </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '7')">
+                {% if sort_mode == 7 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Is active?
+            </a>
+        </td>
         {% else %}
         <td></td>
         {% endif %}
@@ -191,6 +207,13 @@
             {% endfor %}
             {% endif %}
         </td>
+        <td class="mytable-col-sm">
+            {% if client.is_active %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif client.is_active is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
         {% else %}
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -234,6 +257,18 @@
                         {% endfor %}
                         </div>
                         {% endif %}
+                        <div class="list-group-item p-1">
+                            <div class="row">
+                                <div class="col text-muted">Is active?</div>
+                                <div class="col-auto">
+                                    {% if client.is_active %}
+                                    <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+                                    {% elif client.is_active is False %}
+                                    <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

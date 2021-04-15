@@ -263,11 +263,13 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 if i.destination:
                     addresses.add(str(i.destination))
 
+    clients = Client.objects.filter(is_active=True)
+
     context = {
         'form': form,
         'trip': trip,
-        'clients': Client.objects.all(),
-        'clients_json': serializers.serialize('json', Client.objects.all()),
+        'clients': clients,
+        'clients_json': serializers.serialize('json', clients),
         'addresses': sorted(addresses),
         'destinations': destinations,
         'destinations_json': serializers.serialize('json', destinations),

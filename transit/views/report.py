@@ -680,11 +680,12 @@ class Report():
                     if i != trip.shift:
                         continue
                     report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
-                    if trip.trip_type != None:
-                        report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                    else:
-                        report_day.by_vehicle[shift.shift.vehicle].trip_types_unknown.addTrips(1, trip.trip.passenger)
-                    report_day.by_vehicle[shift.shift.vehicle].trip_types_total.addTrips(1, trip.trip.passenger)
+                    if trip.trip != None:
+                        if trip.trip_type != None:
+                            report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
+                        else:
+                            report_day.by_vehicle[shift.shift.vehicle].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                        report_day.by_vehicle[shift.shift.vehicle].trip_types_total.addTrips(1, trip.trip.passenger)
                     report_day.by_vehicle[shift.shift.vehicle].collected_cash += trip.collected_cash
                     report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
                     report_day.by_vehicle[shift.shift.vehicle].total_collected_money += (trip.collected_cash + trip.collected_check)
@@ -709,11 +710,12 @@ class Report():
                     if i != trip.shift:
                         continue
                     report_day.by_driver[shift.shift.driver].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
-                    if trip.trip_type != None:
-                        report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                    else:
-                        report_day.by_driver[shift.shift.driver].trip_types_unknown.addTrips(1, trip.trip.passenger)
-                    report_day.by_driver[shift.shift.driver].trip_types_total.addTrips(1, trip.trip.passenger)
+                    if trip.trip != None:
+                        if trip.trip_type != None:
+                            report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
+                        else:
+                            report_day.by_driver[shift.shift.driver].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                        report_day.by_driver[shift.shift.driver].trip_types_total.addTrips(1, trip.trip.passenger)
                     report_day.by_driver[shift.shift.driver].collected_cash += trip.collected_cash
                     report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
                     report_day.by_driver[shift.shift.driver].total_collected_money += (trip.collected_cash + trip.collected_check)

@@ -512,6 +512,7 @@ class Destination(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     address = models.CharField(max_length=FieldSizes.MD)
     phone = models.CharField(max_length=FieldSizes.PHONE, blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['address']

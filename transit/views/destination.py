@@ -70,6 +70,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
 
             unique_destination.address = form.cleaned_data['address']
             unique_destination.phone = form.cleaned_data['phone']
+            unique_destination.is_active = form.cleaned_data['is_active']
             unique_destination.save()
 
             if is_new and not is_existing_destination:
@@ -87,6 +88,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
         initial = {
             'address': destination.address,
             'phone': destination.phone,
+            'is_active': destination.is_active,
         }
         form = EditDestinationForm(initial=initial)
 
@@ -177,6 +179,7 @@ def ajaxDestinationList(request):
 
     SORT_ADDRESS = 0
     SORT_PHONE = 1
+    SORT_IS_ACTIVE = 2
 
     sort_mode = request.session.get('destinations_sort', SORT_ADDRESS)
     sort_mode_dir = request.session.get('destinations_sort_dir', 0)
@@ -188,9 +191,12 @@ def ajaxDestinationList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
-    if request_action == 'filter_search':
+    if request_action == 'filter_active':
+        request.session['destinations_active'] = int(request_data)
+    elif request_action == 'filter_search':
         request.session['destinations_search'] = request_data
     elif request_action == 'filter_reset':
+        request.session['destinations_active'] = 0
         request.session['destinations_search'] = ''
     elif request_action == 'sort':
         new_sort_mode = int(request_data)
@@ -202,10 +208,16 @@ def ajaxDestinationList(request):
         request.session['destinations_sort'] = new_sort_mode
         request.session['destinations_sort_dir'] = sort_mode_dir
 
+    filter_active = request.session.get('destinations_active', 0)
     filter_search = request.session.get('destinations_search', '')
 
     destinations = Destination.objects.all()
     unfiltered_count = len(destinations)
+
+    if filter_active == 1:
+        destinations = destinations.filter(is_active=True)
+    if filter_active == 2:
+        destinations = destinations.filter(is_active=False)
 
     if filter_search != '':
         destinations = destinations.filter(address__icontains=filter_search)
@@ -216,14 +228,17 @@ def ajaxDestinationList(request):
         destinations = destinations.order_by('address')
     elif sort_mode == SORT_PHONE:
         destinations = destinations.order_by('phone', 'address')
+    elif sort_mode == SORT_IS_ACTIVE:
+        destinations = destinations.order_by('is_active', 'address')
 
     if sort_mode_dir == 1:
         destinations = destinations.reverse()
 
     context = {
         'destinations': destinations,
+        'filter_active': filter_active,
         'filter_search': filter_search,
-        'is_filtered': (filter_search != ''),
+        'is_filtered': (filter_active > 0 or filter_search != ''),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'sort_mode': sort_mode,

@@ -186,6 +186,7 @@ class EditClientPaymentForm(forms.Form):
 class EditDestinationForm(forms.Form):
     address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))
     phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
+    is_active = forms.ChoiceField(choices=BOOL_CHOICES, label='Is active?', help_text='Inactive destinations will not appear in autocomplete drop-downs.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

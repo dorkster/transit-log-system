@@ -214,7 +214,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             form = EditTemplateTripForm(initial=initial)
 
     addresses = set()
-    destinations = Destination.objects.all()
+    destinations = Destination.objects.filter(is_active=True)
 
     if len(destinations) == 0:
         site_settings = SiteSettings.load()
@@ -231,8 +231,8 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
         'clients': Client.objects.all(),
         'clients_json': serializers.serialize('json', Client.objects.all()),
         'addresses': sorted(addresses),
-        'destinations': Destination.objects.all(),
-        'destinations_json': serializers.serialize('json', Destination.objects.all()),
+        'destinations': destinations,
+        'destinations_json': serializers.serialize('json', destinations),
         'is_new': is_new,
         'is_return_trip': is_return_trip,
         'tags': Tag.objects.all(),

@@ -11,6 +11,18 @@
         {% endif %}
     </div>
     <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_active == 1 %}Active{% elif filter_active == 2 %}Non-Active{% else %}All Statuses{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_active == 0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '0')">All Statuses</a>
+                <a class="dropdown-item {% if filter_active == 1 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '1')">Active</a>
+                <a class="dropdown-item {% if filter_active == 2 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_active', '2')">Non-Active</a>
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
                 <span class="oi oi-magnifying-glass mr-2"></span>Search
@@ -61,6 +73,12 @@
                 Phone
             </a>
         </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
+                {% if sort_mode == 2 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Is active?
+            </a>
+        </td>
     </thead>
     {% for destination in destinations %}
     <tr>
@@ -78,6 +96,13 @@
         </td>
         <td class="mytable-col-lg">{{ destination.address }}</td>
         <td class="mytable-col-lg">{{ destination.phone }}</td>
+        <td class="mytable-col-sm">
+            {% if destination.is_active %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif destination.is_active is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>

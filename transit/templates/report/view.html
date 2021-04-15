@@ -449,6 +449,12 @@
                 <td class="mytable-col-sm {% if value.total == 0 %}mytable-zero{%endif%}">{{value.total}}</td>
             </tr>
             {% endfor %}
+            <tr>
+                <td class="mytable-col-lg">Unknown</td>
+                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.passenger == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.passenger}}</td>
+                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.no_passenger}}</td>
+                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.total == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.total}}</td>
+            </tr>
             <tr class="bg-success text-light text-bold">
                 <td class="mytable-col-lg">TOTAL</td>
                 <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.passenger }}</td>

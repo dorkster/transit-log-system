@@ -140,6 +140,7 @@ class Report():
             self.pmt = 0
             self.fuel = 0
             self.trip_types = {}
+            self.trip_types_unknown = Report.TripCount()
             self.trip_types_total = Report.TripCount()
             self.tags = {}
             self.collected_cash = Report.Money(0)
@@ -165,6 +166,7 @@ class Report():
             r.fuel += other.fuel
             for i in self.query_triptypes:
                 r.trip_types[i] += other.trip_types[i]
+            r.trip_types_unknown += other.trip_types_unknown
             r.trip_types_total += other.trip_types_total
             for i in other.tags:
                 if i in r.tags:
@@ -680,7 +682,9 @@ class Report():
                     report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
                     if trip.trip_type != None:
                         report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                        report_day.by_vehicle[shift.shift.vehicle].trip_types_total.addTrips(1, trip.trip.passenger)
+                    else:
+                        report_day.by_vehicle[shift.shift.vehicle].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                    report_day.by_vehicle[shift.shift.vehicle].trip_types_total.addTrips(1, trip.trip.passenger)
                     report_day.by_vehicle[shift.shift.vehicle].collected_cash += trip.collected_cash
                     report_day.by_vehicle[shift.shift.vehicle].collected_check += trip.collected_check
                     report_day.by_vehicle[shift.shift.vehicle].total_collected_money += (trip.collected_cash + trip.collected_check)
@@ -707,7 +711,9 @@ class Report():
                     report_day.by_driver[shift.shift.driver].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
                     if trip.trip_type != None:
                         report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                        report_day.by_driver[shift.shift.driver].trip_types_total.addTrips(1, trip.trip.passenger)
+                    else:
+                        report_day.by_driver[shift.shift.driver].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                    report_day.by_driver[shift.shift.driver].trip_types_total.addTrips(1, trip.trip.passenger)
                     report_day.by_driver[shift.shift.driver].collected_cash += trip.collected_cash
                     report_day.by_driver[shift.shift.driver].collected_check += trip.collected_check
                     report_day.by_driver[shift.shift.driver].total_collected_money += (trip.collected_cash + trip.collected_check)
@@ -1228,7 +1234,13 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
         ws_tags.cell(row_header + row_trip_type, 4, report.all_vehicles.trip_types[trip_type].total)
         row_trip_type += 1
 
-    row_trip_type_total = row_trip_type
+    row_trip_type_unknown = row_trip_type
+    ws_tags.cell(row_header + row_trip_type_unknown, 1, 'Unknown')
+    ws_tags.cell(row_header + row_trip_type_unknown, 2, report.all_vehicles.trip_types_unknown.passenger)
+    ws_tags.cell(row_header + row_trip_type_unknown, 3, report.all_vehicles.trip_types_unknown.no_passenger)
+    ws_tags.cell(row_header + row_trip_type_unknown, 4, report.all_vehicles.trip_types_unknown.total)
+
+    row_trip_type_total = row_trip_type_unknown + 1
     ws_tags.cell(row_header + row_trip_type_total, 1, 'TOTAL')
     ws_tags.cell(row_header + row_trip_type_total, 2, report.all_vehicles.trip_types_total.passenger)
     ws_tags.cell(row_header + row_trip_type_total, 3, report.all_vehicles.trip_types_total.no_passenger)

@@ -356,23 +356,23 @@ class Report():
 
         # also cache destinations
         all_destinations = Destination.objects.all()
-        destination_dict = {obj.id: obj for obj in all_destinations}
+        destination_list = list(all_destinations)
 
         # store our database lookups in dictionaries
         all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one)
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
-        all_shifts_dict = {obj.id: obj for obj in all_shifts}
+        all_shifts_list = list(all_shifts)
 
         all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, is_activity=False)
         all_trips = all_trips.select_related('driver').select_related('vehicle').select_related('trip_type')
-        all_trips_dict = {obj.id: obj for obj in all_trips}
+        all_trips_list = list(all_trips)
 
         all_clients = Client.objects.all()
-        all_clients_dict = {obj.id: obj for obj in all_clients}
+        all_clients_list = list(all_clients)
 
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
-        all_client_payments_dict = {obj.id: obj for obj in all_client_payments}
+        all_client_payments_list = list(all_client_payments)
 
         day_date = date_start
         while day_date < date_end_plus_one:
@@ -382,7 +382,7 @@ class Report():
             report_day = Report.ReportDay()
             report_day.date = day_date
 
-            for k, i in all_shifts_dict.items():
+            for i in all_shifts_list:
                 if i.date != day_date:
                     continue
                 if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or i.driver is None or i.vehicle is None:
@@ -440,7 +440,7 @@ class Report():
 
                 report_day.shifts.append(report_shift)
 
-            for k, i in all_trips_dict.items():
+            for i in all_trips_list:
                 if i.date != day_date:
                     continue
                 if i.driver and not i.driver.is_logged:
@@ -474,7 +474,7 @@ class Report():
                 if report_trip.shift == None:
                     if i.driver and i.vehicle and i.vehicle.is_logged:
                         found_shift = False
-                        for k, test_shift in all_shifts_dict.items():
+                        for test_shift in all_shifts_list:
                             if test_shift.driver == i.driver and test_shift.vehicle == test_shift.vehicle and i.date == test_shift.date:
                                 found_shift = True
                                 break
@@ -592,7 +592,7 @@ class Report():
                         rider.ambulatory = i.ambulatory
 
                         clients = Client.objects.filter(name=i.name)
-                        for k, client in all_clients_dict.items():
+                        for client in all_clients_list:
                             if client.name != i.name:
                                 continue
 
@@ -618,7 +618,7 @@ class Report():
                     report_trip.tags = i.get_tag_list()
 
                 # add destination to frequent destinations
-                for k, dest in destination_dict.items():
+                for dest in destination_list:
                     if dest.address == i.destination:
                         found_frequent_destination = False
                         for j in self.frequent_destinations:
@@ -634,7 +634,7 @@ class Report():
                             self.frequent_destinations.append(temp_fd)
 
             # handle payments from Clients that didn't ride (so far)
-            for k, i in all_client_payments_dict.items():
+            for i in all_client_payments_list:
                 if i.date_paid != day_date:
                     continue
 

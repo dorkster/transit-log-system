@@ -98,8 +98,8 @@ class Report():
             self.other_employment = False
 
     class ReportDay():
-        query_vehicles = Vehicle.objects.all()
-        query_drivers = Driver.objects.filter(is_logged=True)
+        query_vehicles = ()
+        query_drivers = ()
 
         def __init__(self):
             self.date = None
@@ -127,8 +127,8 @@ class Report():
             return False
 
     class ReportSummary():
-        query_triptypes = TripType.objects.all()
-        query_tags = Tag.objects.all()
+        query_triptypes = ()
+        query_tags = ()
 
         def __init__(self):
             self.service_miles = 0
@@ -329,6 +329,9 @@ class Report():
             self.check = Report.Money(0)
 
     def __init__(self):
+        Report.ReportSummary.query_triptypes = TripType.objects.all()
+        Report.ReportSummary.query_tags = Tag.objects.all()
+
         self.report_all = []
         self.vehicle_reports = []
         self.driver_reports = []
@@ -373,6 +376,9 @@ class Report():
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
         all_client_payments_list = list(all_client_payments)
+
+        Report.ReportDay.query_drivers = all_drivers.filter(is_logged=True)
+        Report.ReportDay.query_vehicles = all_vehicles
 
         day_date = date_start
         while day_date < date_end_plus_one:
@@ -780,7 +786,7 @@ class Report():
 
         self.driver_reports = []
         for driver in Driver.objects.filter(is_logged=True):
-            driver_report = Report.ReportOutputVehicles()
+            driver_report = Report.ReportOutputDrivers()
             driver_report.driver = driver
             for report_day in self.report_all:
                 if report_day.hasDriverInShift(driver):

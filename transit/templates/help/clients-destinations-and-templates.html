@@ -1,5 +1,6 @@
 {% extends "help.html" %}
 {% block help_content %}
+{% load static %}
 <p>It is highly recommended to set up clients and templates before creating schedules. Doing so will make creating recurring trips easier and less prone to typo errors.</p>
 
 <hr/>
@@ -11,7 +12,7 @@
 <p>The clients created here will appear in the drop-down of the <strong>Name</strong> field when creating trips in a template or schedule. Defining clients here allows fields such as the address and phone number to be automatically filled in when creating trips.</p>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_clients.png" alt="The clients page"/>
+    <img src="{% static '/transit/img/help_clients.png' %}" alt="The clients page"/>
     <div class="help-img-text help-img-text-left" style="left: 180px; top: 20px;">Create a new client</div>
     <div class="help-img-text help-img-text-left" style="left: 210px; top: 110px;">Filter the available clients by elderly and ambulatory status...</div>
     <div class="help-img-text help-img-text-left" style="left: 120px; top: 160px;">...Or simply search by name and address</div>
@@ -48,7 +49,7 @@
 <p>For things such as daily schedules and regular group outings, templates can be created to speed up inserting multiple trips into the schedule.</p>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_templates.png" alt="The templates page"/>
+    <img src="{% static '/transit/img/help_templates.png' %}" alt="The templates page"/>
     <div class="help-img-text help-img-text-left" style="left: 215px; top: 20px;">Create a new template</div>
     <div class="help-img-text help-img-text-left" style="left: 110px; top: 90px;">Edit the template name or delete the template</div>
     <div class="help-img-text help-img-text-left" style="left: 55px; top: 140px;">Change the order that templates appear</div>
@@ -58,7 +59,7 @@
 <p>Once a template has been created, clicking on <em>Edit Trips</em> will lead to the page where trips and activities can be added or edited.</p>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_template_trips.png" alt="The Edit Trips page for a 'Thursday' template"/>
+    <img src="{% static '/transit/img/help_template_trips.png' %}" alt="The Edit Trips page for a 'Thursday' template"/>
     <div class="help-img-text help-img-text-left" style="left: 475px; top: 20px;">Create a new trip or activity</div>
     <div class="help-img-text help-img-text-left" style="left: 110px; top: 130px;">Edit or delete the trip or activity<br/>For trips, there are shortcuts to copy the trip, create a return trip, or create a client</div>
     <div class="help-img-text help-img-text-left" style="left: 55px; top: 245px;">Change the order of trips</div>

@@ -1,10 +1,11 @@
 {% extends "help.html" %}
 {% block help_content %}
+{% load static %}
 <p>Now that <a href="{% url 'help-topic' 'drivers-vehicles-and-trip-types' %}">Drivers, Vehicles, and Trip Types</a> and <a href="{% url 'help-topic' 'clients-destinations-and-templates'%}">Clients, Destinations, and Templates</a> have been set up, it's time to start editing schedules.</p>
 <p>The <strong><a href="{% url 'schedule-today' 'edit' %}">Edit Schedule</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Edit Schedule</em>.
 <hr/>
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule.png" alt="The schedule page"/>
+    <img src="{% static '/transit/img/help_schedule.png' %}" alt="The schedule page"/>
     <div class="help-img-text help-img-text-right" style="max-width: 300px; right: 350px; top: 30px;">
         (From left to right)<br/>
         <ul>
@@ -33,7 +34,7 @@
 <p>Trips are the primary focus of the schedule, describing a person's ride from one <strong>Address</strong> to a <strong>Destination</strong>. The information in a Trip can be divided into three parts: <em>Client Information</em>, <em>Trip Information</em>, and <em>Log Information</em>.</p>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule_new_trip.png" alt="The trip edit page"/>
+    <img src="{% static '/transit/img/help_schedule_new_trip.png' %}" alt="The trip edit page"/>
     <div class="help-img-text help-img-text-left" style="left: 730px; top: 120px;">Mark a trip as canceled</div>
     <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 90px; top: 235px;">The name field has a dropdown with a list of all the available Clients. Selecting one will fill in all the available information for that Client.<br/>If the name entered isn't in the Client database, a warning will be displayed and the option to add them to the database will be enabled.</div>
     <div class="help-img-text help-img-text-left" style="left: 170px; top: 390px;">Fill in the phone number from the Client information</div>

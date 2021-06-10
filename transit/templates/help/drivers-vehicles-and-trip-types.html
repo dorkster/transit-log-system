@@ -1,5 +1,6 @@
 {% extends "help.html" %}
 {% block help_content %}
+{% load static %}
 <p>Before using the schedule system, it is important to first set up the available <strong>drivers</strong> and <strong>vehicles</strong>, as well as the different <strong>trip types</strong>.</p>
 
 <p>Your administrator has likely already done this for you, but it is worth reviewing this section to learn how to add, edit, and re-order these items.</p>
@@ -9,7 +10,7 @@
 <p>The <strong><a href="{% url 'drivers' %}">Drivers</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Drivers</em>.</p>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_drivers_list.png" alt="The drivers page" />
+    <img src="{% static '/transit/img/help_drivers_list.png' %}" alt="The drivers page" />
     <div class="help-img-text help-img-text-left" style="left: 180px; top: 20px;">Create a new driver</div>
     <div class="help-img-text help-img-text-left" style="left: 110px; top: 90px;">Edit an existing driver</div>
     <div class="help-img-text help-img-text-left" style="left: 55px; top: 165px;">Change the order that drivers will appear</div>

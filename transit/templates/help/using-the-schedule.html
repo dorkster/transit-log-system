@@ -1,10 +1,11 @@
 {% extends "help.html" %}
 {% block help_content %}
+{% load static %}
 <p>Once a <a href="{% url 'help-topic' 'editing-the-schedule' %}">schedule has been created</a>, drivers can then make use of it. The schedule can continue to be modified and updated by other staff, as any changes will automatically be reflected in the driver's view.</p>
 <p>The <strong><a href="{% url 'schedule-today' 'view' %}">View Schedule</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; View Schedule</em>.
 <hr/>
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule_view.png" alt="The schedule page (view mode)"/>
+    <img src="{% static '/transit/img/help_schedule_view.png' %}" alt="The schedule page (view mode)"/>
     <div class="help-img-text help-img-text-left" style="left: 160px; top: 95px;">Change the date</div>
     <div class="help-img-text help-img-text-right" style="max-width: 150px; right: 290px; top: 265px;">Drivers start and end their Shifts here</div>
     <div class="help-img-text help-img-text-right" style="right: 140px; top: 400px;">Removes all active filters</div>
@@ -25,7 +26,7 @@
 <hr/>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule_view_pretrip.png" alt="The pretrip page"/>
+    <img src="{% static '/transit/img/help_schedule_view_pretrip.png' %}" alt="The pretrip page"/>
     <div class="help-img-text help-img-text-right" style="right: 120px; top: 230px;">Pre-Trip items can be marked as passing or failing</div>
     <div class="help-img-text help-img-text-left" style="max-width: 250px; left: 210px; top: 350px;">If an item is marked as failing, a vehicle issue can be filed here. More information about vehicle issues can be found in the next section, <a href="{% url 'help-topic' 'vehicle-status' %}">Vehicle Status</a>.</div>
 </div>
@@ -33,7 +34,7 @@
 <hr/>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule_view_start_shift.png" alt="The shift start page"/>
+    <img src="{% static '/transit/img/help_schedule_view_start_shift.png' %}" alt="The shift start page"/>
     <div class="help-img-text help-img-text-left" style="max-width: 350px; left: 90px; top: 110px;">Mileage from the odometer. Entering the last few digits is supported, with the full mileage as interpreted by the system being displayed below. When entering partial mileage values, be careful of errors (see below annotation).</div>
     <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 190px; top: 225px;">A <span class="text-danger">red triangle</span> indicates an error was detected.<br/>Please double-check against the actual odometer!</div>
     <div class="help-img-text help-img-text-left" style="max-width: 175px; left: 310px; top: 280px;">When an error occurs, a suggestion for fixing it is displayed. This suggestion is not always correct, but it can speed up fixing errors in some cases.</div>
@@ -43,7 +44,7 @@
 <hr/>
 
 <div class="help-img">
-    <img src="/transit/static/img/help_schedule_view_start_trip.png" alt="The trip start page"/>
+    <img src="{% static '/transit/img/help_schedule_view_start_trip.png' %}" alt="The trip start page"/>
     <div class="help-img-text help-img-text-left" style="max-width: 200px; left: 280px; top: 240px;">Mileage from the odometer. Entering the last few digits is supported, with the full mileage as interpreted by the system being displayed below.<br/><br/>Just like with Shifts, it's important to be aware of errors. Watch for the <span class="text-danger">red triangle</span> indicating an error and check against the actual odometer.</div>
     <div class="help-img-text help-img-text-left" style="left: 125px; top: 300px;">Get the current time</div>
     <div class="help-img-text help-img-text-left" style="left: 160px; top: 490px;">If needed, the Driver and Vehicle can be changed on-the-fly</div>

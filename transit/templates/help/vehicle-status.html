@@ -1,10 +1,11 @@
 {% extends "help.html" %}
 {% block help_content %}
+{% load static %}
 <p>Another feature of the transit system is to keep track of vehicle maintenance information, reported issues, and pre-trip reports.</p>
 <p>The <strong><a href="{% url 'vehicle-status' %}">Vehicle Status</a></strong> page can be accessed via the main menu under <em>Vehicles &gt;&gt; Vehicle Status</em>.
 <hr/>
 <div class="help-img">
-    <img src="/transit/static/img/help_vehicles.png" alt="The schedule page"/>
+    <img src="{% static '/transit/img/help_vehicles.png' %}" alt="The schedule page"/>
     <div class="help-img-text help-img-text-left" style="max-width: 300px; left: 770px; top: 160px;">Update the maintenance information with the mileage that the next oil change is due and when the inspection sticker needs to be renewed.<br/>The oil change mileage should be the full mileage number.</div>
     <div class="help-img-text help-img-text-left" style="left: 290px; top: 310px;">File a new vehicle issue</div>
     <div class="help-img-text help-img-text-left" style="left: 320px; top: 390px;">The list of reported vehicle issues can be filtered by various criteria</div>

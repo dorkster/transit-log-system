@@ -119,3 +119,4 @@ GitHub.sublime-settings
 /static/
 /stow_coa_uwsgi.ini
 /uwsgi_params
+run_debug_server.sh

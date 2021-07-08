@@ -59,6 +59,12 @@ class Report():
             r.no_passenger = self.no_passenger + other.no_passenger
             r.total = self.total + other.total
             return r
+        def __sub__(self, other):
+            r = Report.TripCount()
+            r.passenger = self.passenger - other.passenger
+            r.no_passenger = self.no_passenger - other.no_passenger
+            r.total = self.total - other.total
+            return r
         def addTrips(self, value, is_passenger):
             if is_passenger is False:
                 self.no_passenger += value

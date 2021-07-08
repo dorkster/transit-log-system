@@ -553,6 +553,9 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
 
     trips_employment = report_summary.other_employment
 
+    # don't include employment/education in Other total
+    trips_other = trips_other - trips_employment
+
     context = {
         'date': day_date,
         'shifts': shifts,
@@ -563,7 +566,7 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
         'trips_social': trips_social,
         'trips_shopping': trips_shopping,
         'trips_other': trips_other,
-        'trips_total': trips_medical + trips_nutrition + trips_social + trips_shopping + trips_other,
+        'trips_total': trips_medical + trips_nutrition + trips_social + trips_shopping + trips_other + trips_employment,
         'money_cash': money_cash,
         'money_check': money_check,
         'money_total': money_total,

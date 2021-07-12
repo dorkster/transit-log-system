@@ -111,6 +111,7 @@ class Report():
             self.date = None
             self.shifts = []
             self.trips = []
+            self.all = Report.ReportSummary()
 
             self.by_vehicle = {}
             for i in self.query_vehicles:
@@ -120,15 +121,15 @@ class Report():
             for i in self.query_drivers:
                 self.by_driver[i] = Report.ReportSummary()
 
-        def hasVehicleInShift(self, vehicle):
+        def hasVehicleInShift(self, vehicle = None):
             for i in self.shifts:
-                if i.shift.vehicle == vehicle:
+                if (vehicle and i.shift.vehicle == vehicle) or (vehicle == None and i.shift.vehicle != None):
                     return True
             return False
         
-        def hasDriverInShift(self, driver):
+        def hasDriverInShift(self, driver = None):
             for i in self.shifts:
-                if i.shift.driver == driver:
+                if (driver and i.shift.driver == driver) or (driver == None and i.shift.driver != None):
                     return True
             return False
 
@@ -771,6 +772,8 @@ class Report():
                             report_day.by_driver[shift.shift.driver].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_driver[shift.shift.driver].fuel += shift.fuel
 
+                report_day.all += report_day.by_vehicle[shift.shift.vehicle]
+
             self.report_all.append(report_day)
 
             day_date += datetime.timedelta(days=1)
@@ -981,11 +984,16 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     #####
     #### All Vehicle Totals
     #####
+    report_all = []
+    for i in report.report_all:
+        if i.hasVehicleInShift():
+            report_all.append(i)
+
     ws_vehicle_total = wb.active
     ws_vehicle_total.title = 'Totals for All Vehicles'
 
     row_header = 1
-    row_total = 2
+    row_total = 1 + len(report_all) + 1
 
     ws_vehicle_total.cell(row_header, 2, 'Service Miles')
     ws_vehicle_total.cell(row_header, 3, 'Service Hours')
@@ -993,6 +1001,39 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_vehicle_total.cell(row_header, 5, 'Deadhead Hours')
     ws_vehicle_total.cell(row_header, 6, 'Passenger Miles (PMT)')
     ws_vehicle_total.cell(row_header, 7, 'Fuel')
+
+    for day in range(0, len(report_all)):
+        day_row = row_header + day + 1
+        ws_vehicle_total.cell(day_row, 1, report_all[day].date)
+        ws_vehicle_total.cell(day_row, 2, report_all[day].all.service_miles)
+        ws_vehicle_total.cell(day_row, 3, report_all[day].all.service_hours)
+        ws_vehicle_total.cell(day_row, 4, report_all[day].all.deadhead_miles)
+        ws_vehicle_total.cell(day_row, 5, report_all[day].all.deadhead_hours)
+        ws_vehicle_total.cell(day_row, 6, report_all[day].all.pmt)
+        ws_vehicle_total.cell(day_row, 7, report_all[day].all.fuel)
+
+        triptype_col=8
+        for i in TripType.objects.all():
+            ws_vehicle_total.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
+            ws_vehicle_total.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
+            ws_vehicle_total.cell(day_row, triptype_col, report_all[day].all.trip_types[i].passenger)
+            ws_vehicle_total.cell(day_row, triptype_col+1, report_all[day].all.trip_types[i].no_passenger)
+            ws_vehicle_total.cell(day_row, triptype_col+2, report_all[day].all.trip_types[i].total)
+            triptype_col += 3
+
+        ws_vehicle_total.cell(row_header, triptype_col, 'Total Trips')
+        ws_vehicle_total.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
+        ws_vehicle_total.cell(day_row, triptype_col, report_all[day].all.trip_types_total.passenger)
+        ws_vehicle_total.cell(day_row, triptype_col+1, report_all[day].all.trip_types_total.no_passenger)
+        ws_vehicle_total.cell(day_row, triptype_col+2, report_all[day].all.trip_types_total.total)
+        triptype_col += 3
+
+        ws_vehicle_total.cell(row_header, triptype_col, 'Cash Collected')
+        ws_vehicle_total.cell(row_header, triptype_col+1, 'Check Collected')
+        ws_vehicle_total.cell(row_header, triptype_col+2, 'Total Money Collected')
+        ws_vehicle_total.cell(day_row, triptype_col, report_all[day].all.collected_cash.to_float())
+        ws_vehicle_total.cell(day_row, triptype_col+1, report_all[day].all.collected_check.to_float())
+        ws_vehicle_total.cell(day_row, triptype_col+2, report_all[day].all.total_collected_money.to_float())
 
     ws_vehicle_total.cell(row_total, 1, 'TOTAL')
     ws_vehicle_total.cell(row_total, 2, report.all_vehicles.service_miles)
@@ -1026,15 +1067,18 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_vehicle_total.cell(row_total, triptype_col+2, report.all_vehicles.total_collected_money.to_float())
 
     # number formats
-    ws_vehicle_total.cell(row_total, 2).number_format = '0.0'
-    ws_vehicle_total.cell(row_total, 3).number_format = '0.00'
-    ws_vehicle_total.cell(row_total, 4).number_format = '0.0'
-    ws_vehicle_total.cell(row_total, 5).number_format = '0.00'
-    ws_vehicle_total.cell(row_total, 6).number_format = '0.0'
-    ws_vehicle_total.cell(row_total, 7).number_format = '0.0'
-    ws_vehicle_total.cell(row_total, triptype_col).number_format = '$0.00'
-    ws_vehicle_total.cell(row_total, triptype_col+1).number_format = '$0.00'
-    ws_vehicle_total.cell(row_total, triptype_col+2).number_format = '$0.00'
+    for i in range(row_header + 1, row_total + 1):
+        if i < row_total:
+            ws_vehicle_total.cell(i, 1).number_format = 'MMM DD, YYYY'
+        ws_vehicle_total.cell(i, 2).number_format = '0.0'
+        ws_vehicle_total.cell(i, 3).number_format = '0.00'
+        ws_vehicle_total.cell(i, 4).number_format = '0.0'
+        ws_vehicle_total.cell(i, 5).number_format = '0.00'
+        ws_vehicle_total.cell(i, 6).number_format = '0.0'
+        ws_vehicle_total.cell(i, 7).number_format = '0.0'
+        ws_vehicle_total.cell(i, triptype_col).number_format = '$0.00'
+        ws_vehicle_total.cell(i, triptype_col+1).number_format = '$0.00'
+        ws_vehicle_total.cell(i, triptype_col+2).number_format = '$0.00'
 
     # apply styles
     ws_vehicle_total.row_dimensions[row_header].height = style_rowheight_header

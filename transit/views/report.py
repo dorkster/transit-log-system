@@ -398,6 +398,15 @@ class Report():
             for i in all_shifts_list:
                 if i.date != day_date:
                     continue
+
+                if i.driver and not i.driver.is_logged:
+                    # skip non-logged drivers
+                    continue
+
+                if i.vehicle and not i.vehicle.is_logged:
+                    # skip non-logged vehicles
+                    continue
+
                 if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or i.driver is None or i.vehicle is None:
                     # skip incomplete shift
                     if i.start_miles != '' or i.start_time != '' or i.end_miles != '' or i.end_time != '':
@@ -458,6 +467,10 @@ class Report():
                     continue
                 if i.driver and not i.driver.is_logged:
                     # skip non-logged drivers
+                    continue
+
+                if i.vehicle and not i.vehicle.is_logged:
+                    # skip non-logged vehicles
                     continue
 
                 if i.start_miles == '' and i.start_time == '' and i.end_miles == '' and i.end_time == '':

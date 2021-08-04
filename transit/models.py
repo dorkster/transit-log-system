@@ -390,6 +390,7 @@ class TripType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.SM)
+    is_trip_counted = models.BooleanField('Included in report trip counts?', default=True)
 
     class Meta:
         ordering = ['sort_index']

@@ -63,6 +63,7 @@ def triptypeCreateEditCommon(request, triptype, is_new):
 
         if form.is_valid():
             triptype.name = form.cleaned_data['name']
+            triptype.is_trip_counted = form.cleaned_data['is_trip_counted']
             triptype.save()
 
             if is_new:
@@ -74,6 +75,7 @@ def triptypeCreateEditCommon(request, triptype, is_new):
     else:
         initial = {
             'name': triptype.name,
+            'is_trip_counted': triptype.is_trip_counted,
         }
         form = EditTripTypeForm(initial=initial)
 

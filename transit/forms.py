@@ -200,6 +200,7 @@ class EditVehicleForm(forms.Form):
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    is_trip_counted = forms.ChoiceField(choices=BOOL_CHOICES, label='Include in report trip counts?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))

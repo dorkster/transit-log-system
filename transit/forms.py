@@ -135,6 +135,8 @@ class EditTripForm(forms.Form):
     passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_dest2 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
@@ -246,6 +248,8 @@ class EditTemplateTripForm(forms.Form):
     passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    add_dest2 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
 class EditTemplateActivityForm(forms.Form):
     parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))

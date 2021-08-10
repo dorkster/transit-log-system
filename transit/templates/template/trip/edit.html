@@ -123,8 +123,12 @@
         {% if is_new and not trip.is_activity and not is_return_trip %}
         {{ form.create_return_trip }}
         {{ form.add_client }}
+        {{ form.add_dest1 }}
+        {{ form.add_dest2 }}
         <a id="create_return_trip_btn" class="btn btn-outline-dark" href="#_" onclick="toggleReturnTrip(this)"><span class="oi oi-circle-x mr-2"></span>Create a return trip</a>
         <a id="add_client_btn" class="btn btn-outline-dark disabled" href="#_" onclick="toggleAddClient(this)"><span class="oi oi-circle-x mr-2"></span>Add to Clients</a>
+        <a id="add_dest1_btn" class="btn btn-outline-dark disabled" href="#_" onclick="toggleAddDestination(this, 0)"><span class="oi oi-circle-x mr-2"></span>Add Pick-Up Address to Destinations</a>
+        <a id="add_dest2_btn" class="btn btn-outline-dark disabled" href="#_" onclick="toggleAddDestination(this, 1)"><span class="oi oi-circle-x mr-2"></span>Add Destination Address to Destinations</a>
         <hr/>
         {% endif %}
         <div class="d-flex flex-wrap mt-2">

@@ -91,6 +91,8 @@ function getClientPhone(target) {
 function getClientAddress(target) {
     var address_input = (target == 1 ? "#id_destination" : "#id_address");
     var phone_input = (target == 1 ? "#id_phone_destination" : "#id_phone_address");
+    var add_dest_btn_id = (target == 1 ? "add_dest2_btn" : "add_dest1_btn");
+    var add_dest_input = (target == 1 ? "#id_add_dest2" : "#id_add_dest1");
 
     $(address_input).val("");
     $(phone_input).val("");
@@ -99,16 +101,50 @@ function getClientAddress(target) {
             $(address_input).val(clients[i].fields.address);
         }
     }
+
+    var add_dest_btn = document.getElementById(add_dest_btn_id);
+    if (add_dest_btn) {
+        $(add_dest_input).val("True");
+        toggleAddDestination(add_dest_btn, target);
+        add_dest_btn.classList.add("disabled");
+    }
 }
 
 function onAddressChanged(target) {
     var address_input = (target == 1 ? "#id_destination" : "#id_address");
     var phone_input = (target == 1 ? "#id_phone_destination" : "#id_phone_address");
+    var add_dest_btn_id = (target == 1 ? "add_dest2_btn" : "add_dest1_btn");
+    var add_dest_input = (target == 1 ? "#id_add_dest2" : "#id_add_dest1");
 
+    var found_destination = false;
     for (i in destinations) {
         if (destinations[i].fields.address == $(address_input).val()) {
+            found_destination = true;
             $(phone_input).val(destinations[i].fields.phone);
             break;
+        }
+    }
+
+    var add_client_selected = (target == 0 && $("#id_add_client").val() == "True");
+    if (!found_destination && $(address_input).val() != "" && !add_client_selected) {
+        if (!confirm("Unable to find '" + $(address_input).val() + "' in the Destinations database. Do you still want to continue?")) {
+            $(address_input).val("");
+        }
+    }
+
+    var add_dest_btn = document.getElementById(add_dest_btn_id);
+    if (add_dest_btn) {
+        if (found_destination || $(address_input).val() == "") {
+            $(add_dest_input).val("True");
+            toggleAddDestination(add_dest_btn, target);
+            add_dest_btn.classList.add("disabled");
+        }
+        else {
+            if (!add_client_selected) {
+                $(add_dest_input).val("False");
+                toggleAddDestination(add_dest_btn, target);
+            }
+            add_dest_btn.classList.remove("disabled");
         }
     }
 }
@@ -214,6 +250,36 @@ function toggleReturnTrip(btn) {
 
 function toggleAddClient(btn) {
     var field = document.getElementById("id_add_client");
+    if (field) {
+        if (field.value == "False") {
+            field.value = "True";
+            btn.classList.remove("btn-outline-dark");
+            btn.classList.add("btn-primary");
+            btn.firstChild.classList.remove("oi-circle-x");
+            btn.firstChild.classList.add("oi-circle-check");
+
+            var dest_field = document.getElementById("id_add_dest1");
+            if (dest_field && dest_field.value == "True") {
+                var dest_btn = document.getElementById("add_dest1_btn");
+                if (dest_btn) {
+                    toggleAddDestination(dest_btn, 0);
+                }
+            }
+        }
+        else {
+            field.value = "False";
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-outline-dark");
+            btn.firstChild.classList.remove("oi-circle-check");
+            btn.firstChild.classList.add("oi-circle-x");
+            onAddressChanged(0);
+        }
+    }
+}
+
+function toggleAddDestination(btn, target) {
+    var target_id = (target == 1 ? "id_add_dest2" : "id_add_dest1");
+    var field = document.getElementById(target_id);
     if (field) {
         if (field.value == "False") {
             field.value = "True";

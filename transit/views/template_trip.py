@@ -173,6 +173,16 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                     client.ambulatory = form.cleaned_data['ambulatory']
                     client.save()
                     log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
+                if form.cleaned_data['add_dest1'] == True:
+                    destination = Destination()
+                    destination.address = form.cleaned_data['address']
+                    destination.phone = form.cleaned_data['phone_address']
+                    destination.save()
+                if form.cleaned_data['add_dest2'] == True:
+                    destination = Destination()
+                    destination.address = form.cleaned_data['destination']
+                    destination.phone = form.cleaned_data['phone_destination']
+                    destination.save()
 
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('template-trip-create-return', kwargs={'parent':trip.parent.id, 'id':trip.id}))

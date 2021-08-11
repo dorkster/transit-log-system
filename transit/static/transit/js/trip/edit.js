@@ -16,6 +16,7 @@ function setupFormEventsTrip() {
     $("#id_address").on("change", function() { onAddressChanged(0); });
     $("#id_destination").on("change", function() { onAddressChanged(1); });
     $("#id_driver").on("change", ajaxSetVehicleFromDriver);
+    $("#id_trip_type").on("change", onTripTypeChange);
 }
 
 function onNameChanged() {
@@ -320,5 +321,12 @@ function ajaxSetVehicleFromDriver() {
             $("#id_vehicle").prop("selectedIndex", 0);
         }
     });
+}
+
+function onTripTypeChange() {
+    var other_selected = $("#id_trip_type option:selected").text() == "Other";
+    if (other_selected && $("#id_tags").val() == "") {
+        showTagDialog();
+    }
 }
 

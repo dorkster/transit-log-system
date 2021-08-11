@@ -15,6 +15,7 @@ function setupFormEventsTrip() {
     $("#id_name").on("change", onNameChanged);
     $("#id_address").on("change", function() { onAddressChanged(0); });
     $("#id_destination").on("change", function() { onAddressChanged(1); });
+    $("#id_trip_type").on("change", onTripTypeChange);
 }
 
 function onNameChanged() {
@@ -295,6 +296,13 @@ function toggleAddDestination(btn, target) {
             btn.firstChild.classList.remove("oi-circle-check");
             btn.firstChild.classList.add("oi-circle-x");
         }
+    }
+}
+
+function onTripTypeChange() {
+    var other_selected = $("#id_trip_type option:selected").text() == "Other";
+    if (other_selected && $("#id_tags").val() == "") {
+        showTagDialog();
     }
 }
 

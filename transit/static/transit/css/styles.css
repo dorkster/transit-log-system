@@ -134,3 +134,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.tag-grid-item {
+    flex: 1 1 33%;
+}
+
+@media (max-width: 991.98px) {
+    .tag-grid-item {
+        flex: 1 1 50%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .tag-grid-item {
+        flex: 1 1 100%;
+    }
+}

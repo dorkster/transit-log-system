@@ -179,23 +179,23 @@
 {% endif %}
 
 <div id="tag_modal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Please select a tag to add to this trip</h5>
             </div>
             <div class="modal-body">
-                <div class="list-group list-group-flush">
-                    {% if tags %}
+                {% if tags %}
+                <div class="d-flex flex-wrap">
                     {% for tag in tags %}
-                    <div class="list-group-item">
+                    <div class="p-2 tag-grid-item">
                         <a href="#_" class="btn btn-sm {{tag.get_button_style}} text-bold" onclick="addTag('{{tag.name}}')"><span class="oi oi-tag mr-2"></span>{{tag.name}}</a>
                     </div>
                     {% endfor %}
-                    {% else %}
-                    <p>There are no tags.</p>
-                    {% endif %}
                 </div>
+                {% else %}
+                <p>There are no tags.</p>
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">

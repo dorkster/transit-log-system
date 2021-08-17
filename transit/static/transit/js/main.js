@@ -34,8 +34,33 @@ function AjaxLoader(url, div_id) {
         self.start();
     }
 
+    self.resume = function() {
+        self.restart();
+        self.run();
+    }
+
+    self.animationDone = function() {
+        event.currentTarget.style.display = "none";
+        event.currentTarget.p_done = true;
+    }
+
+    self.animationDoneEarly = function() {
+        event.currentTarget.p_done = true;
+    }
+
     self.run = function(target_id="", target_action="", target_data="") {
-        $('.ajax-loading').stop(true, true).fadeIn("fast");
+        ajax_loading = document.querySelector("#ajax-loading");
+        ajax_loading.p_done = false;
+
+        ajax_loading.style.animation = 'none';
+        ajax_loading.offsetHeight; // trigger reflow
+        ajax_loading.style.animation = null;
+
+        ajax_loading.removeEventListener("animationend", self.animationDone);
+        ajax_loading.removeEventListener("animationend", self.animationDoneEarly);
+
+        ajax_loading.style.display = "initial";
+        ajax_loading.addEventListener("animationend", self.animationDoneEarly);
 
         $.ajax({
             type: "GET",
@@ -48,8 +73,7 @@ function AjaxLoader(url, div_id) {
         })
         .done(function(response) {
             if ( $('.ajax-blocker.show').length == 0 ) {
-                $(self.div_id).html("")
-                $(self.div_id).append(response);
+                $(self.div_id).html(response);
                 if (!self.first_response) {
                     self.first_response = true;
                     var hash = window.location.hash.substr(1);
@@ -63,15 +87,18 @@ function AjaxLoader(url, div_id) {
                                 hash_element.scrollIntoView({block: "center"});
                         }
                 }
-                $('.ajax-loading').stop(true, true).fadeOut();
+
+                ajax_loading.addEventListener("animationend", self.animationDone);
+                if (ajax_loading.p_done) {
+                    ajax_loading.style.display = "none";
+                }
                 self.restart();
             }
             else {
-                $('.ajax-loading').stop(true, true).fadeOut();
                 self.stop();
                 // when the ajax blocker is hidden, fire a new ajax request
-                $('.modal.ajax-blocker.show').one('hidden.bs.modal', function(){ self.restart(); })
-                $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', function(){ self.restart(); })
+                $('.modal.ajax-blocker.show').one('hidden.bs.modal', self.resume);
+                $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', self.resume);
             }
         });
     }

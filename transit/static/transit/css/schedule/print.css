@@ -1,6 +1,6 @@
 @media print {
-    #print-print, #print-close, #print-filter, #print-filter-hr, #print-shiftselect {
-        display: none;
+    #print-print, #print-close, #print-filter, #print-filter-hr, #print-shiftselect, #ajax-loading {
+        display: none !important;
     }
 }
 

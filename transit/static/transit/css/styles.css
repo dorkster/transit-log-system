@@ -150,3 +150,15 @@
         flex: 1 1 100%;
     }
 }
+
+.ajax-loading {
+    height: 0.4em;
+    animation-name: ajax-loading-keyframes;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes ajax-loading-keyframes {
+    from { width: 1%; }
+    to { width: 100%; }
+}

@@ -2,6 +2,9 @@
     #print-print, #print-close, #print-filter, #print-filter-hr {
         display: none;
     }
+    .mytable * {
+        font-size: 93%;
+    }
 }
 
 body.bg-light {
@@ -22,4 +25,8 @@ nav {
 
 #global-notifications {
     display: none !important;
+}
+
+.mytable, .mytable td, .mytable thead {
+    page-break-inside: avoid;
 }

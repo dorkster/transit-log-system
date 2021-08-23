@@ -47,6 +47,78 @@
         </span>
     </div>
     <div class="mt-2">
+        <span class="mr-2">Start Date</span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_start_month == 0 %}-- Month --{% else %}{% for date_month in date_months %}{% if filter_date_start_month == date_month.id %}{{ date_month.name }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_start_month == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_month', '0')">-- Month --</button>
+                {% for date_month in date_months %}
+                <button class="dropdown-item {% if filter_date_start_month == date_month.id %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_month', '{{date_month.id}}')">{{date_month.name}}</button>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_start_day == 0 %}-- Day --{% else %}{% for date_day in date_days %}{% if filter_date_start_day == date_day %}{{ date_day }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_start_day == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_day', '0')">-- Day --</button>
+                {% for date_day in date_days %}
+                <button class="dropdown-item {% if filter_date_start_day == date_day %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_day', '{{date_day}}')">{{date_day}}</button>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_start_year == 0 %}-- Year --{% else %}{% for date_year in date_years %}{% if filter_date_start_year == date_year %}{{ date_year }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_start_year == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_year', '0')">-- Year --</button>
+                {% for date_year in date_years %}
+                <button class="dropdown-item {% if filter_date_start_year == date_year %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_start_year', '{{date_year}}')">{{date_year}}</button>
+                {% endfor %}
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
+        <span class="mr-2">End Date</span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_end_month == 0 %}-- Month --{% else %}{% for date_month in date_months %}{% if filter_date_end_month == date_month.id %}{{ date_month.name }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_end_month == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_month', '0')">-- Month --</button>
+                {% for date_month in date_months %}
+                <button class="dropdown-item {% if filter_date_end_month == date_month.id %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_month', '{{date_month.id}}')">{{date_month.name}}</button>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_end_day == 0 %}-- Day --{% else %}{% for date_day in date_days %}{% if filter_date_end_day == date_day %}{{ date_day }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_end_day == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_day', '0')">-- Day --</button>
+                {% for date_day in date_days %}
+                <button class="dropdown-item {% if filter_date_end_day == date_day %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_day', '{{date_day}}')">{{date_day}}</button>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_date_end_year == 0 %}-- Year --{% else %}{% for date_year in date_years %}{% if filter_date_end_year == date_year %}{{ date_year }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <button class="dropdown-item {% if filter_date_end_year == 0 %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_year', '0')">-- Year --</button>
+                {% for date_year in date_years %}
+                <button class="dropdown-item {% if filter_date_end_year == date_year %}active{% endif %}" onclick="ajax_loader.run('', 'filter_date_end_year', '{{date_year}}')">{{date_year}}</button>
+                {% endfor %}
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
                 <span class="oi oi-magnifying-glass mr-2"></span>Search

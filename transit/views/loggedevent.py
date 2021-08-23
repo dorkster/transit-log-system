@@ -39,6 +39,29 @@ def ajaxLoggedEventList(request):
     if not request.user.has_perm('transit.view_loggedevent'):
         return HttpResponseRedirect(reverse('login_redirect'))
 
+    date_months = [
+        { 'id': 1, 'name': 'January' },
+        { 'id': 2, 'name': 'February' },
+        { 'id': 3, 'name': 'March' },
+        { 'id': 4, 'name': 'April' },
+        { 'id': 5, 'name': 'May' },
+        { 'id': 6, 'name': 'June' },
+        { 'id': 7, 'name': 'July' },
+        { 'id': 8, 'name': 'August' },
+        { 'id': 9, 'name': 'September' },
+        { 'id': 10, 'name': 'October' },
+        { 'id': 11, 'name': 'November' },
+        { 'id': 12, 'name': 'December' },
+    ]
+
+    date_days = []
+    for i in range(1,32):
+        date_days.append(i)
+
+    date_years = []
+    for i in range(2019, datetime.date.today().year + 2):
+        date_years.append(i)
+
     SORT_TIMESTAMP = 0
     SORT_USERNAME = 1
     SORT_IP_ADDRESS = 2
@@ -64,11 +87,29 @@ def ajaxLoggedEventList(request):
         request.session['eventlog_filter_username'] = request_data
     elif request_action == 'filter_search':
         request.session['eventlog_filter_search'] = request_data
+    elif request_action == 'filter_date_start_month':
+        request.session['eventlog_filter_date_start_month'] = int(request_data)
+    elif request_action == 'filter_date_start_day':
+        request.session['eventlog_filter_date_start_day'] = int(request_data)
+    elif request_action == 'filter_date_start_year':
+        request.session['eventlog_filter_date_start_year'] = int(request_data)
+    elif request_action == 'filter_date_end_month':
+        request.session['eventlog_filter_date_end_month'] = int(request_data)
+    elif request_action == 'filter_date_end_day':
+        request.session['eventlog_filter_date_end_day'] = int(request_data)
+    elif request_action == 'filter_date_end_year':
+        request.session['eventlog_filter_date_end_year'] = int(request_data)
     elif request_action == 'filter_reset':
         request.session['eventlog_filter_action'] = ''
         request.session['eventlog_filter_target'] = ''
         request.session['eventlog_filter_username'] = ''
         request.session['eventlog_filter_search'] = ''
+        request.session['eventlog_filter_date_start_month'] = 0
+        request.session['eventlog_filter_date_start_day'] = 0
+        request.session['eventlog_filter_date_start_year'] = 0
+        request.session['eventlog_filter_date_end_month'] = 0
+        request.session['eventlog_filter_date_end_day'] = 0
+        request.session['eventlog_filter_date_end_year'] = 0
     elif request_action == 'clear_log':
         for i in LoggedEvent.objects.all():
             i.delete()
@@ -87,23 +128,42 @@ def ajaxLoggedEventList(request):
     filter_target = request.session.get('eventlog_filter_target', '')
     filter_username = request.session.get('eventlog_filter_username', '')
     filter_search = request.session.get('eventlog_filter_search', '')
+    filter_date_start_month = request.session.get('eventlog_filter_date_start_month', 0)
+    filter_date_start_day = request.session.get('eventlog_filter_date_start_day', 0)
+    filter_date_start_year = request.session.get('eventlog_filter_date_start_year', 0)
+    filter_date_end_month = request.session.get('eventlog_filter_date_end_month', 0)
+    filter_date_end_day = request.session.get('eventlog_filter_date_end_day', 0)
+    filter_date_end_year = request.session.get('eventlog_filter_date_end_year', 0)
 
     # TODO filter by date?
     logged_events = LoggedEvent.objects.all()
 
     unfiltered_count = len(logged_events)
+    is_filtered = False
 
     if filter_action != '':
         logged_events = logged_events.filter(event_action=filter_action)
+        is_filtered = True
 
     if filter_target != '':
         logged_events = logged_events.filter(event_model=filter_target)
+        is_filtered = True
 
     if filter_username != '':
         logged_events = logged_events.filter(username=filter_username)
+        is_filtered = True
 
     if filter_search != '':
         logged_events = logged_events.filter(event_desc__icontains=filter_search)
+        is_filtered = True
+
+    if filter_date_start_month != 0 and filter_date_start_day != 0 and filter_date_start_year != 0:
+        logged_events = logged_events.filter(timestamp__gte=datetime.datetime(year=filter_date_start_year, month=filter_date_start_month, day=filter_date_start_day))
+        is_filtered = True
+
+    if filter_date_end_month != 0 and filter_date_end_day != 0 and filter_date_end_year != 0:
+        logged_events = logged_events.filter(timestamp__lt=datetime.datetime(year=filter_date_end_year, month=filter_date_end_month, day=filter_date_end_day) + datetime.timedelta(days=1))
+        is_filtered = True
 
     filtered_count = len(logged_events)
 
@@ -147,7 +207,13 @@ def ajaxLoggedEventList(request):
         'filter_target': None if filter_target == '' else int(filter_target),
         'filter_username': None if filter_username == '' else filter_username,
         'filter_search': filter_search,
-        'is_filtered': (filter_action != '' or filter_target != '' or filter_username != '' or filter_search != ''),
+        'filter_date_start_month': filter_date_start_month,
+        'filter_date_start_day': filter_date_start_day,
+        'filter_date_start_year': filter_date_start_year,
+        'filter_date_end_month': filter_date_end_month,
+        'filter_date_end_day': filter_date_end_day,
+        'filter_date_end_year': filter_date_end_year,
+        'is_filtered': is_filtered,
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'users': User.objects.all(),
@@ -156,6 +222,9 @@ def ajaxLoggedEventList(request):
         'current_ip': request.META['REMOTE_ADDR'],
         'sort_mode': sort_mode,
         'sort_mode_dir': sort_mode_dir,
+        'date_months': date_months,
+        'date_days': date_days,
+        'date_years': date_years,
     }
     return render(request, 'loggedevent/ajax_list.html', context=context)
 

@@ -975,6 +975,8 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
         date_start = date_end
         date_end = swap_date
 
+    trip_types = TripType.objects.filter(is_trip_counted=True)
+
     report = Report()
     report.load(date_start, date_end)
 
@@ -1028,7 +1030,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
         ws_vehicle_total.cell(day_row, 7, report_all[day].all.fuel)
 
         triptype_col=8
-        for i in TripType.objects.all():
+        for i in trip_types:
             ws_vehicle_total.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
             ws_vehicle_total.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
             ws_vehicle_total.cell(day_row, triptype_col, report_all[day].all.trip_types[i].passenger)
@@ -1059,7 +1061,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_vehicle_total.cell(row_total, 7, report.all_vehicles.fuel)
 
     triptype_col=8
-    for i in TripType.objects.all():
+    for i in trip_types:
         ws_vehicle_total.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
         ws_vehicle_total.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
         ws_vehicle_total.cell(row_total, triptype_col, report.all_vehicles.trip_types[i].passenger)
@@ -1139,7 +1141,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
             ws_vehicle.cell(day_row, 7, vr.days[day]['data'].fuel)
 
             triptype_col=8
-            for i in TripType.objects.all():
+            for i in trip_types:
                 ws_vehicle.cell(row_header, triptype_col, 'Trip Type: ' + str(i))
                 ws_vehicle.merge_cells(start_row=row_header, start_column=triptype_col, end_row=row_header, end_column=triptype_col+2)
                 ws_vehicle.cell(day_row, triptype_col, vr.days[day]['data'].trip_types[i].passenger)
@@ -1170,7 +1172,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
         ws_vehicle.cell(row_total, 7, vr.totals.fuel)
 
         triptype_col=8
-        for i in TripType.objects.all():
+        for i in trip_types:
             ws_vehicle.cell(row_total, triptype_col, vr.totals.trip_types[i].passenger)
             ws_vehicle.cell(row_total, triptype_col+1, vr.totals.trip_types[i].no_passenger)
             ws_vehicle.cell(row_total, triptype_col+2, vr.totals.trip_types[i].total)
@@ -1330,7 +1332,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     ws_tags.cell(row_header, 4, 'Total Trips')
 
     row_trip_type = 1
-    for trip_type in TripType.objects.all():
+    for trip_type in trip_types:
         ws_tags.cell(row_header + row_trip_type, 1, str(trip_type))
         ws_tags.cell(row_header + row_trip_type, 2, report.all_vehicles.trip_types[trip_type].passenger)
         ws_tags.cell(row_header + row_trip_type, 3, report.all_vehicles.trip_types[trip_type].no_passenger)

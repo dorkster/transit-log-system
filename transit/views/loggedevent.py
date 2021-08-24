@@ -158,12 +158,18 @@ def ajaxLoggedEventList(request):
         is_filtered = True
 
     if filter_date_start_month != 0 and filter_date_start_day != 0 and filter_date_start_year != 0:
-        logged_events = logged_events.filter(timestamp__gte=datetime.datetime(year=filter_date_start_year, month=filter_date_start_month, day=filter_date_start_day))
-        is_filtered = True
+        try:
+            logged_events = logged_events.filter(timestamp__gte=datetime.datetime(year=filter_date_start_year, month=filter_date_start_month, day=filter_date_start_day))
+            is_filtered = True
+        except:
+            pass
 
     if filter_date_end_month != 0 and filter_date_end_day != 0 and filter_date_end_year != 0:
-        logged_events = logged_events.filter(timestamp__lt=datetime.datetime(year=filter_date_end_year, month=filter_date_end_month, day=filter_date_end_day) + datetime.timedelta(days=1))
-        is_filtered = True
+        try:
+            logged_events = logged_events.filter(timestamp__lt=datetime.datetime(year=filter_date_end_year, month=filter_date_end_month, day=filter_date_end_day) + datetime.timedelta(days=1))
+            is_filtered = True
+        except:
+            pass
 
     filtered_count = len(logged_events)
 

@@ -22,6 +22,8 @@
                 </button>
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'driver-edit' driver.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit driver</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'report-this-month-driver' driver.id %}" class="dropdown-item"><span class="oi oi-graph mr-2"></span>View report</a>
                     {% if perms.transit.delete_driver %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'driver-delete' driver.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete driver</a>

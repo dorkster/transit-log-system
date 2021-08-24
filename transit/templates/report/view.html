@@ -11,16 +11,16 @@
             <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
         </div>
         <div class="col-auto p-1">
-            <a href="{% url 'report-print' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="btn btn-info" target="_blank">
+            <a href="{{ url_print }}" class="btn btn-info" target="_blank">
                 <span class="oi oi-print mr-2"></span>Print
             </a>
         </div>
         <div class="col-auto p-1">
-            <a class="btn btn-primary" href="{% url 'report-xlsx' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+            <a class="btn btn-primary" href="{{ url_xlsx }}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
         </div>
         <div class="col-sm-auto p-1">
             <div class="btn-group" role="group">
-                <a title="Previous month" class="btn btn-secondary" href="{{ month_prev }}">
+                <a title="Previous month" class="btn btn-secondary" href="{{ url_month_prev }}">
                     <span class="oi oi-chevron-left"></span>
                 </a>
                 <div class="btn-group" role="group" id="date_dropdown">
@@ -35,7 +35,7 @@
                                 <input type="submit" value="Go" class="btn btn-secondary align-top">
                             </form>
                         </div>
-                        <a class="dropdown-item" href="{% url 'report-this-month' %}">Go to this month</a>
+                        <a class="dropdown-item" href="{{ url_this_month }}">Go to this month</a>
                         <div class="dropdown-divider"></div>
                         <div class="p-2 small"><strong>Custom Date Range</strong></div>
                         <div class="p-2" style="white-space: nowrap;">
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-                <a title="Next month" class="btn btn-secondary" href="{{ month_next }}">
+                <a title="Next month" class="btn btn-secondary" href="{{ url_month_next }}">
                     <span class="oi oi-chevron-right"></span>
                 </a>
             </div>
@@ -135,6 +135,17 @@
         </div>
     </div>
 </div>
+{% if selected_driver %}
+<div class="alert alert-warning">
+    <p>This report is showing only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
+    <p>Contrary to normal reports:</p>
+    <ul>
+        <li><strong>Trips with no mileage or time data are included</strong></li>
+        <li><strong>The "is logged" property of both the driver and any vehicles is ignored</strong></li>
+    </ul>
+    <p>To view the standard report, <a class="alert-link" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">click here</a>.</p>
+</div>
+{% endif %}
 <hr/>
 <div>
 {% if report_errors.errors %}

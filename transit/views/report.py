@@ -81,9 +81,9 @@ class Report():
     class ReportShift():
         def __init__(self):
             self.shift = None
-            self.start_miles = { T_STR:None, T_FLOAT:None }
+            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.start_time = None
-            self.end_miles = { T_STR:None, T_FLOAT:None }
+            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.end_time = None
             self.fuel = 0
             self.start_trip = None
@@ -93,9 +93,9 @@ class Report():
         def __init__(self):
             self.trip = None
             self.shift = None
-            self.start_miles = { T_STR:None, T_FLOAT: None }
+            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.start_time = None
-            self.end_miles = { T_STR:None, T_FLOAT: None }
+            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.end_time = None
             self.trip_type = None
             self.tags = []
@@ -123,13 +123,13 @@ class Report():
 
         def hasVehicleInShift(self, vehicle = None):
             for i in self.shifts:
-                if (vehicle and i.shift.vehicle == vehicle) or (vehicle == None and i.shift.vehicle != None):
+                if (vehicle and i.shift and i.shift.vehicle == vehicle) or (vehicle == None and i.shift and i.shift.vehicle != None):
                     return True
             return False
         
         def hasDriverInShift(self, driver = None):
             for i in self.shifts:
-                if (driver and i.shift.driver == driver) or (driver == None and i.shift.driver != None):
+                if (driver and i.shift and i.shift.driver == driver) or (driver == None and i.shift and i.shift.driver != None):
                     return True
             return False
 
@@ -350,8 +350,10 @@ class Report():
         self.money_payments_summary = Report.ReportPayment()
         self.frequent_destinations = []
         self.report_errors = Report.ReportErrors()
+        self.filtered_vehicles = None
+        self.filtered_drivers = None
 
-    def load(self, date_start, date_end, daily_log_shift=None):
+    def load(self, date_start, date_end, daily_log_shift=None, driver_id=None):
         if date_start != date_end:
             daily_log_shift = None
 
@@ -363,6 +365,13 @@ class Report():
         all_drivers = Driver.objects.all()
         all_vehicles = Vehicle.objects.all()
         all_triptypes = TripType.objects.all()
+
+        if driver_id == None:
+            self.filtered_vehicles = all_vehicles.filter(is_logged=True)
+            self.filtered_drivers = all_drivers.filter(is_logged=True)
+        else:
+            self.filtered_vehicles = all_vehicles
+            self.filtered_drivers = all_drivers.filter(id=driver_id)
 
         # also cache destinations
         all_destinations = Destination.objects.all()
@@ -384,7 +393,7 @@ class Report():
         all_client_payments = all_client_payments.select_related('parent')
         all_client_payments_list = list(all_client_payments)
 
-        Report.ReportDay.query_drivers = all_drivers.filter(is_logged=True)
+        Report.ReportDay.query_drivers = self.filtered_drivers
         Report.ReportDay.query_vehicles = all_vehicles
 
         day_date = date_start
@@ -399,13 +408,17 @@ class Report():
                 if i.date != day_date:
                     continue
 
-                if i.driver and not i.driver.is_logged:
-                    # skip non-logged drivers
-                    continue
+                if driver_id == None:
+                    if i.driver and not i.driver.is_logged:
+                        # skip non-logged drivers
+                        continue
 
-                if i.vehicle and not i.vehicle.is_logged:
-                    # skip non-logged vehicles
-                    continue
+                    if i.vehicle and not i.vehicle.is_logged:
+                        # skip non-logged vehicles
+                        continue
+                elif i.driver:
+                    if i.driver.id != driver_id:
+                        continue
 
                 if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or i.driver is None or i.vehicle is None:
                     # skip incomplete shift
@@ -465,20 +478,35 @@ class Report():
             for i in all_trips_list:
                 if i.date != day_date:
                     continue
-                if i.driver and not i.driver.is_logged:
-                    # skip non-logged drivers
+
+                empty_trip = (i.start_miles == '' and i.start_time == '' and i.end_miles == '' and i.end_time == '')
+
+                if driver_id == None:
+                    if i.driver and not i.driver.is_logged:
+                        # skip non-logged drivers
+                        continue
+
+                    if i.vehicle and not i.vehicle.is_logged:
+                        # skip non-logged vehicles
+                        continue
+
+                    if empty_trip:
+                        # skip empty trip
+                        continue
+                elif i.driver:
+                    if i.driver.id != driver_id:
+                        continue
+                elif not i.driver or not i.vehicle:
+                    # skip trip with no driver/vehicle
                     continue
 
-                if i.vehicle and not i.vehicle.is_logged:
-                    # skip non-logged vehicles
+                if not empty_trip and (i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == ''):
+                    # skip incomplete trip
+                    self.report_errors.add(day_date, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
-                if i.start_miles == '' and i.start_time == '' and i.end_miles == '' and i.end_time == '':
-                    # skip empty trip
-                    continue
-
-                if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or not i.driver or not i.vehicle:
-                    # skip incomplete shift
+                if not i.driver or not i.vehicle:
+                    # skip incomplete trip
                     if i.driver and i.vehicle:
                         self.report_errors.add(day_date, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
@@ -487,91 +515,111 @@ class Report():
                 report_trip.trip = i
 
                 for j in range(0, len(report_day.shifts)):
-                    if i.driver == report_day.shifts[j].shift.driver and i.vehicle == report_day.shifts[j].shift.vehicle:
+                    if report_day.shifts[j].shift and i.driver == report_day.shifts[j].shift.driver and i.vehicle == report_day.shifts[j].shift.vehicle:
                         report_trip.shift = j
                         break
 
                 if report_trip.shift == None:
                     for j in range(0, len(report_day.shifts)):
-                        if i.vehicle == report_day.shifts[j].shift.vehicle:
+                        if report_day.shifts[j].shift and i.vehicle == report_day.shifts[j].shift.vehicle:
                             report_trip.shift = j
                             break
 
                 if report_trip.shift == None:
-                    if i.driver and i.vehicle and i.vehicle.is_logged:
-                        found_shift = False
-                        for test_shift in all_shifts_list:
-                            if test_shift.driver == i.driver and test_shift.vehicle == test_shift.vehicle and i.date == test_shift.date:
-                                found_shift = True
-                                break
-                        if not found_shift:
-                            self.report_errors.add(day_date, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
-                    continue
+                    if driver_id == None:
+                        if i.driver and i.vehicle and i.vehicle.is_logged:
+                            found_shift = False
+                            for test_shift in all_shifts_list:
+                                if test_shift.driver == i.driver and test_shift.vehicle == test_shift.vehicle and i.date == test_shift.date:
+                                    found_shift = True
+                                    break
+                            if not found_shift:
+                                self.report_errors.add(day_date, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
+                        continue
+                    else:
+                        dummy_shift = Report.ReportShift()
+                        dummy_shift.shift = Shift()
+                        dummy_shift.driver = dummy_shift.shift.driver = i.driver
+                        dummy_shift.vehicle = dummy_shift.shift.vehicle = i.vehicle
+                        report_day.shifts.append(dummy_shift)
+                        report_trip.shift = len(report_day.shifts)-1
 
                 shift = report_day.shifts[report_trip.shift]
 
-                if len(i.start_miles) < len(shift.start_miles[T_STR]):
-                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
-                else:
-                    report_trip.start_miles[T_STR] = i.start_miles
-                try:
-                    report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
-                except:
-                    report_trip.start_miles[T_FLOAT] = 0
-                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+                # don't include trip if matching shift is incomplete
+                if not empty_trip and (shift.start_miles[T_STR] == '' or shift.start_time == None or shift.end_miles[T_STR] == '' or shift.end_time == None):
+                    continue
 
-                try:
-                    report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
-                except:
-                    report_trip.start_time = fallback_time
-                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+                if not empty_trip:
+                    parse_error = False
 
-                if len(i.end_miles) < len(shift.start_miles[T_STR]):
-                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
-                else:
-                    report_trip.end_miles[T_STR] = i.end_miles
-                try:
-                    report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
-                except:
-                    report_trip.end_miles[T_FLOAT] = 0
-                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+                    if len(i.start_miles) < len(shift.start_miles[T_STR]):
+                        report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
+                    else:
+                        report_trip.start_miles[T_STR] = i.start_miles
+                    try:
+                        report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
+                    except:
+                        report_trip.start_miles[T_FLOAT] = 0
+                        parse_error = True
 
-                try:
-                    report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
-                except:
-                    report_trip.end_time = fallback_time
-                    self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+                    try:
+                        report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
+                    except:
+                        report_trip.start_time = fallback_time
+                        parse_error = True
 
-                # check for trip errors
-                # TODO abstract the float/str stuff to make this cleaner
-                # TODO the above execptions add errors to the report without adding the trip to the various trip counts
-                # BUT, the below errors still count the trips where possible. Not sure which is preferable, but it's probably bad that both behaviors exist?
-                if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
-                    if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT]:
+                    if len(i.end_miles) < len(shift.start_miles[T_STR]):
+                        report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
+                    else:
+                        report_trip.end_miles[T_STR] = i.end_miles
+                    try:
+                        report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
+                    except:
+                        report_trip.end_miles[T_FLOAT] = 0
+                        parse_error = True
+
+                    try:
+                        report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
+                    except:
+                        report_trip.end_time = fallback_time
+                        parse_error = True
+
+                    if parse_error:
+                        self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+
+                    # check for trip errors
+                    # TODO abstract the float/str stuff to make this cleaner
+                    # TODO the above execptions add errors to the report without adding the trip to the various trip counts
+                    # BUT, the below errors still count the trips where possible. Not sure which is preferable, but it's probably bad that both behaviors exist?
+
+                    if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                        self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+                        if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT]:
+                            report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                            report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
+                        if report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                            report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
+                            report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
+                    elif report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
+                        self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
                         report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
                         report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
-                    if report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
-                        report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
-                        report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
-                elif report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
-                    report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
-                    report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
+                        report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
+                        report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
 
 
-                if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
-                    if report_trip.start_time < shift.start_time:
-                        report_trip.start_time = shift.start_time
-                    if report_trip.end_time > shift.end_time:
-                        report_trip.end_time = shift.end_time
-                elif report_trip.start_time > report_trip.end_time:
-                    self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
-                    report_trip.start_time = shift.start_time
-                    report_trip.end_time = shift.start_time
+                    if report_trip.start_time and shift.start_time and report_trip.end_time and shift.end_time:
+                        if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
+                            self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
+                            if report_trip.start_time < shift.start_time:
+                                report_trip.start_time = shift.start_time
+                            if report_trip.end_time > shift.end_time:
+                                report_trip.end_time = shift.end_time
+                        elif report_trip.start_time > report_trip.end_time:
+                            self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
+                            report_trip.start_time = shift.start_time
+                            report_trip.end_time = shift.start_time
 
                 report_trip.trip_type = i.trip_type
                 report_trip.collected_cash = Report.Money(i.collected_cash)
@@ -581,11 +629,12 @@ class Report():
 
                 report_day.trips.append(report_trip)
 
-                if shift.start_trip == None or report_trip.start_miles[T_FLOAT] < report_day.trips[shift.start_trip].start_miles[T_FLOAT]:
-                    report_day.shifts[report_trip.shift].start_trip = len(report_day.trips) - 1;
+                if not empty_trip:
+                    if shift.start_trip == None or report_trip.start_miles[T_FLOAT] < report_day.trips[shift.start_trip].start_miles[T_FLOAT]:
+                        report_day.shifts[report_trip.shift].start_trip = len(report_day.trips) - 1;
 
-                if shift.end_trip == None or report_trip.end_miles[T_FLOAT] > report_day.trips[shift.end_trip].end_miles[T_FLOAT]:
-                    report_day.shifts[report_trip.shift].end_trip = len(report_day.trips) - 1;
+                    if shift.end_trip == None or report_trip.end_miles[T_FLOAT] > report_day.trips[shift.end_trip].end_miles[T_FLOAT]:
+                        report_day.shifts[report_trip.shift].end_trip = len(report_day.trips) - 1;
 
 
                 if daily_log_shift == None or (daily_log_shift != None and daily_log_shift == shift.shift.id):
@@ -651,12 +700,14 @@ class Report():
                             if j.address == i.destination:
                                 found_frequent_destination = True
                                 j.trips.addTrips(1, i.passenger)
-                                j.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                                if not empty_trip:
+                                    j.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
                         if not found_frequent_destination:
                             temp_fd = Report.FrequentDestination()
                             temp_fd.address = i.destination
                             temp_fd.trips.addTrips(1, i.passenger)
-                            temp_fd.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                            if not empty_trip:
+                                temp_fd.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
                             self.frequent_destinations.append(temp_fd)
 
             # handle payments from Clients that didn't ride (so far)
@@ -720,10 +771,15 @@ class Report():
                 if daily_log_shift != None and daily_log_shift != shift.shift.id:
                     continue
                 
-                service_miles = shift.end_miles[T_FLOAT] - shift.start_miles[T_FLOAT]
-                service_hours = (shift.end_time - shift.start_time).seconds / 60 / 60
-                deadhead_miles = (report_day.trips[shift.start_trip].start_miles[T_FLOAT] - shift.start_miles[T_FLOAT]) + (shift.end_miles[T_FLOAT] - report_day.trips[shift.end_trip].end_miles[T_FLOAT])
-                deadhead_hours = ((report_day.trips[shift.start_trip].start_time - shift.start_time).seconds + (shift.end_time - report_day.trips[shift.end_trip].end_time).seconds) / 60 / 60
+                service_miles = 0
+                service_hours = 0
+                deadhead_miles = 0
+                deadhead_hours = 0
+                if not (shift.start_miles[T_STR] == '' or shift.start_time == None or shift.end_miles[T_STR] == '' or shift.end_time == None):
+                    service_miles = shift.end_miles[T_FLOAT] - shift.start_miles[T_FLOAT]
+                    service_hours = (shift.end_time - shift.start_time).seconds / 60 / 60
+                    deadhead_miles = (report_day.trips[shift.start_trip].start_miles[T_FLOAT] - shift.start_miles[T_FLOAT]) + (shift.end_miles[T_FLOAT] - report_day.trips[shift.end_trip].end_miles[T_FLOAT])
+                    deadhead_hours = ((report_day.trips[shift.start_trip].start_time - shift.start_time).seconds + (shift.end_time - report_day.trips[shift.end_trip].end_time).seconds) / 60 / 60
 
                 # per-vehicle log
                 report_day.by_vehicle[shift.shift.vehicle].service_miles += service_miles
@@ -794,7 +850,7 @@ class Report():
             day_date += datetime.timedelta(days=1)
 
         self.vehicle_reports = []
-        for vehicle in Vehicle.objects.filter(is_logged=True):
+        for vehicle in self.filtered_vehicles:
             vehicle_report = Report.ReportOutputVehicles()
             vehicle_report.vehicle = vehicle
             for report_day in self.report_all:
@@ -809,7 +865,7 @@ class Report():
             self.all_vehicles += vehicle_report.totals
 
         self.driver_reports = []
-        for driver in Driver.objects.filter(is_logged=True):
+        for driver in self.filtered_drivers:
             driver_report = Report.ReportOutputDrivers()
             driver_report.driver = driver
             for report_day in self.report_all:
@@ -856,19 +912,18 @@ class Report():
         # sort frequent destinations by total trips
         self.frequent_destinations.sort(reverse=True)
 
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportMonth(request, year, month):
-    date_start = datetime.date(year, month, 1)
-    date_end = date_start
-    if date_end.month == 12:
-        date_end = date_end.replace(day=31)
-    else:
-        date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
 
-    return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def report(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
@@ -885,11 +940,17 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
             if date_range_picker.is_valid():
                 new_start = date_range_picker.cleaned_data['date_start']
                 new_end = date_range_picker.cleaned_data['date_end']
-                return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+                if driver_id == None:
+                    return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+                else:
+                    return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
         else:
             if date_picker.is_valid():
                 date_picker_date = date_picker.cleaned_data['date']
-                return HttpResponseRedirect(reverse('report-month', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
+                if driver_id == None:
+                    return HttpResponseRedirect(reverse('report-month', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
+                else:
+                    return HttpResponseRedirect(reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year':date_picker_date.year, 'month':date_picker_date.month}))
     else:
         date_picker = DatePickerForm(initial={'date':date_start})
         date_range_picker = DateRangePickerForm(initial={'date_start':date_start, 'date_end':date_end})
@@ -899,16 +960,31 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
     month_next = date_end + datetime.timedelta(days=1)
 
     report = Report()
-    report.load(date_start, date_end)
+    report.load(date_start, date_end, driver_id=driver_id)
+
+    if driver_id == None:
+        url_month_prev = reverse('report-month', kwargs={'year': month_prev.year, 'month': month_prev.month})
+        url_month_next = reverse('report-month', kwargs={'year': month_next.year, 'month': month_next.month})
+        url_this_month = reverse('report-this-month')
+        url_print = reverse('report-print', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
+        url_xlsx = reverse('report-xlsx', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
+    else:
+        url_month_prev = reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year': month_prev.year, 'month': month_prev.month})
+        url_month_next = reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year': month_next.year, 'month': month_next.month})
+        url_this_month = reverse('report-this-month-driver', kwargs={'driver_id': driver_id})
+        url_print = reverse('report-print-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
+        url_xlsx = reverse('report-xlsx-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
+
+    selected_driver = None
+    if driver_id != None:
+        selected_driver = Driver.objects.get(id=driver_id)
 
     context = {
         'date_start': date_start,
         'date_end': date_end,
-        'month_prev': reverse('report-month', kwargs={'year':month_prev.year, 'month':month_prev.month}),
-        'month_next': reverse('report-month', kwargs={'year':month_next.year, 'month':month_next.month}),
         'date_picker': date_picker,
         'date_range_picker': date_range_picker,
-        'vehicles': Vehicle.objects.filter(is_logged=True),
+        'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
@@ -920,11 +996,27 @@ def report(request, start_year, start_month, start_day, end_year, end_month, end
         'money_payments_summary': report.money_payments_summary,
         'frequent_destinations': report.frequent_destinations,
         'report_errors': report.report_errors,
+        'url_month_prev': url_month_prev,
+        'url_month_next': url_month_next,
+        'url_this_month': url_this_month,
+        'url_print': url_print,
+        'url_xlsx': url_xlsx,
+        'selected_driver': selected_driver,
     }
     return render(request, 'report/view.html', context)
 
+
+
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportPrint(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportPrintBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportPrintDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportPrintBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
@@ -934,12 +1026,12 @@ def reportPrint(request, start_year, start_month, start_day, end_year, end_month
         date_end = swap_date
 
     report = Report()
-    report.load(date_start, date_end)
+    report.load(date_start, date_end, driver_id=driver_id)
 
     context = {
         'date_start': date_start,
         'date_end': date_end,
-        'vehicles': Vehicle.objects.filter(is_logged=True),
+        'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
@@ -954,19 +1046,79 @@ def reportPrint(request, start_year, start_month, start_day, end_year, end_month
     }
     return render(request, 'report/print.html', context)
 
+
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportMonth(request, year, month):
+    return reportMonthBase(request, None, year, month)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportMonthDriver(request, driver_id, year, month):
+    return reportMonthBase(request, driver_id, year, month)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportMonthBase(request, driver_id, year, month):
+    date_start = datetime.date(year, month, 1)
+    date_end = date_start
+    if date_end.month == 12:
+        date_end = date_end.replace(day=31)
+    else:
+        date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
+
+    if driver_id:
+        return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+    else:
+        return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+
+
+
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportThisMonth(request):
+    return reportThisMonthBase(request, None)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportThisMonthDriver(request, driver_id):
+    return reportThisMonthBase(request, driver_id)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportThisMonthBase(request, driver_id):
     date = datetime.datetime.now().date()
-    return reportMonth(request, date.year, date.month)
+    if driver_id:
+        return reportMonthDriver(request, driver_id, date.year, date.month)
+    else:
+        return reportMonth(request, date.year, date.month)
+
+
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportLastMonth(request):
+    return reportLastMonthBase(request, None)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportLastMonthDriver(request, driver_id):
+    return reportLastMonthBase(request, driver_id)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportLastMonthBase(request, driver_id):
     date = (datetime.datetime.now().date()).replace(day=1) # first day of this month 
     date = date + datetime.timedelta(days=-1) # last day of the previous month
-    return reportMonth(request, date.year, date.month)
+    if driver_id:
+        return reportMonthDriver(request, driver_id, date.year, date.month)
+    else:
+        return reportMonth(request, date.year, date.month)
+
+
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportXLSX(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportXLSXBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportXLSXDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
+    return reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
@@ -978,7 +1130,7 @@ def reportXLSX(request, start_year, start_month, start_day, end_year, end_month,
     trip_types = TripType.objects.filter(is_trip_counted=True)
 
     report = Report()
-    report.load(date_start, date_end)
+    report.load(date_start, date_end, driver_id=driver_id)
 
     temp_file = tempfile.NamedTemporaryFile()
 

@@ -53,6 +53,7 @@ class formWidgetAttrs():
     phone = default.copy()
     phone['onchange'] = 'validatePhone(this)'
     phone['inputmode'] = 'tel'
+    phone['autocomplete'] = 'off'
 
     notes = default.copy()
     notes['rows'] = '3'
@@ -60,10 +61,12 @@ class formWidgetAttrs():
 
     time = default.copy()
     time['onchange'] = 'validateTime(this)'
+    time['autocomplete'] = 'off'
 
     mile = default.copy()
     mile['onchange'] = 'validateMiles(this, false)'
     mile['inputmode'] = 'decimal'
+    mile['autocomplete'] = 'off'
 
     mile_shift = mile.copy()
     mile_shift['onchange'] = 'validateMiles(this, true)'
@@ -75,6 +78,7 @@ class formWidgetAttrs():
     fuel = default.copy()
     fuel['onchange'] = 'validateFuel(this)'
     fuel['inputmode'] = 'decimal'
+    fuel['autocomplete'] = 'off'
 
     text_area = default.copy()
     text_area['rows'] = '6'
@@ -87,6 +91,7 @@ class formWidgetAttrs():
     money = default.copy()
     money['onchange'] = 'validateMoney(this)'
     money['inputmode'] = 'decimal'
+    money['autocomplete'] = 'off'
 
     new_user = default.copy()
     new_user['autocomplete'] = 'off'

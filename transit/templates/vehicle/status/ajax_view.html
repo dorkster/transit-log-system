@@ -120,8 +120,17 @@
                 </button>
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
+                    {% if perms.transit.change_vehicleissue %}
+                    <div class="dropdown-divider"></div>
+                    {% if issue.priority < 2 %}
+                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
+                    {% endif %}
+                    {% if issue.priority > 0 %}
+                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_down', '')" class="dropdown-item"><span class="oi oi-caret-bottom mr-2"></span>Decrease Priority</a>
+                    {% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}<span class="oi oi-x mr-2"></span>Set as not resolved{% else %}<span class="oi oi-check mr-2"></span>Set as resolved{% endif %}</a>
+                    {% endif %}
                     {% if perms.transit.delete_vehicleissue %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>

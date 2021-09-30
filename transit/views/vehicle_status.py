@@ -50,6 +50,18 @@ def ajaxVehicleStatus(request):
             issue.is_resolved = not issue.is_resolved
             issue.save()
             log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
+        elif request_action == 'priority_up':
+            issue = get_object_or_404(VehicleIssue, id=request_id)
+            if issue.priority < VehicleIssue.PRIORITY_HIGH:
+                issue.priority += 1
+            issue.save()
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(issue))
+        elif request_action == 'priority_down':
+            issue = get_object_or_404(VehicleIssue, id=request_id)
+            if issue.priority > VehicleIssue.PRIORITY_LOW:
+                issue.priority -= 1
+            issue.save()
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(issue))
     if request_action == 'filter_toggle_resolved':
         request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
     elif request_action == 'filter_driver':

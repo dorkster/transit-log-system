@@ -135,12 +135,28 @@
         </nav>
         {% if notifications and user.is_authenticated and perms.transit.change_vehicleissue %}
             <div id="global-notifications" class="list-group list-group-flush">
-            {% for issue in notify_vehicle_issues %}
-            <strong><a href="{% url 'vehicle-issue-edit' issue.id %}" class="global-notification list-group-item list-group-item-action p-1 {% if issue.priority is 2 %}bg-danger text-light{% elif issue.priority is 1 %}bg-warning text-dark{% endif %}">{{ issue }}</a></strong>
-            {% endfor %}
-            {% if notify_vehicle_issues_low|length > 0 %}
-            <strong><a href="{% url 'vehicle-status' %}#issues" class="global-notification list-group-item list-group-item-action p-1 bg-white">{{ notify_vehicle_issues_low|length }} low priority vehicle {% if notify_vehicle_issues_low|length == 1 %}issue{% else %}issues{% endif %}</a></strong>
+            {% if notify_vehicle_issues_high|length > 0 %}
+                {% if notify_vehicle_issues_high|length > 1 %}
+                    <strong><a href="{% url 'vehicle-status' %}#issues" class="global-notification list-group-item list-group-item-action p-1 bg-danger text-light">{{ notify_vehicle_issues_high|length }} high priority vehicle issues</a></strong>
+                {% else %}
+                    <strong><a href="{% url 'vehicle-issue-edit' notify_vehicle_issues_high.0.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-danger text-light">{{ notify_vehicle_issues_high.0 }}</a></strong>
+                {% endif %}
             {% endif %}
+            {% if notify_vehicle_issues_medium|length > 0 %}
+                {% if notify_vehicle_issues_medium|length > 1 %}
+                    <strong><a href="{% url 'vehicle-status' %}#issues" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ notify_vehicle_issues_medium|length }} medium priority vehicle issues</a></strong>
+                {% else %}
+                    <strong><a href="{% url 'vehicle-issue-edit' notify_vehicle_issues_medium.0.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ notify_vehicle_issues_medium.0 }}</a></strong>
+                {% endif %}
+            {% endif %}
+            {% if notify_vehicle_issues_low|length > 0 %}
+                {% if notify_vehicle_issues_low|length > 1 %}
+                    <strong><a href="{% url 'vehicle-status' %}#issues" class="global-notification list-group-item list-group-item-action p-1 bg-white">{{ notify_vehicle_issues_low|length }} low priority vehicle issues</a></strong>
+                {% else %}
+                    <strong><a href="{% url 'vehicle-issue-edit' notify_vehicle_issues_low.0.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-white">{{ notify_vehicle_issues_low.0 }}</a></strong>
+                {% endif %}
+            {% endif %}
+
             {% for vehicle in notify_vehicle_inspections %}
             <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for inspection!</a></strong>
             {% endfor %}

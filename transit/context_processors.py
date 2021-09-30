@@ -49,12 +49,15 @@ def globals(request):
                     vehicle_oil_changes.append(v)
 
 
-    vehicle_issues = VehicleIssue.objects.filter(priority__gt=VehicleIssue.PRIORITY_LOW, is_resolved=False)
     vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False)
+    vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, is_resolved=False)
+    vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, is_resolved=False)
+
     return {
-        'notifications': (len(vehicle_issues) > 0 or len(vehicle_issues_low) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0),
-        'notify_vehicle_issues': vehicle_issues,
+        'notifications': (len(vehicle_issues_low) > 0 or len(vehicle_issues_medium) > 0 or len(vehicle_issues_high) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0),
         'notify_vehicle_issues_low': vehicle_issues_low,
+        'notify_vehicle_issues_medium': vehicle_issues_medium,
+        'notify_vehicle_issues_high': vehicle_issues_high,
         'notify_vehicle_inspections': vehicle_inspections,
         'notify_vehicle_oil_changes': vehicle_oil_changes,
         'settings': SiteSettings.load(),

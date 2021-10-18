@@ -216,8 +216,10 @@ class Trip(models.Model):
 
     def get_driver_color(self):
         site_settings = SiteSettings.load()
-        if self.status > 0:
+        if self.status == Trip.STATUS_CANCELED:
             return site_settings.get_color('cancel')
+        elif self.status == Trip.STATUS_NO_SHOW:
+            return site_settings.get_color('no_show')
         elif self.is_activity:
             return site_settings.get_color('activity')
         else:
@@ -891,6 +893,7 @@ class SiteSettings(SingletonModel):
     id = models.AutoField(primary_key=True)
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
+    no_show_color = models.CharField(default='888888', max_length=FieldSizes.COLOR, blank=True)
     autocomplete_history_days = models.IntegerField(default=30)
     reset_filter_on_shift_change = models.BooleanField(verbose_name='Reset Schedule filter when starting/ending Shift', default=False)
     skip_weekends = models.BooleanField(verbose_name='Skip weekends in Schedule date picker', default=False)
@@ -905,6 +908,9 @@ class SiteSettings(SingletonModel):
         elif context == 'cancel':
             if self.cancel_color != '':
                 color = self.cancel_color
+        elif context == 'no_show':
+            if self.no_show_color != '':
+                color = self.no_show_color
 
         return color
 

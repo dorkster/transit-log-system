@@ -217,11 +217,11 @@ class Trip(models.Model):
     def get_driver_color(self):
         site_settings = SiteSettings.load()
         if self.status == Trip.STATUS_CANCELED:
-            return site_settings.get_color('cancel')
+            return site_settings.get_color(SiteSettings.COLOR_CANCEL)
         elif self.status == Trip.STATUS_NO_SHOW:
-            return site_settings.get_color('no_show')
+            return site_settings.get_color(SiteSettings.COLOR_NO_SHOW)
         elif self.is_activity:
-            return site_settings.get_color('activity')
+            return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)
 
@@ -364,9 +364,10 @@ class Driver(models.Model):
         return 'Driver'
 
     def get_color(self):
-        color = 'FFFFFF00'
         if self and self.color != '':
             color = self.color
+        else:
+            color = 'FFFFFF00'
         
         return color
 
@@ -742,9 +743,9 @@ class TemplateTrip(models.Model):
     def get_driver_color(self):
         site_settings = SiteSettings.load()
         if self.status > 0:
-            return site_settings.get_color('cancel')
+            return site_settings.get_color(SiteSettings.COLOR_CANCEL)
         elif self.is_activity:
-            return site_settings.get_color('activity')
+            return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)
 
@@ -890,6 +891,10 @@ class LoggedEvent(models.Model):
         return LoggedEventAction.get_str(self.event_action)
 
 class SiteSettings(SingletonModel):
+    COLOR_ACTIVITY = 0
+    COLOR_CANCEL = 1
+    COLOR_NO_SHOW = 2
+
     id = models.AutoField(primary_key=True)
     activity_color = models.CharField(default='DDD9C3', max_length=FieldSizes.COLOR, blank=True)
     cancel_color = models.CharField(default='BBBBBB', max_length=FieldSizes.COLOR, blank=True)
@@ -901,16 +906,17 @@ class SiteSettings(SingletonModel):
     short_page_title = models.CharField(max_length=FieldSizes.MD, blank=True)
 
     def get_color(self, context):
-        color = '00000000'
-        if context == 'activity':
+        if context == self.COLOR_ACTIVITY:
             if self.activity_color != '':
                 color = self.activity_color
-        elif context == 'cancel':
+        elif context == self.COLOR_CANCEL:
             if self.cancel_color != '':
                 color = self.cancel_color
-        elif context == 'no_show':
+        elif context == self.COLOR_NO_SHOW:
             if self.no_show_color != '':
                 color = self.no_show_color
+        else:
+            color = '00000000'
 
         return color
 

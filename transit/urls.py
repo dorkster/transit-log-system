@@ -159,6 +159,7 @@ urlpatterns = [
 
     path('import/', views.excelImport, name='excel-import'),
     path('search/', views.search, name='search'),
+    path('search-xlsx/', views.searchExportXLSX, name='search-xlsx'),
 
     path('event-log/', views.loggedEventList, name='loggedevent-list'),
 

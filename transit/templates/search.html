@@ -39,6 +39,7 @@
 </form>
 {% if results %}
 <hr/>
+<a class="btn btn-primary mb-3" href="{% url 'search-xlsx' %}?{{ query_string }}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
 <table class="mytable mytable-striped">
     <thead>
         {% if perms.transit.change_trip %}

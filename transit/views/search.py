@@ -259,36 +259,40 @@ def searchExportXLSX(request):
     trip_count = len(trips)
 
     ws_results.cell(row_header, 1, 'Date')
-    ws_results.cell(row_header, 2, 'Name')
-    ws_results.cell(row_header, 3, 'Address')
-    ws_results.cell(row_header, 4, 'Destination')
-    ws_results.cell(row_header, 5, 'Driver')
-    ws_results.cell(row_header, 6, 'Vehicle')
-    ws_results.cell(row_header, 7, 'Start Miles')
-    ws_results.cell(row_header, 8, 'Start Time')
-    ws_results.cell(row_header, 9, 'End Miles')
-    ws_results.cell(row_header, 10, 'End Time')
-    ws_results.cell(row_header, 11, 'Notes')
-    ws_results.cell(row_header, 12, 'Trip Type / Tags')
-    ws_results.cell(row_header, 13, 'Fare')
-    ws_results.cell(row_header, 14, 'Money Collected')
-    ws_results.cell(row_header, 15, 'Elderly?')
-    ws_results.cell(row_header, 16, 'Ambulatory?')
+    ws_results.cell(row_header, 2, 'Pick up')
+    ws_results.cell(row_header, 3, 'Appt. Time')
+    ws_results.cell(row_header, 4, 'Name')
+    ws_results.cell(row_header, 5, 'Address')
+    ws_results.cell(row_header, 6, 'Destination')
+    ws_results.cell(row_header, 7, 'Driver')
+    ws_results.cell(row_header, 8, 'Vehicle')
+    ws_results.cell(row_header, 9, 'Start Miles')
+    ws_results.cell(row_header, 10, 'Start Time')
+    ws_results.cell(row_header, 11, 'End Miles')
+    ws_results.cell(row_header, 12, 'End Time')
+    ws_results.cell(row_header, 13, 'Notes')
+    ws_results.cell(row_header, 14, 'Trip Type / Tags')
+    ws_results.cell(row_header, 15, 'Fare')
+    ws_results.cell(row_header, 16, 'Money Collected')
+    ws_results.cell(row_header, 17, 'Elderly?')
+    ws_results.cell(row_header, 18, 'Ambulatory?')
 
     for i in range(0, trip_count):
         ws_results.cell(row_header + i + 1, 1, trips[i].date)
-        ws_results.cell(row_header + i + 1, 2, trips[i].name)
-        ws_results.cell(row_header + i + 1, 3, trips[i].address)
-        ws_results.cell(row_header + i + 1, 4, trips[i].destination)
+        ws_results.cell(row_header + i + 1, 2, trips[i].pick_up_time)
+        ws_results.cell(row_header + i + 1, 3, trips[i].appointment_time)
+        ws_results.cell(row_header + i + 1, 4, trips[i].name)
+        ws_results.cell(row_header + i + 1, 5, trips[i].address)
+        ws_results.cell(row_header + i + 1, 6, trips[i].destination)
         if trips[i].driver:
-            ws_results.cell(row_header + i + 1, 5, str(trips[i].driver))
+            ws_results.cell(row_header + i + 1, 7, str(trips[i].driver))
         if trips[i].vehicle:
-            ws_results.cell(row_header + i + 1, 6, str(trips[i].vehicle))
-        ws_results.cell(row_header + i + 1, 7, trips[i].start_miles)
-        ws_results.cell(row_header + i + 1, 8, trips[i].start_time)
-        ws_results.cell(row_header + i + 1, 9, trips[i].end_miles)
-        ws_results.cell(row_header + i + 1, 10, trips[i].end_time)
-        ws_results.cell(row_header + i + 1, 11, trips[i].note)
+            ws_results.cell(row_header + i + 1, 8, str(trips[i].vehicle))
+        ws_results.cell(row_header + i + 1, 9, trips[i].start_miles)
+        ws_results.cell(row_header + i + 1, 10, trips[i].start_time)
+        ws_results.cell(row_header + i + 1, 11, trips[i].end_miles)
+        ws_results.cell(row_header + i + 1, 12, trips[i].end_time)
+        ws_results.cell(row_header + i + 1, 13, trips[i].note)
         tags_string = ''
         if trips[i].trip_type:
             tags_string += str(trips[i].trip_type)
@@ -296,26 +300,26 @@ def searchExportXLSX(request):
                 tags_string += ' / '
         if trips[i].tags:
             tags_string += trips[i].tags
-        ws_results.cell(row_header + i + 1, 12, tags_string)
-        ws_results.cell(row_header + i + 1, 13, trips[i].fare / 100)
-        ws_results.cell(row_header + i + 1, 14, (trips[i].collected_cash + trips[i].collected_check) / 100)
-        ws_results.cell(row_header + i + 1, 15, trips[i].elderly)
-        ws_results.cell(row_header + i + 1, 16, trips[i].ambulatory)
+        ws_results.cell(row_header + i + 1, 14, tags_string)
+        ws_results.cell(row_header + i + 1, 15, trips[i].fare / 100)
+        ws_results.cell(row_header + i + 1, 16, (trips[i].collected_cash + trips[i].collected_check) / 100)
+        ws_results.cell(row_header + i + 1, 17, trips[i].elderly)
+        ws_results.cell(row_header + i + 1, 18, trips[i].ambulatory)
 
     # number formats
     for i in range(row_header + 1, row_header + trip_count + 1):
         ws_results.cell(i, 1).number_format = 'MMM DD, YYYY'
-        ws_results.cell(i, 13).number_format = '$0.00'
-        ws_results.cell(i, 14).number_format = '$0.00'
-        ws_results.cell(i, 15).number_format = 'BOOLEAN'
-        ws_results.cell(i, 16).number_format = 'BOOLEAN'
+        ws_results.cell(i, 15).number_format = '$0.00'
+        ws_results.cell(i, 16).number_format = '$0.00'
+        ws_results.cell(i, 17).number_format = 'BOOLEAN'
+        ws_results.cell(i, 18).number_format = 'BOOLEAN'
 
     # apply styles
     ws_results.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 17):
-        if i == 2 or i == 11 or i == 12:
+    for i in range(1, 19):
+        if i == 4 or i == 13 or i == 14:
             ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_large
-        elif i == 3 or i == 4:
+        elif i == 5 or i == 6:
             ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_xlarge
         else:
             ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_normal

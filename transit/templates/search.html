@@ -46,6 +46,8 @@
         <td></td>
         {% endif %}
         <td>Date</td>
+        <td>Pick up</td>
+        <td>Appt. Time</td>
         <td>Name</td>
         <td>Address</td>
         <td>Destination</td>
@@ -70,6 +72,8 @@
         {% else %}
         <td class="mytable-col-md"><a href="{% url 'schedule' 'read-only' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% endif %}
+        <td class="mytable-col-sm">{{trip.pick_up_time}}</td>
+        <td class="mytable-col-sm">{{trip.appointment_time}}</td>
         <td class="mytable-col-lg">{{trip.name}}</td>
         <td class="mytable-col-lg">{{trip.address}}</td>
         <td class="mytable-col-lg">{{trip.destination}}</td>

@@ -64,8 +64,8 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
 
         if form.is_valid():
             client_payment.date_paid = form.cleaned_data['date_paid']
-            client_payment.cash = money_string_to_int(form.cleaned_data['cash'])
-            client_payment.check = money_string_to_int(form.cleaned_data['check'])
+            client_payment.money_cash = money_string_to_int(form.cleaned_data['cash'])
+            client_payment.money_check = money_string_to_int(form.cleaned_data['check'])
             client_payment.save()
 
             if is_new:
@@ -77,8 +77,8 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
     else:
         initial = {
             'date_paid': client_payment.date_paid,
-            'cash': int_to_money_string(client_payment.cash, blank_zero=True),
-            'check': int_to_money_string(client_payment.check, blank_zero=True),
+            'cash': int_to_money_string(client_payment.money_cash, blank_zero=True),
+            'check': int_to_money_string(client_payment.money_check, blank_zero=True),
         }
         form = EditClientPaymentForm(initial=initial)
 

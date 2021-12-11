@@ -720,8 +720,8 @@ class Report():
                     if j.name == i.parent.name:
                         found_unique_rider = True
 
-                        j.paid_cash += Report.Money(i.cash)
-                        j.paid_check += Report.Money(i.check)
+                        j.paid_cash += Report.Money(i.money_cash)
+                        j.paid_check += Report.Money(i.money_check)
 
                         break
                 if not found_unique_rider:
@@ -731,8 +731,8 @@ class Report():
                     rider.ambulatory = i.parent.ambulatory
                     rider.client_id = i.parent.id
 
-                    rider.paid_cash += Report.Money(i.cash)
-                    rider.paid_check += Report.Money(i.check)
+                    rider.paid_cash += Report.Money(i.money_cash)
+                    rider.paid_check += Report.Money(i.money_check)
 
                     self.unique_riders.names.append(rider)
                     self.unique_riders.names = sorted(self.unique_riders.names)
@@ -742,8 +742,8 @@ class Report():
                 payment.date = i.date_paid
                 payment.id = i.id
                 payment.client = i.parent
-                payment.cash = Report.Money(i.cash)
-                payment.check = Report.Money(i.check)
+                payment.cash = Report.Money(i.money_cash)
+                payment.check = Report.Money(i.money_check)
                 self.money_payments.append(payment)
                 self.money_payments_summary.cash += payment.cash
                 self.money_payments_summary.check += payment.check

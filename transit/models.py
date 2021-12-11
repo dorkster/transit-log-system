@@ -492,8 +492,8 @@ class ClientPayment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('Client', on_delete=models.CASCADE)
     date_paid = models.DateField()
-    cash = models.IntegerField(default=0)
-    check = models.IntegerField(default=0)
+    money_cash = models.IntegerField(default=0)
+    money_check = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['date_paid']
@@ -508,10 +508,10 @@ class ClientPayment(models.Model):
             return '[' + str(self.date_paid) + '] <None>'
 
     def get_cash_str(self):
-        return int_to_money_string(self.cash)
+        return int_to_money_string(self.money_cash)
 
     def get_check_str(self):
-        return int_to_money_string(self.check)
+        return int_to_money_string(self.money_check)
 
 class Destination(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

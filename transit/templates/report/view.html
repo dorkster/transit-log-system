@@ -11,9 +11,16 @@
             <h5>Report for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
         </div>
         <div class="col-auto p-1">
-            <a href="{{ url_print }}" class="btn btn-info" target="_blank">
-                <span class="oi oi-print mr-2"></span>Print
-            </a>
+            <span class="dropdown">
+                <a href="#_" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Print the schedule or daily log">
+                    <span class="oi oi-print mr-2"></span>Print
+                </a>
+                <div class="dropdown-menu shadow dropdown-menu-right">
+                    <a class="dropdown-item" href="{{ url_print }}" target="_blank"><span class="oi oi-graph mr-2"></span>Print Report</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url_print_mile_summary}}" target="_blank"><span class="oi oi-spreadsheet mr-2"></span>Print Mileage Summary</a>
+                </div>
+            </span>
         </div>
         <div class="col-auto p-1">
             <a class="btn btn-primary" href="{{ url_xlsx }}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>

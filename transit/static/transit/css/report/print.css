@@ -30,3 +30,11 @@ nav {
 .mytable, .mytable td, .mytable thead {
     page-break-inside: avoid;
 }
+
+.blank-field {
+    width: 100%;
+    border-bottom: 1px solid #343a40;
+    min-height: 1.5em;
+    text-align: center;
+    font-size: 150%;
+}

@@ -983,6 +983,9 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         url_print = reverse('report-print-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
         url_xlsx = reverse('report-xlsx-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
 
+    # we don't care about the driver for the mileage summary
+    url_print_mile_summary = reverse('report-print-mileage-summary', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
+
     selected_driver = None
     if driver_id != None:
         selected_driver = Driver.objects.get(id=driver_id)
@@ -1008,6 +1011,7 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'url_month_next': url_month_next,
         'url_this_month': url_this_month,
         'url_print': url_print,
+        'url_print_mile_summary': url_print_mile_summary,
         'url_xlsx': url_xlsx,
         'selected_driver': selected_driver,
     }
@@ -1053,6 +1057,26 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'report_errors': report.report_errors,
     }
     return render(request, 'report/print.html', context)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportPrintMileageSummary(request, start_year, start_month, start_day, end_year, end_month, end_day):
+    date_start = datetime.date(start_year, start_month, start_day)
+    date_end = datetime.date(end_year, end_month, end_day)
+
+    if date_start > date_end:
+        swap_date = date_start
+        date_start = date_end
+        date_end = swap_date
+
+    report = Report()
+    report.load(date_start, date_end, driver_id=None)
+
+    context = {
+        'date_start': date_start,
+        'date_end': date_end,
+        'vehicle_reports': report.vehicle_reports,
+    }
+    return render(request, 'report/print_mileage_summary.html', context)
 
 
 

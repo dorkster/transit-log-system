@@ -1,0 +1,49 @@
+{% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Print mileage summary for: {{date_start}} - {{date_end}} | {% endif %}
+{% endblock %}
+
+{% block auth_content %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'transit/css/report/print.css' %}">
+{% endblock %}
+
+<div class="container-fluid mt-4 mb-3">
+    <div class="row">
+        <div class="col p-1">
+            <h5>Mileage Summary for: <strong>{{ date_start }} - {{ date_end }}</strong></h5>
+        </div>
+        <div class="col-auto p-1" id="print-print">
+            <button class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</button>
+        </div>
+        <div class="col-auto p-1" id="print-close">
+            <button class="btn btn-secondary" onclick="window.close()"><span class="oi oi-x mr-2"></span>Close</button>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+<div class="row">
+    <div class="col text-center"><h5>Vehicle</h5></div>
+    <div class="col text-center"><h5>Start Mileage</h5></div>
+    <div class="col text-center"><h5>End Mileage</h5></div>
+</div>
+{% for v in vehicle_reports %}
+    <div class="row">
+        <div class="col m-5 blank-field"><strong>{{v.vehicle}}</strong></div>
+        <div class="col m-5 blank-field">{{v.start_miles.0}}</div>
+        <div class="col m-5 blank-field">{{v.end_miles.0}}</div>
+    </div>
+{% endfor %}
+</div>
+<script type="text/javascript" src="{% static 'transit/js/report/common.js' %}"></script>
+<script type="text/javascript">
+    window.print();
+</script>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

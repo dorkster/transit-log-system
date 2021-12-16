@@ -156,6 +156,7 @@ urlpatterns = [
     path('vehicle-status/maintainence/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
 
     path('vehicle-pretrip/create/<uuid:shift_id>', views.vehiclePreTripCreate, name='vehicle-pretrip-create'),
+    path('vehicle-pretrip/create-no-shift/<uuid:vehicle_id>', views.vehiclePreTripCreateNoShift, name='vehicle-pretrip-create-no-shift'),
     path('vehicle-pretrip/<uuid:id>/delete', views.vehiclePreTripDelete, name='vehicle-pretrip-delete'),
 
     path('import/', views.excelImport, name='excel-import'),

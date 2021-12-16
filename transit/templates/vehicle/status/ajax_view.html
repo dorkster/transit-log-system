@@ -6,6 +6,7 @@
         <td>Next Oil Change</td>
         <td>Inspection Sticker</td>
         <td></td>
+        <td></td>
     </thead>
 {% for vehicle in logged_vehicles %}
     <tr>
@@ -14,6 +15,9 @@
         <td class="mytable-col-lg">{{ vehicle.inspection_date|date:"n / Y" }}</td>
         <td class="mytable-col-md">
             <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-secondary btn-sm w-100">Update</a>
+        </td>
+        <td class="mytable-col-md">
+            <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-warning btn-sm w-100">Pre-Trip</a>
         </td>
     </tr>
 {% endfor %}

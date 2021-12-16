@@ -783,7 +783,7 @@ class PreTrip(models.Model):
     date = models.DateField(editable=False)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
-    shift_id = models.UUIDField(editable=False)
+    shift_id = models.UUIDField(editable=False, null=True)
     cl_fluids = models.IntegerField(default=0)
     cl_engine = models.IntegerField(default=0)
     cl_headlights = models.IntegerField(default=0)
@@ -902,6 +902,7 @@ class SiteSettings(SingletonModel):
     autocomplete_history_days = models.IntegerField(default=30)
     reset_filter_on_shift_change = models.BooleanField(verbose_name='Reset Schedule filter when starting/ending Shift', default=False)
     skip_weekends = models.BooleanField(verbose_name='Skip weekends in Schedule date picker', default=False)
+    pretrip_warning_threshold = models.IntegerField(default=14)
     page_title = models.CharField(max_length=FieldSizes.LG, blank=True)
     short_page_title = models.CharField(max_length=FieldSizes.MD, blank=True)
 

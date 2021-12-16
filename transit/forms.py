@@ -283,6 +283,7 @@ class vehicleMaintainForm(forms.Form):
 
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
+    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditFareForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
@@ -320,6 +321,7 @@ class SiteSettingsForm(forms.Form):
     autocomplete_history_days = forms.IntegerField(min_value=0, label='Address autocomplete history days', help_text='If no Destinations have been defined, address fields will use the past X days of Trips to generate suggestions.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     reset_filter_on_shift_change = forms.ChoiceField(choices=BOOL_CHOICES, label='Reset Schedule filter when starting/ending Shift', widget=forms.Select(attrs=formWidgetAttrs.default))
     skip_weekends = forms.ChoiceField(choices=BOOL_CHOICES, label='Skip weekends in the Schedule date picker', widget=forms.Select(attrs=formWidgetAttrs.default))
+    pretrip_warning_threshold = forms.IntegerField(min_value=0, label='Pre-Trip Warning Threshold', help_text='If a vehicle has gone X days without a pre-trip inspection, a warning notification will be displayed. Set it to 0 to disable the warning altogether.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 

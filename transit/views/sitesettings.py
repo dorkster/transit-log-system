@@ -42,6 +42,7 @@ def sitesettingsEdit(request):
             settings.autocomplete_history_days = form.cleaned_data['autocomplete_history_days']
             settings.reset_filter_on_shift_change = form.cleaned_data['reset_filter_on_shift_change']
             settings.skip_weekends = form.cleaned_data['skip_weekends']
+            settings.pretrip_warning_threshold = form.cleaned_data['pretrip_warning_threshold']
             if request.user.is_superuser:
                 settings.page_title = form.cleaned_data['page_title']
                 settings.short_page_title = form.cleaned_data['short_page_title']
@@ -56,6 +57,7 @@ def sitesettingsEdit(request):
             'autocomplete_history_days': settings.autocomplete_history_days,
             'reset_filter_on_shift_change': settings.reset_filter_on_shift_change,
             'skip_weekends': settings.skip_weekends,
+            'pretrip_warning_threshold': settings.pretrip_warning_threshold,
             'page_title': settings.page_title,
             'short_page_title': settings.short_page_title,
         }

@@ -16,16 +16,24 @@
 import datetime
 import subprocess
 
-from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift
+from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift, PreTrip
 
 class VersionInfo():
     version_str = subprocess.run(['git', 'describe', '--tags'], stdout=subprocess.PIPE).stdout.decode('utf-8')
 
 def globals(request):
+    site_settings = SiteSettings.load()
+
     vehicle_inspections = []
     vehicle_oil_changes = []
+    vehicle_pretrips = []
 
     today = datetime.date.today()
+
+    if site_settings.pretrip_warning_threshold > 0:
+        pretrip_threshold = today - datetime.timedelta(days=site_settings.pretrip_warning_threshold)
+        pretrips = PreTrip.objects.filter(date__gte=pretrip_threshold)
+
     for v in Vehicle.objects.filter(is_logged=True):
         if v.inspection_date is not None:
             due_date = v.inspection_date
@@ -48,19 +56,23 @@ def globals(request):
                 if shift_miles >= oil_change_miles:
                     vehicle_oil_changes.append(v)
 
+        if site_settings.pretrip_warning_threshold > 0 and len(pretrips.filter(vehicle=v.id)) == 0:
+            vehicle_pretrips.append(v)
+
 
     vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False)
     vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, is_resolved=False)
     vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, is_resolved=False)
 
     return {
-        'notifications': (len(vehicle_issues_low) > 0 or len(vehicle_issues_medium) > 0 or len(vehicle_issues_high) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0),
+        'notifications': (len(vehicle_issues_low) > 0 or len(vehicle_issues_medium) > 0 or len(vehicle_issues_high) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0 or len(vehicle_pretrips) > 0),
         'notify_vehicle_issues_low': vehicle_issues_low,
         'notify_vehicle_issues_medium': vehicle_issues_medium,
         'notify_vehicle_issues_high': vehicle_issues_high,
         'notify_vehicle_inspections': vehicle_inspections,
         'notify_vehicle_oil_changes': vehicle_oil_changes,
-        'settings': SiteSettings.load(),
+        'notify_vehicle_pretrips': vehicle_pretrips,
+        'settings': site_settings,
         'version': VersionInfo.version_str,
     }
 

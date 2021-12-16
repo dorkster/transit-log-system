@@ -191,24 +191,52 @@ def vehicleMaintainEdit(request, id):
 
 @permission_required(['transit.add_pretrip'])
 def vehiclePreTripCreate(request, shift_id):
-    shift = get_object_or_404(Shift, id=shift_id)
+    return vehiclePreTripCreateCommon(request, shift_id=shift_id, vehicle_id=None)
 
-    # Pretrip was already logged, return to the schedule
-    if len(PreTrip.objects.filter(shift_id=shift_id)) > 0:
-        return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+@permission_required(['transit.add_pretrip'])
+def vehiclePreTripCreateNoShift(request, vehicle_id):
+    return vehiclePreTripCreateCommon(request, shift_id=None, vehicle_id=vehicle_id)
+
+@permission_required(['transit.add_pretrip'])
+def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
+    if shift_id:
+        shift = get_object_or_404(Shift, id=shift_id)
+        pretrip_date = shift.date
+        pretrip_driver = shift.driver
+        pretrip_vehicle = shift.vehicle
+
+        # Pretrip was already logged, return to the schedule
+        if len(PreTrip.objects.filter(shift_id=shift_id)) > 0:
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+    elif vehicle_id:
+        shift = None
+        pretrip_date = datetime.date.today()
+        pretrip_driver = None
+        pretrip_vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    else:
+        return HttpResponseRedirect(reverse('vehicle-status'))
 
     if request.method == 'POST':
         form = vehiclePreTripForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+            if shift_id:
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
+            else:
+                return HttpResponseRedirect(reverse('vehicle-status'))
 
         if form.is_valid():
             pretrip = PreTrip()
-            pretrip.date = shift.date
-            pretrip.driver = shift.driver
-            pretrip.vehicle = shift.vehicle
-            pretrip.shift_id = shift_id
+            pretrip.date = pretrip_date
+            pretrip.vehicle = pretrip_vehicle
+
+            if pretrip_driver:
+                pretrip.driver = pretrip_driver
+            else:
+                pretrip.driver = form.cleaned_data['driver']
+
+            if shift_id:
+                pretrip.shift_id = shift_id
 
             if form.cleaned_data['checklist'] != '':
                 cl = json.loads(form.cleaned_data['checklist'])
@@ -237,9 +265,9 @@ def vehiclePreTripCreate(request, shift_id):
                 for key in cl:
                     if cl[key]['status'] == 1 and cl[key]['issue'] != "":
                         issue = VehicleIssue()
-                        issue.date = shift.date
-                        issue.driver = shift.driver
-                        issue.vehicle = shift.vehicle
+                        issue.date = pretrip.date
+                        issue.driver = pretrip.driver
+                        issue.vehicle = pretrip.vehicle
                         issue.description = cl[key]['issue']
                         issue.priority = cl[key]['issue_prio']
                         issue.category = issue.get_category_from_checklist(key)
@@ -248,12 +276,18 @@ def vehiclePreTripCreate(request, shift_id):
                         issue.save()
                         log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE_ISSUE, str(issue))
 
-                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
+                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
     else:
         form = vehiclePreTripForm()
 
+    if not shift:
+        form.fields['driver'].required = True
+
     context = {
         'form': form,
+        'pretrip_date': pretrip_date,
+        'pretrip_driver': pretrip_driver,
+        'pretrip_vehicle': pretrip_vehicle,
         'shift': shift,
         'checklist': PreTrip.CHECKLIST,
     }

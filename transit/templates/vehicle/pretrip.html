@@ -1,30 +1,36 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Pre-Trip Checklist | {{ shift }} | {% endif %}
+{% if user.is_authenticated %}Pre-Trip Checklist | {% if shift %}{{ shift }}{% else %}{{ pretrip_vehicle }}{% endif %} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
 <h2>Pre-Trip Checklist</h2>
-<div class="container ml-0 mb-3 p-0">
-    <div class="list-group">
-        <div class="list-group-item d-flex">
-            <span class="text-muted w-50">Date</span>
-            <span class="w-50"><strong>{{shift.date}}</strong></span>
-        </div>
-        <div class="list-group-item d-flex">
-            <span class="text-muted w-50">Vehicle</span>
-            <span class="w-50"><strong>{{shift.vehicle}}</strong></span>
-        </div>
-        <div class="list-group-item d-flex">
-            <span class="text-muted w-50">Driver</span>
-            <span class="w-50"><strong>{{shift.driver}}</strong></span>
-        </div>
-    </div>
-</div>
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     {{ form.checklist }}
+    <div class="container ml-0 mb-3 p-0">
+        <div class="list-group">
+            <div class="list-group-item d-flex">
+                <span class="text-muted w-50">Date</span>
+                <span class="w-50"><strong>{{pretrip_date}}</strong></span>
+            </div>
+            <div class="list-group-item d-flex">
+                <span class="text-muted w-50">Vehicle</span>
+                <span class="w-50"><strong>{{pretrip_vehicle}}</strong></span>
+            </div>
+            <div class="list-group-item d-flex">
+                <span class="text-muted w-50">Driver</span>
+                <span class="w-50">
+                    {% if shift %}
+                    <strong>{{pretrip_driver}}</strong>
+                    {% else %}
+                    {{ form.driver }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
     <div class="container ml-0">
         <div class="row">
             <div class="col border m-1 pt-1">

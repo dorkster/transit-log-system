@@ -163,6 +163,10 @@
             {% for vehicle in notify_vehicle_oil_changes %}
             <strong><a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for an oil change!</a></strong>
             {% endfor %}
+
+            {% for vehicle in notify_vehicle_pretrips %}
+            <strong><a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">{{ vehicle }}: Due for a pre-trip!</a></strong>
+            {% endfor %}
             </div>
         {% endif %}
         <div class="container-fluid mt-3">

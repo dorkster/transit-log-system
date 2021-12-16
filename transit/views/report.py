@@ -189,6 +189,8 @@ class Report():
     class ReportOutputVehicles():
         def __init__(self):
             self.vehicle = None
+            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.days = []
             self.totals = Report.ReportSummary()
 
@@ -857,6 +859,12 @@ class Report():
                 if report_day.hasVehicleInShift(vehicle):
                     vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle]})
                     vehicle_report.totals += report_day.by_vehicle[vehicle]
+                    for shift_iter in report_day.shifts:
+                        if shift_iter.shift and vehicle.id == shift_iter.shift.vehicle.id:
+                            if vehicle_report.start_miles[T_STR] == '' or (vehicle_report.start_miles[T_STR] != '' and vehicle_report.start_miles[T_FLOAT] > shift_iter.start_miles[T_FLOAT]):
+                                vehicle_report.start_miles[T_STR] = shift_iter.start_miles[T_STR]
+                            if vehicle_report.end_miles[T_STR] == '' or (vehicle_report.end_miles[T_STR] != '' and vehicle_report.end_miles[T_FLOAT] < shift_iter.end_miles[T_FLOAT]):
+                                vehicle_report.end_miles = shift_iter.end_miles
 
             self.vehicle_reports.append(vehicle_report)
 

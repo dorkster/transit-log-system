@@ -148,6 +148,7 @@
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
+            {% if v.start_miles.0 and v.end_miles.0 %}<p>Mileage Start: <strong>{{v.start_miles.0}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles.0}}</strong></p>{% endif %}
         </div>
     </div>
     {% if v.days %}

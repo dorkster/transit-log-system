@@ -229,8 +229,12 @@ class Report():
                 shift_start_miles = shift_end_miles = shift_start_time = shift_end_time = ''
 
             if (error_trip):
-                trip_start_miles = error_trip.start_miles
-                trip_end_miles = error_trip.end_miles
+                if (error_shift):
+                    trip_start_miles = shift_start_miles[:len(shift_start_miles)-len(error_trip.start_miles)] + error_trip.start_miles
+                    trip_end_miles = shift_start_miles[:len(shift_start_miles)-len(error_trip.end_miles)] + error_trip.end_miles
+                else:
+                    trip_start_miles = error_trip.start_miles
+                    trip_end_miles = error_trip.end_miles
                 trip_start_time = error_trip.start_time
                 trip_end_time = error_trip.end_time
             else:
@@ -604,7 +608,7 @@ class Report():
                             report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
                             report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
                     elif report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
-                        self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_trip=i)
+                        self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_shift=shift.shift, error_trip=i)
                         report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
                         report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
                         report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]

@@ -476,8 +476,8 @@ class Report():
 
                 if report_shift.start_time > report_shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
-                    report_shift.end_time[T_FLOAT] = report_shift.start_time[T_FLOAT]
-                    report_shift.end_time[T_STR] = report_shift.start_time[T_STR]
+                    report_shift.end_time = report_shift.start_time
+                    report_shift.end_time = report_shift.start_time
 
                 report_day.shifts.append(report_shift)
 

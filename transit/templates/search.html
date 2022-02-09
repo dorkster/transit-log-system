@@ -65,10 +65,10 @@
         <td>Ambulatory?</td>
     </thead>
 {% for trip in results %}
-<tr style="background: #{{ trip.get_driver_color }};">
+<tr style="{{ trip.get_driver_style }}">
         {% if perms.transit.change_trip %}
-        <td class="mytable-col-xs"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
-        <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
+        <td class="mytable-col-xs"><a class="btn btn-secondary btn-sm" style="font-size: 0.9em;" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+        <td class="mytable-col-md"><a class="btn btn-secondary btn-sm" style="font-size: 0.9em;" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% else %}
         <td class="mytable-col-md"><a href="{% url 'schedule' 'read-only' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% endif %}

@@ -165,7 +165,7 @@
 </div>
 {% if trips %}
     {% for trip in trips %}
-    <div class="card mb-3 border-secondary" style="background: #{{ trip.get_driver_color }}; max-width: 960px;">
+    <div class="card mb-3 border-secondary" style="{{ trip.get_driver_style }}; max-width: 960px;">
         <div class="card-body p-0">
             <div style="background: rgba(255,255,255,.3); border-bottom: 1px solid rgba(0,0,0,.125);">
             <a id="trip_{{ trip.id }}"></a>

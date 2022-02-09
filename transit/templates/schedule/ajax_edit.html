@@ -156,7 +156,7 @@
     {% if trip.sort_index == 0 %}
     <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}22{% else %}15{% endif %}"></td></tr>
     {% endif %}
-    <tr style="background: #{{ trip.get_driver_color }};" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="trip_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>

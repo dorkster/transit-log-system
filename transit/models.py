@@ -225,6 +225,12 @@ class Trip(models.Model):
         else:
             return Driver.get_color(self.driver)
 
+    def get_driver_style(self):
+        output = "background: #" + self.get_driver_color() + ";"
+        if self.status == Trip.STATUS_CANCELED or self.status == Trip.STATUS_NO_SHOW:
+            output += "text-decoration: line-through;"
+        return output
+
     def get_phone_number(self, phone_type):
         num_only = ''
         num_regex = '\d*'
@@ -748,6 +754,12 @@ class TemplateTrip(models.Model):
             return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)
+
+    def get_driver_style(self):
+        output = "background: #" + self.get_driver_color() + ";"
+        if self.status == Trip.STATUS_CANCELED or self.status == Trip.STATUS_NO_SHOW:
+            output += "text-decoration: line-through;"
+        return output
 
     def get_fare_str(self):
         return int_to_money_string(self.fare)

@@ -22,6 +22,7 @@ from django.urls import reverse
 
 from transit.models import Client, ClientPayment
 from transit.forms import EditClientPaymentForm
+from transit.views.report import Report
 
 from django.contrib.auth.decorators import permission_required
 
@@ -32,10 +33,18 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
 @permission_required(['transit.view_clientpayment'])
 def clientPaymentList(request, parent):
+    # run report to get all fares/payments
+    report_date_start = datetime.date(year=2019, month=1, day=1)
+    report_date_end = datetime.date(year=datetime.date.today().year+3, month=1, day=1)
+    report_client = Client.objects.get(id=parent)
+    report = Report()
+    report.load(report_date_start, report_date_end, client_name=report_client.name, filter_by_money=True)
+
     context = {
         'parent':parent,
         'client': Client.objects.get(id=parent),
         'client_payments': ClientPayment.objects.filter(parent=parent),
+        'report': report,
     }
     return render(request, 'client/payment/list.html', context=context)
 

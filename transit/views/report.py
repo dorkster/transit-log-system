@@ -359,7 +359,7 @@ class Report():
         self.filtered_vehicles = None
         self.filtered_drivers = None
 
-    def load(self, date_start, date_end, daily_log_shift=None, driver_id=None):
+    def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
             daily_log_shift = None
 
@@ -389,10 +389,16 @@ class Report():
         all_shifts_list = list(all_shifts)
 
         all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, is_activity=False)
+        if filter_by_money:
+            all_trips = all_trips.exclude(fare=0, collected_cash=0, collected_check=0)
+        if client_name != None:
+            all_trips = all_trips.filter(name=client_name)
         all_trips = all_trips.select_related('driver').select_related('vehicle').select_related('trip_type')
         all_trips_list = list(all_trips)
 
         all_clients = Client.objects.all()
+        if client_name != None:
+            all_clients = all_clients.filter(name=client_name)
         all_clients_list = list(all_clients)
 
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)

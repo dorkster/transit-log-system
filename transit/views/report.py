@@ -421,7 +421,7 @@ class Report():
                 if i.date not in all_dates:
                     all_dates.append(i.date)
 
-        sorted(all_dates)
+        all_dates = sorted(all_dates)
 
         for day_date in all_dates:
             # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...

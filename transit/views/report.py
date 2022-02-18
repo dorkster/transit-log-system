@@ -409,9 +409,18 @@ class Report():
         Report.ReportDay.query_vehicles = all_vehicles
 
         all_dates = []
+
         for i in all_trips_list:
             if i.date not in all_dates:
                 all_dates.append(i.date)
+
+        # when given a client name, it is because we are only interested in fares/payments
+        # since shifts don't contain that data, we can skip looking at the shift list (which takes more time than the filtered trip list)
+        if client_name == None:
+            for i in all_shifts_list:
+                if i.date not in all_dates:
+                    all_dates.append(i.date)
+
         sorted(all_dates)
 
         for day_date in all_dates:

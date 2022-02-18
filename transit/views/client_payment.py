@@ -35,7 +35,7 @@ from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 def clientPaymentList(request, parent):
     # run report to get all fares/payments
     report_date_start = datetime.date(year=2019, month=1, day=1)
-    report_date_end = datetime.date(year=datetime.date.today().year+3, month=1, day=1)
+    report_date_end = datetime.date(year=datetime.date.today().year+2, month=1, day=1)
     report_client = Client.objects.get(id=parent)
     report = Report()
     report.load(report_date_start, report_date_end, client_name=report_client.name, filter_by_money=True)

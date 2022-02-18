@@ -408,8 +408,13 @@ class Report():
         Report.ReportDay.query_drivers = self.filtered_drivers
         Report.ReportDay.query_vehicles = all_vehicles
 
-        day_date = date_start
-        while day_date < date_end_plus_one:
+        all_dates = []
+        for i in all_trips_list:
+            if i.date not in all_dates:
+                all_dates.append(i.date)
+        sorted(all_dates)
+
+        for day_date in all_dates:
             # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...
             fallback_time = datetime.datetime(year=day_date.year, month=day_date.month, day=day_date.day, hour=8, minute=0)
 
@@ -858,8 +863,6 @@ class Report():
                 report_day.all += report_day.by_vehicle[shift.shift.vehicle]
 
             self.report_all.append(report_day)
-
-            day_date += datetime.timedelta(days=1)
 
         self.vehicle_reports = []
         for vehicle in self.filtered_vehicles:

@@ -410,6 +410,11 @@ class Report():
 
         all_dates = []
 
+        # process days where non-driver money is collected, even if there were no shifts/trips
+        for i in all_client_payments_list:
+            if i.date_paid not in all_dates:
+                all_dates.append(i.date_paid)
+
         for i in all_trips_list:
             if i.date not in all_dates:
                 all_dates.append(i.date)

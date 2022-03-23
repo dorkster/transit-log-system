@@ -500,6 +500,7 @@ class ClientPayment(models.Model):
     date_paid = models.DateField()
     money_cash = models.IntegerField(default=0)
     money_check = models.IntegerField(default=0)
+    notes = models.TextField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['date_paid']

@@ -75,6 +75,7 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
             client_payment.date_paid = form.cleaned_data['date_paid']
             client_payment.money_cash = money_string_to_int(form.cleaned_data['cash'])
             client_payment.money_check = money_string_to_int(form.cleaned_data['check'])
+            client_payment.notes = form.cleaned_data['notes']
             client_payment.save()
 
             if is_new:
@@ -88,6 +89,7 @@ def clientPaymentCreateEditCommon(request, client_payment, is_new):
             'date_paid': client_payment.date_paid,
             'cash': int_to_money_string(client_payment.money_cash, blank_zero=True),
             'check': int_to_money_string(client_payment.money_check, blank_zero=True),
+            'notes': client_payment.notes,
         }
         form = EditClientPaymentForm(initial=initial)
 
@@ -125,6 +127,7 @@ def ajaxClientPaymentList(request, parent):
     SORT_DATE_PAID = 0
     SORT_CASH = 1
     SORT_CHECK = 2
+    SORT_NOTES = 3
 
     sort_mode = request.session.get('client_payments_sort', SORT_DATE_PAID)
     sort_mode_dir = request.session.get('client_payments_sort_dir', 0)
@@ -151,9 +154,11 @@ def ajaxClientPaymentList(request, parent):
     if sort_mode == SORT_DATE_PAID:
         client_payments = client_payments.order_by('date_paid')
     elif sort_mode == SORT_CASH:
-        client_payments = client_payments.order_by('cash', 'date_paid')
+        client_payments = client_payments.order_by('money_cash', 'date_paid')
     elif sort_mode == SORT_CHECK:
-        client_payments = client_payments.order_by('check', 'date_paid')
+        client_payments = client_payments.order_by('money_check', 'date_paid')
+    elif sort_mode == SORT_NOTES:
+        client_payments = client_payments.order_by('notes')
 
     if sort_mode_dir == 1:
         client_payments = client_payments.reverse()

@@ -190,6 +190,7 @@ class EditClientPaymentForm(forms.Form):
     date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     cash = forms.CharField(label='Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     check = forms.CharField(label='Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
 
 class EditDestinationForm(forms.Form):
     address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))

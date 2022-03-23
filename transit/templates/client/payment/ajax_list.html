@@ -28,6 +28,12 @@
                 Check
             </a>
         </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
+                {% if sort_mode == 3 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Notes
+            </a>
+        </td>
     </thead>
     {% for client_payment in client_payments %}
     <tr>
@@ -46,6 +52,7 @@
         <td class="mytable-col-lg">{{ client_payment.date_paid }}</td>
         <td class="mytable-col-md">${{ client_payment.get_cash_str }}</td>
         <td class="mytable-col-md">${{ client_payment.get_check_str }}</td>
+        <td class="mytable-col-lg">{{ client_payment.notes }}</td>
     </tr>
     {% endfor %}
 </table>

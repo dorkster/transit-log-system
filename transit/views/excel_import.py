@@ -59,7 +59,7 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
             return t_time
 
         if type(cell_value) == datetime.time:
-            return getWorkHourTime(cell_value).strftime('%_I:%M %p').strip()
+            return getWorkHourTime(cell_value).strftime('%-I:%M %p').strip()
         elif cell_value != None:
             errors.append(str(file_obj) + ': Could not parse ' + error_str + ' time, "' + str(cell_value) + '"')
         return ''

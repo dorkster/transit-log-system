@@ -200,7 +200,7 @@ def shiftStart(request, id):
     else:
         auto_time = shift.start_time
         if auto_time == '':
-            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
+            auto_time = datetime.datetime.now().strftime('%-I:%M %p')
 
         initial = {
             'miles': shift.start_miles,
@@ -251,7 +251,7 @@ def shiftEnd(request, id):
     else:
         auto_time = shift.end_time
         if auto_time == '':
-            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
+            auto_time = datetime.datetime.now().strftime('%-I:%M %p')
 
         initial = {
             'miles': shift.end_miles,

@@ -437,7 +437,7 @@ def tripStart(request, id):
     else:
         auto_time = trip.start_time
         if auto_time == '':
-            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
+            auto_time = datetime.datetime.now().strftime('%-I:%M %p')
 
         initial = {
             'miles': trip.start_miles,
@@ -503,7 +503,7 @@ def tripEnd(request, id):
     else:
         auto_time = trip.end_time
         if auto_time == '':
-            auto_time = datetime.datetime.now().strftime('%_I:%M %p')
+            auto_time = datetime.datetime.now().strftime('%-I:%M %p')
 
         initial = {
             'miles': trip.end_miles,

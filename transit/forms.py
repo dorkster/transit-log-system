@@ -185,6 +185,7 @@ class EditClientForm(forms.Form):
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
     staff = forms.ChoiceField(choices=BOOL_CHOICES, label='Is staff member?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     is_active = forms.ChoiceField(choices=BOOL_CHOICES, label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    update_trips = forms.ChoiceField(choices=BOOL_CHOICES, label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditClientPaymentForm(forms.Form):
     date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))

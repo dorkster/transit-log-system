@@ -75,6 +75,13 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             else:
                 unique_client = client
 
+            prev_name = unique_client.name
+            prev_address = unique_client.address
+            prev_phone_home = unique_client.phone_home
+            prev_phone_cell = unique_client.phone_cell
+            prev_elderly = unique_client.elderly
+            prev_ambulatory = unique_client.ambulatory
+
             unique_client.name = form.cleaned_data['name']
             unique_client.address = form.cleaned_data['address']
             unique_client.phone_home = form.cleaned_data['phone_home']
@@ -91,6 +98,75 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(unique_client))
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(unique_client))
+
+            if form.cleaned_data['update_trips'] == 'True':
+                trips = Trip.objects.filter(name=prev_name)
+                for trip in trips:
+                    updated = False
+
+                    # address
+                    if prev_address != unique_client.address:
+                        if trip.address == prev_address:
+                            trip.address = unique_client.address
+                            updated = True
+                        if trip.destination == prev_address:
+                            trip.destination == unique_client.address
+                            updated = True
+                    # phone numbers
+                    if prev_phone_home != unique_client.phone_home:
+                        if trip.phone_home == prev_phone_home:
+                            trip.phone_home = unique_client.phone_home
+                            updated = True
+                    if prev_phone_cell != unique_client.phone_cell:
+                        if trip.phone_cell == prev_phone_cell:
+                            trip.phone_cell = unique_client.phone_cell
+                            updated = True
+                    # elderly/ambulatory
+                    if prev_elderly != unique_client.elderly:
+                        if trip.elderly == prev_elderly:
+                            trip.elderly = unique_client.elderly
+                            updated = True
+                    if prev_ambulatory != unique_client.ambulatory:
+                        if trip.ambulatory == prev_ambulatory:
+                            trip.ambulatory = unique_client.ambulatory
+                            updated = True
+
+                    if updated:
+                        trip.save()
+
+                template_trips = TemplateTrip.objects.filter(name=prev_name)
+                for trip in template_trips:
+                    updated = False
+
+                    # address
+                    if prev_address != unique_client.address:
+                        if trip.address == prev_address:
+                            trip.address = unique_client.address
+                            updated = True
+                        if trip.destination == prev_address:
+                            trip.destination == unique_client.address
+                            updated = True
+                    # phone numbers
+                    if prev_phone_home != unique_client.phone_home:
+                        if trip.phone_home == prev_phone_home:
+                            trip.phone_home = unique_client.phone_home
+                            updated = True
+                    if prev_phone_cell != unique_client.phone_cell:
+                        if trip.phone_cell == prev_phone_cell:
+                            trip.phone_cell = unique_client.phone_cell
+                            updated = True
+                    # elderly/ambulatory
+                    if prev_elderly != unique_client.elderly:
+                        if trip.elderly == prev_elderly:
+                            trip.elderly = unique_client.elderly
+                            updated = True
+                    if prev_ambulatory != unique_client.ambulatory:
+                        if trip.ambulatory == prev_ambulatory:
+                            trip.ambulatory = unique_client.ambulatory
+                            updated = True
+
+                    if updated:
+                        trip.save()
 
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
@@ -109,6 +185,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'tags': client.tags,
             'staff': client.staff,
             'is_active': client.is_active,
+            'update_trips': False,
         }
         form = EditClientForm(initial=initial)
 

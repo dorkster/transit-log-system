@@ -30,6 +30,11 @@
                     <div class="mb-2"><label for="{{ form.phone.id_for_label }}"><strong>{{ form.phone.label }}</strong></label><br/>{{ form.phone }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.is_active.id_for_label }}"><strong>{{ form.is_active.label }}</strong><br/><span class="small text-muted">{{ form.is_active.help_text }}</span></label><br/>{{ form.is_active }}</div>
+                    <hr/>
+                    <div class="mb-2">
+                        <label for="{{ form.update_trips.id_for_label }}"><strong>{{ form.update_trips.label }}</strong><br/><span class="small text-muted">{{ form.update_trips.help_text }}</span></label>
+                        <br/>{{ form.update_trips }}<span class="alert alert-warning p-1 ml-3 small"><span class="oi oi-warning mr-2"></span>Please use this option with caution!</span>
+                    </div>
                 </fieldset>
             </div>
         </div>

@@ -25,6 +25,8 @@ from transit.forms import EditDestinationForm
 
 from django.contrib.auth.decorators import permission_required
 
+from django.db.models import Q
+
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
@@ -68,6 +70,9 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             else:
                 unique_destination = destination
 
+            prev_address = unique_destination.address
+            prev_phone = unique_destination.phone
+
             unique_destination.address = form.cleaned_data['address']
             unique_destination.phone = form.cleaned_data['phone']
             unique_destination.is_active = form.cleaned_data['is_active']
@@ -77,6 +82,57 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
                 log_event(request, LoggedEventAction.CREATE, LoggedEventModel.DESTINATION, str(unique_destination))
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(unique_destination))
+
+            if form.cleaned_data['update_trips'] == 'True':
+                trips = Trip.objects.filter(Q(address=prev_address) | Q(destination=prev_address))
+                for trip in trips:
+                    updated = False
+
+                    # address
+                    if prev_address != unique_destination.address:
+                        if trip.address == prev_address:
+                            trip.address = unique_destination.address
+                            updated = True
+                        if trip.destination == prev_address:
+                            trip.destination = unique_destination.address
+                            updated = True
+
+                    # phone numbers
+                    if prev_phone != unique_destination.phone:
+                        if trip.address == prev_address and trip.phone_address == prev_phone:
+                            trip.phone_address = unique_destination.phone
+                            updated = True
+                        if trip.destination == prev_address and trip.phone_destination == prev_phone:
+                            trip.phone_destination = unique_destination.phone
+                            updated = True
+
+                    if updated:
+                        trip.save()
+
+                template_trips = TemplateTrip.objects.filter(Q(address=prev_address) | Q(destination=prev_address))
+                for trip in template_trips:
+                    updated = False
+
+                    # address
+                    if prev_address != unique_destination.address:
+                        if trip.address == prev_address:
+                            trip.address = unique_destination.address
+                            updated = True
+                        if trip.destination == prev_address:
+                            trip.destination = unique_destination.address
+                            updated = True
+
+                    # phone numbers
+                    if prev_phone != unique_destination.phone:
+                        if trip.address == prev_address and trip.phone_address == prev_phone:
+                            trip.phone_address = unique_destination.phone
+                            updated = True
+                        if trip.destination == prev_address and trip.phone_destination == prev_phone:
+                            trip.phone_destination = unique_destination.phone
+                            updated = True
+
+                    if updated:
+                        trip.save()
 
             if src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
@@ -89,6 +145,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             'address': destination.address,
             'phone': destination.phone,
             'is_active': destination.is_active,
+            'update_trips': False,
         }
         form = EditDestinationForm(initial=initial)
 

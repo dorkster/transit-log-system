@@ -746,6 +746,9 @@ class Report():
                 if i.date_paid != day_date:
                     continue
 
+                if client_name and i.parent.name != client_name:
+                    continue
+
                 found_unique_rider = False
                 for j in self.unique_riders.names:
                     if j.name == i.parent.name:

@@ -33,6 +33,7 @@ from .help import *
 from .destination import *
 from .user_account import *
 from .client_payment import *
+from .client_report import *
 from .fare import *
 from .tag import *
 from .loggedevent import *

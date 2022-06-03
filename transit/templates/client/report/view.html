@@ -1,0 +1,181 @@
+{% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Report for: {{date_start}} - {{date_end}} | {% endif %}
+{% endblock %}
+
+{% block auth_content %}
+{% load static %}
+<div class="container-fluid mt-4 mb-3">
+    <div class="row">
+        <div class="col p-1">
+            <h3>
+                <a href="{% url 'clients' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
+                Client Report for {{ client.name }}: <strong>{{ date_start }} - {{ date_end }}</strong>
+            </h3>
+        </div>
+        <div class="col-sm-auto p-1">
+            <div class="btn-group" role="group">
+                <a title="Previous month" class="btn btn-secondary" href="{{ url_month_prev }}">
+                    <span class="oi oi-chevron-left"></span>
+                </a>
+                <div class="btn-group" role="group" id="date_dropdown">
+                    <button title="Select a month" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="oi oi-calendar"></span>
+                    </button>
+                    <div class="dropdown-menu shadow dropdown-menu-right">
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                {{ date_picker }}
+                                <input type="submit" value="Go" class="btn btn-secondary align-top">
+                            </form>
+                        </div>
+                        <a class="dropdown-item" href="{{ url_this_month }}">Go to this month</a>
+                        <div class="dropdown-divider"></div>
+                        <div class="p-2 small"><strong>Custom Date Range</strong></div>
+                        <div class="p-2" style="white-space: nowrap;">
+                            <form action="" method="post" class="date-picker">
+                                {% csrf_token %}
+                                <div class="mb-2">
+                                    {{ date_range_picker.date_start }}
+                                </div>
+                                <div class="mb-2">
+                                    {{ date_range_picker.date_end }}
+                                </div>
+                                <div>
+                                    <button class="btn btn-secondary align-top w-100" type="submit" name="date_range">Go</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <a title="Next month" class="btn btn-secondary" href="{{ url_month_next }}">
+                    <span class="oi oi-chevron-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<h4>Trips ({{trips_normal|length}})</h4>
+{% if trips_normal %}
+{% for trip in trips_normal %}
+<div class="mb-1">
+    <div class="btn-group w-75">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
+        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div>There are no normal trips for the selected date range.</div>
+{% endif %}
+
+<hr/>
+
+<h4>Canceled Trips ({{trips_canceled|length}})</h4>
+{% if trips_canceled %}
+{% for trip in trips_canceled %}
+<div class="mb-1">
+    <div class="btn-group w-75">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
+        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div>There are trips marked as <b>canceled</b> for the selected date range.</div>
+{% endif %}
+
+<hr/>
+
+<h4>No Show Trips ({{trips_no_show|length}})</h4>
+{% if trips_no_show %}
+{% for trip in trips_no_show %}
+<div class="mb-1">
+    <div class="btn-group w-75">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
+        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div>There are no trips marked as <b>no show</b> for the selected date range.</div>
+{% endif %}
+
+
+<hr/>
+<h4>Fares &amp; Payments</h4>
+<p>A full summary of fares and payments for this client can be found <a href="{% url 'client-payments' client.id %}">here</a>.</p>
+<table class="mytable mytable-striped">
+    <thead>
+        <td class="mytable-col-lg">Name</td>
+        <td class="mytable-col-md">Cash (driver collected)</td>
+        <td class="mytable-col-md">Check (driver collected)</td>
+        <td class="mytable-col-md">Cash (not driver collected)</td>
+        <td class="mytable-col-md">Check (not driver collected)</td>
+        <td class="mytable-col-md">Total Payments</td>
+        <td class="mytable-col-md">Total Fares</td>
+        <td class="mytable-col-md">Total Owed</td>
+    </thead>
+    <tbody class="mytable-hoverhi">
+        {% for rider in report.unique_riders.names %}
+        {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
+        <tr>
+            <td class="mytable-col-lg">
+                <div class="dropdown ajax-blocker">
+                    <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
+                    <div class="dropdown-menu shadow">
+                        <h5 class="pl-3 pr-3">{{rider.name}}</h5>
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                        </a>
+                        {% if rider.client_id %}
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
+                            <span class="oi oi-person mr-2"></span>Edit Client
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+            <td class="mytable-col-md {% if rider.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_cash }}</td>
+            <td class="mytable-col-md {% if rider.collected_check.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_check }}</td>
+            <td class="mytable-col-md {% if rider.paid_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_cash }}</td>
+            <td class="mytable-col-md {% if rider.paid_check.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_check }}</td>
+            <td class="mytable-col-md {% if rider.total_payments.value == 0 %}mytable-zero{%endif%}">{{ rider.total_payments }}</td>
+            <td class="mytable-col-md {% if rider.total_fares.value == 0 %}mytable-zero{%endif%}">{{ rider.total_fares }}</td>
+            <td class="mytable-col-md {% if rider.total_owed.value == 0 %}mytable-zero{%endif%}">{{ rider.total_owed }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+    <tr class="bg-success text-light text-bold">
+        <td class="mytable-col-lg">TOTAL</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_collected_check }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_paid_cash }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_paid_check }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
+        <td class="mytable-col-md">{{ report.unique_riders.total_total_owed }}</td>
+    </tr>
+</table>
+<script type="text/javascript">
+    function fixDatePicker() {
+        // Keep the dropdown from closing when picking a date
+        $('#date_dropdown option, #date_dropdown select').click(function(e) {
+            e.stopPropagation();
+        });
+        $("#id_date_day").attr("style", "display: none !important;");
+    }
+
+    fixDatePicker();
+</script>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

@@ -83,6 +83,10 @@ urlpatterns = [
     path('clients/<uuid:parent>/payments/<uuid:id>/edit', views.clientPaymentEdit, name='client-payment-edit'),
     path('clients/<uuid:parent>/payments/<uuid:id>/delete', views.clientPaymentDelete, name='client-payment-delete'),
 
+    path('clients/<uuid:parent>/report/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/', views.clientReport, name='client-report'),
+    path('clients/<uuid:parent>/report/<int:year>/<int:month>/', views.clientReportMonth, name='client-report-month'),
+    path('clients/<uuid:parent>/report/this-month/', views.clientReportThisMonth, name='client-report-this-month'),
+
     path('destinations/', views.destinationList, name='destinations'),
     path('destinations/create', views.destinationCreate, name='destination-create'),
     path('destinations/<uuid:id>/edit', views.destinationEdit, name='destination-edit'),

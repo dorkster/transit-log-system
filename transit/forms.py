@@ -138,6 +138,7 @@ class EditTripForm(forms.Form):
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -275,6 +276,7 @@ class EditActivityForm(forms.Form):
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
+    cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
 class vehicleMaintainForm(forms.Form):
     MONTHS = {}

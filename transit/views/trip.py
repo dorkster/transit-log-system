@@ -168,6 +168,13 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.fare = money_string_to_int(form.cleaned_data['fare'])
                 trip.passenger = form.cleaned_data['passenger']
 
+            trip.cancel_date = None
+            try:
+                if int(trip.status) == Trip.STATUS_CANCELED:
+                    trip.cancel_date = form.cleaned_data['cancel_date']
+            except:
+                pass
+
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
                 # decrease sort indexes on the old date to fill in the gap
@@ -221,6 +228,10 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
             else:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
+        cancel_date = trip.cancel_date
+        if cancel_date == None:
+            cancel_date = datetime.date.today()
+
         if trip.is_activity:
             initial = {
                 'date': trip.date,
@@ -228,6 +239,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'end_time': trip.appointment_time,
                 'description': trip.note,
                 'status': trip.status,
+                'cancel_date': cancel_date,
             }
             form = EditActivityForm(initial=initial)
         else:
@@ -258,6 +270,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
                 'fare': int_to_money_string(trip.fare, blank_zero=True),
                 'passenger': trip.passenger,
+                'cancel_date': cancel_date,
             }
             form = EditTripForm(initial=initial)
 

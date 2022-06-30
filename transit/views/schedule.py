@@ -335,10 +335,13 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             trip = get_object_or_404(Trip, id=request_id)
             if request_data == '0':
                 trip.status = Trip.STATUS_NORMAL
+                trip.cancel_date = None
             elif request_data == '1':
                 trip.status = Trip.STATUS_CANCELED
+                trip.cancel_date = datetime.date.today()
             elif request_data == '2':
                 trip.status = Trip.STATUS_NO_SHOW
+                trip.cancel_date = None
             trip.save()
             log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
             log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
@@ -376,6 +379,10 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.status = temp_trip.status
                 trip.fare = temp_trip.fare
                 trip.passenger = temp_trip.passenger
+
+                if trip.status == Trip.STATUS_CANCELED:
+                    trip.cancel_date = datetime.date.today()
+
                 trip.save()
             log_event(request, LoggedEventAction.CREATE, LoggedEventModel.TRIP, 'Insert Template -> ' + str(parent_template) + ' | [' + str(date) + ']')
 

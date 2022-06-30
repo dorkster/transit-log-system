@@ -181,6 +181,7 @@ class Trip(models.Model):
     collected_check = models.IntegerField(default=0)
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
+    cancel_date = models.DateField(default=None, null=True, blank=False)
 
     class Meta:
         ordering = ['-date', 'sort_index']

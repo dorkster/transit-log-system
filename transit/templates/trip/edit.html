@@ -46,6 +46,10 @@
                 <fieldset class="form-group">
                     <legend>{{ form.status.label }}</legend>
                     <div class="mb-2">{{ form.status }}</div>
+                    <div id="cancel_date" class="collapse">
+                        <legend>{{ form.cancel_date.label }}</legend>
+                        <div class="mb-2">{{ form.cancel_date }}</div>
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -229,6 +233,7 @@
 {{ destinations_json|json_script:"destinations-tag" }}
 <script type="text/javascript">
     setStatusColor();
+    setCancelDateVisibility();
     focusFromParam();
     setupFormEvents();
 

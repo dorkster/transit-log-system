@@ -73,6 +73,9 @@
 <hr/>
 
 <h4>Canceled Trips ({{trips_canceled|length}})</h4>
+{% if trips_canceled_late %}
+<p class="small text-muted">Canceled on the same day (or later): {{trips_canceled_late|length}}</p>
+{% endif %}
 {% if trips_canceled %}
 {% for trip in trips_canceled %}
 <div class="mb-1">

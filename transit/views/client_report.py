@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from django.db.models import Q
+from django.db.models import F
 
 from transit.models import Client, Trip
 from transit.forms import DatePickerForm, DateRangePickerForm
@@ -57,6 +58,7 @@ def clientReportBase(request, parent, start_year, start_month, start_day, end_ye
     trips_normal = all_trips.filter(status=Trip.STATUS_NORMAL).exclude(Q(start_miles='') | Q(end_miles='') | Q(start_time='') | Q(end_time=''))
     trips_canceled = all_trips.filter(status=Trip.STATUS_CANCELED)
     trips_no_show = all_trips.filter(status=Trip.STATUS_NO_SHOW)
+    trips_canceled_late = trips_canceled.filter(cancel_date__gte=F('date'))
 
     # run report to get all fares/payments
     report = Report()
@@ -74,6 +76,7 @@ def clientReportBase(request, parent, start_year, start_month, start_day, end_ye
         'trips_normal': trips_normal,
         'trips_canceled': trips_canceled,
         'trips_no_show': trips_no_show,
+        'trips_canceled_late': trips_canceled_late,
         'report': report,
     }
     return render(request, 'client/report/view.html', context=context)

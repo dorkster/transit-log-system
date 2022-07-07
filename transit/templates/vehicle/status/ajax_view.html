@@ -1,3 +1,4 @@
+<a id="maintainence" data-scrollintoview="start"></a>
 <h3>Maintainence Information</h3>
 {% if logged_vehicles %}
 <table class="mytable mytable-striped">
@@ -11,13 +12,39 @@
 {% for vehicle in logged_vehicles %}
     <tr>
         <td class="mytable-col-lg">{{vehicle.name}}</td>
-        <td class="mytable-col-lg">{{ vehicle.oil_change_miles }}</td>
-        <td class="mytable-col-lg">{{ vehicle.inspection_date|date:"n / Y" }}</td>
-        <td class="mytable-col-md">
-            <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-secondary btn-sm w-100">Update</a>
+        <td class="mytable-col-lg">
+            {% if vehicle in notify_vehicle_oil_changes %}
+            <span class="text-danger font-weight-bold">
+            {% else %}
+            <span>
+            {% endif %}
+            {{ vehicle.oil_change_miles }}
+            </span>
+        </td>
+        <td class="mytable-col-lg">
+            {% if vehicle in notify_vehicle_inspections %}
+            <span class="text-danger font-weight-bold">
+            {% else %}
+            <span>
+            {% endif %}
+            {{ vehicle.inspection_date|date:"n / Y" }}
+            </span>
         </td>
         <td class="mytable-col-md">
-            <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-warning btn-sm w-100">Pre-Trip</a>
+            <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-secondary btn-sm w-100">
+                {% if vehicle in notify_vehicle_oil_changes or vehicle in notify_vehicle_inspections %}
+                <span class="oi oi-warning"></span>
+                {% endif %}
+                Update
+            </a>
+        </td>
+        <td class="mytable-col-md">
+            <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-warning btn-sm w-100">
+                {% if vehicle in notify_vehicle_pretrips %}
+                <span class="oi oi-warning"></span>
+                {% endif %}
+                Pre-Trip
+            </a>
         </td>
     </tr>
 {% endfor %}

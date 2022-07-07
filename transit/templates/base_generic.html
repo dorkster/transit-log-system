@@ -136,9 +136,9 @@
         {% if notifications and user.is_authenticated and perms.transit.change_vehicleissue %}
             <div id="global-notifications" class="list-group list-group-flush">
                 {% if notify_vehicle_issues_high or notify_vehicle_issues_medium or notify_vehicle_issues_low or notify_vehicle_inspections or notify_vehicle_oil_changes or notify_vehicle_pretrips %}
-                <div class="row no-gutters bg-secondary text-light list-group-item d-flex p-1">
+                <div class="row no-gutters bg-secondary text-light list-group-item d-flex pl-1 pr-1 pt-1 pb-0">
                     {% if notify_vehicle_issues_high or notify_vehicle_issues_medium or notify_vehicle_issues_low %}
-                    <div class="col text-nowrap pl-1 pr-1">
+                    <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Vehicle Issues &raquo; </span>
                         {% if notify_vehicle_issues_high %}<a href="{% url 'vehicle-status' %}#issues" class="btn btn-sm btn-danger pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_issues_high|length }}</span> High</a>{% endif %}
                         {% if notify_vehicle_issues_medium %}<a href="{% url 'vehicle-status' %}#issues" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_issues_medium|length }}</span> Medium</a>{% endif %}
@@ -146,7 +146,7 @@
                     </div>
                     {% endif %}
                     {% if notify_vehicle_inspections %}
-                    <div class="col text-nowrap pl-1 pr-1">
+                    <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Inspection &raquo; </span>
                         {% if notify_vehicle_inspections|length > 3 %}
                         <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_inspections|length }}</span> Vehicles</a>
@@ -158,7 +158,7 @@
                     </div>
                     {% endif %}
                     {% if notify_vehicle_oil_changes %}
-                    <div class="col text-nowrap pl-1 pr-1">
+                    <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Oil Change &raquo; </span>
                         {% if notify_vehicle_oil_changes|length > 3 %}
                         <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_oil_changes|length }}</span> Vehicles</a>
@@ -170,7 +170,7 @@
                     </div>
                     {% endif %}
                     {% if notify_vehicle_pretrips %}
-                    <div class="col text-nowrap pl-1 pr-1">
+                    <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Pre-Trip &raquo; </span>
                         {% if notify_vehicle_pretrips|length > 3 %}
                         <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_pretrips|length }}</span> Vehicles</a>

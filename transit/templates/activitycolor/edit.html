@@ -1,0 +1,43 @@
+{% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}{% if is_new %}New Activity Color{% else %}Activity Color Edit | {{activity_color}}{% endif %} | {% endif %}
+{% endblock %}
+
+{% block auth_content %}
+<h2>
+    {% if is_new %}
+    New Activity Color
+    {% else %}
+    Activity Color Edit
+    {% endif %}
+</h2>
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
+    {% csrf_token %}
+    <div class="container ml-0">
+        <div class="row">
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
+                    <div class="mb-2"><label for="{{ form.color.id_for_label }}"><strong>{{ form.color.label }}</strong></label><br/>{{ form.color }}</div>
+                </fieldset>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex flex-wrap mt-2">
+            <div class="mr-auto mb-3">
+                <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>
+                <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel Changes</button>
+            </div>
+            {% if not is_new and perms.transit.delete_activitycolor %}
+            <div>
+                <button class="btn btn-danger btn-lg m-2" type="submit" name="delete" formnovalidate><span class="oi oi-delete mr-2"></span>Delete {{activity_color.get_class_name}}</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

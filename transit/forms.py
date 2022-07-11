@@ -17,7 +17,7 @@ import datetime
 
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip, ActivityColor
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -277,6 +277,7 @@ class EditActivityForm(forms.Form):
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    activity_color = forms.ModelChoiceField(ActivityColor.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class vehicleMaintainForm(forms.Form):
     MONTHS = {}
@@ -296,6 +297,10 @@ class EditFareForm(forms.Form):
 
 class EditTagForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+
+class EditActivityColorForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
 
 class SearchTripsForm(forms.Form):
     TRIP_STATUS_LEVELS = (

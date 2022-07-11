@@ -137,6 +137,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
                 trip.status = form.cleaned_data['status']
+                trip.activity_color = form.cleaned_data['activity_color']
 
                 if trip.pick_up_time == trip.appointment_time:
                     trip.appointment_time = ''
@@ -240,6 +241,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'description': trip.note,
                 'status': trip.status,
                 'cancel_date': cancel_date,
+                'activity_color': trip.activity_color,
             }
             form = EditActivityForm(initial=initial)
         else:

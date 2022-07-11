@@ -119,6 +119,11 @@ urlpatterns = [
     path('tags/<uuid:id>/edit', views.tagEdit, name='tag-edit'),
     path('tags/<uuid:id>/delete', views.tagDelete, name='tag-delete'),
 
+    path('activty-colors/', views.activityColorList, name='activity-colors'),
+    path('activty-colors/create', views.activityColorCreate, name='activity-color-create'),
+    path('activty-colors/<uuid:id>/edit', views.activityColorEdit, name='activity-color-edit'),
+    path('activty-colors/<uuid:id>/delete', views.activityColorDelete, name='activity-color-delete'),
+
     path('templates/', views.templateList, name='templates'),
     path('templates/create', views.templateCreate, name='template-create'),
     path('templates/<uuid:id>/edit', views.templateEdit, name='template-edit'),
@@ -183,6 +188,7 @@ urlpatterns = [
     path('ajax/triptype-list/', views.ajaxTripTypeList, name='ajax-triptype-list'),
     path('ajax/fare-list/', views.ajaxFareList, name='ajax-fare-list'),
     path('ajax/tag-list/', views.ajaxTagList, name='ajax-tag-list'),
+    path('ajax/activity-color-list/', views.ajaxActivityColorList, name='ajax-activity-color-list'),
     path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
     path('ajax/template-list/', views.ajaxTemplateList, name='ajax-template-list'),
     path('ajax/template-trip-list/<uuid:parent>/', views.ajaxTemplateTripList, name='ajax-template-trip-list'),

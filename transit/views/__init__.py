@@ -36,4 +36,5 @@ from .client_payment import *
 from .client_report import *
 from .fare import *
 from .tag import *
+from .activity_color import *
 from .loggedevent import *

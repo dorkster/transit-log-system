@@ -68,6 +68,9 @@
                             {% if perms.transit.view_tag %}
                             <a class="dropdown-item" href="{% url 'tags' %}"><span class="oi oi-tag mr-2"></span>Tags</a>
                             {% endif %}
+                            {% if perms.transit.view_activitycolor %}
+                            <a class="dropdown-item" href="{% url 'activity-colors' %}"><span class="oi oi-eyedropper mr-2"></span>Activity Colors</a>
+                            {% endif %}
                         </div>
                     </li>
                     {% if perms.transit.change_vehicle %}

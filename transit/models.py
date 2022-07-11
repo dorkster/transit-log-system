@@ -96,6 +96,7 @@ class LoggedEventModel():
     VEHICLE_MAINTAIN = 16
     VEHICLE_ISSUE = 17
     PRETRIP = 18
+    ACTIVITY_COLOR = 19
 
     def get_str(val):
         if val == LoggedEventModel.CLIENT:
@@ -134,6 +135,8 @@ class LoggedEventModel():
             return "Vehicle Issue"
         elif val == LoggedEventModel.PRETRIP:
             return "Pre-Trip"
+        elif val == LoggedEventModel.ACTIVITY_COLOR:
+            return "Activity Color"
         else: # UNKNOWN
             return "Unknown"
 
@@ -182,6 +185,7 @@ class Trip(models.Model):
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
     cancel_date = models.DateField(default=None, null=True, blank=False)
+    activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -222,6 +226,10 @@ class Trip(models.Model):
         elif self.status == Trip.STATUS_NO_SHOW:
             return site_settings.get_color(SiteSettings.COLOR_NO_SHOW)
         elif self.is_activity:
+            if self.activity_color:
+                activity_color = ActivityColor.objects.filter(id=self.activity_color.id)
+                if len(activity_color) > 0:
+                    return activity_color[0].get_color()
             return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)
@@ -888,6 +896,29 @@ class Tag(models.Model):
             return 'btn-warning'
         else:
             return 'btn-info'
+
+class ActivityColor(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
+    name = models.CharField(max_length=FieldSizes.SM)
+    color = models.CharField(default='FFFFFF', max_length=FieldSizes.COLOR, blank=True)
+
+    class Meta:
+        ordering = ['sort_index']
+
+    def __str__(self):
+        return self.name
+
+    def get_class_name(self):
+        return 'Activity Color'
+
+    def get_color(self):
+        if self and self.color != '':
+            color = self.color
+        else:
+            color = 'FFFFFF00'
+
+        return color
 
 class LoggedEvent(models.Model):
     id = models.AutoField(primary_key=True)

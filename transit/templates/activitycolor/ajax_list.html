@@ -1,0 +1,42 @@
+<h3>Activity Colors <a class="btn btn-success btn-sm" href="{% url 'activity-color-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+{% if activity_colors %}
+<table class="mytable">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Name</td>
+    </thead>
+    {% for activity_color in activity_colors %}
+    {% if activity_color.sort_index == 0 %}
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    {% endif %}
+    <tr style="background: #{{ activity_color.get_color }};">
+        <td class="mytable-col-arrows">
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ activity_color.id }}')"><span class="oi oi-resize-height"></span></button>
+        </td>
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button id="activity_color_{{ activity_color.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a href="{% url 'activity-color-edit' activity_color.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity color</a>
+                    {% if perms.transit.delete_activitycolor %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'activity-color-delete' activity_color.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete activity color</a>
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-lg">{{ activity_color.name }}</td>
+    </tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ activity_color.id }}')"><td colspan="4"></td></tr>
+    {% endfor %}
+</table>
+<script type="text/javascript">
+    var row_mover = new RowMover("RowMover", ajax_loader);
+    setEditButtonStyleFromHash('#activity_color', window.location.hash, 1);
+</script>
+{% else %}
+<p>No activity colors are defined. Actvities will use the default activity color defined on the <a href="{% url 'settings' %}">Settings</a> page.
+{% endif %}

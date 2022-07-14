@@ -241,7 +241,7 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
             {{ trip.note }}
         </td>
         {% else %}

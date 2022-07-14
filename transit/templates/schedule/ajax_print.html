@@ -177,7 +177,7 @@
         <tr style="{{ trip.get_driver_style}}" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
             {% if trip.is_activity %}
             <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
-            <td colspan=11 class="text-center">{{ trip.note }}</td>
+            <td colspan=11 class="text-left">{{ trip.note }}</td>
             {% else %}
             <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>

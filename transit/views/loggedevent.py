@@ -79,27 +79,49 @@ def ajaxLoggedEventList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
+    reset_current_page = False
+
     if request_action == 'filter_action':
+        reset_current_page = True
         request.session['eventlog_filter_action'] = request_data
     elif request_action == 'filter_target':
+        reset_current_page = True
         request.session['eventlog_filter_target'] = request_data
     elif request_action == 'filter_username':
+        reset_current_page = True
         request.session['eventlog_filter_username'] = request_data
     elif request_action == 'filter_search':
+        reset_current_page = True
         request.session['eventlog_filter_search'] = request_data
     elif request_action == 'filter_date_start_month':
+        reset_current_page = True
         request.session['eventlog_filter_date_start_month'] = int(request_data)
     elif request_action == 'filter_date_start_day':
+        reset_current_page = True
         request.session['eventlog_filter_date_start_day'] = int(request_data)
     elif request_action == 'filter_date_start_year':
+        reset_current_page = True
         request.session['eventlog_filter_date_start_year'] = int(request_data)
     elif request_action == 'filter_date_end_month':
+        reset_current_page = True
         request.session['eventlog_filter_date_end_month'] = int(request_data)
     elif request_action == 'filter_date_end_day':
+        reset_current_page = True
         request.session['eventlog_filter_date_end_day'] = int(request_data)
     elif request_action == 'filter_date_end_year':
+        reset_current_page = True
         request.session['eventlog_filter_date_end_year'] = int(request_data)
+    elif request_action == 'filter_date_single_day':
+        reset_current_page = True
+        single_day = datetime.datetime.strptime(request_data, '%Y-%m-%d')
+        request.session['eventlog_filter_date_start_year'] = single_day.year
+        request.session['eventlog_filter_date_start_month'] = single_day.month
+        request.session['eventlog_filter_date_start_day'] = single_day.day
+        request.session['eventlog_filter_date_end_year'] = single_day.year
+        request.session['eventlog_filter_date_end_month'] = single_day.month
+        request.session['eventlog_filter_date_end_day'] = single_day.day
     elif request_action == 'filter_reset':
+        reset_current_page = True
         request.session['eventlog_filter_action'] = ''
         request.session['eventlog_filter_target'] = ''
         request.session['eventlog_filter_username'] = ''
@@ -111,6 +133,7 @@ def ajaxLoggedEventList(request):
         request.session['eventlog_filter_date_end_day'] = 0
         request.session['eventlog_filter_date_end_year'] = 0
     elif request_action == 'clear_log':
+        reset_current_page = True
         for i in LoggedEvent.objects.all():
             i.delete()
         log_event(request, LoggedEventAction.DELETE, LoggedEventModel.UNKNOWN, 'Cleared Event Log')
@@ -123,6 +146,9 @@ def ajaxLoggedEventList(request):
         sort_mode = new_sort_mode
         request.session['eventlog_sort'] = new_sort_mode
         request.session['eventlog_sort_dir'] = sort_mode_dir
+
+    if reset_current_page:
+        return render(request, 'loggedevent/ajax_reset.html', context={})
 
     filter_action = request.session.get('eventlog_filter_action', '')
     filter_target = request.session.get('eventlog_filter_target', '')

@@ -195,7 +195,10 @@
     </thead>
     {% for event in logged_events %}
     <tr {% if event.ip_address and current_ip == event.ip_address %}style="font-weight:bold;"{% endif %}>
-        <td class="mytable-col-lg">{{ event.timestamp }}</td>
+        <td class="mytable-col-lg">
+            <a class="text-dark text-bold" href="#_" onclick="ajax_loader.run('', 'filter_date_single_day', '{{ event.timestamp|date:"Y-m-d" }}')">
+                {{ event.timestamp|date:"F j, Y" }}
+            </a> - {{ event.timestamp|date:"g:i A" }}</span></td>
         <td class="mytable-col-md">{{ event.username }}</td>
         <td class="mytable-col-md">{% if event.ip_address %}{{ event.ip_address }}{% endif %}</td>
         <td class="mytable-col-md">{{ event.get_action_str }}</td>

@@ -174,8 +174,8 @@
             <td>Notes</td>
         </thead>
         {% for trip in trips %}
-        <tr style="{{ trip.get_driver_style}}" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}">
-            {% if trip.is_activity %}
+        <tr style="{{ trip.get_driver_style}}" class="{% if trip.is_medical or trip.format == Trip.FORMAT_ACTIVITY %}text-bold{% endif %}">
+            {% if trip.format == Trip.FORMAT_ACTIVITY %}
             <td colspan=2 class="text-center">{{ trip.appointment_time }}</td>
             <td colspan=11 class="text-left">{{ trip.note }}</td>
             {% else %}

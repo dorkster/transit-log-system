@@ -34,7 +34,7 @@
     <li class="list-group-item p-1">Imported shift: <strong>{{ shift }}</strong></li>
     {% endfor %}
     {% for trip in trips %}
-    <li class="list-group-item p-1">Imported {% if trip.is_activity %}activity{% else %}trip{% endif %}: <strong>{{ trip }}</strong></li>
+    <li class="list-group-item p-1">Imported {% if trip.format == Trip.FORMAT_ACTIVITY %}activity{% else %}trip{% endif %}: <strong>{{ trip }}</strong></li>
     {% endfor %}
 </ul>
 {% endif %}

@@ -1,15 +1,15 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}{% if is_new %}New {% if trip.is_activity %}Activity{% else %}Trip{% endif %}{% else %}{% if trip.is_activity %}Activity{% else %}Trip{% endif %} Edit | {{trip}}{% endif %} | {% endif %}
+{% if user.is_authenticated %}{% if is_new %}New {{ trip.get_class_name }}{% else %}{{ trip.get_class_name }} Edit | {{trip}}{% endif %} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
 <h2>
     {% if is_new %}
-    New {% if trip.is_activity %}Activity{% else %}Trip{% endif %}
+    New {% if trip.format == Trip.FORMAT_ACTIVITY %}Activity{% else %}Trip{% endif %}
     {% else %}
-    {% if trip.is_activity %}Activity{% else %}Trip{% endif %} Edit
+    {% if trip.format == Trip.FORMAT_ACTIVITY %}Activity{% else %}Trip{% endif %} Edit
     {% endif %}
 </h2>
 {% if is_return_trip %}
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="row">
-            {% if trip.is_activity %}
+            {% if trip.format == Trip.FORMAT_ACTIVITY %}
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <legend>Activity Information</legend>
@@ -143,7 +143,7 @@
             {% endif %}
         </div>
         <hr/>
-        {% if is_new and not trip.is_activity and not is_return_trip %}
+        {% if is_new and trip.format == Trip.FORMAT_NORMAL and not is_return_trip %}
         {{ form.create_return_trip }}
         {{ form.add_client }}
         {{ form.add_dest1 }}
@@ -238,7 +238,7 @@
     focusFromParam();
     setupFormEvents();
 
-    {% if not trip.is_activity %}
+    {% if trip.format == Trip.FORMAT_NORMAL %}
     var ajax_set_vehicle_from_driver_url = "{% url 'ajax-set-vehicle-from-driver' %}";
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));

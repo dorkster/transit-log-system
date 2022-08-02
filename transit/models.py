@@ -155,9 +155,13 @@ class Trip(models.Model):
         (STATUS_CANCELED, 'Canceled'),
     ]
 
+    FORMAT_NORMAL = 0
+    FORMAT_ACTIVITY = 1
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     date = models.DateField()
+    format = models.IntegerField(default=FORMAT_NORMAL, editable=False)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=FieldSizes.MD)
@@ -179,7 +183,6 @@ class Trip(models.Model):
     end_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
-    is_activity = models.BooleanField(default=False, editable=False)
     collected_cash = models.IntegerField(default=0)
     collected_check = models.IntegerField(default=0)
     fare = models.IntegerField(default=0)
@@ -191,7 +194,7 @@ class Trip(models.Model):
         ordering = ['-date', 'sort_index']
 
     def __str__(self):
-        if self.is_activity:
+        if self.format == Trip.FORMAT_ACTIVITY:
             output = '[' + str(self.date) + ']'
 
             if self.pick_up_time and self.appointment_time:
@@ -225,7 +228,7 @@ class Trip(models.Model):
             return site_settings.get_color(SiteSettings.COLOR_CANCEL)
         elif self.status == Trip.STATUS_NO_SHOW:
             return site_settings.get_color(SiteSettings.COLOR_NO_SHOW)
-        elif self.is_activity:
+        elif self.format == Trip.FORMAT_ACTIVITY:
             if self.activity_color:
                 activity_color = ActivityColor.objects.filter(id=self.activity_color.id)
                 if len(activity_color) > 0:
@@ -280,7 +283,7 @@ class Trip(models.Model):
         return count
 
     def get_class_name(self):
-        if self.is_activity:
+        if self.format == Trip.FORMAT_ACTIVITY:
             return 'Activity'
         else:
             return 'Trip'
@@ -357,7 +360,7 @@ class Trip(models.Model):
             return '---------'
 
     def get_status_str(self):
-        if self.is_activity:
+        if self.format == Trip.FORMAT_ACTIVITY:
             return self.STATUS_LEVELS_ACTIVITY[self.status][1]
         else:
             return self.STATUS_LEVELS[self.status][1]
@@ -686,6 +689,7 @@ class TemplateTrip(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('Template', on_delete=models.CASCADE)
     sort_index = models.IntegerField(default=0, editable=False)
+    format = models.IntegerField(default=Trip.FORMAT_NORMAL, editable=False)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=FieldSizes.MD)
@@ -702,7 +706,6 @@ class TemplateTrip(models.Model):
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
-    is_activity = models.BooleanField(default=False, editable=False)
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
@@ -711,7 +714,7 @@ class TemplateTrip(models.Model):
         ordering = ['parent', 'sort_index']
 
     def __str__(self):
-        if self.is_activity:
+        if self.format == Trip.FORMAT_ACTIVITY:
             output = ''
             if self.pick_up_time:
                 output += str(self.pick_up_time) + ' - '
@@ -728,7 +731,7 @@ class TemplateTrip(models.Model):
         return output
 
     def get_class_name(self):
-        if self.is_activity:
+        if self.format == Trip.FORMAT_ACTIVITY:
             return 'Activity Template'
         else:
             return 'Trip Template'
@@ -760,7 +763,7 @@ class TemplateTrip(models.Model):
         site_settings = SiteSettings.load()
         if self.status > 0:
             return site_settings.get_color(SiteSettings.COLOR_CANCEL)
-        elif self.is_activity:
+        elif self.format == Trip.FORMAT_ACTIVITY:
             return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)

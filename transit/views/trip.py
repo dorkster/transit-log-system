@@ -87,7 +87,7 @@ def tripCopy(request, mode, id):
 def tripCreateActivity(request, mode, year, month, day):
     trip = Trip()
     trip.date = datetime.date(year, month, day)
-    trip.is_activity = True
+    trip.format = Trip.FORMAT_ACTIVITY
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
 def tripCreateFromClient(request, mode, id):
@@ -123,7 +123,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         return HttpResponseRedirect(reverse('trip-delete', kwargs={'mode':mode, 'id':trip.id}))
 
     if request.method == 'POST':
-        if trip.is_activity:
+        if trip.format == Trip.FORMAT_ACTIVITY:
             form = EditActivityForm(request.POST)
         else:
             form = EditTripForm(request.POST)
@@ -131,7 +131,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         if form.is_valid():
             old_date = trip.date
 
-            if trip.is_activity:
+            if trip.format == Trip.FORMAT_ACTIVITY:
                 trip.date = form.cleaned_data['date']
                 trip.pick_up_time = form.cleaned_data['start_time']
                 trip.appointment_time = form.cleaned_data['end_time']
@@ -193,13 +193,13 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
             trip.save()
 
-            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
+            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TRIP
             if is_new:
                 log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
                 log_event(request, LoggedEventAction.EDIT, log_model, str(trip))
 
-            if is_new and not is_return_trip and not trip.is_activity:
+            if is_new and not is_return_trip and trip.format == Trip.FORMAT_NORMAL:
                 if form.cleaned_data['add_client'] == True:
                     client = Client()
                     client.name = form.cleaned_data['name']
@@ -233,7 +233,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         if cancel_date == None:
             cancel_date = datetime.date.today()
 
-        if trip.is_activity:
+        if trip.format == Trip.FORMAT_ACTIVITY:
             initial = {
                 'date': trip.date,
                 'start_time': trip.pick_up_time,
@@ -302,6 +302,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         'is_return_trip': is_return_trip,
         'tags': Tag.objects.all(),
         'fares': Fare.objects.all(),
+        'Trip': Trip,
     }
 
     return render(request, 'trip/edit.html', context)
@@ -321,7 +322,7 @@ def tripDelete(request, mode, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
+        log_model = LoggedEventModel.TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TRIP
         log_event(request, LoggedEventAction.DELETE, log_model, str(trip))
 
         trip.delete()

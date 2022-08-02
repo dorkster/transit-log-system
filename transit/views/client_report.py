@@ -54,7 +54,7 @@ def clientReportBase(request, parent, start_year, start_month, start_day, end_ye
 
     client = Client.objects.get(id=parent)
 
-    all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, name=client.name, is_activity=False)
+    all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, name=client.name, format=Trip.FORMAT_NORMAL)
     trips_normal = all_trips.filter(status=Trip.STATUS_NORMAL).exclude(Q(start_miles='') | Q(end_miles='') | Q(start_time='') | Q(end_time=''))
     trips_canceled = all_trips.filter(status=Trip.STATUS_CANCELED)
     trips_no_show = all_trips.filter(status=Trip.STATUS_NO_SHOW)

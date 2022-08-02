@@ -192,8 +192,8 @@
         {% endif %}
     </thead>
     {% for trip in trips %}
-    <tr style="{{ trip.get_driver_style }}" class="{% if trip.is_medical or trip.is_activity %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
-        {% if trip.is_activity %}
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.is_medical or trip.format == Trip.FORMAT_ACTIVITY %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
+        {% if trip.format == Trip.FORMAT_ACTIVITY %}
         <td colspan=2 class="text-center">
             <a id="trip_{{ trip.id }}"></a>
             {% if trip.pick_up_time and trip.appointment_time %}

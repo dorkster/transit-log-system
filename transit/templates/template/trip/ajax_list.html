@@ -56,7 +56,7 @@
     {% if trip.sort_index == 0 %}
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}17{% else %}11{% endif %}"></td></tr>
     {% endif %}
-    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.is_activity %}text-bold{% endif %}">
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format == Trip.FORMAT_ACTIVITY %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
@@ -66,7 +66,7 @@
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
-                    {% if trip.is_activity %}
+                    {% if trip.format == Trip.FORMAT_ACTIVITY %}
                     <a href="{% url 'template-trip-edit-activity' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                     <div class="dropdown-divider"></div>
                     {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
@@ -130,7 +130,7 @@
             </div>
             {% endif %}
         </td>
-        {% if trip.is_activity %}
+        {% if trip.format == Trip.FORMAT_ACTIVITY %}
         <td colspan=2 class="text-center edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_start_time', row_movers)">
             {% if trip.pick_up_time and trip.appointment_time %}
             {{ trip.pick_up_time }} - {{ trip.appointment_time }}

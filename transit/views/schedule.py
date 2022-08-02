@@ -149,20 +149,20 @@ def ajaxSchedulePrint(request, year, month, day):
         query_trips = query_trips.filter(status=Trip.STATUS_NORMAL)
 
     if filter_hide_completed:
-        query_trips = query_trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(is_activity=True))
+        query_trips = query_trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(format=Trip.FORMAT_ACTIVITY))
 
     if filter_hide_nolog:
-        query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
+        query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(format=Trip.FORMAT_ACTIVITY))
 
     if filter_search != '':
         query_trips = query_trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
     if filter_driver != '':
-        query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
+        query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(format=Trip.FORMAT_ACTIVITY))
         query_shifts = query_shifts.filter(driver__id=filter_driver)
 
     if filter_vehicle != '':
-        query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | Q(is_activity=True))
+        query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | Q(format=Trip.FORMAT_ACTIVITY))
         query_shifts = query_shifts.filter(vehicle__id=filter_vehicle)
 
     filtered_count = len(query_trips)
@@ -187,6 +187,7 @@ def ajaxSchedulePrint(request, year, month, day):
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'show_dialog': show_dialog,
+        'Trip': Trip,
     }
     return render(request, 'schedule/ajax_print.html', context=context)
 
@@ -343,7 +344,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.status = Trip.STATUS_NO_SHOW
                 trip.cancel_date = None
             trip.save()
-            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TRIP
+            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TRIP
             log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
@@ -359,6 +360,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.date = date
                 trip.sort_index = sort_index
                 sort_index += 1
+                trip.format = temp_trip.format
                 trip.driver = temp_trip.driver
                 trip.vehicle = temp_trip.vehicle
                 trip.name = temp_trip.name
@@ -375,7 +377,6 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.elderly = temp_trip.elderly
                 trip.ambulatory = temp_trip.ambulatory
                 trip.note = temp_trip.note
-                trip.is_activity = temp_trip.is_activity
                 trip.status = temp_trip.status
                 trip.fare = temp_trip.fare
                 trip.passenger = temp_trip.passenger
@@ -433,19 +434,19 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             trips = trips.filter(status=Trip.STATUS_NORMAL)
 
         if filter_hide_completed:
-            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(is_activity=True))
+            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(format=Trip.FORMAT_ACTIVITY))
 
         if filter_hide_nolog:
-            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(is_activity=True))
+            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(format=Trip.FORMAT_ACTIVITY))
 
         if filter_search != '':
             trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
         if filter_driver != '':
-            trips = trips.filter(Q(driver__id=filter_driver) | Q(is_activity=True))
+            trips = trips.filter(Q(driver__id=filter_driver) | Q(format=Trip.FORMAT_ACTIVITY))
 
         if filter_vehicle != '':
-            trips = trips.filter(Q(vehicle__id=filter_vehicle) | Q(is_activity=True))
+            trips = trips.filter(Q(vehicle__id=filter_vehicle) | Q(format=Trip.FORMAT_ACTIVITY))
 
     filtered_count = len(trips)
 
@@ -477,6 +478,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'templates': Template.objects.all(),
         'message': message,
         'show_extra_columns': request.session.get('schedule_edit_extra_columns', False),
+        'Trip': Trip,
     }
     return render(request, template, context=context)
 

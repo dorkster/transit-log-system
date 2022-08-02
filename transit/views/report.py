@@ -388,7 +388,7 @@ class Report():
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
         all_shifts_list = list(all_shifts)
 
-        all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, is_activity=False)
+        all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, format=Trip.FORMAT_NORMAL)
         if filter_by_money:
             all_trips = all_trips.exclude(fare=0, collected_cash=0, collected_check=0)
         if client_name != None:

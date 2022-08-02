@@ -43,7 +43,7 @@ def excelImport(request):
             return render(request, 'excel_import.html', {'form': form, 'import_done': True, 'trips':trips, 'shifts':shifts, 'errors':errors})
     else:
         form = UploadFileForm()
-    return render(request, 'excel_import.html', {'form': form, 'import_done': False, })
+    return render(request, 'excel_import.html', {'form': form, 'import_done': False, 'Trip': Trip, })
 
 def excelParseFile(file_obj, shifts, trips, errors, options):
     def parseString(cell_value):
@@ -273,7 +273,7 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
             sort_index += 1
 
             if trip.name and not trip.address and not trip.destination and not trip.driver and not trip.vehicle and trip.check_blank(''):
-                trip.is_activity = True
+                trip.format = Trip.FORMAT_ACTIVITY
                 trip.note = trip.name
                 trip.name = ''
 

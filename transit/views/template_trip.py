@@ -49,7 +49,7 @@ def templateTripCreate(request, parent):
 def templateTripCreateActivity(request, parent):
     trip = TemplateTrip()
     trip.parent = Template.objects.get(id=parent)
-    trip.is_activity = True
+    trip.format = Trip.FORMAT_ACTIVITY
     return templateTripCreateEditCommon(request, trip, is_new=True)
 
 def templateTripCreateReturn(request, parent, id):
@@ -96,7 +96,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             trip.sort_index = 0
 
     if request.method == 'POST':
-        if trip.is_activity:
+        if trip.format == Trip.FORMAT_ACTIVITY:
             form = EditTemplateActivityForm(request.POST)
         else:
             form = EditTemplateTripForm(request.POST)
@@ -112,7 +112,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             trip.parent = form.cleaned_data['parent']
             trip.status = form.cleaned_data['status']
 
-            if trip.is_activity:
+            if trip.format == Trip.FORMAT_ACTIVITY:
                 trip.pick_up_time = form.cleaned_data['start_time']
                 trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
@@ -156,13 +156,13 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
             trip.save()
 
-            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
+            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TEMPLATE_TRIP
             if is_new:
                 log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
                 log_event(request, LoggedEventAction.EDIT, log_model, str(trip))
 
-            if is_new and not is_return_trip and not trip.is_activity:
+            if is_new and not is_return_trip and trip.format == Trip.FORMAT_NORMAL:
                 if form.cleaned_data['add_client'] == True:
                     client = Client()
                     client.name = form.cleaned_data['name']
@@ -189,7 +189,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
             return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + '#trip_' + str(trip.id))
     else:
-        if trip.is_activity:
+        if trip.format == Trip.FORMAT_ACTIVITY:
             initial = {
                 'parent': trip.parent,
                 'start_time': trip.pick_up_time,
@@ -249,6 +249,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
         'is_return_trip': is_return_trip,
         'tags': Tag.objects.all(),
         'fares': Fare.objects.all(),
+        'Trip': Trip,
     }
 
     return render(request, 'template/trip/edit.html', context)
@@ -267,7 +268,7 @@ def templateTripDelete(request, parent, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
+        log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TEMPLATE_TRIP
         log_event(request, LoggedEventAction.DELETE, log_model, str(trip))
 
         trip.delete()
@@ -326,7 +327,7 @@ def ajaxTemplateTripList(request, parent):
             elif request_data == '1':
                 trip.status = Trip.STATUS_CANCELED
             trip.save()
-            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.is_activity else LoggedEventModel.TEMPLATE_TRIP
+            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TEMPLATE_TRIP
             log_event(request, LoggedEventAction.STATUS, log_model, str(trip))
 
     if request_action == 'toggle_extra_columns':
@@ -339,6 +340,7 @@ def ajaxTemplateTripList(request, parent):
         'trips': trips,
         'template': Template.objects.get(id=parent),
         'show_extra_columns': request.session.get('template_extra_columns', False),
+        'Trip': Trip,
     }
     return render(request, 'template/trip/ajax_list.html', context=context)
 

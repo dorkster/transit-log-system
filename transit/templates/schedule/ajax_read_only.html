@@ -192,8 +192,8 @@
         {% endif %}
     </thead>
     {% for trip in trips %}
-    <tr style="{{ trip.get_driver_style }}" class="{% if trip.is_medical or trip.format == Trip.FORMAT_ACTIVITY %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
-        {% if trip.format == Trip.FORMAT_ACTIVITY %}
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.is_medical or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
+        {% if trip.format != Trip.FORMAT_NORMAL %}
         <td colspan=2 class="text-center">
             <a id="trip_{{ trip.id }}"></a>
             {% if trip.pick_up_time and trip.appointment_time %}
@@ -205,7 +205,17 @@
             {% endif %}
         </td>
         <td colspan="{% if show_extra_columns %}17{% else %}11{% endif %}" class="text-left">
+            {% if trip.format == Trip.FORMAT_ACTIVITY %}
             {{ trip.note }}
+            {% elif trip.format == Trip.FORMAT_DRIVER_STATUS %}
+            {% if trip.passenger %}
+            <span style="font-size: 120%;"><span class="badge badge-light text-success mr-1">Driver Available</span></span>
+            {% else %}
+            <span style="font-size: 120%;"><span class="badge badge-light text-danger mr-1">Driver Not Available</span></span>
+            {% endif %}
+            {{ trip.driver }}
+            {% if trip.note %} &mdash; {{ trip.note }}{% endif %}
+            {% endif %}
         </td>
         {% else %}
         <td class="mytable-col-sm">

@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.core import serializers
 
 from transit.models import Trip, Driver, Vehicle, Client, Shift, Tag, SiteSettings, Destination, Fare
-from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
+from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm, EditDriverStatusForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -90,6 +90,12 @@ def tripCreateActivity(request, mode, year, month, day):
     trip.format = Trip.FORMAT_ACTIVITY
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
+def tripCreateDriverStatus(request, mode, year, month, day):
+    trip = Trip()
+    trip.date = datetime.date(year, month, day)
+    trip.format = Trip.FORMAT_DRIVER_STATUS
+    return tripCreateEditCommon(request, mode, trip, is_new=True)
+
 def tripCreateFromClient(request, mode, id):
     client = get_object_or_404(Client, id=id)
     trip = Trip()
@@ -125,6 +131,8 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
     if request.method == 'POST':
         if trip.format == Trip.FORMAT_ACTIVITY:
             form = EditActivityForm(request.POST)
+        elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+            form = EditDriverStatusForm(request.POST)
         else:
             form = EditTripForm(request.POST)
 
@@ -138,6 +146,16 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.note = form.cleaned_data['description']
                 trip.status = form.cleaned_data['status']
                 trip.activity_color = form.cleaned_data['activity_color']
+
+                if trip.pick_up_time == trip.appointment_time:
+                    trip.appointment_time = ''
+            elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+                trip.date = form.cleaned_data['date']
+                trip.driver = form.cleaned_data['driver']
+                trip.pick_up_time = form.cleaned_data['start_time']
+                trip.appointment_time = form.cleaned_data['end_time']
+                trip.note = form.cleaned_data['notes']
+                trip.passenger = form.cleaned_data['is_available']
 
                 if trip.pick_up_time == trip.appointment_time:
                     trip.appointment_time = ''
@@ -193,7 +211,13 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
             trip.save()
 
-            log_model = LoggedEventModel.TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TRIP
+            if trip.format == Trip.FORMAT_ACTIVITY:
+                log_model = LoggedEventModel.TRIP_ACTIVITY
+            elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+                log_model = LoggedEventModel.DRIVER_STATUS
+            else:
+                log_model = LoggedEventModel.TRIP
+
             if is_new:
                 log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
@@ -244,6 +268,16 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'activity_color': trip.activity_color,
             }
             form = EditActivityForm(initial=initial)
+        elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+            initial = {
+                'date': trip.date,
+                'driver': trip.driver,
+                'start_time': trip.pick_up_time,
+                'end_time': trip.appointment_time,
+                'notes': trip.note,
+                'is_available': False if is_new else trip.passenger
+            }
+            form = EditDriverStatusForm(initial=initial)
         else:
             initial = {
                 'date': trip.date,

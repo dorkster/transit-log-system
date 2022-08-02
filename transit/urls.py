@@ -70,6 +70,10 @@ urlpatterns = [
     path('schedule/<slug:mode>/activities/<uuid:id>/edit/', views.tripEdit, name='trip-edit-activity'),
     path('schedule/<slug:mode>/activities/<uuid:id>/delete/', views.tripDelete, name='trip-delete-activity'),
 
+    path('schedule/<slug:mode>/driver-statuses/create/<int:year>/<int:month>/<int:day>', views.tripCreateDriverStatus, name='trip-create-driver-status'),
+    path('schedule/<slug:mode>/driver-statuses/<uuid:id>/edit/', views.tripEdit, name='trip-edit-driver-status'),
+    path('schedule/<slug:mode>/driver-statuses/<uuid:id>/delete/', views.tripDelete, name='trip-delete-driver-status'),
+
     path('clients/', views.clientList, name='clients'),
     path('clients/create', views.clientCreate, name='client-create'),
     path('clients/<uuid:id>/edit', views.clientEdit, name='client-edit'),
@@ -139,6 +143,10 @@ urlpatterns = [
     path('templates/<uuid:parent>/activities/create', views.templateTripCreateActivity, name='template-trip-create-activity'),
     path('templates/<uuid:parent>/activities/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit-activity'),
     path('templates/<uuid:parent>/activities/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete-activity'),
+
+    path('templates/<uuid:parent>/driver-statuses/create', views.templateTripCreateDriverStatus, name='template-trip-create-driver-status'),
+    path('templates/<uuid:parent>/driver-statuses/<uuid:id>/edit', views.templateTripEdit, name='template-trip-edit-driver-status'),
+    path('templates/<uuid:parent>/driver-statuses/<uuid:id>/delete', views.templateTripDelete, name='template-trip-delete-driver-status'),
 
     path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.report, name='report'),
     path('report/<int:year>/<int:month>', views.reportMonth, name='report-month'),

@@ -6,11 +6,7 @@
 {% block auth_content %}
 {% load static %}
 <h2>
-    {% if is_new %}
-    New {% if trip.format == Trip.FORMAT_ACTIVITY %}Activity{% else %}Trip{% endif %}
-    {% else %}
-    {% if trip.format == Trip.FORMAT_ACTIVITY %}Activity{% else %}Trip{% endif %} Edit
-    {% endif %}
+    {% if is_new %}New {{ trip.get_class_name }}{% else %}{{ trip.get_class_name }} Edit{% endif %}
 </h2>
 {% if is_return_trip %}
 <div class="alert alert-primary" role="alert">Return trip created. Use <a class="alert-link" href="#_" onclick="document.getElementById('trip_form').submit();return false;">Save Changes</a> to confirm.</div>
@@ -42,6 +38,7 @@
                     <div>{{ form.date }}</div>
                 </fieldset>
             </div>
+            {% if trip.format != Trip.FORMAT_DRIVER_STATUS %}
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <legend>{{ form.status.label }}</legend>
@@ -52,6 +49,7 @@
                     </div>
                 </fieldset>
             </div>
+            {% endif %}
         </div>
         <div class="row">
             {% if trip.format == Trip.FORMAT_ACTIVITY %}
@@ -62,6 +60,17 @@
                     <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label><br/>{{ form.end_time }}</div>
                     <div class="mb-2"><label for="{{ form.description.id_for_label }}"><strong>{{ form.description.label }}</strong></label><br/>{{ form.description }}</div>
                     <div class="mb-2"><label for="{{ form.activity_color.id_for_label }}"><strong>{{ form.activity_color.label }}</strong></label><br/>{{ form.activity_color }}</div>
+                </fieldset>
+            </div>
+            {% elif trip.format == Trip.FORMAT_DRIVER_STATUS %}
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>Driver Status Information</legend>
+                    <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
+                    <div class="mb-2"><label for="{{ form.is_available.id_for_label }}"><strong>{{ form.is_available.label }}</strong></label><br/>{{ form.is_available }}</div>
+                    <div class="mb-2"><label for="{{ form.start_time.id_for_label }}"><strong>{{ form.start_time.label }}</strong></label><br/>{{ form.start_time }}</div>
+                    <div class="mb-2"><label for="{{ form.end_time.id_for_label }}"><strong>{{ form.end_time.label }}</strong></label><br/>{{ form.end_time }}</div>
+                    <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }}</strong></label><br/>{{ form.notes }}</div>
                 </fieldset>
             </div>
             {% else %}

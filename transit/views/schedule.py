@@ -149,20 +149,20 @@ def ajaxSchedulePrint(request, year, month, day):
         query_trips = query_trips.filter(status=Trip.STATUS_NORMAL)
 
     if filter_hide_completed:
-        query_trips = query_trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(format=Trip.FORMAT_ACTIVITY))
+        query_trips = query_trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | ~Q(format=Trip.FORMAT_NORMAL))
 
     if filter_hide_nolog:
-        query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(format=Trip.FORMAT_ACTIVITY))
+        query_trips = query_trips.filter(Q(driver=None) | Q(driver__is_logged=True) | ~Q(format=Trip.FORMAT_NORMAL))
 
     if filter_search != '':
         query_trips = query_trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
     if filter_driver != '':
-        query_trips = query_trips.filter(Q(driver__id=filter_driver) | Q(format=Trip.FORMAT_ACTIVITY))
+        query_trips = query_trips.filter(Q(driver__id=filter_driver) | ~Q(format=Trip.FORMAT_NORMAL))
         query_shifts = query_shifts.filter(driver__id=filter_driver)
 
     if filter_vehicle != '':
-        query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | Q(format=Trip.FORMAT_ACTIVITY))
+        query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | ~Q(format=Trip.FORMAT_NORMAL))
         query_shifts = query_shifts.filter(vehicle__id=filter_vehicle)
 
     filtered_count = len(query_trips)
@@ -434,19 +434,19 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             trips = trips.filter(status=Trip.STATUS_NORMAL)
 
         if filter_hide_completed:
-            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | Q(format=Trip.FORMAT_ACTIVITY))
+            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | ~Q(format=Trip.FORMAT_NORMAL))
 
         if filter_hide_nolog:
-            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | Q(format=Trip.FORMAT_ACTIVITY))
+            trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | ~Q(format=Trip.FORMAT_NORMAL))
 
         if filter_search != '':
             trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search))
 
         if filter_driver != '':
-            trips = trips.filter(Q(driver__id=filter_driver) | Q(format=Trip.FORMAT_ACTIVITY))
+            trips = trips.filter(Q(driver__id=filter_driver) | ~Q(format=Trip.FORMAT_NORMAL))
 
         if filter_vehicle != '':
-            trips = trips.filter(Q(vehicle__id=filter_vehicle) | Q(format=Trip.FORMAT_ACTIVITY))
+            trips = trips.filter(Q(vehicle__id=filter_vehicle) | ~Q(format=Trip.FORMAT_NORMAL))
 
     filtered_count = len(trips)
 

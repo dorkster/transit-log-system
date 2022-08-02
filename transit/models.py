@@ -97,6 +97,8 @@ class LoggedEventModel():
     VEHICLE_ISSUE = 17
     PRETRIP = 18
     ACTIVITY_COLOR = 19
+    DRIVER_STATUS = 20
+    TEMPLATE_DRIVER_STATUS = 21
 
     def get_str(val):
         if val == LoggedEventModel.CLIENT:
@@ -137,6 +139,10 @@ class LoggedEventModel():
             return "Pre-Trip"
         elif val == LoggedEventModel.ACTIVITY_COLOR:
             return "Activity Color"
+        elif val == LoggedEventModel.DRIVER_STATUS:
+            return "Driver Status"
+        elif val == LoggedEventModel.TEMPLATE_DRIVER_STATUS:
+            return "Template Driver Status"
         else: # UNKNOWN
             return "Unknown"
 
@@ -157,6 +163,11 @@ class Trip(models.Model):
 
     FORMAT_NORMAL = 0
     FORMAT_ACTIVITY = 1
+    FORMAT_DRIVER_STATUS = 2
+
+    # NOTE Trips that are of the format FORMAT_DRIVER_STATUS use the 'passenger' field to store the driver availability flag
+    # This field isn't used otherwise in this context, and I felt it was unneccessary to create a new field for this purpose
+    # The same behavior applies to the TemplateTrip class
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -194,7 +205,7 @@ class Trip(models.Model):
         ordering = ['-date', 'sort_index']
 
     def __str__(self):
-        if self.format == Trip.FORMAT_ACTIVITY:
+        if self.format == Trip.FORMAT_ACTIVITY or self.format == Trip.FORMAT_DRIVER_STATUS:
             output = '[' + str(self.date) + ']'
 
             if self.pick_up_time and self.appointment_time:
@@ -204,7 +215,16 @@ class Trip(models.Model):
             elif self.appointment_time:
                 output += ' - ' + str(self.appointment_time)
 
-            output += ' - ' + self.note
+            if self.format == Trip.FORMAT_ACTIVITY:
+                output += ' - ' + self.note
+            elif self.format == Trip.FORMAT_DRIVER_STATUS:
+                output += ' - ' + str(self.driver)
+                if self.passenger:
+                    output += ' (Available)'
+                else:
+                    output += ' (Not Available)'
+                if self.note:
+                    output += ' -- ' + self.note
             return output
 
         output = '[' + str(self.date) + '] - ' + self.name
@@ -285,6 +305,8 @@ class Trip(models.Model):
     def get_class_name(self):
         if self.format == Trip.FORMAT_ACTIVITY:
             return 'Activity'
+        elif self.format == Trip.FORMAT_DRIVER_STATUS:
+            return 'Driver Status'
         else:
             return 'Trip'
 
@@ -362,8 +384,11 @@ class Trip(models.Model):
     def get_status_str(self):
         if self.format == Trip.FORMAT_ACTIVITY:
             return self.STATUS_LEVELS_ACTIVITY[self.status][1]
-        else:
+        elif self.format == Trip.FORMAT_NORMAL:
             return self.STATUS_LEVELS[self.status][1]
+        else:
+            # TODO should this be something?
+            return ''
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -714,16 +739,29 @@ class TemplateTrip(models.Model):
         ordering = ['parent', 'sort_index']
 
     def __str__(self):
-        if self.format == Trip.FORMAT_ACTIVITY:
-            output = ''
-            if self.pick_up_time:
-                output += str(self.pick_up_time) + ' - '
-            if self.appointment_time: 
-                output += str(self.appointment_time) + ' - '
-            output += self.note
+        if self.format == Trip.FORMAT_ACTIVITY or self.format == Trip.FORMAT_DRIVER_STATUS:
+            output = '[' + str(self.parent.name) + ']'
+
+            if self.pick_up_time and self.appointment_time:
+                output += ' - ' + str(self.pick_up_time) + ' to ' + str(self.appointment_time)
+            elif self.pick_up_time:
+                output += ' - ' + str(self.pick_up_time)
+            elif self.appointment_time:
+                output += ' - ' + str(self.appointment_time)
+
+            if self.format == Trip.FORMAT_ACTIVITY:
+                output += ' - ' + self.note
+            elif self.format == Trip.FORMAT_DRIVER_STATUS:
+                output += ' - ' + str(self.driver)
+                if self.passenger:
+                    output += ' (Available)'
+                else:
+                    output += ' (Not Available)'
+                if self.note:
+                    output += ' -- ' + self.note
             return output
 
-        output = '[' + self.parent.name + '] - ' + self.name
+        output = '[' + str(self.parent.name) + '] - ' + self.name
         if self.address is not None and self.address != '':
             output += ' from ' + self.address
             if self.destination is not None and self.destination != '':
@@ -732,9 +770,11 @@ class TemplateTrip(models.Model):
 
     def get_class_name(self):
         if self.format == Trip.FORMAT_ACTIVITY:
-            return 'Activity Template'
+            return 'Activity'
+        elif self.format == Trip.FORMAT_DRIVER_STATUS:
+            return 'Driver Status'
         else:
-            return 'Trip Template'
+            return 'Trip'
 
     def get_tag_list(self):
         tags = self.tags.split(',')

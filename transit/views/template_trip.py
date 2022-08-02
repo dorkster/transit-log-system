@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.core import serializers
 
 from transit.models import Template, TemplateTrip, Client, Tag, Trip, SiteSettings, Destination, Fare
-from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
+from transit.forms import EditTemplateTripForm, EditTemplateActivityForm, EditTemplateDriverStatusForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -50,6 +50,12 @@ def templateTripCreateActivity(request, parent):
     trip = TemplateTrip()
     trip.parent = Template.objects.get(id=parent)
     trip.format = Trip.FORMAT_ACTIVITY
+    return templateTripCreateEditCommon(request, trip, is_new=True)
+
+def templateTripCreateDriverStatus(request, parent):
+    trip = TemplateTrip()
+    trip.parent = Template.objects.get(id=parent)
+    trip.format = Trip.FORMAT_DRIVER_STATUS
     return templateTripCreateEditCommon(request, trip, is_new=True)
 
 def templateTripCreateReturn(request, parent, id):
@@ -98,6 +104,8 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
     if request.method == 'POST':
         if trip.format == Trip.FORMAT_ACTIVITY:
             form = EditTemplateActivityForm(request.POST)
+        elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+            form = EditTemplateDriverStatusForm(request.POST)
         else:
             form = EditTemplateTripForm(request.POST)
 
@@ -110,16 +118,26 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
         if form.is_valid():
             old_parent = trip.parent
             trip.parent = form.cleaned_data['parent']
-            trip.status = form.cleaned_data['status']
 
             if trip.format == Trip.FORMAT_ACTIVITY:
+                trip.status = form.cleaned_data['status']
                 trip.pick_up_time = form.cleaned_data['start_time']
                 trip.appointment_time = form.cleaned_data['end_time']
                 trip.note = form.cleaned_data['description']
 
                 if trip.pick_up_time == trip.appointment_time:
                     trip.appointment_time = ''
+            elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+                trip.driver = form.cleaned_data['driver']
+                trip.pick_up_time = form.cleaned_data['start_time']
+                trip.appointment_time = form.cleaned_data['end_time']
+                trip.note = form.cleaned_data['notes']
+                trip.passenger = form.cleaned_data['is_available']
+
+                if trip.pick_up_time == trip.appointment_time:
+                    trip.appointment_time = ''
             else:
+                trip.status = form.cleaned_data['status']
                 trip.driver = form.cleaned_data['driver']
                 trip.vehicle = form.cleaned_data['vehicle']
                 trip.name = form.cleaned_data['name']
@@ -156,7 +174,13 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
             trip.save()
 
-            log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TEMPLATE_TRIP
+            if trip.format == Trip.FORMAT_ACTIVITY:
+                log_model = LoggedEventModel.TEMPLATE_TRIP_ACTIVITY
+            elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+                log_model = LoggedEventModel.TEMPLATE_DRIVER_STATUS
+            else:
+                log_model = LoggedEventModel.TEMPLATE_TRIP
+
             if is_new:
                 log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
@@ -198,6 +222,16 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 'status': trip.status,
             }
             form = EditTemplateActivityForm(initial=initial)
+        elif trip.format == Trip.FORMAT_DRIVER_STATUS:
+            initial = {
+                'parent': trip.parent,
+                'driver': trip.driver,
+                'start_time': trip.pick_up_time,
+                'end_time': trip.appointment_time,
+                'notes': trip.note,
+                'is_available': False if is_new else trip.passenger,
+            }
+            form = EditTemplateDriverStatusForm(initial=initial)
         else:
             initial = {
                 'parent': trip.parent,

@@ -10,7 +10,6 @@
                 <div class="dropdown-menu shadow dropdown-menu-right">
                     <a class="dropdown-item" href="{% url 'template-trip-create' parent %}"><span class="oi oi-document mr-2"></span>New Trip</a>
                     <a class="dropdown-item" href="{% url 'template-trip-create-activity' parent %}"><span class="oi oi-star mr-2"></span>New Activity</a>
-                    <a class="dropdown-item" href="{% url 'template-trip-create-driver-status' parent %}"><span class="oi oi-person mr-2"></span>New Driver Status</a>
                 </div>
             </span>
         </h3>
@@ -74,10 +73,6 @@
                     {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'template-trip-delete-activity' trip.parent.id trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete activity</a>
-                    {% elif trip.format == Trip.FORMAT_DRIVER_STATUS %}
-                    <a href="{% url 'template-trip-edit-driver-status' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit driver status</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'template-trip-delete-driver-status' trip.parent.id trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete driver status</a>
                     {% else %}
                     <a href="{% url 'template-trip-edit' trip.parent.id trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                     <div class="dropdown-divider"></div>
@@ -145,27 +140,15 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}13{% else %}7{% endif %}" class="text-center edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}13{% else %}7{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
+            {% if trip.driver %}
+                {% if trip.passenger %}
+                <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
+                {% else %}
+                <span class="badge badge-light text-danger mr-1"><span class="oi oi-person"></span></span>
+                {% endif %}
+            {% endif %}
             {{ trip.note }}
-        </td>
-        {% elif trip.format == Trip.FORMAT_DRIVER_STATUS %}
-        <td colspan=2 class="text-center edit_cell" onclick="editCell('{% url 'template-trip-edit-driver-status' trip.parent.id trip.id %}?focus=id_start_time', row_movers)">
-            {% if trip.pick_up_time and trip.appointment_time %}
-            {{ trip.pick_up_time }} - {{ trip.appointment_time }}
-            {% elif trip.pick_up_time %}
-            {{ trip.pick_up_time }}
-            {% elif trip.appointment_time %}
-            {{ trip.appointment_time }}
-            {% endif %}
-        </td>
-        <td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'template-trip-edit-driver-status' trip.parent.id trip.id %}?focus=id_driver', row_movers)">
-            {% if trip.passenger %}
-            <span style="font-size: 120%;"><span class="badge badge-light text-success mr-1">Driver Available</span></span>
-            {% else %}
-            <span style="font-size: 120%;"><span class="badge badge-light text-danger mr-1">Driver Not Available</span></span>
-            {% endif %}
-            {{ trip.driver }}
-            {% if trip.note %} &mdash; {{ trip.note }}{% endif %}
         </td>
         {% else %}
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_pick_up_time', row_movers)">

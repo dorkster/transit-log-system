@@ -380,6 +380,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.status = temp_trip.status
                 trip.fare = temp_trip.fare
                 trip.passenger = temp_trip.passenger
+                trip.activity_color = temp_trip.activity_color
 
                 if trip.status == Trip.STATUS_CANCELED:
                     trip.cancel_date = datetime.date.today()

@@ -97,8 +97,6 @@ class LoggedEventModel():
     VEHICLE_ISSUE = 17
     PRETRIP = 18
     ACTIVITY_COLOR = 19
-    DRIVER_STATUS = 20
-    TEMPLATE_DRIVER_STATUS = 21
 
     def get_str(val):
         if val == LoggedEventModel.CLIENT:
@@ -139,10 +137,6 @@ class LoggedEventModel():
             return "Pre-Trip"
         elif val == LoggedEventModel.ACTIVITY_COLOR:
             return "Activity Color"
-        elif val == LoggedEventModel.DRIVER_STATUS:
-            return "Driver Status"
-        elif val == LoggedEventModel.TEMPLATE_DRIVER_STATUS:
-            return "Template Driver Status"
         else: # UNKNOWN
             return "Unknown"
 
@@ -163,9 +157,8 @@ class Trip(models.Model):
 
     FORMAT_NORMAL = 0
     FORMAT_ACTIVITY = 1
-    FORMAT_DRIVER_STATUS = 2
 
-    # NOTE Trips that are of the format FORMAT_DRIVER_STATUS use the 'passenger' field to store the driver availability flag
+    # NOTE Trips that are of the format FORMAT_ACTIVITY and have a driver use the 'passenger' field to store the driver availability flag
     # This field isn't used otherwise in this context, and I felt it was unneccessary to create a new field for this purpose
     # The same behavior applies to the TemplateTrip class
 
@@ -205,7 +198,7 @@ class Trip(models.Model):
         ordering = ['-date', 'sort_index']
 
     def __str__(self):
-        if self.format == Trip.FORMAT_ACTIVITY or self.format == Trip.FORMAT_DRIVER_STATUS:
+        if self.format == Trip.FORMAT_ACTIVITY:
             output = '[' + str(self.date) + ']'
 
             if self.pick_up_time and self.appointment_time:
@@ -215,9 +208,9 @@ class Trip(models.Model):
             elif self.appointment_time:
                 output += ' - ' + str(self.appointment_time)
 
-            if self.format == Trip.FORMAT_ACTIVITY:
+            if not self.driver:
                 output += ' - ' + self.note
-            elif self.format == Trip.FORMAT_DRIVER_STATUS:
+            else:
                 output += ' - ' + str(self.driver)
                 if self.passenger:
                     output += ' (Available)'
@@ -248,7 +241,7 @@ class Trip(models.Model):
             return site_settings.get_color(SiteSettings.COLOR_CANCEL)
         elif self.status == Trip.STATUS_NO_SHOW:
             return site_settings.get_color(SiteSettings.COLOR_NO_SHOW)
-        elif self.format == Trip.FORMAT_ACTIVITY:
+        elif self.format == Trip.FORMAT_ACTIVITY and not self.driver:
             if self.activity_color:
                 activity_color = ActivityColor.objects.filter(id=self.activity_color.id)
                 if len(activity_color) > 0:
@@ -305,8 +298,6 @@ class Trip(models.Model):
     def get_class_name(self):
         if self.format == Trip.FORMAT_ACTIVITY:
             return 'Activity'
-        elif self.format == Trip.FORMAT_DRIVER_STATUS:
-            return 'Driver Status'
         else:
             return 'Trip'
 
@@ -734,12 +725,13 @@ class TemplateTrip(models.Model):
     status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
+    activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['parent', 'sort_index']
 
     def __str__(self):
-        if self.format == Trip.FORMAT_ACTIVITY or self.format == Trip.FORMAT_DRIVER_STATUS:
+        if self.format == Trip.FORMAT_ACTIVITY:
             output = '[' + str(self.parent.name) + ']'
 
             if self.pick_up_time and self.appointment_time:
@@ -749,9 +741,9 @@ class TemplateTrip(models.Model):
             elif self.appointment_time:
                 output += ' - ' + str(self.appointment_time)
 
-            if self.format == Trip.FORMAT_ACTIVITY:
+            if not self.driver:
                 output += ' - ' + self.note
-            elif self.format == Trip.FORMAT_DRIVER_STATUS:
+            else:
                 output += ' - ' + str(self.driver)
                 if self.passenger:
                     output += ' (Available)'
@@ -771,8 +763,6 @@ class TemplateTrip(models.Model):
     def get_class_name(self):
         if self.format == Trip.FORMAT_ACTIVITY:
             return 'Activity'
-        elif self.format == Trip.FORMAT_DRIVER_STATUS:
-            return 'Driver Status'
         else:
             return 'Trip'
 
@@ -801,9 +791,13 @@ class TemplateTrip(models.Model):
 
     def get_driver_color(self):
         site_settings = SiteSettings.load()
-        if self.status > 0:
+        if self.status == Trip.STATUS_CANCELED:
             return site_settings.get_color(SiteSettings.COLOR_CANCEL)
-        elif self.format == Trip.FORMAT_ACTIVITY:
+        elif self.format == Trip.FORMAT_ACTIVITY and not self.driver:
+            if self.activity_color:
+                activity_color = ActivityColor.objects.filter(id=self.activity_color.id)
+                if len(activity_color) > 0:
+                    return activity_color[0].get_color()
             return site_settings.get_color(SiteSettings.COLOR_ACTIVITY)
         else:
             return Driver.get_color(self.driver)

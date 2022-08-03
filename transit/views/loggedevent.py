@@ -229,7 +229,7 @@ def ajaxLoggedEventList(request):
         actions.append( { 'id': i, 'name': LoggedEventAction.get_str(i) })
 
     targets = []
-    for i in range(LoggedEventModel.CLIENT, LoggedEventModel.TEMPLATE_DRIVER_STATUS + 1):
+    for i in range(LoggedEventModel.CLIENT, LoggedEventModel.ACTIVITY_COLOR + 1):
         targets.append( { 'id': i, 'name': LoggedEventModel.get_str(i) })
 
     context = {

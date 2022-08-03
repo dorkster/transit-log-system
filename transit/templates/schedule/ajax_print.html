@@ -187,15 +187,14 @@
             </td>
             <td colspan="11" class="text-left">
                 {% if trip.format == Trip.FORMAT_ACTIVITY %}
-                {{ trip.note }}
-                {% elif trip.format == Trip.FORMAT_DRIVER_STATUS %}
-                {% if trip.passenger %}
-                <span style="font-size: 120%;"><span class="badge badge-light text-success mr-1">Driver Available</span></span>
-                {% else %}
-                <span style="font-size: 120%;"><span class="badge badge-light text-danger mr-1">Driver Not Available</span></span>
+                {% if trip.driver %}
+                    {% if trip.passenger %}
+                    <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
+                    {% else %}
+                    <span class="badge badge-light text-danger mr-1"><span class="oi oi-person"></span></span>
+                    {% endif %}
                 {% endif %}
-                {{ trip.driver }}
-                {% if trip.note %} &mdash; {{ trip.note }}{% endif %}
+                {{ trip.note }}
                 {% endif %}
             </td>
             {% else %}

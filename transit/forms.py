@@ -266,14 +266,9 @@ class EditTemplateActivityForm(forms.Form):
     end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-
-class EditTemplateDriverStatusForm(forms.Form):
-    parent = forms.ModelChoiceField(Template.objects.all(), label='Template', empty_label=None, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    driver = forms.ModelChoiceField(Driver.objects, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
-    is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    activity_color = forms.ModelChoiceField(ActivityColor.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver_is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditScheduleMessageForm(forms.Form):
     message = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
@@ -286,14 +281,8 @@ class EditActivityForm(forms.Form):
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     activity_color = forms.ModelChoiceField(ActivityColor.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-
-class EditDriverStatusForm(forms.Form):
-    date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
-    driver = forms.ModelChoiceField(Driver.objects, required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
-    is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver_is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class vehicleMaintainForm(forms.Form):
     MONTHS = {}

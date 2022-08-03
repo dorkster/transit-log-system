@@ -100,7 +100,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(unique_client))
 
             if form.cleaned_data['update_trips']:
-                trips = Trip.objects.filter(name=prev_name)
+                trips = Trip.objects.filter(name=prev_name, format=Trip.FORMAT_NORMAL)
                 for trip in trips:
                     updated = False
 
@@ -134,7 +134,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                     if updated:
                         trip.save()
 
-                template_trips = TemplateTrip.objects.filter(name=prev_name)
+                template_trips = TemplateTrip.objects.filter(name=prev_name, format=Trip.FORMAT_NORMAL)
                 for trip in template_trips:
                     updated = False
 

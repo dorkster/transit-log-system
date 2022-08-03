@@ -101,7 +101,7 @@ def activityColorDelete(request, id):
                 i.sort_index -= 1;
                 i.save()
 
-        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.ACTIVITY_COLOR, str(driver))
+        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.ACTIVITY_COLOR, str(activity_color))
 
         activity_color.delete()
         return HttpResponseRedirect(reverse('activity-colors'))

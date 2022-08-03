@@ -137,7 +137,7 @@ class EditTripForm(forms.Form):
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
-    passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -184,9 +184,9 @@ class EditClientForm(forms.Form):
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
-    staff = forms.ChoiceField(choices=BOOL_CHOICES, label='Is staff member?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    is_active = forms.ChoiceField(choices=BOOL_CHOICES, label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    update_trips = forms.ChoiceField(choices=BOOL_CHOICES, label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    staff = forms.BooleanField(label='Is staff member?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    is_active = forms.BooleanField(label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    update_trips = forms.BooleanField(label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditClientPaymentForm(forms.Form):
     date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
@@ -197,33 +197,33 @@ class EditClientPaymentForm(forms.Form):
 class EditDestinationForm(forms.Form):
     address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))
     phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
-    is_active = forms.ChoiceField(choices=BOOL_CHOICES, label='Is active?', help_text='Inactive destinations will not appear in autocomplete drop-downs.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
-    update_trips = forms.ChoiceField(choices=BOOL_CHOICES, label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on trips that use this destination.', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_active = forms.BooleanField(label='Is active?', help_text='Inactive destinations will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    update_trips = forms.BooleanField(label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on trips that use this destination.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
-    is_logged = forms.ChoiceField(choices=BOOL_CHOICES, label='Is logged?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditVehicleForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    is_logged = forms.ChoiceField(choices=BOOL_CHOICES, label='Is logged?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    is_trip_counted = forms.ChoiceField(choices=BOOL_CHOICES, label='Include in report trip counts?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_trip_counted = forms.BooleanField(label='Include in report trip counts?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
-    log_data_only = forms.ChoiceField(choices=BOOL_CHOICES, label='Only include rows with full log data?', required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    dry_run = forms.ChoiceField(choices=BOOL_CHOICES, label="Dry run? (i.e. don't write to database)", required=True, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    log_data_only = forms.BooleanField(label='Only include rows with full log data?', required=False, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    dry_run = forms.BooleanField(label="Dry run? (i.e. don't write to database)", required=False, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditVehicleIssueForm(forms.Form):
     driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    is_resolved = forms.ChoiceField(choices=BOOL_CHOICES, label='Is Resolved?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    is_resolved = forms.BooleanField(label='Is Resolved?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     category = forms.ChoiceField(choices=VehicleIssue.ISSUE_CATEGORIES, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditTemplateForm(forms.Form):
@@ -254,7 +254,7 @@ class EditTemplateTripForm(forms.Form):
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
-    passenger = forms.ChoiceField(choices=BOOL_CHOICES, label='Passenger on vehicle?', required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -345,8 +345,8 @@ class SiteSettingsForm(forms.Form):
     cancel_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
     no_show_color = forms.CharField(label='No-show color', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
     autocomplete_history_days = forms.IntegerField(min_value=0, label='Address autocomplete history days', help_text='If no Destinations have been defined, address fields will use the past X days of Trips to generate suggestions.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
-    reset_filter_on_shift_change = forms.ChoiceField(choices=BOOL_CHOICES, label='Reset Schedule filter when starting/ending Shift', widget=forms.Select(attrs=formWidgetAttrs.default))
-    skip_weekends = forms.ChoiceField(choices=BOOL_CHOICES, label='Skip weekends in the Schedule date picker', widget=forms.Select(attrs=formWidgetAttrs.default))
+    reset_filter_on_shift_change = forms.BooleanField(label='Reset Schedule filter when starting/ending Shift', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    skip_weekends = forms.BooleanField(label='Skip weekends in the Schedule date picker', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     pretrip_warning_threshold = forms.IntegerField(min_value=0, label='Pre-Trip Warning Threshold', help_text='If a vehicle has gone X days without a pre-trip inspection, a warning notification will be displayed. Set it to 0 to disable the warning altogether.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))

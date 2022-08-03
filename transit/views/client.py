@@ -99,7 +99,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(unique_client))
 
-            if form.cleaned_data['update_trips'] == 'True':
+            if form.cleaned_data['update_trips']:
                 trips = Trip.objects.filter(name=prev_name)
                 for trip in trips:
                     updated = False

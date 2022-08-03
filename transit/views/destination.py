@@ -83,7 +83,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(unique_destination))
 
-            if form.cleaned_data['update_trips'] == 'True':
+            if form.cleaned_data['update_trips']:
                 trips = Trip.objects.filter(Q(address=prev_address) | Q(destination=prev_address))
                 for trip in trips:
                     updated = False

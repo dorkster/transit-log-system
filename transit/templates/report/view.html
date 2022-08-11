@@ -457,7 +457,7 @@
                         <div class="dropdown-menu shadow">
                             <h5 class="pl-3 pr-3">{{rider.name}}</h5>
                             <div class="dropdown-divider"></div>
-                            <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}{% if selected_driver %}&driver={{ selected_driver.id }}{% endif %}">
                                 <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                             </a>
                             {% if rider.client_id %}
@@ -611,7 +611,7 @@
                         <div class="dropdown-menu shadow">
                             <h5 class="pl-3 pr-3">{{rider.name}}</h5>
                             <div class="dropdown-divider"></div>
-                            <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}{% if selected_driver %}&driver={{ selected_driver.id }}{% endif %}">
                                 <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                             </a>
                             {% if rider.client_id %}

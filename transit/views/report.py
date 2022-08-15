@@ -319,6 +319,7 @@ class Report():
             self.total = Report.TripCount()
             self.staff = Report.TripCount()
             self.all = Report.TripCount()
+            self.all_with_staff = Report.TripCount()
             # fares & payments totals
             self.total_collected_cash = Report.Money(0)
             self.total_collected_check = Report.Money(0)
@@ -916,10 +917,11 @@ class Report():
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
             if rider.trips.total > 0:
-                self.unique_riders.all.addTrips(1, (rider.trips.passenger > 0))
+                self.unique_riders.all_with_staff.addTrips(1, (rider.trips.passenger > 0))
                 if rider.staff:
                     self.unique_riders.staff.addTrips(1, (rider.trips.passenger > 0))
                 else:
+                    self.unique_riders.all.addTrips(1, (rider.trips.passenger > 0))
                     self.unique_riders.total.addTrips(1, (rider.trips.passenger > 0))
                     if rider.elderly == None or rider.ambulatory == None:
                         self.unique_riders.unknown.addTrips(1, (rider.trips.passenger > 0))
@@ -1448,8 +1450,9 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_riders.cell(row_header, 4, 'Non-Elderly Ambulatory')
     ws_riders.cell(row_header, 5, 'Non-Elderly Non-Ambulatory')
     ws_riders.cell(row_header, 6, 'Unknown')
-    ws_riders.cell(row_header, 7, 'Staff')
-    ws_riders.cell(row_header, 8, 'Total')
+    ws_riders.cell(row_header, 7, 'Total')
+    ws_riders.cell(row_header, 8, 'Staff')
+    ws_riders.cell(row_header, 9, 'Total (with staff)')
 
     ws_riders.cell(row_header+1, 1, 'On vehicle')
     ws_riders.cell(row_header+1, 2, report.unique_riders.elderly_ambulatory.passenger)
@@ -1457,8 +1460,9 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_riders.cell(row_header+1, 4, report.unique_riders.nonelderly_ambulatory.passenger)
     ws_riders.cell(row_header+1, 5, report.unique_riders.nonelderly_nonambulatory.passenger)
     ws_riders.cell(row_header+1, 6, report.unique_riders.unknown.passenger)
-    ws_riders.cell(row_header+1, 7, report.unique_riders.staff.passenger)
-    ws_riders.cell(row_header+1, 8, report.unique_riders.all.passenger)
+    ws_riders.cell(row_header+1, 7, report.unique_riders.all.passenger)
+    ws_riders.cell(row_header+1, 8, report.unique_riders.staff.passenger)
+    ws_riders.cell(row_header+1, 9, report.unique_riders.all_with_staff.passenger)
 
     ws_riders.cell(row_header+2, 1, 'Not on vehicle')
     ws_riders.cell(row_header+2, 2, report.unique_riders.elderly_ambulatory.no_passenger)
@@ -1466,8 +1470,9 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_riders.cell(row_header+2, 4, report.unique_riders.nonelderly_ambulatory.no_passenger)
     ws_riders.cell(row_header+2, 5, report.unique_riders.nonelderly_nonambulatory.no_passenger)
     ws_riders.cell(row_header+2, 6, report.unique_riders.unknown.no_passenger)
-    ws_riders.cell(row_header+2, 7, report.unique_riders.staff.no_passenger)
-    ws_riders.cell(row_header+2, 8, report.unique_riders.all.no_passenger)
+    ws_riders.cell(row_header+2, 7, report.unique_riders.all.no_passenger)
+    ws_riders.cell(row_header+2, 8, report.unique_riders.staff.no_passenger)
+    ws_riders.cell(row_header+2, 9, report.unique_riders.all_with_staff.no_passenger)
 
     ws_riders.cell(row_total, 1, 'TOTAL')
     ws_riders.cell(row_total, 2, report.unique_riders.elderly_ambulatory.total)
@@ -1475,8 +1480,9 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_riders.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory.total)
     ws_riders.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory.total)
     ws_riders.cell(row_total, 6, report.unique_riders.unknown.total)
-    ws_riders.cell(row_total, 7, report.unique_riders.staff.total)
-    ws_riders.cell(row_total, 8, report.unique_riders.all.total)
+    ws_riders.cell(row_total, 7, report.unique_riders.all.total)
+    ws_riders.cell(row_total, 8, report.unique_riders.staff.total)
+    ws_riders.cell(row_total, 9, report.unique_riders.all_with_staff.total)
 
     row_total_riders = 0
     for i in report.unique_riders.names:
@@ -1512,7 +1518,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     # apply styles
     ws_riders.row_dimensions[row_header].height = style_rowheight_header
     ws_riders.row_dimensions[row_header_riders].height = style_rowheight_header
-    for i in range(1, 9):
+    for i in range(1, 10):
         ws_riders.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
         for j in range(row_header, row_total+1):
             ws_riders.cell(j, i).border = style_border_normal

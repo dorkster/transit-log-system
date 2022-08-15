@@ -112,6 +112,12 @@ class Report():
             self.shifts = []
             self.trips = []
             self.all = Report.ReportSummary()
+            self.collected_cash = Report.Money(0)
+            self.collected_check = Report.Money(0)
+            self.paid_cash = Report.Money(0)
+            self.paid_check = Report.Money(0)
+            self.total_payments = Report.Money(0)
+            self.total_fares = Report.Money(0)
 
             self.by_vehicle = {}
             for i in self.query_vehicles:
@@ -658,6 +664,12 @@ class Report():
                 report_trip.collected_cash = Report.Money(i.collected_cash)
                 report_trip.collected_check = Report.Money(i.collected_check)
 
+                report_day.collected_cash += report_trip.collected_cash
+                report_day.collected_check += report_trip.collected_check
+                report_day.total_payments += report_trip.collected_cash + report_trip.collected_check
+
+                report_day.total_fares += Report.Money(i.fare)
+
                 report_trip.other_employment = i.check_tag('Employment')
 
                 report_day.trips.append(report_trip)
@@ -750,6 +762,10 @@ class Report():
 
                 if client_name and i.parent.name != client_name:
                     continue
+
+                report_day.paid_cash += Report.Money(i.money_cash)
+                report_day.paid_check += Report.Money(i.money_check)
+                report_day.total_payments += report_day.paid_cash + report_day.paid_check
 
                 found_unique_rider = False
                 for j in self.unique_riders.names:
@@ -1653,9 +1669,9 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                 ws_destinations.cell(j, i).font = style_font_normal
 
     #####
-    #### Fares & Payments
+    #### Fares & Payments (by client)
     #####
-    ws_fares = wb.create_sheet('Fares & Payments')
+    ws_fares = wb.create_sheet('Fares & Payments (by client)')
     row_header = 1
 
     row_total = 0
@@ -1719,6 +1735,71 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                 ws_fares.cell(j, i).fill = style_fill_total
             else:
                 ws_fares.cell(j, i).font = style_font_normal
+
+    #####
+    #### Fares & Payments (by date)
+    #####
+    ws_fares_by_date = wb.create_sheet('Fares & Payments (by date)')
+    row_header = 1
+
+    row_total = 0
+    for i in report.report_all:
+        if i.total_payments.value > 0 or i.total_fares.value > 0:
+            row_total += 1
+    row_total += 2
+
+    ws_fares_by_date.cell(row_header, 1, 'Date')
+    ws_fares_by_date.cell(row_header, 2, 'Cash (driver collected)')
+    ws_fares_by_date.cell(row_header, 3, 'Check (driver collected)')
+    ws_fares_by_date.cell(row_header, 4, 'Cash (not driver collected)')
+    ws_fares_by_date.cell(row_header, 5, 'Check (not driver collected)')
+    ws_fares_by_date.cell(row_header, 6, 'Total Payments')
+    ws_fares_by_date.cell(row_header, 7, 'Total Fares')
+
+    ws_fares_by_date.cell(row_total, 1, 'TOTAL')
+    ws_fares_by_date.cell(row_total, 2, report.unique_riders.total_collected_cash.to_float())
+    ws_fares_by_date.cell(row_total, 3, report.unique_riders.total_collected_check.to_float())
+    ws_fares_by_date.cell(row_total, 4, report.unique_riders.total_paid_cash.to_float())
+    ws_fares_by_date.cell(row_total, 5, report.unique_riders.total_paid_check.to_float())
+    ws_fares_by_date.cell(row_total, 6, report.unique_riders.total_total_payments.to_float())
+    ws_fares_by_date.cell(row_total, 7, report.unique_riders.total_total_fares.to_float())
+
+    row = 0
+    for i in report.report_all:
+        if i.total_payments.value <= 0 and i.total_fares.value <= 0:
+            continue
+        ws_fares_by_date.cell(row + row_header + 1, 1, i.date)
+        ws_fares_by_date.cell(row + row_header + 1, 2, i.collected_cash.to_float())
+        ws_fares_by_date.cell(row + row_header + 1, 3, i.collected_check.to_float())
+        ws_fares_by_date.cell(row + row_header + 1, 4, i.paid_cash.to_float())
+        ws_fares_by_date.cell(row + row_header + 1, 5, i.paid_check.to_float())
+        ws_fares_by_date.cell(row + row_header + 1, 6, i.total_payments.to_float())
+        ws_fares_by_date.cell(row + row_header + 1, 7, i.total_fares.to_float())
+        row += 1
+
+    # number formats
+    for i in range(row_header + 1, row_total + 1):
+        if i < row_total:
+            ws_fares_by_date.cell(i, 1).number_format = 'MMM DD, YYYY'
+        for j in range(2,8):
+            ws_fares_by_date.cell(i, j).number_format = '$0.00'
+
+    # apply styles
+    ws_fares_by_date.row_dimensions[row_header].height = style_rowheight_header
+    for i in range(1, 8):
+        ws_fares_by_date.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
+
+        for j in range(row_header, row_total+1):
+            ws_fares_by_date.cell(j, i).border = style_border_normal
+            if j == row_header:
+                ws_fares_by_date.cell(j, i).font = style_font_header
+                ws_fares_by_date.cell(j, i).alignment = style_alignment_header
+                ws_fares_by_date.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_fares_by_date.cell(j, i).font = style_font_total
+                ws_fares_by_date.cell(j, i).fill = style_fill_total
+            else:
+                ws_fares_by_date.cell(j, i).font = style_font_normal
 
     #####
     #### Money Collected by the Drivers

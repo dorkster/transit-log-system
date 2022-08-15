@@ -446,7 +446,7 @@
 <div id="report_fares">
     <div class="row">
         <div class="col">
-            <h3>Fares &amp; Payments</h3>
+            <h3>Fares &amp; Payments (by client)</h3>
         </div>
     </div>
     <table class="mytable mytable-striped">
@@ -504,6 +504,55 @@
             <td class="mytable-col-md">{{ unique_riders.total_total_payments }}</td>
             <td class="mytable-col-md">{{ unique_riders.total_total_fares }}</td>
             <td class="mytable-col-md">{{ unique_riders.total_total_owed }}</td>
+        </tr>
+    </table>
+    <hr/>
+</div>
+{% endif %}
+
+{% if unique_riders.names or money_payments %}
+<div id="report_fares_by_date">
+    <div class="row">
+        <div class="col">
+            <h3>Fares &amp; Payments (by date)</h3>
+        </div>
+        <div class="col-auto">
+            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+        </div>
+    </div>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-md">Date</td>
+            <td class="mytable-col-md">Cash (driver collected)</td>
+            <td class="mytable-col-md">Check (driver collected)</td>
+            <td class="mytable-col-md">Cash (not driver collected)</td>
+            <td class="mytable-col-md">Check (not driver collected)</td>
+            <td class="mytable-col-md">Total Payments</td>
+            <td class="mytable-col-md">Total Fares</td>
+        </thead>
+        <tbody class="mytable-hoverhi">
+            {% for day in reports %}
+            {% if day.total_payments.value > 0 or day.total_fares.value > 0 %}
+            <tr>
+                <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{day.date|date:"M j, Y"}}</a></td>
+                <td class="mytable-col-md {% if day.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ day.collected_cash }}</td>
+                <td class="mytable-col-md {% if day.collected_check.value == 0 %}mytable-zero{%endif%}">{{ day.collected_check }}</td>
+                <td class="mytable-col-md {% if day.paid_cash.value == 0 %}mytable-zero{%endif%}">{{ day.paid_cash }}</td>
+                <td class="mytable-col-md {% if day.paid_check.value == 0 %}mytable-zero{%endif%}">{{ day.paid_check }}</td>
+                <td class="mytable-col-md {% if day.total_payments.value == 0 %}mytable-zero{%endif%}">{{ day.total_payments }}</td>
+                <td class="mytable-col-md {% if day.total_fares.value == 0 %}mytable-zero{%endif%}">{{ day.total_fares }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            <td class="mytable-col-md">{{ unique_riders.total_collected_cash }}</td>
+            <td class="mytable-col-md">{{ unique_riders.total_collected_check }}</td>
+            <td class="mytable-col-md">{{ unique_riders.total_paid_cash }}</td>
+            <td class="mytable-col-md">{{ unique_riders.total_paid_check }}</td>
+            <td class="mytable-col-md">{{ unique_riders.total_total_payments }}</td>
+            <td class="mytable-col-md">{{ unique_riders.total_total_fares }}</td>
         </tr>
     </table>
     <hr/>
@@ -627,6 +676,7 @@
     visible.addSection("#report_tags", "#vis_tags");
     visible.addSection("#report_destinations", "#vis_destinations");
     visible.addSection("#report_fares", "#vis_fares");
+    visible.addSection("#report_fares_by_date", "#vis_fares_by_date");
     visible.addSection("#report_collected_money", "#vis_collected_money");
     visible.addSection("#report_payments", "#vis_payments");
     visible.addSection("#report_drivers", "#vis_drivers");

@@ -58,6 +58,7 @@
     <div class="row">
         <div class="col">
             <h3>Totals for All Vehicles</h3>
+            {% if reports %}<p>Days of service: <strong>{{ total_vehicle_days_of_service }}</strong></p>{% endif %}
             <p class="text-muted small">Note: Trip counts are divided into three values: trips with passengers, trips without passengers, and a grand total.</p>
         </div>
     </div>
@@ -148,7 +149,12 @@
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
-            {% if v.start_miles.0 and v.end_miles.0 %}<p>Mileage Start: <strong>{{v.start_miles.0}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles.0}}</strong></p>{% endif %}
+            {% if v.start_miles.0 and v.end_miles.0 %}
+            <p>
+                Mileage Start: <strong>{{v.start_miles.0}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles.0}}</strong>
+                {% if v.days %}<br/>Days of service: <strong>{{ v.days|length }}</strong>{% endif %}
+            </p>
+            {% endif %}
         </div>
     </div>
     {% if v.days %}

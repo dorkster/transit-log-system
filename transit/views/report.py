@@ -359,6 +359,7 @@ class Report():
         self.report_errors = Report.ReportErrors()
         self.filtered_vehicles = None
         self.filtered_drivers = None
+        self.total_vehicle_days_of_service = 0
 
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
@@ -952,6 +953,10 @@ class Report():
         # sort frequent destinations by total trips
         self.frequent_destinations.sort(reverse=True)
 
+        for day in self.report_all:
+            if day.hasVehicleInShift():
+                self.total_vehicle_days_of_service += 1
+
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
@@ -1029,6 +1034,7 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'date_range_picker': date_range_picker,
         'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
+        'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
         'driver_reports': report.driver_reports,
@@ -1077,6 +1083,7 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'date_end': date_end,
         'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
+        'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
         'driver_reports': report.driver_reports,

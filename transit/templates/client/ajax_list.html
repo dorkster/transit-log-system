@@ -173,6 +173,8 @@
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'client-edit' client.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit client</a>
                     <div class="dropdown-divider"></div>
+                    <a href="{% url 'search' %}?name={{client.name|urlencode}}" class="dropdown-item" target="_blank"><span class="oi oi-magnifying-glass mr-2"></span>Search for trips</a>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-create-from-client' 'edit' client.id %}" class="dropdown-item"><span class="oi oi-document mr-2"></span>Create trip from client</a>
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'client-payments' client.id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Payments</a>

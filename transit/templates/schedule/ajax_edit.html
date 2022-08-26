@@ -39,44 +39,44 @@
                 </div>
             </div>
         </td>
-        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_driver', row_movers)">
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_driver', null)">
             {{ shift.driver }}
         </td>
-        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_vehicle', row_movers)">
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_vehicle', null)">
             {{ shift.vehicle }}
         </td>
-        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_miles', row_movers)">
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_miles', null)">
             {% if shift.check_start_miles %}
                 {{ shift.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_time', row_movers)">
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_time', null)">
             {% if shift.check_start_time %}
                 {{ shift.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_miles', row_movers)">
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_miles', null)">
             {% if shift.check_end_miles %}
                 {{ shift.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_time', row_movers)">
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_time', null)">
             {% if shift.check_end_time %}
                 {{ shift.end_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_fuel', row_movers)">
+        <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_fuel', null)">
             {{ shift.fuel }}
         </td>
-        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_notes', row_movers)">
+        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_notes', null)">
             {{ shift.note }}
         </td>
     </tr>

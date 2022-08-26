@@ -16,10 +16,21 @@
                     <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
                     <div id="full_miles_desc"></div>
                     <div id="full_miles" class="full-miles"></div>
+                    <div id="mile_suggestion_typo_warning" class="mb-3" style="font-size: 120%; display: none;">
+                        <span class="text-danger">
+                            <em><strong>Please check for typos.</strong></em>
+                        </span>
+                    </div>
                     <div id="mile_suggestion" class="mb-3" style="font-size: 120%; display: none;">
                         <span class="text-danger">
                             <em>Did you mean: <span id="mile_suggestion_prefix"></span><strong><span id="mile_suggestion_suffix"></span></strong>?</em>
                             <a id="mile_suggestion_button" href="#_" class="ml-2 btn btn-success" data-suggestion="" onclick="useSuggestion(this, mile_data)">Yes</a>
+                        </span>
+                    </div>
+                    <div id="mile_suggestion_error" class="mb-3" style="font-size: 120%; display: none;">
+                        <span class="text-danger">
+                            <em>No suggested fixes.</em>
+                            <a id="mile_suggestion_error_button" href="#_" class="ml-2 btn btn-danger" data-suggestion="" onclick="mileageErrorTryAgain(mile_data)">Try Again</a>
                         </span>
                     </div>
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>

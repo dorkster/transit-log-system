@@ -344,6 +344,8 @@ def tripDelete(request, mode, id):
     return render(request, 'model_delete.html', context)
 
 def getStartAndPrevMiles(date, start_miles, prev_miles, vehicles, all_trips):
+    active_shift_driver = None
+
     # get the starting mileage for all vehicles
     all_previous_shifts = Shift.objects.exclude(start_miles='').exclude(end_miles='')
     for vehicle in vehicles.filter(is_logged=True):
@@ -369,6 +371,9 @@ def getStartAndPrevMiles(date, start_miles, prev_miles, vehicles, all_trips):
             except:
                 continue
 
+            if shift.end_miles == '':
+                active_shift_driver = shift.driver
+
     # get the previous trip milage for all vehicles
     for vehicle in vehicles:
         if str(vehicle) in start_miles:
@@ -376,7 +381,7 @@ def getStartAndPrevMiles(date, start_miles, prev_miles, vehicles, all_trips):
         else:
             start_miles_str = start_miles[str(vehicle)] = ''
         prev_miles[str(vehicle)] = start_miles_str
-        vehicle_trips = all_trips.filter(vehicle=vehicle)
+        vehicle_trips = all_trips.filter(vehicle=vehicle, driver=active_shift_driver)
         for vehicle_trip in vehicle_trips:
             if vehicle_trip.end_miles != '':
                 mile_str = vehicle_trip.end_miles

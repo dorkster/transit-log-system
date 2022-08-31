@@ -174,6 +174,8 @@ class tripStartForm(forms.Form):
 class tripEndForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class EditClientForm(forms.Form):

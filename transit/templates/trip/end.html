@@ -42,6 +42,9 @@
                     <div class="mb-2"><label for="{{ form.time.id_for_label }}"><strong>{{ form.time.label }}</strong></label>
                         <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_time')"><span class="oi oi-clock"></span></a>
                         <br/>{{ form.time }}</div>
+                    <hr/>
+                    <div class="mb-2"><label for="{{ form.collected_cash.id_for_label }}"><strong>{{ form.collected_cash.label }}</strong></label><br/>{{ form.collected_cash }}</div>
+                    <div class="mb-2"><label for="{{ form.collected_check.id_for_label }}"><strong>{{ form.collected_check.label }}</strong></label><br/>{{ form.collected_check }}</div>
                     {{ form.additional_pickups }}
                 </fieldset>
             </div>

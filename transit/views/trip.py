@@ -516,6 +516,8 @@ def tripEnd(request, id):
         if form.is_valid():
             trip.end_miles = form.cleaned_data['miles']
             trip.end_time = form.cleaned_data['time']
+            trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
+            trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
             trip.save()
             log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(trip))
 
@@ -538,6 +540,8 @@ def tripEnd(request, id):
         initial = {
             'miles': trip.end_miles,
             'time': auto_time,
+            'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
+            'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
         }
         form = tripEndForm(initial=initial)
 

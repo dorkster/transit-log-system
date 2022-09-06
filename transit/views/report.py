@@ -197,6 +197,7 @@ class Report():
             self.vehicle = None
             self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
             self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.total_miles = {T_STR: '', T_FLOAT: 0.0 }
             self.days = []
             self.totals = Report.ReportSummary()
 
@@ -366,6 +367,7 @@ class Report():
         self.filtered_vehicles = None
         self.filtered_drivers = None
         self.total_vehicle_days_of_service = 0
+        self.total_vehicle_mileage = {T_STR: '', T_FLOAT: 0.0 }
 
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
@@ -910,11 +912,18 @@ class Report():
                     for shift_iter in report_day.shifts:
                         if shift_iter.shift and vehicle.id == shift_iter.shift.vehicle.id:
                             if vehicle_report.start_miles[T_STR] == '' or (vehicle_report.start_miles[T_STR] != '' and vehicle_report.start_miles[T_FLOAT] > shift_iter.start_miles[T_FLOAT]):
-                                vehicle_report.start_miles[T_STR] = shift_iter.start_miles[T_STR]
+                                vehicle_report.start_miles = shift_iter.start_miles
                             if vehicle_report.end_miles[T_STR] == '' or (vehicle_report.end_miles[T_STR] != '' and vehicle_report.end_miles[T_FLOAT] < shift_iter.end_miles[T_FLOAT]):
                                 vehicle_report.end_miles = shift_iter.end_miles
 
+            if vehicle_report.end_miles[T_FLOAT] >= vehicle_report.start_miles[T_FLOAT]:
+                vehicle_report.total_miles[T_FLOAT] = vehicle_report.end_miles[T_FLOAT] - vehicle_report.start_miles[T_FLOAT]
+                vehicle_report.total_miles[T_STR] = f"{vehicle_report.total_miles[T_FLOAT]:.1f}"
+            self.total_vehicle_mileage[T_FLOAT] += vehicle_report.total_miles[T_FLOAT]
+
             self.vehicle_reports.append(vehicle_report)
+
+        self.total_vehicle_mileage[T_STR] = f"{self.total_vehicle_mileage[T_FLOAT]:.1f}"
 
         self.all_vehicles = Report.ReportSummary()
         for vehicle_report in self.vehicle_reports:
@@ -1051,6 +1060,7 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
         'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
+        'total_vehicle_mileage': report.total_vehicle_mileage,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
         'driver_reports': report.driver_reports,
@@ -1100,6 +1110,7 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'vehicles': report.filtered_vehicles,
         'reports': report.report_all,
         'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
+        'total_vehicle_mileage': report.total_vehicle_mileage,
         'vehicle_reports': report.vehicle_reports,
         'all_vehicles': report.all_vehicles,
         'driver_reports': report.driver_reports,
@@ -1130,6 +1141,7 @@ def reportPrintMileageSummary(request, start_year, start_month, start_day, end_y
         'date_start': date_start,
         'date_end': date_end,
         'vehicle_reports': report.vehicle_reports,
+        'total_vehicle_mileage': report.total_vehicle_mileage,
     }
     return render(request, 'report/print_mileage_summary.html', context)
 

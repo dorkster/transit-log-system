@@ -149,9 +149,9 @@
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
-            {% if v.start_miles.0 and v.end_miles.0 %}
+            {% if not v.start_miles.empty and not v.end_miles.empty %}
             <p>
-                Mileage Start: <strong>{{v.start_miles.0}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles.0}}</strong>
+                Mileage Start: <strong>{{v.start_miles}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles}}</strong>
                 {% if v.days %}<br/>Days of service: <strong>{{ v.days|length }}</strong>{% endif %}
             </p>
             {% endif %}

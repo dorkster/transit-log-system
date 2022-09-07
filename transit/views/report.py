@@ -32,9 +32,6 @@ from openpyxl.utils import get_column_letter
 
 from transit.common.util import *
 
-T_STR = 0
-T_FLOAT = 1
-
 class Report():
     class Money():
         def __init__(self, default_value=0):
@@ -47,6 +44,67 @@ class Report():
             return int_to_money_string(self.value, show_currency=True)
         def to_float(self):
             return float(self.value) / 100
+
+    class Mileage():
+        def __init__(self):
+            self.value = 0
+            self.string = ''
+            self.is_empty = True
+            self.is_string_valid = True
+        def __add__(self, other):
+            r = Report.Mileage()
+            r.value = self.value + other.value
+            r.is_empty = False
+            r.is_string_valid = False
+            return r
+        def __sub__(self, other):
+            r = Report.Mileage()
+            r.value = self.value - other.value
+            r.is_empty = False
+            r.is_string_valid = False
+            return r
+        def __lt__(self, other):
+            return self.value < other.value
+        def __gt__(self, other):
+            return self.value > other.value
+        def __le__(self, other):
+            return self.value <= other.value
+        def __ge__(self, other):
+            return self.value >= other.value
+        def __eq__(self, other):
+            return self.value == other.value
+        def __ne__(self, other):
+            return self.value != other.value
+        def __str__(self):
+            if not self.is_string_valid:
+                self.string = f"{self.value:.1f}"
+                self.is_string_valid = True
+            return self.string
+        def setFromString(self, string):
+            try:
+                self.value = float(string)
+            except:
+                self.value = 0
+                self.string = ''
+                self.is_empty = True
+                self.is_string_valid = True
+                return 1
+            self.string = string
+            self.is_empty = False
+            self.is_string_valid = True
+            return 0
+        def mergeStrings(self, base, suffix):
+            merged = ''
+            if len(suffix) < len(base):
+                merged = base[0:len(base) - len(suffix)] + suffix
+            else:
+                merged = suffix
+            if self.setFromString(merged) != 0:
+                return 1
+            else:
+                return 0
+        def empty(self):
+            return self.is_empty
 
     class TripCount():
         def __init__(self):
@@ -81,9 +139,9 @@ class Report():
     class ReportShift():
         def __init__(self):
             self.shift = None
-            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.start_miles = Report.Mileage()
             self.start_time = None
-            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.end_miles = Report.Mileage()
             self.end_time = None
             self.fuel = 0
             self.start_trip = None
@@ -93,9 +151,9 @@ class Report():
         def __init__(self):
             self.trip = None
             self.shift = None
-            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.start_miles = Report.Mileage()
             self.start_time = None
-            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
+            self.end_miles = Report.Mileage()
             self.end_time = None
             self.trip_type = None
             self.tags = []
@@ -195,9 +253,9 @@ class Report():
     class ReportOutputVehicles():
         def __init__(self):
             self.vehicle = None
-            self.start_miles = { T_STR: '', T_FLOAT: 0.0 }
-            self.end_miles = { T_STR: '', T_FLOAT: 0.0 }
-            self.total_miles = {T_STR: '', T_FLOAT: 0.0 }
+            self.start_miles = Report.Mileage()
+            self.end_miles = Report.Mileage()
+            self.total_miles = Report.Mileage()
             self.days = []
             self.totals = Report.ReportSummary()
 
@@ -367,7 +425,7 @@ class Report():
         self.filtered_vehicles = None
         self.filtered_drivers = None
         self.total_vehicle_days_of_service = 0
-        self.total_vehicle_mileage = {T_STR: '', T_FLOAT: 0.0 }
+        self.total_vehicle_mileage = Report.Mileage()
 
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
@@ -470,13 +528,8 @@ class Report():
                 report_shift = Report.ReportShift()
                 report_shift.shift = i
 
-                report_shift.start_miles[T_STR] = i.start_miles
-                try:
-                    report_shift.start_miles[T_FLOAT] = float(i.start_miles)
-                except:
-                    report_shift.start_miles[T_FLOAT] = 0
+                if report_shift.start_miles.setFromString(i.start_miles) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
-
 
                 try:
                     report_shift.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
@@ -484,11 +537,7 @@ class Report():
                     report_shift.start_time = fallback_time
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                report_shift.end_miles[T_STR] = i.end_miles
-                try:
-                    report_shift.end_miles[T_FLOAT] = float(i.end_miles)
-                except:
-                    report_shift.end_miles[T_FLOAT] = 0
+                if report_shift.end_miles.setFromString(i.end_miles) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 try:
@@ -504,14 +553,12 @@ class Report():
                         report_shift.fuel = 0
                         self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                if report_shift.start_miles[T_FLOAT] > report_shift.end_miles[T_FLOAT]:
+                if report_shift.start_miles > report_shift.end_miles:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
-                    report_shift.end_miles[T_FLOAT] = report_shift.start_miles[T_FLOAT]
-                    report_shift.end_miles[T_STR] = report_shift.start_miles[T_STR]
+                    report_shift.end_miles = report_shift.start_miles
 
                 if report_shift.start_time > report_shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
-                    report_shift.end_time = report_shift.start_time
                     report_shift.end_time = report_shift.start_time
 
                 report_day.shifts.append(report_shift)
@@ -588,20 +635,13 @@ class Report():
                 shift = report_day.shifts[report_trip.shift]
 
                 # don't include trip if matching shift is incomplete
-                if not empty_trip and (shift.start_miles[T_STR] == '' or shift.start_time == None or shift.end_miles[T_STR] == '' or shift.end_time == None):
+                if not empty_trip and (shift.start_miles.empty() or shift.start_time == None or shift.end_miles.empty() or shift.end_time == None):
                     continue
 
                 if not empty_trip:
                     parse_error = False
 
-                    if len(i.start_miles) < len(shift.start_miles[T_STR]):
-                        report_trip.start_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.start_miles)] + i.start_miles
-                    else:
-                        report_trip.start_miles[T_STR] = i.start_miles
-                    try:
-                        report_trip.start_miles[T_FLOAT] = float(report_trip.start_miles[T_STR])
-                    except:
-                        report_trip.start_miles[T_FLOAT] = 0
+                    if report_trip.start_miles.mergeStrings(str(shift.start_miles), i.start_miles) != 0:
                         parse_error = True
 
                     try:
@@ -610,14 +650,7 @@ class Report():
                         report_trip.start_time = fallback_time
                         parse_error = True
 
-                    if len(i.end_miles) < len(shift.start_miles[T_STR]):
-                        report_trip.end_miles[T_STR] = shift.start_miles[T_STR][0:len(shift.start_miles[T_STR]) - len(i.end_miles)] + i.end_miles
-                    else:
-                        report_trip.end_miles[T_STR] = i.end_miles
-                    try:
-                        report_trip.end_miles[T_FLOAT] = float(report_trip.end_miles[T_STR])
-                    except:
-                        report_trip.end_miles[T_FLOAT] = 0
+                    if report_trip.end_miles.mergeStrings(str(shift.start_miles), i.end_miles) != 0:
                         parse_error = True
 
                     try:
@@ -630,25 +663,18 @@ class Report():
                         self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
 
                     # check for trip errors
-                    # TODO abstract the float/str stuff to make this cleaner
                     # TODO the above execptions add errors to the report without adding the trip to the various trip counts
                     # BUT, the below errors still count the trips where possible. Not sure which is preferable, but it's probably bad that both behaviors exist?
-
-                    if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT] or report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
+                    if report_trip.start_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
                         self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
-                        if report_trip.start_miles[T_FLOAT] < shift.start_miles[T_FLOAT]:
-                            report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                            report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
-                        if report_trip.end_miles[T_FLOAT] > shift.end_miles[T_FLOAT]:
-                            report_trip.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
-                            report_trip.end_miles[T_STR] = shift.end_miles[T_STR]
-                    elif report_trip.start_miles[T_FLOAT] > report_trip.end_miles[T_FLOAT]:
+                        if report_trip.start_miles < shift.start_miles:
+                            report_trip.start_miles = shift.start_miles
+                        if report_trip.end_miles > shift.end_miles:
+                            report_trip.end_miles = shift.end_miles
+                    elif report_trip.start_miles > report_trip.end_miles:
                         self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_shift=shift.shift, error_trip=i)
-                        report_trip.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                        report_trip.start_miles[T_STR] = shift.start_miles[T_STR]
-                        report_trip.end_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                        report_trip.end_miles[T_STR] = shift.start_miles[T_STR]
-
+                        report_trip.start_miles = shift.start_miles
+                        report_trip.end_miles = shift.start_miles
 
                     if report_trip.start_time and shift.start_time and report_trip.end_time and shift.end_time:
                         if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
@@ -677,10 +703,10 @@ class Report():
                 report_day.trips.append(report_trip)
 
                 if not empty_trip:
-                    if shift.start_trip == None or report_trip.start_miles[T_FLOAT] < report_day.trips[shift.start_trip].start_miles[T_FLOAT]:
+                    if shift.start_trip == None or report_trip.start_miles < report_day.trips[shift.start_trip].start_miles:
                         report_day.shifts[report_trip.shift].start_trip = len(report_day.trips) - 1;
 
-                    if shift.end_trip == None or report_trip.end_miles[T_FLOAT] > report_day.trips[shift.end_trip].end_miles[T_FLOAT]:
+                    if shift.end_trip == None or report_trip.end_miles > report_day.trips[shift.end_trip].end_miles:
                         report_day.shifts[report_trip.shift].end_trip = len(report_day.trips) - 1;
 
 
@@ -748,13 +774,13 @@ class Report():
                                 found_frequent_destination = True
                                 j.trips.addTrips(1, i.passenger)
                                 if not empty_trip:
-                                    j.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                                    j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                         if not found_frequent_destination:
                             temp_fd = Report.FrequentDestination()
                             temp_fd.address = i.destination
                             temp_fd.trips.addTrips(1, i.passenger)
                             if not empty_trip:
-                                temp_fd.averageMiles(report_trip.end_miles[T_FLOAT] - report_trip.start_miles[T_FLOAT])
+                                temp_fd.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                             self.frequent_destinations.append(temp_fd)
 
             # handle payments from Clients that didn't ride (so far)
@@ -809,10 +835,8 @@ class Report():
                 if shift.start_trip == None and shift.end_trip == None:
                     rt = Report.ReportTrip()
                     rt.shift = i
-                    rt.start_miles[T_STR] = shift.start_miles[T_STR]
-                    rt.start_miles[T_FLOAT] = shift.start_miles[T_FLOAT]
-                    rt.end_miles[T_STR] = shift.end_miles[T_STR]
-                    rt.end_miles[T_FLOAT] = shift.end_miles[T_FLOAT]
+                    rt.start_miles = shift.start_miles
+                    rt.end_miles = shift.end_miles
                     rt.start_time = shift.start_time
                     rt.end_time = shift.end_time
                     report_day.trips.append(rt)
@@ -829,10 +853,10 @@ class Report():
                 service_hours = 0
                 deadhead_miles = 0
                 deadhead_hours = 0
-                if not (shift.start_miles[T_STR] == '' or shift.start_time == None or shift.end_miles[T_STR] == '' or shift.end_time == None):
-                    service_miles = shift.end_miles[T_FLOAT] - shift.start_miles[T_FLOAT]
+                if not (shift.start_miles.empty() or shift.start_time == None or shift.end_miles.empty() or shift.end_time == None):
+                    service_miles = shift.end_miles.value - shift.start_miles.value
                     service_hours = (shift.end_time - shift.start_time).seconds / 60 / 60
-                    deadhead_miles = (report_day.trips[shift.start_trip].start_miles[T_FLOAT] - shift.start_miles[T_FLOAT]) + (shift.end_miles[T_FLOAT] - report_day.trips[shift.end_trip].end_miles[T_FLOAT])
+                    deadhead_miles = (report_day.trips[shift.start_trip].start_miles.value - shift.start_miles.value) + (shift.end_miles.value - report_day.trips[shift.end_trip].end_miles.value)
                     deadhead_hours = ((report_day.trips[shift.start_trip].start_time - shift.start_time).seconds + (shift.end_time - report_day.trips[shift.end_trip].end_time).seconds) / 60 / 60
 
                 # per-vehicle log
@@ -845,7 +869,7 @@ class Report():
                 for trip in report_day.trips:
                     if i != trip.shift:
                         continue
-                    report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
+                    report_day.by_vehicle[shift.shift.vehicle].pmt += trip.end_miles.value - trip.start_miles.value
                     if trip.trip != None:
                         if trip.trip_type != None and trip.trip_type.is_trip_counted:
                             report_day.by_vehicle[shift.shift.vehicle].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
@@ -876,7 +900,7 @@ class Report():
                 for trip in report_day.trips:
                     if i != trip.shift:
                         continue
-                    report_day.by_driver[shift.shift.driver].pmt += trip.end_miles[T_FLOAT] - trip.start_miles[T_FLOAT]
+                    report_day.by_driver[shift.shift.driver].pmt += trip.end_miles.value - trip.start_miles.value
                     if trip.trip != None:
                         if trip.trip_type != None and trip.trip_type.is_trip_counted:
                             report_day.by_driver[shift.shift.driver].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
@@ -911,19 +935,16 @@ class Report():
                     vehicle_report.totals += report_day.by_vehicle[vehicle]
                     for shift_iter in report_day.shifts:
                         if shift_iter.shift and vehicle.id == shift_iter.shift.vehicle.id:
-                            if vehicle_report.start_miles[T_STR] == '' or (vehicle_report.start_miles[T_STR] != '' and vehicle_report.start_miles[T_FLOAT] > shift_iter.start_miles[T_FLOAT]):
+                            if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
                                 vehicle_report.start_miles = shift_iter.start_miles
-                            if vehicle_report.end_miles[T_STR] == '' or (vehicle_report.end_miles[T_STR] != '' and vehicle_report.end_miles[T_FLOAT] < shift_iter.end_miles[T_FLOAT]):
+                            if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
                                 vehicle_report.end_miles = shift_iter.end_miles
 
-            if vehicle_report.end_miles[T_FLOAT] >= vehicle_report.start_miles[T_FLOAT]:
-                vehicle_report.total_miles[T_FLOAT] = vehicle_report.end_miles[T_FLOAT] - vehicle_report.start_miles[T_FLOAT]
-                vehicle_report.total_miles[T_STR] = f"{vehicle_report.total_miles[T_FLOAT]:.1f}"
-            self.total_vehicle_mileage[T_FLOAT] += vehicle_report.total_miles[T_FLOAT]
+            if vehicle_report.end_miles >= vehicle_report.start_miles:
+                vehicle_report.total_miles = vehicle_report.end_miles - vehicle_report.start_miles
+            self.total_vehicle_mileage += vehicle_report.total_miles
 
             self.vehicle_reports.append(vehicle_report)
-
-        self.total_vehicle_mileage[T_STR] = f"{self.total_vehicle_mileage[T_FLOAT]:.1f}"
 
         self.all_vehicles = Report.ReportSummary()
         for vehicle_report in self.vehicle_reports:

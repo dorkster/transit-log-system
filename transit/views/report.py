@@ -1111,22 +1111,9 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
     context = {
         'date_start': date_start,
         'date_end': date_end,
+        'report': report,
         'date_picker': date_picker,
         'date_range_picker': date_range_picker,
-        'vehicles': report.filtered_vehicles,
-        'reports': report.report_all,
-        'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
-        'total_vehicle_mileage': report.total_vehicle_mileage,
-        'vehicle_reports': report.vehicle_reports,
-        'all_vehicles': report.all_vehicles,
-        'driver_reports': report.driver_reports,
-        'unique_riders': report.unique_riders,
-        'money_trips': report.money_trips,
-        'money_trips_summary': report.money_trips_summary,
-        'money_payments': report.money_payments,
-        'money_payments_summary': report.money_payments_summary,
-        'frequent_destinations': report.frequent_destinations,
-        'report_errors': report.report_errors,
         'url_month_prev': url_month_prev,
         'url_month_next': url_month_next,
         'url_this_month': url_this_month,
@@ -1163,20 +1150,7 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
     context = {
         'date_start': date_start,
         'date_end': date_end,
-        'vehicles': report.filtered_vehicles,
-        'reports': report.report_all,
-        'total_vehicle_days_of_service': report.total_vehicle_days_of_service,
-        'total_vehicle_mileage': report.total_vehicle_mileage,
-        'vehicle_reports': report.vehicle_reports,
-        'all_vehicles': report.all_vehicles,
-        'driver_reports': report.driver_reports,
-        'unique_riders': report.unique_riders,
-        'money_trips': report.money_trips,
-        'money_trips_summary': report.money_trips_summary,
-        'money_payments': report.money_payments,
-        'money_payments_summary': report.money_payments_summary,
-        'frequent_destinations': report.frequent_destinations,
-        'report_errors': report.report_errors,
+        'report': report,
     }
     return render(request, 'report/print.html', context)
 
@@ -1196,8 +1170,7 @@ def reportPrintMileageSummary(request, start_year, start_month, start_day, end_y
     context = {
         'date_start': date_start,
         'date_end': date_end,
-        'vehicle_reports': report.vehicle_reports,
-        'total_vehicle_mileage': report.total_vehicle_mileage,
+        'report': report,
     }
     return render(request, 'report/print_mileage_summary.html', context)
 

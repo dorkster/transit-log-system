@@ -31,7 +31,7 @@
     <div class="col text-center"><h5>End Mileage</h5></div>
     <div class="col text-center"><h5>Total Mileage</h5></div>
 </div>
-{% for v in vehicle_reports %}
+{% for v in report.vehicle_reports %}
     <div class="row">
         <div class="col m-5 blank-field"><strong>{{v.vehicle}}</strong></div>
         <div class="col m-5 blank-field">{{v.start_miles}}</div>
@@ -43,7 +43,7 @@
         <div class="col m-5"></div>
         <div class="col m-5"></div>
         <div class="col m-5 blank-field"><strong>Grand Total</strong></div>
-        <div class="col m-5 blank-field">{{total_vehicle_mileage}}</div>
+        <div class="col m-5 blank-field">{{report.total_vehicle_mileage}}</div>
     </div>
 </div>
 <script type="text/javascript" src="{% static 'transit/js/report/common.js' %}"></script>

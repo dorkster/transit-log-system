@@ -25,7 +25,7 @@
 </div>
 <hr/>
 <div>
-{% if report_errors.errors %}
+{% if report.report_errors.errors %}
 <div id="report_errors">
     <div class="row">
         <div class="col">
@@ -34,7 +34,7 @@
     </div>
     <div style="max-width: 800px;">
         <ul class="list-group">
-        {% for error in report_errors.errors %}
+        {% for error in report.report_errors.errors %}
         <li class="list-group-item list-group-item-danger p-2 small">
             <strong class="text-danger">Error:</strong>
             {% if error.error_shift and not error.error_trip %}
@@ -58,7 +58,7 @@
     <div class="row">
         <div class="col">
             <h3>Totals for All Vehicles</h3>
-            {% if reports %}<p>Days of service: <strong>{{ total_vehicle_days_of_service }}</strong></p>{% endif %}
+            {% if report.report_all %}<p>Days of service: <strong>{{ report.total_vehicle_days_of_service }}</strong></p>{% endif %}
             <p class="text-muted small">Note: Trip counts are divided into three values: trips with passengers, trips without passengers, and a grand total.</p>
         </div>
     </div>
@@ -71,7 +71,7 @@
             <td class="mytable-col-sm">Deadhead Hours</td>
             <td class="mytable-col-sm">Passenger Miles</td>
             <td class="mytable-col-sm">Fuel</td>
-            {% for key, value in all_vehicles.trip_types.items %}
+            {% for key, value in report.all_vehicles.trip_types.items %}
             <td class="mytable-col-sm" colspan=3>Trips: {{key}}</td>
             {% endfor %}
             <td class="mytable-col-sm" colspan=3>Total Trips</td>
@@ -80,7 +80,7 @@
             <td class="mytable-col-sm">Total Money</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for day in reports %}
+            {% for day in report.report_all %}
             {% if day.hasVehicleInShift %}
             <tr>
                 <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{day.date|date:"M j, Y"}}</a></td>
@@ -113,7 +113,7 @@
             <td class="mytable-col-sm">Deadhead Hours</td>
             <td class="mytable-col-sm">Passenger Miles</td>
             <td class="mytable-col-sm">Fuel</td>
-            {% for key, value in all_vehicles.trip_types.items %}
+            {% for key, value in report.all_vehicles.trip_types.items %}
             <td class="mytable-col-sm" colspan=3>Trips: {{key}}</td>
             {% endfor %}
             <td class="mytable-col-sm" colspan=3>Total Trips</td>
@@ -123,28 +123,28 @@
         </thead>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
-            <td class="mytable-col-sm">{{all_vehicles.service_miles|floatformat:1}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.service_hours|floatformat:2}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.deadhead_miles|floatformat:1}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.deadhead_hours|floatformat:2}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.pmt|floatformat:1}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.fuel|floatformat:1}}</td>
-            {% for key, value in all_vehicles.trip_types.items %}
+            <td class="mytable-col-sm">{{report.all_vehicles.service_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.service_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.deadhead_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.deadhead_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.pmt|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.fuel|floatformat:1}}</td>
+            {% for key, value in report.all_vehicles.trip_types.items %}
             <td class="mytable-col-xxs small">{{value.passenger}}</td>
             <td class="mytable-col-xxs small">{{value.no_passenger}}</td>
             <td class="mytable-col-xxs">{{value.total}}</td>
             {% endfor %}
-            <td class="mytable-col-xxs small">{{all_vehicles.trip_types_total.passenger}}</td>
-            <td class="mytable-col-xxs small">{{all_vehicles.trip_types_total.no_passenger}}</td>
-            <td class="mytable-col-xxs">{{all_vehicles.trip_types_total.total}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.collected_cash}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.collected_check}}</td>
-            <td class="mytable-col-sm">{{all_vehicles.total_collected_money}}</td>
+            <td class="mytable-col-xxs small">{{report.all_vehicles.trip_types_total.passenger}}</td>
+            <td class="mytable-col-xxs small">{{report.all_vehicles.trip_types_total.no_passenger}}</td>
+            <td class="mytable-col-xxs">{{report.all_vehicles.trip_types_total.total}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.collected_cash}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.collected_check}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.total_collected_money}}</td>
         </tr>
     </table>
     <hr/>
 </div>
-{% for v in vehicle_reports %}
+{% for v in report.vehicle_reports %}
 <div id="report_vehicle_{{v.vehicle.id}}">
     <div class="row">
         <div class="col">
@@ -243,7 +243,7 @@
 </div>
 {% endfor %}
 
-{% if unique_riders.names %}
+{% if report.unique_riders.names %}
 <div id="report_riders">
     <div class="row">
         <div class="col">
@@ -264,36 +264,36 @@
         </thead>
         <tr>
             <td class="mytable-col-md">On vehicle</td>
-            <td class="mytable-col-sm {% if unique_riders.elderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_ambulatory.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.elderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_nonambulatory.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.nonelderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_ambulatory.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.unknown.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.all.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.staff.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.all_with_staff.passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all_with_staff.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.elderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.elderly_ambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.elderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.elderly_nonambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.nonelderly_ambulatory.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.nonelderly_ambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.nonelderly_nonambulatory.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.nonelderly_nonambulatory.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.unknown.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.unknown.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.all.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.all.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.staff.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.staff.passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.all_with_staff.passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.all_with_staff.passenger}}</td>
         </tr>
         <tr>
             <td class="mytable-col-md">Not on vehicle</td>
-            <td class="mytable-col-sm {% if unique_riders.elderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_ambulatory.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.elderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.elderly_nonambulatory.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.nonelderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_ambulatory.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.nonelderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.nonelderly_nonambulatory.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.unknown.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.all.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.staff.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.staff.no_passenger}}</td>
-            <td class="mytable-col-sm {% if unique_riders.all_with_staff.no_passenger == 0 %}mytable-zero{%endif%}">{{unique_riders.all_with_staff.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.elderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.elderly_ambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.elderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.elderly_nonambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.nonelderly_ambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.nonelderly_ambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.nonelderly_nonambulatory.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.nonelderly_nonambulatory.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.unknown.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.all.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.all.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.staff.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.staff.no_passenger}}</td>
+            <td class="mytable-col-sm {% if report.unique_riders.all_with_staff.no_passenger == 0 %}mytable-zero{%endif%}">{{report.unique_riders.all_with_staff.no_passenger}}</td>
         </tr>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.elderly_ambulatory.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.elderly_nonambulatory.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_ambulatory.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.nonelderly_nonambulatory.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.unknown.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.all.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.staff.total }}</td>
-            <td class="mytable-col-md text-center">{{ unique_riders.all_with_staff.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.elderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.elderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.nonelderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.nonelderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.unknown.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.all.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.staff.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.all_with_staff.total }}</td>
         </tr>
     </table>
     <br/>
@@ -307,7 +307,7 @@
             <td class="mytable-col-sm">Total Trips</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for rider in unique_riders.names %}
+            {% for rider in report.unique_riders.names %}
             {% if rider.trips.total > 0 %}
             <tr>
                 <td class="mytable-col-lg">
@@ -364,7 +364,7 @@
             <td class="mytable-col-sm">Total Trips</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for key, value in all_vehicles.trip_types.items %}
+            {% for key, value in report.all_vehicles.trip_types.items %}
             <tr>
                 <td class="mytable-col-lg">{{key}}</td>
                 <td class="mytable-col-sm {% if value.passenger == 0 %}mytable-zero{%endif%}">{{value.passenger}}</td>
@@ -374,15 +374,15 @@
             {% endfor %}
             <tr>
                 <td class="mytable-col-lg">Unknown</td>
-                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.passenger == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.passenger}}</td>
-                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.no_passenger}}</td>
-                <td class="mytable-col-sm {% if all_vehicles.trip_types_unknown.total == 0 %}mytable-zero{%endif%}">{{all_vehicles.trip_types_unknown.total}}</td>
+                <td class="mytable-col-sm {% if report.all_vehicles.trip_types_unknown.passenger == 0 %}mytable-zero{%endif%}">{{report.all_vehicles.trip_types_unknown.passenger}}</td>
+                <td class="mytable-col-sm {% if report.all_vehicles.trip_types_unknown.no_passenger == 0 %}mytable-zero{%endif%}">{{report.all_vehicles.trip_types_unknown.no_passenger}}</td>
+                <td class="mytable-col-sm {% if report.all_vehicles.trip_types_unknown.total == 0 %}mytable-zero{%endif%}">{{report.all_vehicles.trip_types_unknown.total}}</td>
             </tr>
             <tr class="bg-success text-light text-bold">
                 <td class="mytable-col-lg">TOTAL</td>
-                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.passenger }}</td>
-                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.no_passenger }}</td>
-                <td class="mytable-col-sm text-center">{{ all_vehicles.trip_types_total.total }}</td>
+                <td class="mytable-col-sm text-center">{{ report.all_vehicles.trip_types_total.passenger }}</td>
+                <td class="mytable-col-sm text-center">{{ report.all_vehicles.trip_types_total.no_passenger }}</td>
+                <td class="mytable-col-sm text-center">{{ report.all_vehicles.trip_types_total.total }}</td>
             </tr>
         </tbody>
     </table>
@@ -395,7 +395,7 @@
             <td class="mytable-col-sm">Total Trips</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for key, value in all_vehicles.tags.items %}
+            {% for key, value in report.all_vehicles.tags.items %}
             <tr>
                 <td class="mytable-col-lg">{{key}}</td>
                 <td class="mytable-col-sm {% if value.passenger == 0 %}mytable-zero{%endif%}">{{value.passenger}}</td>
@@ -408,7 +408,7 @@
     <hr/>
 </div>
 
-{% if frequent_destinations %}
+{% if report.frequent_destinations %}
 <div id="report_destinations">
     <div class="row">
         <div class="col">
@@ -427,7 +427,7 @@
             <td class="mytable-col-sm">Average Mileage</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for destination in frequent_destinations %}
+            {% for destination in report.frequent_destinations %}
             <tr>
                 <td class="mytable-col-lg">{{ destination.address }}</td>
                 <td class="mytable-col-sm {% if destination.trips.passenger == 0 %}mytable-zero{%endif%}">{{destination.trips.passenger}}</td>
@@ -442,7 +442,7 @@
 </div>
 {% endif %}
 
-{% if unique_riders.names or money_payments %}
+{% if report.unique_riders.names or report.money_payments %}
 <div id="report_fares">
     <div class="row">
         <div class="col">
@@ -461,7 +461,7 @@
             <td class="mytable-col-md">Total Owed</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for rider in unique_riders.names %}
+            {% for rider in report.unique_riders.names %}
             {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
             <tr>
                 <td class="mytable-col-lg">
@@ -497,20 +497,20 @@
         </tbody>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-lg">TOTAL</td>
-            <td class="mytable-col-md">{{ unique_riders.total_collected_cash }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_collected_check }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_paid_cash }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_paid_check }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_total_payments }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_total_fares }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_total_owed }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_collected_check }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_paid_cash }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_paid_check }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_total_owed }}</td>
         </tr>
     </table>
     <hr/>
 </div>
 {% endif %}
 
-{% if unique_riders.names or money_payments %}
+{% if report.unique_riders.names or report.money_payments %}
 <div id="report_fares_by_date">
     <div class="row">
         <div class="col">
@@ -531,7 +531,7 @@
             <td class="mytable-col-md">Total Fares</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for day in reports %}
+            {% for day in report.report_all %}
             {% if day.total_payments.value > 0 or day.total_fares.value > 0 %}
             <tr>
                 <td class="mytable-col-md"><a href="{% url 'schedule' 'edit' day.date.year day.date.month day.date.day %}">{{day.date|date:"M j, Y"}}</a></td>
@@ -547,19 +547,19 @@
         </tbody>
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
-            <td class="mytable-col-md">{{ unique_riders.total_collected_cash }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_collected_check }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_paid_cash }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_paid_check }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_total_payments }}</td>
-            <td class="mytable-col-md">{{ unique_riders.total_total_fares }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_collected_check }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_paid_cash }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_paid_check }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
+            <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
         </tr>
     </table>
     <hr/>
 </div>
 {% endif %}
 
-{% if money_trips %}
+{% if report.money_trips %}
 <div id="report_collected_money">
     <div class="row">
         <div class="col">
@@ -574,7 +574,7 @@
             <td class="mytable-col-sm">Check</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for money_trip in money_trips %}
+            {% for money_trip in report.money_trips %}
             <tr>
                 <td class="mytable-col-md"><a href="{% url 'trip-edit' 'edit' money_trip.trip.id %}">{{ money_trip.trip.date|date:"M j, Y" }}</a></td>
                 <td class="mytable-col-lg">{{ money_trip.trip.name }}</td>
@@ -586,15 +586,15 @@
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-lg"></td>
-            <td class="mytable-col-sm">{{ money_trips_summary.collected_cash}}</td>
-            <td class="mytable-col-sm">{{ money_trips_summary.collected_check}}</td>
+            <td class="mytable-col-sm">{{ report.money_trips_summary.collected_cash}}</td>
+            <td class="mytable-col-sm">{{ report.money_trips_summary.collected_check}}</td>
         </tr>
     </table>
     <hr/>
 </div>
 {% endif %}
 
-{% if money_payments %}
+{% if report.money_payments %}
 <div id="report_payments">
     <div class="row">
         <div class="col">
@@ -609,7 +609,7 @@
             <td class="mytable-col-sm">Check</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for money_payment in money_payments %}
+            {% for money_payment in report.money_payments %}
             <tr>
                 <td class="mytable-col-md"><a href="{% url 'client-payment-edit' money_payment.client.id money_payment.id %}">{{ money_payment.date }}</a></td>
                 <td class="mytable-col-lg">{{ money_payment.client.name }}</td>
@@ -621,15 +621,15 @@
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-lg"></td>
-            <td class="mytable-col-sm">{{ money_payments_summary.cash}}</td>
-            <td class="mytable-col-sm">{{ money_payments_summary.check}}</td>
+            <td class="mytable-col-sm">{{ report.money_payments_summary.cash}}</td>
+            <td class="mytable-col-sm">{{ report.money_payments_summary.check}}</td>
         </tr>
     </table>
     <hr/>
 </div>
 {% endif %}
 
-{% if driver_reports %}
+{% if report.driver_reports %}
 <div id="report_drivers">
     <div class="row">
         <div class="col">
@@ -646,7 +646,7 @@
             <td class="mytable-col-sm">Total Miles</td>
             <td class="mytable-col-sm">Total Hours</td>
         </thead>
-        {% for d in driver_reports %}
+        {% for d in report.driver_reports %}
         <tr style="background: #{{d.driver.get_color}}">
             <td class="mytable-col-md">{{d.driver}}</td>
             <td class="mytable-col-sm {% if d.totals.service_miles == 0 %}mytable-zero{%endif%}">{{d.totals.service_miles|floatformat:1}}</td>
@@ -669,7 +669,7 @@
     var visible = new ReportVisibility();
     visible.addSection("#report_errors", "#vis_errors");
     visible.addSection("#report_vehicle_totals", "#vis_vehicle_totals");
-    {% for v in vehicles %}
+    {% for v in report.filtered_vehicles %}
     visible.addSection("#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}");
     {% endfor %}
     visible.addSection("#report_riders", "#vis_riders");

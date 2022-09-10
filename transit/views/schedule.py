@@ -188,6 +188,7 @@ def ajaxSchedulePrint(request, year, month, day):
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'show_dialog': show_dialog,
         'Trip': Trip,
+        'Shift': Shift,
     }
     return render(request, 'schedule/ajax_print.html', context=context)
 
@@ -480,6 +481,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'message': message,
         'show_extra_columns': request.session.get('schedule_edit_extra_columns', False),
         'Trip': Trip,
+        'Shift': Shift,
     }
     return render(request, template, context=context)
 

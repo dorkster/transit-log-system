@@ -158,6 +158,10 @@ class Trip(models.Model):
     FORMAT_NORMAL = 0
     FORMAT_ACTIVITY = 1
 
+    LOG_EMPTY = 0
+    LOG_COMPLETE = 1
+    LOG_INCOMPLETE = 2
+
     # NOTE Trips that are of the format FORMAT_ACTIVITY and have a driver use the 'passenger' field to store the driver availability flag
     # This field isn't used otherwise in this context, and I felt it was unneccessary to create a new field for this purpose
     # The same behavior applies to the TemplateTrip class
@@ -301,25 +305,13 @@ class Trip(models.Model):
         else:
             return 'Trip'
 
-    def check_blank(self, field):
-        if field != '':
-            return True
-        elif self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
-            return True
+    def check_log(self):
+        if not self.start_miles and not self.start_time and not self.end_miles and not self.end_time:
+            return Trip.LOG_EMPTY
+        elif self.start_miles and self.start_time and self.end_miles and self.end_time:
+            return Trip.LOG_COMPLETE
         else:
-            return False
-
-    def check_start_miles(self):
-        return self.check_blank(self.start_miles)
-
-    def check_start_time(self):
-        return self.check_blank(self.start_time)
-
-    def check_end_miles(self):
-        return self.check_blank(self.end_miles)
-
-    def check_end_time(self):
-        return self.check_blank(self.end_time)
+            return Trip.LOG_INCOMPLETE
 
     def get_tag_list(self):
         tags = self.tags.split(',')
@@ -439,6 +431,10 @@ class TripType(models.Model):
         return 'Trip Type'
 
 class Shift(models.Model):
+    LOG_EMPTY = 0
+    LOG_COMPLETE = 1
+    LOG_INCOMPLETE = 2
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
@@ -459,25 +455,13 @@ class Shift(models.Model):
     def get_class_name(self):
         return 'Shift'
 
-    def check_blank(self, field):
-        if field != '':
-            return True
-        elif self.start_miles == '' and self.start_time == '' and self.end_miles == '' and self.end_time == '':
-            return True
+    def check_log(self):
+        if not self.start_miles and not self.start_time and not self.end_miles and not self.end_time:
+            return Trip.LOG_EMPTY
+        elif self.start_miles and self.start_time and self.end_miles and self.end_time:
+            return Trip.LOG_COMPLETE
         else:
-            return False
-
-    def check_start_miles(self):
-        return self.check_blank(self.start_miles)
-
-    def check_start_time(self):
-        return self.check_blank(self.start_time)
-
-    def check_end_miles(self):
-        return self.check_blank(self.end_miles)
-
-    def check_end_time(self):
-        return self.check_blank(self.end_time)
+            return Trip.LOG_INCOMPLETE
 
     def check_pretrip(self):
         return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)

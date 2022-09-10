@@ -80,28 +80,28 @@
         <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>
         <td class="mytable-col-md">{% if trip.vehicle %}{{trip.vehicle}}{% endif %}</td>
         <td class="mytable-col-sm">
-            {% if trip.check_start_miles %}
+            {% if trip.start_miles or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm">
-            {% if trip.check_start_time %}
+            {% if trip.start_time or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm">
-            {% if trip.check_end_miles %}
+            {% if trip.end_miles or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm">
-            {% if trip.check_end_time %}
+            {% if trip.end_time or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.end_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
@@ -118,10 +118,10 @@
             <span class="badge badge-primary"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
             {% endif %}
             {% endif %}
-            {% if trip.status > 0 %}
-                {% if trip.status == 1 %}
+            {% if trip.status != Trip.STATUS_NORMAL %}
+                {% if trip.status == Trip.STATUS_CANCELED %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                {% elif trip.status == 2 %}
+                {% elif trip.status == Trip.STATUS_NO_SHOW %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                 {% endif %}
             {% endif %}

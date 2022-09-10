@@ -225,6 +225,7 @@ def search(request):
         'results': results_paginated if searched else Trip.objects.none(),
         'page_ranges': page_ranges,
         'query_string': request.GET.urlencode(),
+        'Trip': Trip,
     }
     return render(request, 'search.html', context=context)
 

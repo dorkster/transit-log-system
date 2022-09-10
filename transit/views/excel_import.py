@@ -272,7 +272,7 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
             trip.sort_index = sort_index
             sort_index += 1
 
-            if trip.name and not trip.address and not trip.destination and not trip.driver and not trip.vehicle and trip.check_blank(''):
+            if trip.name and not trip.address and not trip.destination and not trip.driver and not trip.vehicle and trip.check_log == Trip.LOG_EMPTY:
                 trip.format = Trip.FORMAT_ACTIVITY
                 trip.note = trip.name
                 trip.name = ''

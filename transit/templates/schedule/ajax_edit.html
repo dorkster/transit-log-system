@@ -46,28 +46,28 @@
             {{ shift.vehicle }}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_miles', null)">
-            {% if shift.check_start_miles %}
+            {% if shift.start_miles or shift.check_log != Shift.LOG_INCOMPLETE %}
                 {{ shift.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_start_time', null)">
-            {% if shift.check_start_time %}
+            {% if shift.start_time or shift.check_log != Shift.LOG_INCOMPLETE %}
                 {{ shift.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_miles', null)">
-            {% if shift.check_end_miles %}
+            {% if shift.end_miles or shift.check_log != Shift.LOG_INCOMPLETE %}
                 {{ shift.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'shift-edit' 'edit' shift.id %}?focus=id_end_time', null)">
-            {% if shift.check_end_time %}
+            {% if shift.end_time or shift.check_log != Shift.LOG_INCOMPLETE %}
                 {{ shift.end_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
@@ -169,8 +169,8 @@
                     {% if trip.format == Trip.FORMAT_ACTIVITY %}
                     <a href="{% url 'trip-edit-activity' 'edit' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                     <div class="dropdown-divider"></div>
-                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                    {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                    {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-delete-activity' 'edit' trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete activity</a>
                     {% else %}
@@ -178,9 +178,9 @@
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-copy' 'edit' trip.id %}" class="dropdown-item"><span class="oi oi-clipboard mr-2"></span>Copy Trip</a>
                     <div class="dropdown-divider"></div>
-                    {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
-                    {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
+                    {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                    {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                    {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'client-create-from-trip' trip.id %}" class="dropdown-item"><span class="oi oi-person mr-2"></span>Create/Edit Client</a>
                     {% if trip.address and trip.destination %}
@@ -305,28 +305,28 @@
             </div>
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_start_miles', row_movers)">
-            {% if trip.check_start_miles %}
+            {% if trip.start_miles or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.start_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_start_time', row_movers)">
-            {% if trip.check_start_time %}
+            {% if trip.start_time or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.start_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_end_miles', row_movers)">
-            {% if trip.check_end_miles %}
+            {% if trip.end_miles or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.end_miles }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_end_time', row_movers)">
-            {% if trip.check_end_time %}
+            {% if trip.end_time or trip.check_log != Trip.LOG_INCOMPLETE %}
                 {{ trip.end_time }}
             {% else %}
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
@@ -346,10 +346,10 @@
             {% endif %}
         </td>
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=tag_list', row_movers)">
-            {% if trip.status > 0 %}
-                {% if trip.status == 1 %}
+            {% if trip.status != Trip.STATUS_NORMAL %}
+                {% if trip.status == Trip.STATUS_CANCELED %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                {% elif trip.status == 2 %}
+                {% elif trip.status == Trip.STATUS_NO_SHOW %}
                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                 {% endif %}
             {% endif %}
@@ -501,11 +501,11 @@
                             {% endif %}
                         </div>
                         {% endif %}
-                        {% if trip.status > 0 %}
+                        {% if trip.status != Trip.STATUS_NORMAL %}
                         <div class="list-group-item p-1">
-                            {% if trip.status == 1 %}
+                            {% if trip.status == Trip.STATUS_CANCELED %}
                             <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                            {% elif trip.status == 2 %}
+                            {% elif trip.status == Trip.STATUS_NO_SHOW %}
                             <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                             {% endif %}
                         </div>

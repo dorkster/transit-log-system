@@ -180,14 +180,14 @@
                                 {% if trip.format == Trip.FORMAT_ACTIVITY %}
                                 <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                                 <div class="dropdown-divider"></div>
-                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                                {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                                 {% else %}
                                 <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                                 <div class="dropdown-divider"></div>
-                                {% if trip.status > 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
-                                {% if trip.status == 0 %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
+                                {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -280,11 +280,11 @@
                             </div>
                             {% endif %}
                             {% endif %}
-                            {% if trip.trip_type or trip.status > 0 or trip.tags%}
+                            {% if trip.trip_type or trip.status != Trip.STATUS_NORMAL or trip.tags%}
                             <div class="list-group-item bg-transparent p-1">
-                                {% if trip.status == 1 %}
+                                {% if trip.status == Trip.STATUS_CANCELED %}
                                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                                {% elif trip.status == 2 %}
+                                {% elif trip.status == Trip.STATUS_NO_SHOW %}
                                 <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
                                 {% endif %}
                                 {% if trip.is_medical %}
@@ -308,7 +308,7 @@
                     </div>
                     {% if trip.format == Trip.FORMAT_NORMAL %}
                     <div class="text-right p-1 card-footer w-100">
-                        {% if trip.status == 0 %}
+                        {% if trip.status == Trip.STATUS_NORMAL %}
                             {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
                             <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
                                 Cash: ${{ trip.get_collected_cash_str }}<br/>

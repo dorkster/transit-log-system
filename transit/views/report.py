@@ -45,24 +45,12 @@ class Report():
         def to_float(self):
             return float(self.value) / 100
 
-    class Mileage():
+    class ValueString():
         def __init__(self):
             self.value = 0
             self.string = ''
             self.is_empty = True
             self.is_string_valid = True
-        def __add__(self, other):
-            r = Report.Mileage()
-            r.value = self.value + other.value
-            r.is_empty = False
-            r.is_string_valid = False
-            return r
-        def __sub__(self, other):
-            r = Report.Mileage()
-            r.value = self.value - other.value
-            r.is_empty = False
-            r.is_string_valid = False
-            return r
         def __lt__(self, other):
             return self.value < other.value
         def __gt__(self, other):
@@ -75,6 +63,22 @@ class Report():
             return self.value == other.value
         def __ne__(self, other):
             return self.value != other.value
+        def empty(self):
+            return self.is_empty
+
+    class Mileage(ValueString):
+        def __add__(self, other):
+            r = Report.Mileage()
+            r.value = self.value + other.value
+            r.is_empty = False
+            r.is_string_valid = False
+            return r
+        def __sub__(self, other):
+            r = Report.Mileage()
+            r.value = self.value - other.value
+            r.is_empty = False
+            r.is_string_valid = False
+            return r
         def __str__(self):
             if not self.is_string_valid:
                 self.string = f"{self.value:.1f}"
@@ -103,8 +107,58 @@ class Report():
                 return 1
             else:
                 return 0
-        def empty(self):
-            return self.is_empty
+
+    class Time(ValueString):
+        # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...
+        fallback_value = datetime.datetime(year=1900, month=1, day=1, hour=8, minute=0)
+        fallback_string = fallback_value.strftime('%I:%M %p')
+
+        def __str__(self):
+            if not self.is_string_valid:
+                self.is_string_valid = True
+                if self.value != 0:
+                    self.string = self.value.strftime('%I:%M %p')
+            return self.string
+        def setFromString(self, string, use_fallback=True):
+            try:
+                self.value = datetime.datetime.strptime(string, '%I:%M %p')
+            except:
+                if use_fallback:
+                    self.value = Report.Time.fallback_value
+                    self.string = Report.Time.fallback_string
+                else:
+                    self.value = 0
+                    self.string = ''
+                self.is_empty = True
+                self.is_string_valid = True
+                return 1
+            self.string = string
+            self.is_empty = False
+            self.is_string_valid = True
+            return 0
+
+    class Fuel(ValueString):
+        def __str__(self):
+            if not self.is_string_valid:
+                self.string = f"{self.value:.1f}"
+                self.is_string_valid = True
+            return self.string
+        def setFromString(self, string):
+            if string == '':
+                value = 0
+            else:
+                try:
+                    self.value = float(string)
+                except:
+                    self.value = 0
+                    self.string = ''
+                    self.is_empty = True
+                    self.is_string_valid = True
+                    return 1
+            self.string = string
+            self.is_empty = False
+            self.is_string_valid = True
+            return 0
 
     class TripCount():
         def __init__(self):
@@ -140,10 +194,10 @@ class Report():
         def __init__(self):
             self.shift = None
             self.start_miles = Report.Mileage()
-            self.start_time = None
+            self.start_time = Report.Time()
             self.end_miles = Report.Mileage()
-            self.end_time = None
-            self.fuel = 0
+            self.end_time = Report.Time()
+            self.fuel = Report.Fuel()
             self.start_trip = None
             self.end_trip = None
 
@@ -152,9 +206,9 @@ class Report():
             self.trip = None
             self.shift = None
             self.start_miles = Report.Mileage()
-            self.start_time = None
+            self.start_time = Report.Time()
             self.end_miles = Report.Mileage()
-            self.end_time = None
+            self.end_time = Report.Time()
             self.trip_type = None
             self.tags = []
             self.collected_cash = Report.Money(0)
@@ -497,9 +551,6 @@ class Report():
         all_dates = sorted(all_dates)
 
         for day_date in all_dates:
-            # TODO is this an acceptable "fallback" value? Does it matter? This is a worst case anyway...
-            fallback_time = datetime.datetime(year=day_date.year, month=day_date.month, day=day_date.day, hour=8, minute=0)
-
             report_day = Report.ReportDay()
             report_day.date = day_date
 
@@ -531,27 +582,17 @@ class Report():
                 if report_shift.start_miles.setFromString(i.start_miles) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                try:
-                    report_shift.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
-                except:
-                    report_shift.start_time = fallback_time
+                if report_shift.start_time.setFromString(i.start_time) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.end_miles.setFromString(i.end_miles) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                try:
-                    report_shift.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
-                except:
-                    report_shift.end_time = fallback_time
+                if report_shift.end_time.setFromString(i.end_time) != 0:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                if i.fuel:
-                    try:
-                        report_shift.fuel = float(i.fuel)
-                    except:
-                        report_shift.fuel = 0
-                        self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                if report_shift.fuel.setFromString(i.fuel) != 0:
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.start_miles > report_shift.end_miles:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
@@ -635,7 +676,7 @@ class Report():
                 shift = report_day.shifts[report_trip.shift]
 
                 # don't include trip if matching shift is incomplete
-                if not empty_trip and (shift.start_miles.empty() or shift.start_time == None or shift.end_miles.empty() or shift.end_time == None):
+                if not empty_trip and (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
                     continue
 
                 if not empty_trip:
@@ -644,19 +685,13 @@ class Report():
                     if report_trip.start_miles.mergeStrings(str(shift.start_miles), i.start_miles) != 0:
                         parse_error = True
 
-                    try:
-                        report_trip.start_time = datetime.datetime.strptime(i.start_time, '%I:%M %p')
-                    except:
-                        report_trip.start_time = fallback_time
+                    if report_trip.start_time.setFromString(i.start_time) != 0:
                         parse_error = True
 
                     if report_trip.end_miles.mergeStrings(str(shift.start_miles), i.end_miles) != 0:
                         parse_error = True
 
-                    try:
-                        report_trip.end_time = datetime.datetime.strptime(i.end_time, '%I:%M %p')
-                    except:
-                        report_trip.end_time = fallback_time
+                    if report_trip.end_time.setFromString(i.end_time) != 0:
                         parse_error = True
 
                     if parse_error:
@@ -853,11 +888,11 @@ class Report():
                 service_hours = 0
                 deadhead_miles = 0
                 deadhead_hours = 0
-                if not (shift.start_miles.empty() or shift.start_time == None or shift.end_miles.empty() or shift.end_time == None):
+                if not (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
                     service_miles = shift.end_miles.value - shift.start_miles.value
-                    service_hours = (shift.end_time - shift.start_time).seconds / 60 / 60
+                    service_hours = (shift.end_time.value - shift.start_time.value).seconds / 60 / 60
                     deadhead_miles = (report_day.trips[shift.start_trip].start_miles.value - shift.start_miles.value) + (shift.end_miles.value - report_day.trips[shift.end_trip].end_miles.value)
-                    deadhead_hours = ((report_day.trips[shift.start_trip].start_time - shift.start_time).seconds + (shift.end_time - report_day.trips[shift.end_trip].end_time).seconds) / 60 / 60
+                    deadhead_hours = ((report_day.trips[shift.start_trip].start_time.value - shift.start_time.value).seconds + (shift.end_time.value - report_day.trips[shift.end_trip].end_time.value).seconds) / 60 / 60
 
                 # per-vehicle log
                 report_day.by_vehicle[shift.shift.vehicle].service_miles += service_miles
@@ -888,7 +923,7 @@ class Report():
                         else:
                             report_day.by_vehicle[shift.shift.vehicle].tags[tag] = Report.TripCount()
                             report_day.by_vehicle[shift.shift.vehicle].tags[tag].setTrips(1, trip.trip.passenger)
-                report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel
+                report_day.by_vehicle[shift.shift.vehicle].fuel += shift.fuel.value
 
                 # per-driver log
                 report_day.by_driver[shift.shift.driver].service_miles += service_miles
@@ -919,7 +954,7 @@ class Report():
                         else:
                             report_day.by_driver[shift.shift.driver].tags[tag] = Report.TripCount()
                             report_day.by_driver[shift.shift.driver].tags[tag].setTrips(1, trip.trip.passenger)
-                report_day.by_driver[shift.shift.driver].fuel += shift.fuel
+                report_day.by_driver[shift.shift.driver].fuel += shift.fuel.value
 
                 report_day.all += report_day.by_vehicle[shift.shift.vehicle]
 

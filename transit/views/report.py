@@ -178,13 +178,13 @@ class Report():
             r.total = self.total - other.total
             return r
         def addTrips(self, value, is_passenger):
-            if is_passenger is False:
+            if is_passenger == False:
                 self.no_passenger += value
             else:
                 self.passenger += value
             self.total = self.passenger + self.no_passenger
         def setTrips(self, value, is_passenger):
-            if is_passenger is False:
+            if is_passenger == False:
                 self.no_passenger = value
             else:
                 self.passenger = value
@@ -570,9 +570,10 @@ class Report():
                     if i.driver.id != driver_id:
                         continue
 
-                if i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == '' or i.driver is None or i.vehicle is None:
+                log_status = i.check_log()
+                if log_status != Shift.LOG_COMPLETE or i.driver == None or i.vehicle == None:
                     # skip incomplete shift
-                    if i.start_miles != '' or i.start_time != '' or i.end_miles != '' or i.end_time != '':
+                    if log_status == Shift.LOG_INCOMPLETE:
                         self.report_errors.add(day_date, self.report_errors.SHIFT_INCOMPLETE, error_shift=i)
                     continue
 
@@ -608,7 +609,7 @@ class Report():
                 if i.date != day_date:
                     continue
 
-                empty_trip = (i.start_miles == '' and i.start_time == '' and i.end_miles == '' and i.end_time == '')
+                log_status = i.check_log()
 
                 if driver_id == None:
                     if i.driver and not i.driver.is_logged:
@@ -619,7 +620,7 @@ class Report():
                         # skip non-logged vehicles
                         continue
 
-                    if empty_trip:
+                    if log_status == Trip.LOG_EMPTY:
                         # skip empty trip
                         continue
                 elif i.driver:
@@ -629,7 +630,7 @@ class Report():
                     # skip trip with no driver/vehicle
                     continue
 
-                if not empty_trip and (i.start_miles == '' or i.start_time == '' or i.end_miles == '' or i.end_time == ''):
+                if log_status == Trip.LOG_INCOMPLETE:
                     # skip incomplete trip
                     self.report_errors.add(day_date, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
@@ -676,10 +677,10 @@ class Report():
                 shift = report_day.shifts[report_trip.shift]
 
                 # don't include trip if matching shift is incomplete
-                if not empty_trip and (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
+                if log_status == Trip.LOG_COMPLETE and (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
                     continue
 
-                if not empty_trip:
+                if log_status == Trip.LOG_COMPLETE:
                     parse_error = False
 
                     if report_trip.start_miles.mergeStrings(str(shift.start_miles), i.start_miles) != 0:
@@ -737,7 +738,7 @@ class Report():
 
                 report_day.trips.append(report_trip)
 
-                if not empty_trip:
+                if log_status == Trip.LOG_COMPLETE:
                     if shift.start_trip == None or report_trip.start_miles < report_day.trips[shift.start_trip].start_miles:
                         report_day.shifts[report_trip.shift].start_trip = len(report_day.trips) - 1;
 
@@ -808,13 +809,13 @@ class Report():
                             if j.address == i.destination:
                                 found_frequent_destination = True
                                 j.trips.addTrips(1, i.passenger)
-                                if not empty_trip:
+                                if log_status == Trip.LOG_COMPLETE:
                                     j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                         if not found_frequent_destination:
                             temp_fd = Report.FrequentDestination()
                             temp_fd.address = i.destination
                             temp_fd.trips.addTrips(1, i.passenger)
-                            if not empty_trip:
+                            if log_status == Trip.LOG_COMPLETE:
                                 temp_fd.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                             self.frequent_destinations.append(temp_fd)
 

@@ -80,6 +80,10 @@
                         <a title="Get the client's cell phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(1)"><span class="oi oi-phone"></span></a>
                         <br/>{{ form.phone_cell }}
                     </div>
+                    <div class="mb-2"><label for="{{ form.phone_alt.id_for_label }}"><strong>{{ form.phone_alt.label }}</strong></label>
+                        <a title="Get the client's alternate phone number" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="getClientPhone(2)"><span class="oi oi-phone"></span></a>
+                        <br/>{{ form.phone_alt }}
+                    </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
                     <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>

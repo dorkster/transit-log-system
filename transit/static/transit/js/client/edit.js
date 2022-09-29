@@ -33,9 +33,9 @@ function checkAlertAddress() {
 }
 
 function checkAlertPhone() {
-    var has_number = ($("#id_phone_home").val() != "" || $("#id_phone_cell").val() != "");
-    var both_checked = ($("#toggle_phone_home").is(":checked") == true && $("#toggle_phone_cell").is(":checked") == true);
-    if (has_number || both_checked) {
+    var has_number = ($("#id_phone_home").val() != "" || $("#id_phone_cell").val() != "" || $("#id_phone_alt").val() != "");
+    var all_checked = ($("#toggle_phone_home").is(":checked") == true && $("#toggle_phone_cell").is(":checked") == true && $("#toggle_phone_alt").is(":checked") == true);
+    if (has_number || all_checked) {
         $("#alert_phone").addClass("d-none");
     }
     else {
@@ -113,6 +113,7 @@ function setupFormEvents() {
     $("#toggle_address").on("click", function() { toggleFieldByCheckbox("#toggle_address", "#id_address"); checkAlertAddress(); } );
     $("#toggle_phone_home").on("click", function() { toggleFieldByCheckbox("#toggle_phone_home", "#id_phone_home"); checkAlertPhone(); } );
     $("#toggle_phone_cell").on("click", function() { toggleFieldByCheckbox("#toggle_phone_cell", "#id_phone_cell"); checkAlertPhone(); } );
+    $("#toggle_phone_alt").on("click", function() { toggleFieldByCheckbox("#toggle_phone_alt", "#id_phone_alt"); checkAlertPhone(); } );
 
     $("#id_address").on("change", checkAlertAddress);
     $("#id_phone_home").on("change", checkAlertPhone);

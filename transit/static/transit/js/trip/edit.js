@@ -39,6 +39,7 @@ function onNameChanged() {
 
             $("#id_phone_home").val(clients[i].fields.phone_home);
             $("#id_phone_cell").val(clients[i].fields.phone_cell);
+            $("#id_phone_alt").val(clients[i].fields.phone_alt);
 
             if (clients[i].fields.elderly == null)
                 $("#id_elderly").prop("selectedIndex", 0);
@@ -84,12 +85,20 @@ function onNameChanged() {
 }
 
 function getClientPhone(target) {
-    var phone_input = (target == 1 ? "#id_phone_cell" : "#id_phone_home");
+    var phone_input;
+    if (target == 2)
+        phone_input = "#id_phone_alt";
+    else if (target == 1)
+        phone_input = "#id_phone_cell";
+    else
+        phone_input = "#id_phone_home";
 
     $(phone_input).val("");
     for (i in clients) {
         if (clients[i].fields.name == $("#id_name").val()) {
-            if (target == 1)
+            if (target == 2)
+                $(phone_input).val(clients[i].fields.phone_alt);
+            else if (target == 1)
                 $(phone_input).val(clients[i].fields.phone_cell);
             else
                 $(phone_input).val(clients[i].fields.phone_home);

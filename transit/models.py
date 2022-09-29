@@ -162,6 +162,12 @@ class Trip(models.Model):
     LOG_COMPLETE = 1
     LOG_INCOMPLETE = 2
 
+    PHONE_HOME = 0
+    PHONE_CELL = 1
+    PHONE_ALT = 2
+    PHONE_ADDRESS = 3
+    PHONE_DESTINATION = 4
+
     # NOTE Trips that are of the format FORMAT_ACTIVITY and have a driver use the 'passenger' field to store the driver availability flag
     # This field isn't used otherwise in this context, and I felt it was unneccessary to create a new field for this purpose
     # The same behavior applies to the TemplateTrip class
@@ -176,6 +182,7 @@ class Trip(models.Model):
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
     phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
+    phone_alt = models.CharField(verbose_name='Phone (Alternate)', max_length=FieldSizes.PHONE, blank=True)
     phone_address = models.CharField(verbose_name='Phone (Address)', max_length=FieldSizes.PHONE, blank=True)
     phone_destination = models.CharField(verbose_name='Phone (Destination)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
@@ -263,14 +270,16 @@ class Trip(models.Model):
     def get_phone_number(self, phone_type):
         num_only = ''
         num_regex = '\d*'
-        if phone_type == 'cell':
-            matches = re.findall(num_regex, self.phone_cell)
-        elif phone_type == 'address':
-            matches = re.findall(num_regex, self.phone_address)
-        elif phone_type == 'destination':
-            matches = re.findall(num_regex, self.phone_destination)
-        else:
+        if phone_type == Trip.PHONE_HOME:
             matches = re.findall(num_regex, self.phone_home)
+        elif phone_type == Trip.PHONE_CELL:
+            matches = re.findall(num_regex, self.phone_cell)
+        elif phone_type == Trip.PHONE_ALT:
+            matches = re.findall(num_regex, self.phone_alt)
+        elif phone_type == Trip.PHONE_ADDRESS:
+            matches = re.findall(num_regex, self.phone_address)
+        elif phone_type == Trip.PHONE_DESTINATION:
+            matches = re.findall(num_regex, self.phone_destination)
         for i in matches:
             num_only += i
         return num_only
@@ -278,13 +287,15 @@ class Trip(models.Model):
     def get_phone_number_list(self):
         phone_numbers = []
         if self.phone_home:
-            phone_numbers.append({'label': 'Home Phone', 'value': self.phone_home, 'tel':self.get_phone_number('')})
+            phone_numbers.append({'label': 'Home Phone', 'value': self.phone_home, 'tel':self.get_phone_number(Trip.PHONE_HOME)})
         if self.phone_cell:
-            phone_numbers.append({'label': 'Cell Phone', 'value': self.phone_cell, 'tel':self.get_phone_number('cell')})
+            phone_numbers.append({'label': 'Cell Phone', 'value': self.phone_cell, 'tel':self.get_phone_number(Trip.PHONE_CELL)})
+        if self.phone_alt:
+            phone_numbers.append({'label': 'Alternate Phone', 'value': self.phone_alt, 'tel':self.get_phone_number(Trip.PHONE_ALT)})
         if self.address and self.phone_address:
-            phone_numbers.append({'label': self.address, 'value': self.phone_address, 'tel':self.get_phone_number('address')})
+            phone_numbers.append({'label': self.address, 'value': self.phone_address, 'tel':self.get_phone_number(Trip.PHONE_ADDRESS)})
         if self.destination and self.phone_destination:
-            phone_numbers.append({'label': self.destination, 'value': self.phone_destination, 'tel':self.get_phone_number('destination')})
+            phone_numbers.append({'label': self.destination, 'value': self.phone_destination, 'tel':self.get_phone_number(Trip.PHONE_DESTINATION)})
         return phone_numbers
 
     def get_phone_number_count(self):
@@ -292,6 +303,8 @@ class Trip(models.Model):
         if self.phone_home:
             count += 1
         if self.phone_cell:
+            count += 1
+        if self.phone_alt:
             count += 1
         if self.address and self.phone_address:
             count += 1
@@ -372,6 +385,14 @@ class Trip(models.Model):
         else:
             # TODO should this be something?
             return ''
+
+    def get_form_phone_focus(self):
+        if not self.phone_home and not self.phone_cell and self.phone_alt:
+            return 'id_phone_alt'
+        elif not self.phone_home and self.phone_cell:
+            return 'id_phone_cell'
+        else:
+            return 'id_phone_home'
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -473,6 +494,7 @@ class Client(models.Model):
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField('Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
     phone_cell = models.CharField('Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
+    phone_alt = models.CharField('Phone (Alternate)', max_length=FieldSizes.PHONE, blank=True)
     elderly = models.BooleanField(verbose_name='Elderly?', null=True, blank=True)
     ambulatory = models.BooleanField(verbose_name='Ambulatory?', null=True, blank=True)
     tags = models.CharField(max_length=FieldSizes.XL, blank=True)
@@ -696,6 +718,7 @@ class TemplateTrip(models.Model):
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
     phone_home = models.CharField(verbose_name='Phone (Home)', max_length=FieldSizes.PHONE, blank=True)
     phone_cell = models.CharField(verbose_name='Phone (Cell)', max_length=FieldSizes.PHONE, blank=True)
+    phone_alt = models.CharField(verbose_name='Phone (Alternate)', max_length=FieldSizes.PHONE, blank=True)
     phone_address = models.CharField(verbose_name='Phone (Address)', max_length=FieldSizes.PHONE, blank=True)
     phone_destination = models.CharField(verbose_name='Phone (Destination)', max_length=FieldSizes.PHONE, blank=True)
     destination = models.CharField(max_length=FieldSizes.MD, blank=True)
@@ -795,6 +818,13 @@ class TemplateTrip(models.Model):
     def get_fare_str(self):
         return int_to_money_string(self.fare)
 
+    def get_form_phone_focus(self):
+        if not self.phone_home and not self.phone_cell and self.phone_alt:
+            return 'id_phone_alt'
+        elif not self.phone_home and self.phone_cell:
+            return 'id_phone_cell'
+        else:
+            return 'id_phone_home'
 
 class ScheduleMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

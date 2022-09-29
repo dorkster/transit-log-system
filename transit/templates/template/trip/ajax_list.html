@@ -164,14 +164,12 @@
             {{ trip.address }}
             {% if trip.phone_address and trip.address %}<br/>Phone #: {{ trip.phone_address }}{% endif %}
         </td>
-        {% if not trip.phone_home and trip.phone_cell %}
-        <td class="mytable-col-md edit_cell" style="white-space: nowrap;" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_phone_cell', row_movers)">
-        {% else %}
-        <td class="mytable-col-md edit_cell" style="white-space: nowrap;" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_phone_home', row_movers)">
-        {% endif %}
+        <td class="mytable-col-md edit_cell" style="white-space: nowrap;" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus={{ trip.get_form_phone_focus }}', row_movers)">
             {{ trip.phone_home }}
             {% if trip.phone_home and trip.phone_cell %}<br/>{% endif %}
             {{ trip.phone_cell }}
+            {% if trip.phone_home or trip.phone_cell %}<br/>{% endif %}
+            {{ trip.phone_alt }}
         </td>
         <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_destination', row_movers)">
             {{ trip.destination }}

@@ -63,6 +63,7 @@ def tripCreateReturn(request, mode, id):
     trip.address = origin_trip.destination
     trip.phone_home = origin_trip.phone_home
     trip.phone_cell = origin_trip.phone_cell
+    trip.phone_alt = origin_trip.phone_alt
     trip.phone_address = origin_trip.phone_destination
     trip.phone_destination = origin_trip.phone_address
     trip.destination = origin_trip.address
@@ -97,6 +98,7 @@ def tripCreateFromClient(request, mode, id):
     trip.name = client.name
     trip.phone_home = client.phone_home
     trip.phone_cell = client.phone_cell
+    trip.phone_alt = client.phone_alt
     trip.elderly = client.elderly
     trip.ambulatory = client.ambulatory
     trip.tags = client.tags
@@ -150,6 +152,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.address = form.cleaned_data['address']
                 trip.phone_home = form.cleaned_data['phone_home']
                 trip.phone_cell = form.cleaned_data['phone_cell']
+                trip.phone_alt = form.cleaned_data['phone_alt']
                 trip.phone_address = form.cleaned_data['phone_address']
                 trip.phone_destination = form.cleaned_data['phone_destination']
                 trip.destination = form.cleaned_data['destination']
@@ -213,6 +216,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                     client.address = form.cleaned_data['address']
                     client.phone_home = form.cleaned_data['phone_home']
                     client.phone_cell = form.cleaned_data['phone_cell']
+                    client.phone_alt = form.cleaned_data['phone_alt']
                     client.elderly = form.cleaned_data['elderly']
                     client.ambulatory = form.cleaned_data['ambulatory']
                     client.save()
@@ -260,6 +264,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'address': trip.address,
                 'phone_home': trip.phone_home,
                 'phone_cell': trip.phone_cell,
+                'phone_alt': trip.phone_alt,
                 'phone_address': trip.phone_address,
                 'phone_destination': trip.phone_destination,
                 'destination': trip.destination,

@@ -206,13 +206,11 @@
                 {% if trip.phone_address and trip.address %}<br/>Phone #: {{ trip.phone_address }}{% endif %}
             </td>
             <td class="mytable-col-md" style="white-space: nowrap;">
-                {% if trip.phone_home and trip.phone_cell %}
-                {{ trip.phone_home }}<br/>{{ trip.phone_cell }}
-                {% elif not trip.phone_home and trip.phone_cell %}
-                {{ trip.phone_cell }}
-                {% elif trip.phone_home and not trip.phone_cell %}
                 {{ trip.phone_home }}
-                {% endif %}
+                {% if trip.phone_home and trip.phone_cell %}<br/>{% endif %}
+                {{ trip.phone_cell }}
+                {% if trip.phone_home or trip.phone_cell %}<br/>{% endif %}
+                {{ trip.phone_alt }}
             </td>
             <td class="mytable-col-lg">
                 {{ trip.destination }}

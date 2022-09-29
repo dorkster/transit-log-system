@@ -79,6 +79,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             prev_address = unique_client.address
             prev_phone_home = unique_client.phone_home
             prev_phone_cell = unique_client.phone_cell
+            prev_phone_alt = unique_client.phone_alt
             prev_elderly = unique_client.elderly
             prev_ambulatory = unique_client.ambulatory
 
@@ -86,6 +87,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.address = form.cleaned_data['address']
             unique_client.phone_home = form.cleaned_data['phone_home']
             unique_client.phone_cell = form.cleaned_data['phone_cell']
+            unique_client.phone_alt = form.cleaned_data['phone_alt']
             unique_client.elderly = form.cleaned_data['elderly']
             unique_client.ambulatory = form.cleaned_data['ambulatory']
             unique_client.tags = form.cleaned_data['tags']
@@ -121,6 +123,10 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                         if trip.phone_cell == prev_phone_cell:
                             trip.phone_cell = unique_client.phone_cell
                             updated = True
+                    if prev_phone_alt != unique_client.phone_alt:
+                        if trip.phone_alt == prev_phone_alt:
+                            trip.phone_alt = unique_client.phone_alt
+                            updated = True
                     # elderly/ambulatory
                     if prev_elderly != unique_client.elderly:
                         if trip.elderly == prev_elderly:
@@ -155,6 +161,10 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                         if trip.phone_cell == prev_phone_cell:
                             trip.phone_cell = unique_client.phone_cell
                             updated = True
+                    if prev_phone_alt != unique_client.phone_alt:
+                        if trip.phone_alt == prev_phone_alt:
+                            trip.phone_alt = unique_client.phone_alt
+                            updated = True
                     # elderly/ambulatory
                     if prev_elderly != unique_client.elderly:
                         if trip.elderly == prev_elderly:
@@ -180,6 +190,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'address': client.address,
             'phone_home': client.phone_home,
             'phone_cell': client.phone_cell,
+            'phone_alt': client.phone_alt,
             'elderly': client.elderly,
             'ambulatory': client.ambulatory,
             'tags': client.tags,
@@ -246,6 +257,7 @@ def clientCreateFromTrip(request, trip_id):
     client.address = trip.address
     client.phone_home = trip.phone_home
     client.phone_cell = trip.phone_cell
+    client.phone_alt = trip.phone_alt
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True, src_trip=trip)
@@ -263,6 +275,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
     client.address = trip.address
     client.phone_home = trip.phone_home
     client.phone_cell = trip.phone_cell
+    client.phone_alt = trip.phone_alt
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
     return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
@@ -275,10 +288,11 @@ def ajaxClientList(request):
     SORT_ADDRESS = 1
     SORT_PHONE_HOME = 2
     SORT_PHONE_CELL = 3
-    SORT_ELDERLY = 4
-    SORT_AMBULATORY = 5
-    SORT_TAGS = 6
-    SORT_IS_ACTIVE = 7
+    SORT_PHONE_ALT = 4
+    SORT_ELDERLY = 5
+    SORT_AMBULATORY = 6
+    SORT_TAGS = 7
+    SORT_IS_ACTIVE = 8
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -360,6 +374,8 @@ def ajaxClientList(request):
         clients = clients.order_by('phone_home', 'name')
     elif sort_mode == SORT_PHONE_CELL:
         clients = clients.order_by('phone_cell', 'name')
+    elif sort_mode == SORT_PHONE_ALT:
+        clients = clients.order_by('phone_alt', 'name')
     elif sort_mode == SORT_ELDERLY:
         clients = clients.order_by('elderly', 'name')
     elif sort_mode == SORT_AMBULATORY:
@@ -394,10 +410,11 @@ def clientXLSX(request):
     SORT_ADDRESS = 1
     SORT_PHONE_HOME = 2
     SORT_PHONE_CELL = 3
-    SORT_ELDERLY = 4
-    SORT_AMBULATORY = 5
-    SORT_TAGS = 6
-    SORT_IS_ACTIVE = 7
+    SORT_PHONE_ALT = 4
+    SORT_ELDERLY = 5
+    SORT_AMBULATORY = 6
+    SORT_TAGS = 7
+    SORT_IS_ACTIVE = 8
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -441,6 +458,8 @@ def clientXLSX(request):
         clients = clients.order_by('phone_home', 'name')
     elif sort_mode == SORT_PHONE_CELL:
         clients = clients.order_by('phone_cell', 'name')
+    elif sort_mode == SORT_PHONE_ALT:
+        clients = clients.order_by('phone_alt', 'name')
     elif sort_mode == SORT_ELDERLY:
         clients = clients.order_by('elderly', 'name')
     elif sort_mode == SORT_AMBULATORY:
@@ -477,30 +496,32 @@ def clientXLSX(request):
     ws.cell(row_header, 2, 'Address')
     ws.cell(row_header, 3, 'Phone (Home)')
     ws.cell(row_header, 4, 'Phone (Cell)')
-    ws.cell(row_header, 5, 'Elderly?')
-    ws.cell(row_header, 6, 'Ambulatory?')
-    ws.cell(row_header, 7, 'Tags')
-    ws.cell(row_header, 8, 'Is active?')
+    ws.cell(row_header, 5, 'Phone (Alternate)')
+    ws.cell(row_header, 6, 'Elderly?')
+    ws.cell(row_header, 7, 'Ambulatory?')
+    ws.cell(row_header, 8, 'Tags')
+    ws.cell(row_header, 9, 'Is active?')
 
     for i in range(0, len(clients)):
         ws.cell(i+2, 1, clients[i].name)
         ws.cell(i+2, 2, clients[i].address)
         ws.cell(i+2, 3, clients[i].phone_home)
         ws.cell(i+2, 4, clients[i].phone_cell)
-        ws.cell(i+2, 5, clients[i].elderly)
-        ws.cell(i+2, 6, clients[i].ambulatory)
-        ws.cell(i+2, 7, clients[i].tags)
-        ws.cell(i+2, 8, clients[i].is_active)
+        ws.cell(i+2, 5, clients[i].phone_alt)
+        ws.cell(i+2, 6, clients[i].elderly)
+        ws.cell(i+2, 7, clients[i].ambulatory)
+        ws.cell(i+2, 8, clients[i].tags)
+        ws.cell(i+2, 9, clients[i].is_active)
 
         # display elderly/ambulatory as booleans
-        ws.cell(i+2, 5).number_format = 'BOOLEAN'
         ws.cell(i+2, 6).number_format = 'BOOLEAN'
-        ws.cell(i+2, 8).number_format = 'BOOLEAN'
+        ws.cell(i+2, 7).number_format = 'BOOLEAN'
+        ws.cell(i+2, 9).number_format = 'BOOLEAN'
 
     # apply styles
     ws.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 9):
-        if i == 1 or i == 2 or i == 7:
+    for i in range(1, 10):
+        if i == 1 or i == 2 or i == 8:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal

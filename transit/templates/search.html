@@ -24,7 +24,7 @@
         </div>
         <div class="row">
             <div class="col-md border m-1 p-2">
-                <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }}</strong></label><br/>{{ form.notes }}</div>
+                <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }} / Activity Description</strong></label><br/>{{ form.notes }}</div>
                 <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
                 <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
             </div>
@@ -72,6 +72,27 @@
         {% else %}
         <td class="mytable-col-md"><a href="{% url 'schedule' 'read-only' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% endif %}
+        {% if trip.format == Trip.FORMAT_ACTIVITY %}
+        <td colspan="2" class="text-center">
+            {% if trip.pick_up_time and trip.appointment_time %}
+            {{ trip.pick_up_time }} - {{ trip.appointment_time }}
+            {% elif trip.pick_up_time %}
+            {{ trip.pick_up_time }}
+            {% elif trip.appointment_time %}
+            {{ trip.appointment_time }}
+            {% endif %}
+        </td>
+        <td colspan="15">
+            {% if trip.driver %}
+                {% if trip.passenger %}
+                <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
+                {% else %}
+                <span class="badge badge-light text-danger mr-1"><span class="oi oi-person"></span></span>
+                {% endif %}
+            {% endif %}
+            {{ trip.note }}
+        </td>
+        {% else %}
         <td class="mytable-col-sm">{{trip.pick_up_time}}</td>
         <td class="mytable-col-sm">{{trip.appointment_time}}</td>
         <td class="mytable-col-lg">{{trip.name}}</td>
@@ -161,6 +182,8 @@
             <span class="oi oi-x"></span>
             {% endif %}
         </td>
+        {% endif %}
+</tr>
 {% endfor %}
 </table>
 {% if results.paginator.num_pages > 1 %}

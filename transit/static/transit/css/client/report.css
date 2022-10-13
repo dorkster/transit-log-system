@@ -1,5 +1,5 @@
 @media print {
-    nav, #global-notifications, #notify_vehicle_issues, .footer, h3 a.btn, .top-right-nav {
+    nav, #global-notifications, #notify_vehicle_issues, .footer, h3 a.btn, .top-right-nav, .mytable-has-edit-column td:first-child {
         display: none !important;
     }
     body.bg-light {

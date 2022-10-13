@@ -111,7 +111,7 @@
         {% if trips_money %}
         <hr/>
         <h4>Trips with a fare and/or payments ({{trips_money|length}})</h4>
-        <table class="mytable mytable-striped">
+        <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-md"></td>
                 <td class="mytable-col-lg">Date</td>
@@ -119,8 +119,8 @@
                 <td class="mytable-col-address">Destination</td>
                 <td class="mytable-col-md">Driver</td>
                 <td class="mytable-col-md">Fare</td>
-                <td class="mytable-col-md">Cash collected</td>
-                <td class="mytable-col-md">Check collected</td>
+                <td class="mytable-col-md">Cash</td>
+                <td class="mytable-col-md">Check</td>
             </thead>
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_money %}
@@ -143,11 +143,12 @@
                 <td>Destination</td>
                 <td>Driver</td>
                 <td>Fare</td>
-                <td>Cash collected</td>
-                <td>Check collected</td>
+                <td>Cash</td>
+                <td>Check</td>
             </thead>
             <tr class="bg-success text-light text-bold">
-                <td colspan="5">TOTAL</td>
+                <td></td>
+                <td colspan="4">TOTAL</td>
                 <td>{{ report.unique_riders.total_total_fares }}</td>
                 <td>{{ report.unique_riders.total_collected_cash }}</td>
                 <td>{{ report.unique_riders.total_collected_check }}</td>
@@ -158,13 +159,13 @@
         <hr/>
         <h4>Payments not collected by drivers ({{ payments|length }})</h4>
         <p class="small text-muted">Payments can be added and managed via this client's <a href="{% url 'client-payments' client.id %}">Payments</a> page.</p>
-        <table class="mytable mytable-striped">
+        <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-sm"></td>
                 <td class="mytable-col-lg">Date paid</td>
                 <td class="mytable-col-xl">Notes</td>
-                <td class="mytable-col-md">Cash collected</td>
-                <td class="mytable-col-md">Check collected</td>
+                <td class="mytable-col-md">Cash</td>
+                <td class="mytable-col-md">Check</td>
             </thead>
             <tbody class="mytable-hoverhi">
                 {% for payment in payments %}
@@ -181,11 +182,12 @@
                 <td></td>
                 <td>Date paid</td>
                 <td>Notes</td>
-                <td>Cash collected</td>
-                <td>Check collected</td>
+                <td>Cash</td>
+                <td>Check</td>
             </thead>
             <tr class="bg-success text-light text-bold">
-                <td colspan="3">TOTAL</td>
+                <td></td>
+                <td colspan="2">TOTAL</td>
                 <td>{{ report.unique_riders.total_paid_cash }}</td>
                 <td>{{ report.unique_riders.total_paid_check }}</td>
             </tr>
@@ -195,7 +197,7 @@
     <div class="tab-pane fade" id="tab_content_trips_normal">
         <h4>Trips ({{trips_normal|length}})</h4>
         {% if trips_normal %}
-        <table class="mytable mytable-striped">
+        <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-md"></td>
                 <td class="mytable-col-lg">Date</td>
@@ -223,7 +225,7 @@
         <p class="small text-muted">Canceled on the same day (or later): {{trips_canceled_late|length}}</p>
         {% endif %}
         {% if trips_canceled %}
-        <table class="mytable mytable-striped">
+        <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-md"></td>
                 <td class="mytable-col-lg">Date</td>
@@ -250,7 +252,7 @@
     <div class="tab-pane fade" id="tab_content_trips_no_show">
         <h4>No Show trips ({{trips_no_show|length}})</h4>
         {% if trips_no_show %}
-        <table class="mytable mytable-striped">
+        <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-md"></td>
                 <td class="mytable-col-lg">Date</td>

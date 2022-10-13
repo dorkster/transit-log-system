@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.db.models import F
 
-from transit.models import Client, Trip
+from transit.models import Client, Trip, ClientPayment
 from transit.forms import DatePickerForm, DateRangePickerForm
 from transit.views.report import Report
 
@@ -59,6 +59,11 @@ def clientReportBase(request, parent, start_year, start_month, start_day, end_ye
     trips_canceled = all_trips.filter(status=Trip.STATUS_CANCELED)
     trips_no_show = all_trips.filter(status=Trip.STATUS_NO_SHOW)
     trips_canceled_late = trips_canceled.filter(cancel_date__gte=F('date'))
+    trips_money = trips_normal.filter(Q(fare__gt=0) | Q(collected_cash__gt=0) | Q(collected_check__gt=0))
+
+    payments = ClientPayment.objects.filter(parent=client.id, date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
+
+    total_fares_and_payments = len(trips_money) + len(payments)
 
     # run report to get all fares/payments
     report = Report()
@@ -77,6 +82,9 @@ def clientReportBase(request, parent, start_year, start_month, start_day, end_ye
         'trips_canceled': trips_canceled,
         'trips_no_show': trips_no_show,
         'trips_canceled_late': trips_canceled_late,
+        'trips_money': trips_money,
+        'payments': payments,
+        'total_fares_and_payments': total_fares_and_payments,
         'report': report,
     }
     return render(request, 'client/report/view.html', context=context)

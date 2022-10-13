@@ -1,10 +1,15 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Report for: {{date_start}} - {{date_end}} | {% endif %}
+{% if user.is_authenticated %}Client Report for {{ client.name }}: {{date_start}} - {{date_end}} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'transit/css/client/report.css' %}">
+{% endblock %}
+
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">
@@ -13,7 +18,30 @@
                 Client Report for {{ client.name }}: <strong>{{ date_start }} - {{ date_end }}</strong>
             </h3>
         </div>
-        <div class="col-sm-auto p-1">
+        <div class="col-auto p-1 top-right-nav">
+            <span class="dropdown">
+                <a href="#_" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="More client actions">
+                    <span class="oi oi-person mr-2"></span>Client
+                </a>
+                    <div class="dropdown-menu shadow">
+                        <a class="dropdown-item" href="{% url 'client-edit' client.id %}">
+                            <span class="oi oi-pencil mr-2"></span>Edit Client
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'client-payments' client.id %}">
+                            <span class="oi oi-dollar mr-2"></span>View Payments
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{client.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
+                            <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                        </a>
+                    </div>
+            </span>
+        </div>
+        <div class="col-auto p-1 top-right-nav">
+            <button class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</button>
+        </div>
+        <div class="col-sm-auto p-1 top-right-nav">
             <div class="btn-group" role="group">
                 <a title="Previous month" class="btn btn-secondary" href="{{ url_month_prev }}">
                     <span class="oi oi-chevron-left"></span>
@@ -56,116 +84,196 @@
         </div>
     </div>
 </div>
-<h4>Trips ({{trips_normal|length}})</h4>
-{% if trips_normal %}
-{% for trip in trips_normal %}
-<div class="mb-1">
-    <div class="btn-group w-75">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
-        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
-    </div>
-</div>
-{% endfor %}
-{% else %}
-<div>There are no normal trips for the selected date range.</div>
-{% endif %}
-
+<ul class="nav nav-pills">
+    <li class="nav-item"><a class="nav-link active" id="tab_trips_money" data-toggle="tab" data-target="#tab_content_trips_money" type="button">Fares &amp; Payments ({{ total_fares_and_payments }})</a></li>
+    <li class="nav-item"><a class="nav-link" id="tab_trips_normal" data-toggle="tab" data-target="#tab_content_trips_normal" type="button">Trips ({{ trips_normal|length }})</a></li>
+    <li class="nav-item"><a class="nav-link" id="tab_trips_canceled" data-toggle="tab" data-target="#tab_content_trips_canceled" type="button">Canceled trips ({{ trips_canceled|length }})</a></li>
+    <li class="nav-item"><a class="nav-link" id="tab_trips_no_show" data-toggle="tab" data-target="#tab_content_trips_no_show" type="button">No Show trips ({{ trips_no_show|length }})</a></li>
+</ul>
 <hr/>
-
-<h4>Canceled Trips ({{trips_canceled|length}})</h4>
-{% if trips_canceled_late %}
-<p class="small text-muted">Canceled on the same day (or later): {{trips_canceled_late|length}}</p>
-{% endif %}
-{% if trips_canceled %}
-{% for trip in trips_canceled %}
-<div class="mb-1">
-    <div class="btn-group w-75">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
-        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
-    </div>
-</div>
-{% endfor %}
-{% else %}
-<div>There are trips marked as <b>canceled</b> for the selected date range.</div>
-{% endif %}
-
-<hr/>
-
-<h4>No Show Trips ({{trips_no_show|length}})</h4>
-{% if trips_no_show %}
-{% for trip in trips_no_show %}
-<div class="mb-1">
-    <div class="btn-group w-75">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a>
-        <a class="btn btn-outline-dark btn-sm w-100 text-left" href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip}}</a>
-    </div>
-</div>
-{% endfor %}
-{% else %}
-<div>There are no trips marked as <b>no show</b> for the selected date range.</div>
-{% endif %}
-
-
-<hr/>
-<h4>Fares &amp; Payments</h4>
-<p>A full summary of fares and payments for this client can be found <a href="{% url 'client-payments' client.id %}">here</a>.</p>
-<table class="mytable mytable-striped">
-    <thead>
-        <td class="mytable-col-lg">Name</td>
-        <td class="mytable-col-md">Cash (driver collected)</td>
-        <td class="mytable-col-md">Check (driver collected)</td>
-        <td class="mytable-col-md">Cash (not driver collected)</td>
-        <td class="mytable-col-md">Check (not driver collected)</td>
-        <td class="mytable-col-md">Total Payments</td>
-        <td class="mytable-col-md">Total Fares</td>
-        <td class="mytable-col-md">Total Owed</td>
-    </thead>
-    <tbody class="mytable-hoverhi">
-        {% for rider in report.unique_riders.names %}
-        {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
-        <tr>
-            <td class="mytable-col-lg">
-                <div class="dropdown ajax-blocker">
-                    <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
-                    <div class="dropdown-menu shadow">
-                        <h5 class="pl-3 pr-3">{{rider.name}}</h5>
-                        <div class="dropdown-divider"></div>
-                        <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}&start_date_year={{date_start.year}}&start_date_month={{date_start.month}}&start_date_day={{date_start.day}}&end_date_year={{date_end.year}}&end_date_month={{date_end.month}}&end_date_day={{date_end.day}}">
-                            <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
-                        </a>
-                        {% if rider.client_id %}
-                        <div class="dropdown-divider"></div>
-                        <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
-                        <div class="dropdown-divider"></div>
-                        <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
-                            <span class="oi oi-person mr-2"></span>Edit Client
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </td>
-            <td class="mytable-col-md {% if rider.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_cash }}</td>
-            <td class="mytable-col-md {% if rider.collected_check.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_check }}</td>
-            <td class="mytable-col-md {% if rider.paid_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_cash }}</td>
-            <td class="mytable-col-md {% if rider.paid_check.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_check }}</td>
-            <td class="mytable-col-md {% if rider.total_payments.value == 0 %}mytable-zero{%endif%}">{{ rider.total_payments }}</td>
-            <td class="mytable-col-md {% if rider.total_fares.value == 0 %}mytable-zero{%endif%}">{{ rider.total_fares }}</td>
-            <td class="mytable-col-md {% if rider.total_owed.value == 0 %}mytable-zero{%endif%}">{{ rider.total_owed }}</td>
-        </tr>
+<div class="tab-content p-1">
+    <div class="tab-pane fade show active" id="tab_content_trips_money">
+        <h4>Summary</h4>
+        <table class="mytable mytable-striped" style="font-size: 1.1em;">
+            <tr>
+                <td>Total Fares</td>
+                <td><span class="text-bold {% if report.unique_riders.total_total_fares.value > 0 %}text-danger{% endif %}">{{ report.unique_riders.total_total_fares }}</span></td>
+            </tr>
+            <tr>
+                <td>Total Payments</td>
+                <td><span class="text-bold {% if report.unique_riders.total_total_payments.value > 0 %}text-success{% endif %}">{{ report.unique_riders.total_total_payments }}</span></td>
+            </tr>
+            <tr style="background-color:#d6d8d9;">
+                <td class="mytable-col-lg text-bold">Total Owed</td>
+                <td class="mytable-col-md"><span class="text-bold {% if report.unique_riders.total_total_owed.value > 0 %}text-danger{% endif %}">{{ report.unique_riders.total_total_owed }}</span></td>
+            </tr>
+        </table>
+        {% if trips_money %}
+        <hr/>
+        <h4>Trips with a fare and/or payments ({{trips_money|length}})</h4>
+        <table class="mytable mytable-striped">
+            <thead>
+                <td class="mytable-col-md"></td>
+                <td class="mytable-col-lg">Date</td>
+                <td class="mytable-col-address">Address</td>
+                <td class="mytable-col-address">Destination</td>
+                <td class="mytable-col-md">Driver</td>
+                <td class="mytable-col-md">Fare</td>
+                <td class="mytable-col-md">Cash collected</td>
+                <td class="mytable-col-md">Check collected</td>
+            </thead>
+            <tbody class="mytable-hoverhi">
+                {% for trip in trips_money %}
+                <tr>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td>{{ trip.address }}</td>
+                    <td>{{ trip.destination }}</td>
+                    <td>{{ trip.driver }}</td>
+                    <td class="{% if trip.fare == 0 %}mytable-zero{% endif %}">${{ trip.get_fare_str }}</td>
+                    <td class="{% if trip.collected_cash == 0 %}mytable-zero{% endif %}">${{ trip.get_collected_cash_str }}</td>
+                    <td class="{% if trip.collected_check == 0 %}mytable-zero{% endif %}">${{ trip.get_collected_check_str }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <thead>
+                <td></td>
+                <td>Date</td>
+                <td>Address</td>
+                <td>Destination</td>
+                <td>Driver</td>
+                <td>Fare</td>
+                <td>Cash collected</td>
+                <td>Check collected</td>
+            </thead>
+            <tr class="bg-success text-light text-bold">
+                <td colspan="5">TOTAL</td>
+                <td>{{ report.unique_riders.total_total_fares }}</td>
+                <td>{{ report.unique_riders.total_collected_cash }}</td>
+                <td>{{ report.unique_riders.total_collected_check }}</td>
+            </tr>
+        </table>
         {% endif %}
-        {% endfor %}
-    </tbody>
-    <tr class="bg-success text-light text-bold">
-        <td class="mytable-col-lg">TOTAL</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_collected_check }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_paid_cash }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_paid_check }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
-        <td class="mytable-col-md">{{ report.unique_riders.total_total_owed }}</td>
-    </tr>
-</table>
+        {% if payments %}
+        <hr/>
+        <h4>Payments not collected by drivers ({{ payments|length }})</h4>
+        <p class="small text-muted">Payments can be added and managed via this client's <a href="{% url 'client-payments' client.id %}">Payments</a> page.</p>
+        <table class="mytable mytable-striped">
+            <thead>
+                <td class="mytable-col-sm"></td>
+                <td class="mytable-col-lg">Date paid</td>
+                <td class="mytable-col-xl">Notes</td>
+                <td class="mytable-col-md">Cash collected</td>
+                <td class="mytable-col-md">Check collected</td>
+            </thead>
+            <tbody class="mytable-hoverhi">
+                {% for payment in payments %}
+                <tr>
+                    <td class="text-center"><a href="{% url 'client-payment-edit' client.id payment.id %}">Edit</a></td>
+                    <td>{{ payment.date_paid|date:"F j, Y" }}</td>
+                    <td>{{ payment.notes }}</td>
+                    <td class="{% if payment.money_cash == 0 %}mytable-zero{% endif %}">${{ payment.get_cash_str }}</td>
+                    <td class="{% if payment.money_check == 0 %}mytable-zero{% endif %}">${{ payment.get_check_str }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <thead>
+                <td></td>
+                <td>Date paid</td>
+                <td>Notes</td>
+                <td>Cash collected</td>
+                <td>Check collected</td>
+            </thead>
+            <tr class="bg-success text-light text-bold">
+                <td colspan="3">TOTAL</td>
+                <td>{{ report.unique_riders.total_paid_cash }}</td>
+                <td>{{ report.unique_riders.total_paid_check }}</td>
+            </tr>
+        </table>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="tab_content_trips_normal">
+        <h4>Trips ({{trips_normal|length}})</h4>
+        {% if trips_normal %}
+        <table class="mytable mytable-striped">
+            <thead>
+                <td class="mytable-col-md"></td>
+                <td class="mytable-col-lg">Date</td>
+                <td class="mytable-col-address">Address</td>
+                <td class="mytable-col-address">Destination</td>
+            </thead>
+            <tbody class="mytable-hoverhi">
+                {% for trip in trips_normal %}
+                <tr>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td>{{ trip.address }}</td>
+                    <td>{{ trip.destination }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div>There are no normal trips for the selected date range.</div>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="tab_content_trips_canceled">
+        <h4>Canceled trips ({{trips_canceled|length}})</h4>
+        {% if trips_canceled_late %}
+        <p class="small text-muted">Canceled on the same day (or later): {{trips_canceled_late|length}}</p>
+        {% endif %}
+        {% if trips_canceled %}
+        <table class="mytable mytable-striped">
+            <thead>
+                <td class="mytable-col-md"></td>
+                <td class="mytable-col-lg">Date</td>
+                <td class="mytable-col-address">Address</td>
+                <td class="mytable-col-address">Destination</td>
+                <td class="mytable-col-lg">Cancel Date</td>
+            </thead>
+            <tbody class="mytable-hoverhi">
+                {% for trip in trips_canceled %}
+                <tr>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td>{{ trip.address }}</td>
+                    <td>{{ trip.destination }}</td>
+                    <td>{% if trip.cancel_date %}<span class="{% if trip.cancel_date >= trip.date %}text-danger text-bold{% endif %}">{{ trip.cancel_date|date:"F, j, Y" }}</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div>There are trips marked as <b>canceled</b> for the selected date range.</div>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="tab_content_trips_no_show">
+        <h4>No Show trips ({{trips_no_show|length}})</h4>
+        {% if trips_no_show %}
+        <table class="mytable mytable-striped">
+            <thead>
+                <td class="mytable-col-md"></td>
+                <td class="mytable-col-lg">Date</td>
+                <td class="mytable-col-address">Address</td>
+                <td class="mytable-col-address">Destination</td>
+            </thead>
+            <tbody class="mytable-hoverhi">
+                {% for trip in trips_no_show %}
+                <tr>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td>{{ trip.address }}</td>
+                    <td>{{ trip.destination }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div>There are no trips marked as <b>no show</b> for the selected date range.</div>
+        {% endif %}
+    </div>
+</div>
+
 <script type="text/javascript">
     function fixDatePicker() {
         // Keep the dropdown from closing when picking a date

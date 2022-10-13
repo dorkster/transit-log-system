@@ -117,7 +117,6 @@
                 <td class="mytable-col-lg">Date</td>
                 <td class="mytable-col-address">Address</td>
                 <td class="mytable-col-address">Destination</td>
-                <td class="mytable-col-md">Driver</td>
                 <td class="mytable-col-md">Fare</td>
                 <td class="mytable-col-md">Cash</td>
                 <td class="mytable-col-md">Check</td>
@@ -129,7 +128,6 @@
                     <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
-                    <td>{{ trip.driver }}</td>
                     <td class="{% if trip.fare == 0 %}mytable-zero{% endif %}">${{ trip.get_fare_str }}</td>
                     <td class="{% if trip.collected_cash == 0 %}mytable-zero{% endif %}">${{ trip.get_collected_cash_str }}</td>
                     <td class="{% if trip.collected_check == 0 %}mytable-zero{% endif %}">${{ trip.get_collected_check_str }}</td>
@@ -141,14 +139,13 @@
                 <td>Date</td>
                 <td>Address</td>
                 <td>Destination</td>
-                <td>Driver</td>
                 <td>Fare</td>
                 <td>Cash</td>
                 <td>Check</td>
             </thead>
             <tr class="bg-success text-light text-bold">
                 <td></td>
-                <td colspan="4">TOTAL</td>
+                <td colspan="3">TOTAL</td>
                 <td>{{ report.unique_riders.total_total_fares }}</td>
                 <td>{{ report.unique_riders.total_collected_cash }}</td>
                 <td>{{ report.unique_riders.total_collected_check }}</td>

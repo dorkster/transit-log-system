@@ -5,71 +5,18 @@
 
 {% block auth_content %}
 {% include "ajax_loading.html" %}
-<div id="client_payment_list">
+
+<h3>
+    <a href="{% url 'clients' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
+    Payments from {{ client.name }}
+    <a class="btn btn-success btn-sm" href="{% url 'client-payment-create' client.id %}"><span class="oi oi-plus mr-2"></span>New</a>
+</h3>
+<div class="alert alert-info">
+    <strong>NOTE:</strong> Payments listed here <strong>do not</strong> include money given directly to drivers.<br/>
+    For that information, please refer to the <a class="alert-link" href="{% url 'client-report-this-month' client.id %}">Client Report</a> or the global <a class="alert-link" href="{% url 'report-this-month' %}">Report</a>.
 </div>
-<hr/>
-<div id="report_fares">
-    <div class="row">
-        <div class="col">
-            <h3>Total Fares &amp; Payments</h3>
-        </div>
-    </div>
-    <table class="mytable mytable-striped">
-        <thead>
-            <td class="mytable-col-lg">Name</td>
-            <td class="mytable-col-md">Cash (driver collected)</td>
-            <td class="mytable-col-md">Check (driver collected)</td>
-            <td class="mytable-col-md">Cash (not driver collected)</td>
-            <td class="mytable-col-md">Check (not driver collected)</td>
-            <td class="mytable-col-md">Total Payments</td>
-            <td class="mytable-col-md">Total Fares</td>
-            <td class="mytable-col-md">Total Owed</td>
-        </thead>
-        <tbody class="mytable-hoverhi">
-            {% for rider in report.unique_riders.names %}
-            {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
-            <tr>
-                <td class="mytable-col-lg">
-                    <div class="dropdown ajax-blocker">
-                        <a href="#_" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{rider.name}}</a>
-                        <div class="dropdown-menu shadow">
-                            <h5 class="pl-3 pr-3">{{rider.name}}</h5>
-                            <div class="dropdown-divider"></div>
-                            <a target="_blank" class="dropdown-item" href="{% url 'search' %}?name={{rider.name|urlencode}}">
-                                <span class="oi oi-magnifying-glass mr-2"></span>Search for trips</span>
-                            </a>
-                            {% if rider.client_id %}
-                            <div class="dropdown-divider"></div>
-                            <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
-                                <span class="oi oi-person mr-2"></span>Edit Client
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </td>
-                <td class="mytable-col-md {% if rider.collected_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_cash }}</td>
-                <td class="mytable-col-md {% if rider.collected_check.value == 0 %}mytable-zero{%endif%}">{{ rider.collected_check }}</td>
-                <td class="mytable-col-md {% if rider.paid_cash.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_cash }}</td>
-                <td class="mytable-col-md {% if rider.paid_check.value == 0 %}mytable-zero{%endif%}">{{ rider.paid_check }}</td>
-                <td class="mytable-col-md {% if rider.total_payments.value == 0 %}mytable-zero{%endif%}">{{ rider.total_payments }}</td>
-                <td class="mytable-col-md {% if rider.total_fares.value == 0 %}mytable-zero{%endif%}">{{ rider.total_fares }}</td>
-                <td class="mytable-col-md {% if rider.total_owed.value == 0 %}mytable-zero{%endif%}">{{ rider.total_owed }}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-        <tr class="bg-success text-light text-bold">
-            <td class="mytable-col-lg">TOTAL</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_collected_check }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_paid_cash }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_paid_check }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
-            <td class="mytable-col-md">{{ report.unique_riders.total_total_owed }}</td>
-        </tr>
-    </table>
-    <hr/>
+
+<div id="client_payment_list">
 </div>
 
 <script type="text/javascript">

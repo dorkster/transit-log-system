@@ -1,11 +1,3 @@
-<h3>
-    <a href="{% url 'clients' %}" class="btn btn-outline-secondary btn-sm"><span class="oi oi-chevron-left"></span></a>
-    Payments from {{ client.name }}
-    <a class="btn btn-success btn-sm" href="{% url 'client-payment-create' client.id %}"><span class="oi oi-plus mr-2"></span>New</a>
-</h3>
-<div class="alert alert-info">
-    <strong>NOTE:</strong> Payments listed here <strong>do not</strong> include money given directly to drivers. For that information, please refer to the <a class="alert-link" href="{% url 'report-this-month' %}">Reports</a>.
-</div>
 {% if client_payments %}
 <table class="mytable mytable-striped">
     <thead>
@@ -14,6 +6,12 @@
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '0')">
                 {% if sort_mode == 0 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Date Paid
+            </a>
+        </td>
+        <td>
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
+                {% if sort_mode == 3 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Notes
             </a>
         </td>
         <td>
@@ -26,12 +24,6 @@
             <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '2')">
                 {% if sort_mode == 2 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
                 Check
-            </a>
-        </td>
-        <td>
-            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '3')">
-                {% if sort_mode == 3 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
-                Notes
             </a>
         </td>
     </thead>
@@ -50,9 +42,9 @@
             </div>
         </td>
         <td class="mytable-col-lg">{{ client_payment.date_paid }}</td>
+        <td class="mytable-col-xl">{{ client_payment.notes }}</td>
         <td class="mytable-col-md">${{ client_payment.get_cash_str }}</td>
         <td class="mytable-col-md">${{ client_payment.get_check_str }}</td>
-        <td class="mytable-col-lg">{{ client_payment.notes }}</td>
     </tr>
     {% endfor %}
 </table>

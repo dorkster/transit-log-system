@@ -102,6 +102,7 @@ def tripCreateFromClient(request, mode, id):
     trip.elderly = client.elderly
     trip.ambulatory = client.ambulatory
     trip.tags = client.tags
+    trip.reminder_instructions = client.reminder_instructions
 
     return tripCreateEditCommon(request, mode, trip, is_new=True)
 
@@ -174,6 +175,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
                 trip.fare = money_string_to_int(form.cleaned_data['fare'])
                 trip.passenger = form.cleaned_data['passenger']
+                trip.reminder_instructions = form.cleaned_data['reminder_instructions']
 
             trip.cancel_date = None
             try:
@@ -219,6 +221,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                     client.phone_alt = form.cleaned_data['phone_alt']
                     client.elderly = form.cleaned_data['elderly']
                     client.ambulatory = form.cleaned_data['ambulatory']
+                    client.reminder_instructions = form.cleaned_data['reminder_instructions']
                     client.save()
                     log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
                 if form.cleaned_data['add_dest1'] == True:
@@ -286,6 +289,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
                 'fare': int_to_money_string(trip.fare, blank_zero=True),
                 'passenger': trip.passenger,
+                'reminder_instructions': trip.reminder_instructions,
                 'cancel_date': cancel_date,
             }
             form = EditTripForm(initial=initial)

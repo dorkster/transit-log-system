@@ -172,6 +172,7 @@
             <td>End Miles</td>
             <td>End Time</td>
             <td>Notes</td>
+            <td>Reminder Instructions</td>
         </thead>
         {% for trip in trips %}
         <tr style="{{ trip.get_driver_style}}" class="{% if trip.is_medical or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}">
@@ -185,7 +186,7 @@
                 {{ trip.appointment_time }}
                 {% endif %}
             </td>
-            <td colspan="11" class="text-left">
+            <td colspan="12" class="text-left">
                 {% if trip.format == Trip.FORMAT_ACTIVITY %}
                 {% if trip.driver %}
                     {% if trip.passenger %}
@@ -247,7 +248,10 @@
                 {% endif %}
             </td>
             <td class="mytable-col-md">
-                {% if trip.note %}{{ trip.note }}{% endif %}
+                {{ trip.note }}
+            </td>
+            <td class="mytable-col-md">
+                {{ trip.reminder_instructions }}
             </td>
             {% endif %}
         </tr>

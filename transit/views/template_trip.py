@@ -145,6 +145,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 trip.note = form.cleaned_data['notes']
                 trip.fare = money_string_to_int(form.cleaned_data['fare'])
                 trip.passenger = form.cleaned_data['passenger']
+                trip.reminder_instructions = form.cleaned_data['reminder_instructions']
 
             # trip date changed, which means sort indexes need to be updated
             if old_parent != trip.parent:
@@ -183,6 +184,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                     client.phone_alt = form.cleaned_data['phone_alt']
                     client.elderly = form.cleaned_data['elderly']
                     client.ambulatory = form.cleaned_data['ambulatory']
+                    client.reminder_instructions = form.cleaned_data['reminder_instructions']
                     client.save()
                     log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
                 if form.cleaned_data['add_dest1'] == True:
@@ -236,6 +238,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 'status': trip.status,
                 'fare': int_to_money_string(trip.fare, blank_zero=True),
                 'passenger': trip.passenger,
+                'reminder_instructions': trip.reminder_instructions,
             }
             form = EditTemplateTripForm(initial=initial)
 

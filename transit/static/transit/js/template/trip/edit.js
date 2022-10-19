@@ -23,7 +23,7 @@ function onNameChanged() {
     address_datalist.children[0].value = "";
 
     var found_client = false;
-    for (i in clients) {
+    for (let i in clients) {
         if (clients[i].fields.name == $("#id_name").val()) {
             found_client = true;
 
@@ -49,6 +49,9 @@ function onNameChanged() {
             createTagList();
 
             address_datalist.children[0].value = clients[i].fields.address;
+
+            $("#id_reminder_instructions").val(clients[i].fields.reminder_instructions);
+
             break;
         }
     }

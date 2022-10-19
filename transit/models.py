@@ -204,6 +204,7 @@ class Trip(models.Model):
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
     cancel_date = models.DateField(default=None, null=True, blank=False)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
+    reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -501,6 +502,7 @@ class Client(models.Model):
     staff = models.BooleanField(verbose_name='Is staff member?', default=False)
     is_active = models.BooleanField(default=True)
     is_transit_policy_acknowledged = models.BooleanField(default=False)
+    reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['name']
@@ -734,6 +736,7 @@ class TemplateTrip(models.Model):
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
+    reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['parent', 'sort_index']

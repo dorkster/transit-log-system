@@ -82,7 +82,7 @@
                 <div class="modal-dialog modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modal_filter_search_title">Filter clients by name/address/tags</h5>
+                            <h5 class="modal-title" id="modal_filter_search_title">Filter clients by name/address/etc.</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -181,6 +181,12 @@
                 Transit Policy Acknowledged?
             </a>
         </td>
+        <td class="text-nowrap">
+            <a class="text-dark" href="#_" onclick="ajax_loader.run('', 'sort', '10')">
+                {% if sort_mode == 10 %}<span class="oi oi-sort-{% if sort_mode_dir == 1 %}descending{% else %}ascending{% endif %}"></span>{% endif %}
+                Reminder Instructions
+            </a>
+        </td>
         {% else %}
         <td></td>
         {% endif %}
@@ -246,6 +252,9 @@
             {% elif client.is_transit_policy_acknowledged is False %}
             <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
             {% endif %}
+        </td>
+        <td class="mytable-col-lg">
+            {{ client.reminder_instructions }}
         </td>
         {% else %}
         <td class="mytable-col-xs">
@@ -317,6 +326,14 @@
                                 </div>
                             </div>
                         </div>
+                        {% if client.reminder_instructions %}
+                        <div class="list-group-item p-1 list-group-item-warning">
+                            <div class="row">
+                                <div class="col text-muted">Reminder Instructions</div>
+                                <div class="col-auto">{{ client.reminder_instructions }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -141,6 +141,7 @@
         <td>End Time</td>
         {% if show_extra_columns %}
         <td>Notes</td>
+        <td>Reminder Instructions</td>
         <td>Trip Type</td>
         <td>Tags</td>
         <td>Passenger on vehicle?</td>
@@ -154,7 +155,7 @@
     </thead>
     {% for trip in trips %}
     {% if trip.sort_index == 0 %}
-    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}22{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('')"><td colspan="{% if show_extra_columns %}23{% else %}15{% endif %}"></td></tr>
     {% endif %}
     <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
@@ -243,7 +244,7 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}19{% else %}11{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'trip-edit-activity' 'edit' trip.id %}?focus=id_description', row_movers)">
             {% if trip.driver %}
                 {% if trip.passenger %}
                 <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
@@ -335,6 +336,9 @@
         {% if show_extra_columns %}
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_notes', row_movers)">
             {{ trip.note }}
+        </td>
+        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_reminder_instructions', row_movers)">
+            {{ trip.reminder_instructions }}
         </td>
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_trip_type', row_movers)">
             {% if trip.trip_type %}
@@ -467,10 +471,18 @@
                             </div>
                         </div>
                         {% if trip.note %}
-                        <div class="list-group-item p-1 {% if trip.note %}list-group-item-warning{% endif %}">
+                        <div class="list-group-item p-1 list-group-item-warning">
                             <div class="row">
                                 <div class="col text-muted">Notes</div>
-                                <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
+                                <div class="col-auto">{{trip.note}}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if trip.reminder_instructions %}
+                        <div class="list-group-item p-1 list-group-item-warning">
+                            <div class="row">
+                                <div class="col text-muted">Reminder Instructions</div>
+                                <div class="col-auto">{{trip.reminder_instructions}}</div>
                             </div>
                         </div>
                         {% endif %}
@@ -524,7 +536,7 @@
         {% endif %}
         {% endif %}
     </tr>
-    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}22{% else %}15{% endif %}"></td></tr>
+    <tr class="RowMover_trips mytable-sort mytable-sort-hidden" onclick="trip_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}23{% else %}15{% endif %}"></td></tr>
     {% endfor %}
 </table>
 <script type="text/javascript">

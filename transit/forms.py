@@ -139,6 +139,7 @@ class EditTripForm(forms.Form):
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -191,6 +192,7 @@ class EditClientForm(forms.Form):
     staff = forms.BooleanField(label='Is staff member?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_active = forms.BooleanField(label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     update_trips = forms.BooleanField(label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditClientPaymentForm(forms.Form):
@@ -261,6 +263,7 @@ class EditTemplateTripForm(forms.Form):
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)

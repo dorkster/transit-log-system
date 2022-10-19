@@ -130,7 +130,7 @@
                 <div class="modal-dialog modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address/notes/tags</h5>
+                            <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address/etc.</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -181,6 +181,7 @@
         <td>End Time</td>
         {% if show_extra_columns %}
         <td>Notes</td>
+        <td>Reminder Instructions</td>
         <td>Trip Type</td>
         <td>Tags</td>
         <td>Passenger on vehicle?</td>
@@ -204,7 +205,7 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}17{% else %}11{% endif %}" class="text-left">
+        <td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}" class="text-left">
             {% if trip.format == Trip.FORMAT_ACTIVITY %}
             {% if trip.driver %}
                 {% if trip.passenger %}
@@ -279,6 +280,9 @@
         {% if show_extra_columns %}
         <td class="mytable-col-md">
             {{ trip.note }}
+        </td>
+        <td class="mytable-col-md">
+            {{ trip.reminder_instructions }}
         </td>
         <td class="mytable-col-md">
             {% if trip.trip_type %}
@@ -410,6 +414,14 @@
                             <div class="row">
                                 <div class="col text-muted">Notes</div>
                                 <div class="col-auto">{% if trip.note %}{{trip.note}}{% endif %}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if trip.reminder_instructions %}
+                        <div class="list-group-item p-1 list-group-item-warning">
+                            <div class="row">
+                                <div class="col text-muted">Reminder Instructions</div>
+                                <div class="col-auto">{{trip.reminder_instructions}}</div>
                             </div>
                         </div>
                         {% endif %}

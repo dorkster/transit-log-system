@@ -85,6 +85,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             prev_phone_alt = unique_client.phone_alt
             prev_elderly = unique_client.elderly
             prev_ambulatory = unique_client.ambulatory
+            prev_reminder_instructions = unique_client.reminder_instructions
 
             unique_client.name = form.cleaned_data['name']
             unique_client.address = form.cleaned_data['address']
@@ -97,6 +98,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.staff = form.cleaned_data['staff']
             unique_client.is_active = form.cleaned_data['is_active']
             unique_client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
+            unique_client.reminder_instructions = form.cleaned_data['reminder_instructions']
 
             unique_client.save()
 
@@ -140,6 +142,11 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                         if trip.ambulatory == prev_ambulatory:
                             trip.ambulatory = unique_client.ambulatory
                             updated = True
+                    # reminder instructions
+                    if prev_reminder_instructions != unique_client.reminder_instructions:
+                        if trip.reminder_instructions == prev_reminder_instructions:
+                            trip.reminder_instructions = unique_client.reminder_instructions
+                            updated = True
 
                     if updated:
                         trip.save()
@@ -178,6 +185,11 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                         if trip.ambulatory == prev_ambulatory:
                             trip.ambulatory = unique_client.ambulatory
                             updated = True
+                    # reminder instructions
+                    if prev_reminder_instructions != unique_client.reminder_instructions:
+                        if trip.reminder_instructions == prev_reminder_instructions:
+                            trip.reminder_instructions = unique_client.reminder_instructions
+                            updated = True
 
                     if updated:
                         trip.save()
@@ -201,6 +213,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'staff': client.staff,
             'is_active': client.is_active,
             'is_transit_policy_acknowledged': client.is_transit_policy_acknowledged,
+            'reminder_instructions': client.reminder_instructions,
             'update_trips': False,
         }
         form = EditClientForm(initial=initial)
@@ -265,6 +278,7 @@ def clientCreateFromTrip(request, trip_id):
     client.phone_alt = trip.phone_alt
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
+    client.reminder_instructions = trip.reminder_instructions
     return clientCreateEditCommon(request, client, is_new=True, src_trip=trip)
 
 @permission_required(['transit.change_client'])
@@ -283,6 +297,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
     client.phone_alt = trip.phone_alt
     client.elderly = trip.elderly
     client.ambulatory = trip.ambulatory
+    client.reminder_instructions = trip.reminder_instructions
     return clientCreateEditCommon(request, client, is_new=True, src_template_trip=trip)
 
 def ajaxClientList(request):
@@ -299,6 +314,7 @@ def ajaxClientList(request):
     SORT_TAGS = 7
     SORT_IS_ACTIVE = 8
     SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
+    SORT_REMINDER_INSTRUCTIONS = 10
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -389,7 +405,7 @@ def ajaxClientList(request):
         clients = clients.filter(is_transit_policy_acknowledged=False)
 
     if filter_search != '':
-        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search))
 
     filtered_count = len(clients)
 
@@ -413,6 +429,8 @@ def ajaxClientList(request):
         clients = clients.order_by('is_active', 'name')
     elif sort_mode == SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED:
         clients = clients.order_by('is_transit_policy_acknowledged', 'name')
+    elif sort_mode == SORT_REMINDER_INSTRUCTIONS:
+        clients = clients.order_by('reminder_instructions', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -452,6 +470,7 @@ def clientXLSX(request):
     SORT_TAGS = 7
     SORT_IS_ACTIVE = 8
     SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
+    SORT_REMINDER_INSTRUCTIONS = 10
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -491,7 +510,7 @@ def clientXLSX(request):
         clients = clients.filter(is_transit_policy_acknowledged=False)
 
     if filter_search != '':
-        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search))
 
     if sort_mode == SORT_NAME:
         clients = clients.order_by('name')
@@ -513,6 +532,8 @@ def clientXLSX(request):
         clients = clients.order_by('is_active', 'name')
     elif sort_mode == SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED:
         clients = clients.order_by('is_transit_policy_acknowledged', 'name')
+    elif sort_mode == SORT_REMINDER_INSTRUCTIONS:
+        clients = clients.order_by('reminder_instructions', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -547,6 +568,7 @@ def clientXLSX(request):
     ws.cell(row_header, 8, 'Tags')
     ws.cell(row_header, 9, 'Is active?')
     ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
+    ws.cell(row_header, 11, 'Reminder Instructions')
 
     for i in range(0, len(clients)):
         ws.cell(i+2, 1, clients[i].name)
@@ -559,6 +581,7 @@ def clientXLSX(request):
         ws.cell(i+2, 8, clients[i].tags)
         ws.cell(i+2, 9, clients[i].is_active)
         ws.cell(i+2, 10, clients[i].is_transit_policy_acknowledged)
+        ws.cell(i+2, 11, clients[i].reminder_instructions)
 
         # display elderly/ambulatory as booleans
         ws.cell(i+2, 6).number_format = 'BOOLEAN'
@@ -568,8 +591,8 @@ def clientXLSX(request):
 
     # apply styles
     ws.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 11):
-        if i == 1 or i == 2 or i == 8:
+    for i in range(1, 12):
+        if i == 1 or i == 2 or i == 8 or i == 11:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal

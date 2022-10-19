@@ -190,6 +190,7 @@ class EditClientForm(forms.Form):
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
     staff = forms.BooleanField(label='Is staff member?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_active = forms.BooleanField(label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     update_trips = forms.BooleanField(label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditClientPaymentForm(forms.Form):

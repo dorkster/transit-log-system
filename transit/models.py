@@ -500,6 +500,7 @@ class Client(models.Model):
     tags = models.CharField(max_length=FieldSizes.XL, blank=True)
     staff = models.BooleanField(verbose_name='Is staff member?', default=False)
     is_active = models.BooleanField(default=True)
+    is_transit_policy_acknowledged = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['name']

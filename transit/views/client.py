@@ -93,6 +93,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             unique_client.tags = form.cleaned_data['tags']
             unique_client.staff = form.cleaned_data['staff']
             unique_client.is_active = form.cleaned_data['is_active']
+            unique_client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
 
             unique_client.save()
 
@@ -196,6 +197,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'tags': client.tags,
             'staff': client.staff,
             'is_active': client.is_active,
+            'is_transit_policy_acknowledged': client.is_transit_policy_acknowledged,
             'update_trips': False,
         }
         form = EditClientForm(initial=initial)
@@ -293,6 +295,7 @@ def ajaxClientList(request):
     SORT_AMBULATORY = 6
     SORT_TAGS = 7
     SORT_IS_ACTIVE = 8
+    SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -312,6 +315,8 @@ def ajaxClientList(request):
         request.session['clients_staff'] = int(request_data)
     elif request_action == 'filter_active':
         request.session['clients_active'] = int(request_data)
+    elif request_action == 'filter_transit_policy':
+        request.session['clients_transit_policy'] = int(request_data)
     elif request_action == 'filter_search':
         request.session['clients_search'] = request_data
     elif request_action == 'filter_reset':
@@ -319,6 +324,7 @@ def ajaxClientList(request):
         request.session['clients_ambulatory'] = 0
         request.session['clients_staff'] = 0
         request.session['clients_active'] = 0
+        request.session['clients_transit_policy'] = 0
         request.session['clients_search'] = ''
     elif request_action == 'toggle_extra_columns':
         request.session['clients_extra_columns'] = not request.session.get('clients_extra_columns', False)
@@ -336,6 +342,7 @@ def ajaxClientList(request):
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
     filter_active = request.session.get('clients_active', 0)
+    filter_transit_policy = request.session.get('clients_transit_policy', 0)
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
@@ -361,6 +368,11 @@ def ajaxClientList(request):
     elif filter_active == 2:
         clients = clients.filter(is_active=False)
 
+    if filter_transit_policy == 1:
+        clients = clients.filter(is_transit_policy_acknowledged=True)
+    elif filter_transit_policy == 2:
+        clients = clients.filter(is_transit_policy_acknowledged=False)
+
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
@@ -384,6 +396,8 @@ def ajaxClientList(request):
         clients = clients.order_by('tags', 'name')
     elif sort_mode == SORT_IS_ACTIVE:
         clients = clients.order_by('is_active', 'name')
+    elif sort_mode == SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED:
+        clients = clients.order_by('is_transit_policy_acknowledged', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -395,7 +409,8 @@ def ajaxClientList(request):
         'filter_staff': filter_staff,
         'filter_active': filter_active,
         'filter_search': filter_search,
-        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_staff > 0 or filter_active > 0 or filter_search != ''),
+        'filter_transit_policy': filter_transit_policy,
+        'is_filtered': (filter_elderly > 0 or filter_ambulatory > 0 or filter_staff > 0 or filter_active > 0 or filter_search != '' or filter_transit_policy > 0),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'show_extra_columns': request.session.get('clients_extra_columns', False),
@@ -415,6 +430,7 @@ def clientXLSX(request):
     SORT_AMBULATORY = 6
     SORT_TAGS = 7
     SORT_IS_ACTIVE = 8
+    SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -423,6 +439,7 @@ def clientXLSX(request):
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
     filter_staff = request.session.get('clients_staff', 0)
     filter_active = request.session.get('clients_active', 0)
+    filter_transit_policy = request.session.get('clients_transit_policy', 0)
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
@@ -447,6 +464,11 @@ def clientXLSX(request):
     elif filter_active == 2:
         clients = clients.filter(is_active=False)
 
+    if filter_transit_policy == 1:
+        clients = clients.filter(is_transit_policy_acknowledged=True)
+    elif filter_transit_policy == 2:
+        clients = clients.filter(is_transit_policy_acknowledged=False)
+
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search))
 
@@ -468,6 +490,8 @@ def clientXLSX(request):
         clients = clients.order_by('tags', 'name')
     elif sort_mode == SORT_IS_ACTIVE:
         clients = clients.order_by('is_active', 'name')
+    elif sort_mode == SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED:
+        clients = clients.order_by('is_transit_policy_acknowledged', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -501,6 +525,7 @@ def clientXLSX(request):
     ws.cell(row_header, 7, 'Ambulatory?')
     ws.cell(row_header, 8, 'Tags')
     ws.cell(row_header, 9, 'Is active?')
+    ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
 
     for i in range(0, len(clients)):
         ws.cell(i+2, 1, clients[i].name)
@@ -512,15 +537,17 @@ def clientXLSX(request):
         ws.cell(i+2, 7, clients[i].ambulatory)
         ws.cell(i+2, 8, clients[i].tags)
         ws.cell(i+2, 9, clients[i].is_active)
+        ws.cell(i+2, 10, clients[i].is_transit_policy_acknowledged)
 
         # display elderly/ambulatory as booleans
         ws.cell(i+2, 6).number_format = 'BOOLEAN'
         ws.cell(i+2, 7).number_format = 'BOOLEAN'
         ws.cell(i+2, 9).number_format = 'BOOLEAN'
+        ws.cell(i+2, 10).number_format = 'BOOLEAN'
 
     # apply styles
     ws.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 10):
+    for i in range(1, 11):
         if i == 1 or i == 2 or i == 8:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:

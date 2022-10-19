@@ -22,6 +22,7 @@ from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.urls import reverse
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from transit.models import Client, Trip, Tag, TemplateTrip, SiteSettings
 from transit.forms import EditClientForm
@@ -34,6 +35,8 @@ from openpyxl.utils import get_column_letter
 
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
+
+from transit.common.util import *
 
 @permission_required(['transit.view_client'])
 def clientList(request):
@@ -307,19 +310,28 @@ def ajaxClientList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
+    reset_current_page = False
+
     if request_action == 'filter_elderly':
+        reset_current_page = True
         request.session['clients_elderly'] = int(request_data)
     elif request_action == 'filter_ambulatory':
+        reset_current_page = True
         request.session['clients_ambulatory'] = int(request_data)
     elif request_action == 'filter_staff':
+        reset_current_page = True
         request.session['clients_staff'] = int(request_data)
     elif request_action == 'filter_active':
+        reset_current_page = True
         request.session['clients_active'] = int(request_data)
     elif request_action == 'filter_transit_policy':
+        reset_current_page = True
         request.session['clients_transit_policy'] = int(request_data)
     elif request_action == 'filter_search':
+        reset_current_page = True
         request.session['clients_search'] = request_data
     elif request_action == 'filter_reset':
+        reset_current_page = True
         request.session['clients_elderly'] = 0
         request.session['clients_ambulatory'] = 0
         request.session['clients_staff'] = 0
@@ -337,6 +349,9 @@ def ajaxClientList(request):
         sort_mode = new_sort_mode
         request.session['clients_sort'] = new_sort_mode
         request.session['clients_sort_dir'] = sort_mode_dir
+
+    if reset_current_page:
+        return render(request, 'client/ajax_reset.html', context={})
 
     filter_elderly = request.session.get('clients_elderly', 0)
     filter_ambulatory = request.session.get('clients_ambulatory', 0)
@@ -402,8 +417,14 @@ def ajaxClientList(request):
     if sort_mode_dir == 1:
         clients = clients.reverse()
 
+    clients_per_page = 30
+    client_pages = Paginator(list(clients), clients_per_page)
+    clients_paginated = client_pages.get_page(request.GET.get('page'))
+    client_page_ranges = get_paginated_ranges(page=clients_paginated, page_range=5, items_per_page=clients_per_page)
+
     context = {
-        'clients': clients,
+        'clients': clients_paginated,
+        'client_page_ranges': client_page_ranges,
         'filter_elderly': filter_elderly,
         'filter_ambulatory': filter_ambulatory,
         'filter_staff': filter_staff,

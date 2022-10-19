@@ -106,6 +106,20 @@
     </tr>
     {% endfor %}
 </table>
+{% if destinations.paginator.num_pages > 1 %}
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="{% if destinations.has_previous %}?page={{ destinations.previous_page_number }}{% endif %}">&laquo;</a></li>
+        {% for page in destinations.paginator.page_range %}
+        {% if page > destination_page_ranges.page_start and page <= destination_page_ranges.page_end %}
+        <li class="page-item {% if destinations.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="{% if destinations.has_next %}?page={{ destinations.next_page_number }}{% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
+{% endif %}
+<p>Showing results {{ destination_page_ranges.item_count_start }}-{{ destination_page_ranges.item_count_end }} of {{ destinations.paginator.count }}</p>
 <script type="text/javascript">
     setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
     setEditButtonStyleFromHash('#destination_', window.location.hash);

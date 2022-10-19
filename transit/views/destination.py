@@ -19,6 +19,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from transit.models import Destination, Trip, SiteSettings, TemplateTrip
 from transit.forms import EditDestinationForm
@@ -29,6 +30,8 @@ from django.db.models import Q
 
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
+
+from transit.common.util import *
 
 @permission_required(['transit.view_destination'])
 def destinationList(request):
@@ -248,11 +251,16 @@ def ajaxDestinationList(request):
     request_action = request.GET['target_action']
     request_data = request.GET['target_data']
 
+    reset_current_page = False
+
     if request_action == 'filter_active':
+        reset_current_page = True
         request.session['destinations_active'] = int(request_data)
     elif request_action == 'filter_search':
+        reset_current_page = True
         request.session['destinations_search'] = request_data
     elif request_action == 'filter_reset':
+        reset_current_page = True
         request.session['destinations_active'] = 0
         request.session['destinations_search'] = ''
     elif request_action == 'sort':
@@ -264,6 +272,9 @@ def ajaxDestinationList(request):
         sort_mode = new_sort_mode
         request.session['destinations_sort'] = new_sort_mode
         request.session['destinations_sort_dir'] = sort_mode_dir
+
+    if reset_current_page:
+        return render(request, 'destination/ajax_reset.html', context={})
 
     filter_active = request.session.get('destinations_active', 0)
     filter_search = request.session.get('destinations_search', '')
@@ -291,8 +302,14 @@ def ajaxDestinationList(request):
     if sort_mode_dir == 1:
         destinations = destinations.reverse()
 
+    destinations_per_page = 30
+    destination_pages = Paginator(list(destinations), destinations_per_page)
+    destinations_paginated = destination_pages.get_page(request.GET.get('page'))
+    destination_page_ranges = get_paginated_ranges(page=destinations_paginated, page_range=5, items_per_page=destinations_per_page)
+
     context = {
-        'destinations': destinations,
+        'destinations': destinations_paginated,
+        'destination_page_ranges': destination_page_ranges,
         'filter_active': filter_active,
         'filter_search': filter_search,
         'is_filtered': (filter_active > 0 or filter_search != ''),

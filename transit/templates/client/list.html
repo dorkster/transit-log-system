@@ -9,7 +9,13 @@
 </div>
 
 <script type="text/javascript">
-    var ajax_loader = new AjaxLoader("{%url 'ajax-client-list' %}", "#client_list");
+    var params = new URLSearchParams(location.search);
+
+    var page = params.get('page');
+    if (page == null)
+        page = 1;
+
+    var ajax_loader = new AjaxLoader("{%url 'ajax-client-list' %}?page=" + page, "#client_list");
 
     // Fetch the initial data and repeat every 10 seconds
     ajax_loader.run();

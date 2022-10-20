@@ -185,7 +185,6 @@
         <td>Trip Type</td>
         <td>Tags</td>
         <td>Passenger on vehicle?</td>
-        <td>Money</td>
         <td>Elderly?</td>
         <td>Ambulatory?</td>
         {% else %}
@@ -314,21 +313,6 @@
             <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
             {% endif %}
         </td>
-        {% if trip.collected_cash == 0 and trip.collected_check > 0 %}
-        <td class="mytable-col-sm">
-        {% else %}
-        <td class="mytable-col-sm">
-        {% endif %}
-            {% if trip.collected_cash > 0 %}
-            Cash: ${{ trip.get_collected_cash_str }}
-            {% endif %}
-            {% if trip.collected_cash > 0 and trip.collected_check > 0 %}
-            <br/>
-            {% endif %}
-            {% if trip.collected_check > 0 %}
-            Check: ${{ trip.get_collected_check_str }}
-            {% endif %}
-        </td>
         <td class="mytable-col-xs">
             {% if trip.elderly %}
             <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
@@ -423,25 +407,6 @@
                                 <div class="col text-muted">Reminder Instructions</div>
                                 <div class="col-auto">{{trip.reminder_instructions}}</div>
                             </div>
-                        </div>
-                        {% endif %}
-                        {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
-                        <div class="list-group-item p-1 list-group-item-success">
-                            <div class="row">
-                                <div class="col text-muted">Money Collected</div>
-                            </div>
-                            {% if trip.collected_cash > 0 %}
-                            <div class="row">
-                                <div class="col text-muted">- Cash</div>
-                                <div class="col-auto">${{ trip.get_collected_cash_str }}</div>
-                            </div>
-                            {% endif %}
-                            {% if trip.collected_check > 0 %}
-                            <div class="row">
-                                <div class="col text-muted">- Check</div>
-                                <div class="col-auto">${{ trip.get_collected_check_str }}</div>
-                            </div>
-                            {% endif %}
                         </div>
                         {% endif %}
                         {% if trip.status != Trip.STATUS_NORMAL %}

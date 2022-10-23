@@ -23,10 +23,10 @@
         </div>
     </div>
 </div>
-<hr/>
 <div>
 {% if report.report_errors.errors %}
 <div id="report_errors">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Errors</h3>
@@ -50,11 +50,11 @@
         {% endfor %}
         </ul>
     </div>
-    <hr/>
 </div>
 {% endif%}
 
 <div id="report_vehicle_totals">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Totals for All Vehicles</h3>
@@ -142,10 +142,10 @@
             <td class="mytable-col-sm">{{report.all_vehicles.total_collected_money}}</td>
         </tr>
     </table>
-    <hr/>
 </div>
 {% for v in report.vehicle_reports %}
 <div id="report_vehicle_{{v.vehicle.id}}">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
@@ -239,12 +239,12 @@
     {% else %}
     <p>No data for this vehicle is available.</p>
     {% endif %}
-    <hr/>
 </div>
 {% endfor %}
 
 {% if report.unique_riders.names %}
 <div id="report_riders">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Elderly/Ambulatory Riders</h3>
@@ -343,11 +343,11 @@
             {% endfor %}
         </tbody>
     </table>
-    <hr/>
 </div>
 {% endif%}
 
 <div id="report_tags">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Trip Types and Tags</h3>
@@ -405,11 +405,11 @@
             {% endfor %}
         </tbody>
     </table>
-    <hr/>
 </div>
 
 {% if report.frequent_destinations %}
 <div id="report_destinations">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Frequent Destinations</h3>
@@ -438,12 +438,12 @@
             {% endfor %}
         </tbody>
     </table>
-    <hr/>
 </div>
 {% endif %}
 
 {% if report.unique_riders.names or report.money_payments %}
 <div id="report_fares">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Fares &amp; Payments (by client)</h3>
@@ -506,12 +506,12 @@
             <td class="mytable-col-md">{{ report.unique_riders.total_total_owed }}</td>
         </tr>
     </table>
-    <hr/>
 </div>
 {% endif %}
 
 {% if report.unique_riders.names or report.money_payments %}
 <div id="report_fares_by_date">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Fares &amp; Payments (by date)</h3>
@@ -555,12 +555,12 @@
             <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
         </tr>
     </table>
-    <hr/>
 </div>
 {% endif %}
 
 {% if report.money_trips %}
 <div id="report_collected_money">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Money Collected by the Drivers</h3>
@@ -590,12 +590,12 @@
             <td class="mytable-col-sm">{{ report.money_trips_summary.collected_check}}</td>
         </tr>
     </table>
-    <hr/>
 </div>
 {% endif %}
 
 {% if report.money_payments %}
 <div id="report_payments">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Money Not Collected by the Drivers</h3>
@@ -625,12 +625,12 @@
             <td class="mytable-col-sm">{{ report.money_payments_summary.check}}</td>
         </tr>
     </table>
-    <hr/>
 </div>
 {% endif %}
 
 {% if report.driver_reports %}
 <div id="report_drivers">
+    <hr/>
     <div class="row">
         <div class="col">
             <h3>Per-Driver Summary</h3>
@@ -658,7 +658,6 @@
         </tr>
         {% endfor %}
     </table>
-    <hr/>
 </div>
 {% endif %}
 </div>

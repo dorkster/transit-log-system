@@ -162,3 +162,9 @@
     from { width: 1%; }
     to { width: 100%; }
 }
+
+.prevent-select {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

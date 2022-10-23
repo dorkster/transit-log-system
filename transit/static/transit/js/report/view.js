@@ -6,6 +6,13 @@ function fixDatePicker() {
     $("#id_date_day").attr("style", "display: none !important;");
 }
 
+function fixSectionPicker() {
+    // Keep the dropdown from closing when clicking inside
+    $('#section_dropdown').click(function(e) {
+        e.stopPropagation();
+    });
+}
+
 function visibleSave(v, get_checkboxes) {
     var cookie_str = "report_visibility=";
 
@@ -33,5 +40,17 @@ function visibleShowAll(v) {
         v.data[i][0] = 1;
     }
     visibleSave(v, false);
+}
+
+function visibleSolo(v, solo_input_id) {
+    for (i = 0; i < v.length; i++) {
+        if (v.data[i][2] != solo_input_id) {
+            $(v.data[i][2]).prop("checked", false);
+        }
+        else {
+            $(v.data[i][2]).prop("checked", true);
+        }
+    }
+    visibleSave(v, true);
 }
 

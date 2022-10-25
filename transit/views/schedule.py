@@ -90,10 +90,20 @@ def schedulePrintFilterReset(request):
     request.session['schedule_print_filter_search'] = ''
     request.session['schedule_print_filter_driver'] = ''
     request.session['schedule_print_filter_vehicle'] = ''
+    request.session['schedule_print_filter_log_columns'] = True
 
 @permission_required(['transit.view_shift', 'transit.view_trip'])
 def schedulePrint(request, year, month, day):
     schedulePrintFilterReset(request)
+    context = {
+        'date': datetime.date(year, month, day),
+    }
+    return render(request, 'schedule/print.html', context=context)
+
+@permission_required(['transit.view_shift', 'transit.view_trip'])
+def schedulePrintSimple(request, year, month, day):
+    schedulePrintFilterReset(request)
+    request.session['schedule_print_filter_log_columns'] = False
     context = {
         'date': datetime.date(year, month, day),
     }
@@ -122,6 +132,8 @@ def ajaxSchedulePrint(request, year, month, day):
         request.session['schedule_print_filter_driver'] = request_data
     elif request_action == 'filter_vehicle':
         request.session['schedule_print_filter_vehicle'] = request_data
+    elif request_action == 'filter_toggle_log_columns':
+        request.session['schedule_print_filter_log_columns'] = not request.session['schedule_print_filter_log_columns']
     elif request_action == 'filter_reset':
         schedulePrintFilterReset(request)
 
@@ -142,6 +154,7 @@ def ajaxSchedulePrint(request, year, month, day):
     filter_search = request.session.get('schedule_print_filter_search', '')
     filter_driver = request.session.get('schedule_print_filter_driver', '')
     filter_vehicle = request.session.get('schedule_print_filter_vehicle', '')
+    filter_log_columns = request.session.get('schedule_print_filter_log_columns', True)
 
     unfiltered_count = len(query_trips)
 
@@ -177,7 +190,7 @@ def ajaxSchedulePrint(request, year, month, day):
         'message': message,
         'drivers': Driver.objects.all(),
         'vehicles': Vehicle.objects.all(),
-        'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
+        'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != '' or not filter_log_columns),
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'filter_hide_canceled': filter_hide_canceled,
@@ -186,6 +199,7 @@ def ajaxSchedulePrint(request, year, month, day):
         'filter_search': filter_search,
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
+        'filter_log_columns': filter_log_columns,
         'show_dialog': show_dialog,
         'Trip': Trip,
         'Shift': Shift,

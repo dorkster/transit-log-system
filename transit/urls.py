@@ -41,6 +41,7 @@ urlpatterns = [
     path('schedule/<slug:mode>/today', views.scheduleToday, name='schedule-today'),
     path('schedule/<slug:mode>/tomorrow', views.scheduleTomorrow, name='schedule-tomorrow'),
     path('schedule/edit/print/<int:year>/<int:month>/<int:day>', views.schedulePrint, name='schedule-print'),
+    path('schedule/edit/print-simple/<int:year>/<int:month>/<int:day>', views.schedulePrintSimple, name='schedule-print-simple'),
     path('schedule/edit/message/<int:year>/<int:month>/<int:day>', views.scheduleMessage, name='schedule-message'),
     path('schedule/edit/print-daily-log/<int:year>/<int:month>/<int:day>', views.schedulePrintDailyLog, name='schedule-print-daily-log'),
 

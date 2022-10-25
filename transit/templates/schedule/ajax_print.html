@@ -20,6 +20,7 @@
 <hr/>
 {% endif %}
 <div>
+    {% if filter_log_columns %}
     <h5>Shifts</h5>
     {% if shifts %}
     <table class="mytable">
@@ -74,6 +75,7 @@
     <p>There are no shifts for this day.</p>
     {% endif %}
     <hr/>
+    {% endif %}
     <div id="print-filter" class="container ml-0 border p-2 mb-3" style="background: #eee;">
         <div class="row">
             <div class="col">
@@ -116,6 +118,18 @@
                     <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_completed', '')"><span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed</button>
                     <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')"><span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled</button>
                     <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')"><span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged</button>
+                </div>
+            </span>
+            <span class="dropdown ajax-blocker">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Log Columns
+                </button>
+                <div class="dropdown-menu shadow dropdown-menu-right">
+                    {% if filter_log_columns %}
+                    <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_log_columns', '')"><span class="mr-2 oi oi-check"></span>On</button>
+                    {% else %}
+                    <button class="dropdown-item" onclick="ajax_loader.run('', 'filter_toggle_log_columns', '')"><span class="mr-2 oi oi-x"></span>Off</button>
+                    {% endif %}
                 </div>
             </span>
         </div>
@@ -165,12 +179,14 @@
             <td>Address</td>
             <td>Phone #</td>
             <td>Destination</td>
+            {% if filter_log_columns %}
             <td>Driver</td>
             <td>Vehicle</td>
             <td>Start Miles</td>
             <td>Start Time</td>
             <td>End Miles</td>
             <td>End Time</td>
+            {% endif %}
             <td>Notes</td>
             <td>Reminder Instructions</td>
         </thead>
@@ -217,6 +233,7 @@
                 {{ trip.destination }}
                 {% if trip.phone_destination and trip.destination %}<br/>Phone #: {{ trip.phone_destination }}{% endif %}
             </td>
+            {% if filter_log_columns %}
             <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
             <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
             <td class="mytable-col-sm">
@@ -247,10 +264,11 @@
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
                 {% endif %}
             </td>
-            <td class="mytable-col-md">
+            {% endif %}
+            <td class="{% if filter_log_columns %}mytable-col-md{% else %}mytable-col-lg{% endif %}">
                 {{ trip.note }}
             </td>
-            <td class="mytable-col-md">
+            <td class="{% if filter_log_columns %}mytable-col-md{% else %}mytable-col-lg{% endif %}">
                 {{ trip.reminder_instructions }}
             </td>
             {% endif %}

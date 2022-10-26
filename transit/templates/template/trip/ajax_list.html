@@ -40,8 +40,8 @@
         <td>Destination</td>
         <td>Driver</td>
         <td>Vehicle</td>
-        {% if show_extra_columns %}
         <td>Notes</td>
+        {% if show_extra_columns %}
         <td>Reminder Instructions</td>
         <td>Trip Type</td>
         <td>Tags</td>
@@ -55,7 +55,7 @@
     </thead>
     {% for trip in trips %}
     {% if trip.sort_index == 0 %}
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}18{% else %}12{% endif %}"></td></tr>
     {% endif %}
     <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}">
         <td class="mytable-col-arrows">
@@ -143,7 +143,7 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="{% if show_extra_columns %}14{% else %}7{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
+        <td colspan="{% if show_extra_columns %}14{% else %}8{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
             {% if trip.driver %}
                 {% if trip.passenger %}
                 <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
@@ -188,10 +188,10 @@
             {{ trip.vehicle }}
             {% endif %}
         </td>
-        {% if show_extra_columns %}
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_notes', row_movers)">
             {{ trip.note }}
         </td>
+        {% if show_extra_columns %}
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_reminder_instructions', row_movers)">
             {{ trip.reminder_instructions }}
         </td>
@@ -246,15 +246,13 @@
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% if trip.note %}
+                    {% if trip.reminder_instructions %}
                     <span class="oi oi-document"></span>
                     {% endif %}
                     {% if trip.tags %}
                     <span class="oi oi-tag"></span>
                     {% endif %}
-                    {% if not trip.tags and not trip.note %}
                     <span class="oi oi-ellipses"></span>
-                    {% endif %}
                 </button>
                 <div class="dropdown-menu shadow dropdown-menu-right p-2">
                     <div class="list-group list-group-flush" style="width: 300px">
@@ -308,14 +306,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% if trip.note %}
-                        <div class="list-group-item p-1 list-group-item-warning">
-                            <div class="row">
-                                <div class="col text-muted">Notes</div>
-                                <div class="col-auto">{{trip.note}}</div>
-                            </div>
-                        </div>
-                        {% endif %}
                         {% if trip.reminder_instructions %}
                         <div class="list-group-item p-1 list-group-item-warning">
                             <div class="row">
@@ -353,7 +343,7 @@
         {% endif %}
         {% endif %}
     </tr>
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}18{% else %}11{% endif %}"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ trip.id }}')"><td colspan="{% if show_extra_columns %}18{% else %}12{% endif %}"></td></tr>
     {% endfor %}
 </table>
 <script type="text/javascript">

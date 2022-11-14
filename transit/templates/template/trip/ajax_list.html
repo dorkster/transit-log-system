@@ -188,7 +188,7 @@
             {{ trip.vehicle }}
             {% endif %}
         </td>
-        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_notes', row_movers)">
+        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_notes', row_movers)">
             {{ trip.note }}
         </td>
         {% if show_extra_columns %}

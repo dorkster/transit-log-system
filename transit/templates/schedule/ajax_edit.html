@@ -333,7 +333,7 @@
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_notes', row_movers)">
+        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_notes', row_movers)">
             {{ trip.note }}
         </td>
         {% if show_extra_columns %}

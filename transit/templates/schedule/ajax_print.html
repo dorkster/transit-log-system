@@ -179,8 +179,8 @@
             <td>Address</td>
             <td>Phone #</td>
             <td>Destination</td>
-            {% if filter_log_columns %}
             <td>Driver</td>
+            {% if filter_log_columns %}
             <td>Vehicle</td>
             <td>Start Miles</td>
             <td>Start Time</td>
@@ -233,8 +233,8 @@
                 {{ trip.destination }}
                 {% if trip.phone_destination and trip.destination %}<br/>Phone #: {{ trip.phone_destination }}{% endif %}
             </td>
-            {% if filter_log_columns %}
             <td class="mytable-col-md">{% if trip.driver %}{{ trip.driver }}{% endif %}</td>
+            {% if filter_log_columns %}
             <td class="mytable-col-md">{% if trip.vehicle %}{{ trip.vehicle }}{% endif %}</td>
             <td class="mytable-col-sm">
                 {% if trip.start_miles or trip.check_log != Trip.LOG_INCOMPLETE %}

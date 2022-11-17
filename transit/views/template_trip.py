@@ -21,6 +21,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import JsonResponse
 from django.core import serializers
+from django.db.models import Q
 
 from transit.models import Template, TemplateTrip, Client, Tag, Trip, SiteSettings, Destination, Fare
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
@@ -173,6 +174,22 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 log_event(request, LoggedEventAction.CREATE, log_model, str(trip))
             else:
                 log_event(request, LoggedEventAction.EDIT, log_model, str(trip))
+
+            # Update empty Elderly/Ambulatory fields in Client data if they've been defined in this Trip
+            if trip.format == Trip.FORMAT_NORMAL and (trip.elderly != None or trip.ambulatory != None):
+                update_clients = Client.objects.filter(Q(elderly=None) | Q(ambulatory=None)).filter(name=trip.name)
+                if len(update_clients) == 1:
+                    update_client = update_clients[0]
+                    client_was_updated = False
+                    if update_client.elderly == None:
+                        client_was_updated = True
+                        update_client.elderly = trip.elderly
+                    if update_client.ambulatory == None:
+                        client_was_updated = True
+                        update_client.ambulatory = trip.ambulatory
+                    if client_was_updated == True:
+                        update_client.save()
+                        log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(update_client))
 
             if is_new and not is_return_trip and trip.format == Trip.FORMAT_NORMAL:
                 if form.cleaned_data['add_client'] == True:

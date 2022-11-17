@@ -33,6 +33,8 @@ from openpyxl.utils import get_column_letter
 from transit.common.util import *
 
 class Report():
+    service_mile_warning_threshold = 1000
+
     class Money():
         def __init__(self, default_value=0):
             self.value = default_value
@@ -331,6 +333,7 @@ class Report():
         SHIFT_TIME_LESS = 8
         TRIP_MILES_LESS = 9
         TRIP_TIME_LESS = 10
+        SHIFT_SERVICE_MILE_THRESHOLD = 11
 
         def __init__(self):
             self.errors = []
@@ -391,6 +394,9 @@ class Report():
 
             elif error_code == self.TRIP_TIME_LESS:
                 return 'Trip start time ( ' + trip_start_time + ' ) is later than Trip end time ( ' + trip_end_time + ' ).'
+
+            elif error_code == self.SHIFT_SERVICE_MILE_THRESHOLD:
+                return 'Shift mileage seems abnormally large.'
 
             else:
                 return 'Unknown error'
@@ -602,6 +608,9 @@ class Report():
                 if report_shift.start_time > report_shift.end_time:
                     self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
                     report_shift.end_time = report_shift.start_time
+
+                if report_shift.end_miles.value - report_shift.start_miles.value > Report.service_mile_warning_threshold:
+                    self.report_errors.add(day_date, self.report_errors.SHIFT_SERVICE_MILE_THRESHOLD, error_shift=i)
 
                 report_day.shifts.append(report_shift)
 

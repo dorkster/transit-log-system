@@ -383,11 +383,15 @@ def ajaxClientList(request):
         clients = clients.filter(elderly=True)
     elif filter_elderly == 2:
         clients = clients.filter(elderly=False)
+    elif filter_elderly == 3:
+        clients = clients.filter(elderly=None)
 
     if filter_ambulatory == 1:
         clients = clients.filter(ambulatory=True)
     elif filter_ambulatory == 2:
         clients = clients.filter(ambulatory=False)
+    elif filter_ambulatory == 3:
+        clients = clients.filter(ambulatory=None)
 
     if filter_staff == 1:
         clients = clients.filter(staff=True)

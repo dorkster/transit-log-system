@@ -58,15 +58,15 @@ def searchGetTrips(request):
 
     if name:
         searched = True
-        trips = trips.filter(name__icontains=name)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(name__icontains=name)
 
     if address:
         searched = True
-        trips = trips.filter(address__icontains=address)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(address__icontains=address)
 
     if destination:
         searched = True
-        trips = trips.filter(destination__icontains=destination)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(destination__icontains=destination)
 
     if driver:
         try:
@@ -86,7 +86,7 @@ def searchGetTrips(request):
 
         if vehicle_obj:
             searched = True
-            trips = trips.filter(vehicle=vehicle_obj)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(vehicle=vehicle_obj)
 
     today = datetime.datetime.today()
 
@@ -165,20 +165,20 @@ def searchGetTrips(request):
     if elderly:
         searched = True
         if elderly == '0':
-            trips = trips.filter(elderly=None)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(elderly=None)
         elif elderly == '1':
-            trips = trips.filter(elderly=True)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(elderly=True)
         elif elderly == '2':
-            trips = trips.filter(elderly=False)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(elderly=False)
 
     if ambulatory:
         searched = True
         if ambulatory == '0':
-            trips = trips.filter(ambulatory=None)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(ambulatory=None)
         elif ambulatory == '1':
-            trips = trips.filter(ambulatory=True)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(ambulatory=True)
         elif ambulatory == '2':
-            trips = trips.filter(ambulatory=False)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(ambulatory=False)
 
     if trip_type:
         try:
@@ -188,11 +188,11 @@ def searchGetTrips(request):
 
         if trip_type_obj:
             searched = True
-            trips = trips.filter(trip_type=trip_type_obj)
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(trip_type=trip_type_obj)
 
     if tags:
         searched = True
-        trips = trips.filter(tags__icontains=tags)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(tags__icontains=tags)
 
     if status:
         searched = True

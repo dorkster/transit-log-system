@@ -966,7 +966,8 @@ class Report():
                             report_day.by_driver[shift.shift.driver].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_driver[shift.shift.driver].fuel += shift.fuel.value
 
-                report_day.all += report_day.by_vehicle[shift.shift.vehicle]
+            for shift_vehicle in report_day.by_vehicle:
+                report_day.all += report_day.by_vehicle[shift_vehicle]
 
             self.report_all.append(report_day)
 

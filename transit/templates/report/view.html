@@ -521,6 +521,10 @@
                             </a>
                             {% if rider.client_id %}
                             <div class="dropdown-divider"></div>
+                            <a target="_blank" href="{% url 'client-report' rider.client_id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                                <span class="oi oi-graph mr-2"></span>View Client Report<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
                             <div class="dropdown-divider"></div>
                             <a target="_blank" class="dropdown-item" href="{% url 'client-edit' rider.client_id %}">
@@ -674,6 +678,10 @@
                                 <span class="oi oi-magnifying-glass mr-2"></span>Search for trips<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                             </a>
                             {% if rider.client_id %}
+                            <div class="dropdown-divider"></div>
+                            <a target="_blank" href="{% url 'client-report' rider.client_id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                                <span class="oi oi-graph mr-2"></span>View Client Report<br/><span class="small">From {{date_start}} - {{date_end}}</span>
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a target="_blank" href="{% url 'client-payments' rider.client_id %}" class="dropdown-item"><span class="oi oi-dollar mr-2"></span>View Client Payments</a>
                             <div class="dropdown-divider"></div>

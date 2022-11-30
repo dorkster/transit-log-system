@@ -25,6 +25,7 @@
         <div class="row">
             <div class="col-md border m-1 p-2">
                 <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }} / Activity Description</strong></label><br/>{{ form.notes }}</div>
+                <div class="mb-2"><label for="{{ form.reminder_instructions.id_for_label }}"><strong>{{ form.reminder_instructions.label }}</strong></label><br/>{{ form.reminder_instructions }}</div>
                 <div class="mb-2"><label for="{{ form.elderly.id_for_label }}"><strong>{{ form.elderly.label }}</strong></label><br/>{{ form.elderly }}</div>
                 <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
             </div>
@@ -58,6 +59,7 @@
         <td>End Miles</td>
         <td>End Time</td>
         <td>Notes</td>
+        <td>Reminder Instructions</td>
         <td>Trip Type / Tags</td>
         <td>Fare</td>
         <td>Money Collected</td>
@@ -130,6 +132,9 @@
         </td>
         <td class="mytable-col-md">
             {{ trip.note }}
+        </td>
+        <td class="mytable-col-md">
+            {{ trip.reminder_instructions }}
         </td>
         <td class="mytable-col-md">
             {% if trip.trip_type %}

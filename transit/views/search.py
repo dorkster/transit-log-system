@@ -47,6 +47,7 @@ def searchGetTrips(request):
     end_month = request.GET.get('end_date_month')
     end_day = request.GET.get('end_date_day')
     notes = request.GET.get('notes')
+    reminder_instructions = request.GET.get('reminder_instructions')
     elderly = request.GET.get('elderly')
     ambulatory = request.GET.get('ambulatory')
     trip_type = request.GET.get('trip_type')
@@ -161,6 +162,10 @@ def searchGetTrips(request):
     if notes:
         searched = True
         trips = trips.filter(note__icontains=notes)
+
+    if reminder_instructions:
+        searched = True
+        trips = trips.filter(reminder_instructions__icontains=reminder_instructions)
 
     if elderly:
         searched = True

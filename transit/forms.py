@@ -333,6 +333,7 @@ class SearchTripsForm(forms.Form):
     start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
     end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
     notes = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    reminder_instructions = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     trip_type = forms.ModelChoiceField(TripType.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))

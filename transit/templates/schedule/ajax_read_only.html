@@ -24,10 +24,10 @@
     {% for shift in shifts %}
     <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
         <td class="mytable-col-md">
-            {{ shift.driver }}
+            {% if shift.driver %}{{ shift.driver }}{% endif %}
         </td>
         <td class="mytable-col-md">
-            {{ shift.vehicle }}
+            {% if shift.vehicle %}{{ shift.vehicle }}{% endif %}
         </td>
         <td class="mytable-col-sm">
             {% if shift.start_miles or shift.check_log != Shift.LOG_INCOMPLETE %}
@@ -246,10 +246,10 @@
             {% if trip.phone_destination and trip.destination %}<br/>Phone #: {{ trip.phone_destination }}{% endif %}
         </td>
         <td class="mytable-col-md">
-            {{ trip.driver }}
+            {% if trip.driver %}{{ trip.driver }}{% endif %}
         </td>
         <td class="mytable-col-md">
-            {{ trip.vehicle }}
+            {% if trip.vehicle %}{{ trip.vehicle }}{% endif %}
         </td>
         <td class="mytable-col-sm">
             {% if trip.start_miles or trip.check_log != Trip.LOG_INCOMPLETE %}

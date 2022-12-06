@@ -145,6 +145,9 @@
         </td>
         <td colspan="{% if show_extra_columns %}14{% else %}8{% endif %}" class="text-left edit_cell" onclick="editCell('{% url 'template-trip-edit-activity' trip.parent.id trip.id %}?focus=id_description', row_movers)">
             {% if trip.driver %}
+                {% if trip.activity_color %}
+                <span class="badge badge-light border border-dark mr-1" style="font-size: 100%; background:#{{trip.activity_color.get_color}};">{{trip.activity_color}}</span>
+                {% endif %}
                 {% if trip.passenger %}
                 <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
                 {% else %}

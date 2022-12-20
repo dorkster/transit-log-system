@@ -132,6 +132,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         else:
             form = EditTripForm(request.POST)
 
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
+
         if form.is_valid():
             old_date = trip.date
 
@@ -311,6 +314,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
             }
             form = EditTripForm(initial=initial)
 
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
+
     addresses = set()
     destinations = Destination.objects.filter(is_active=True)
 
@@ -438,6 +444,9 @@ def tripStart(request, id):
     if request.method == 'POST':
         form = tripStartForm(request.POST)
 
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=trip.driver.id))
+
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
 
@@ -504,6 +513,8 @@ def tripStart(request, id):
             'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
         }
         form = tripStartForm(initial=initial)
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=trip.driver.id))
 
     additional_pickups = []
     if trip.address != '':

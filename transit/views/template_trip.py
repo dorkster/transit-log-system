@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.db.models import Q
 
-from transit.models import Template, TemplateTrip, Client, Tag, Trip, SiteSettings, Destination, Fare
+from transit.models import Template, TemplateTrip, Client, Tag, Trip, SiteSettings, Destination, Fare, Driver
 from transit.forms import EditTemplateTripForm, EditTemplateActivityForm
 
 from django.contrib.auth.decorators import permission_required
@@ -108,6 +108,9 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             return HttpResponseRedirect(reverse('template-trips', kwargs={'parent':trip.parent.id}) + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('template-trip-delete', kwargs={'parent':trip.parent.id, 'id':trip.id}))
+
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
 
         if form.is_valid():
             old_parent = trip.parent
@@ -258,6 +261,9 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                 'reminder_instructions': trip.reminder_instructions,
             }
             form = EditTemplateTripForm(initial=initial)
+
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
 
     addresses = set()
     destinations = Destination.objects.filter(is_active=True)

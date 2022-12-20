@@ -18,6 +18,7 @@ import datetime, uuid
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from transit.models import VehicleIssue
 from transit.forms import EditVehicleIssueForm
@@ -25,7 +26,7 @@ from transit.forms import EditVehicleIssueForm
 from django.contrib.auth.decorators import permission_required
 
 from transit.common.eventlog import *
-from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
+from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel, Driver
 
 def vehicleIssueCreate(request):
     vehicle_issue = VehicleIssue()
@@ -44,6 +45,9 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             return HttpResponseRedirect(reverse('vehicle-status'))
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('vehicle-issue-delete', kwargs={'id':vehicle_issue.id}))
+
+        if vehicle_issue.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=vehicle_issue.driver.id))
 
         if form.is_valid():
             if is_new:
@@ -74,6 +78,8 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             'is_resolved': vehicle_issue.is_resolved,
         }
         form = EditVehicleIssueForm(initial=initial)
+        if vehicle_issue.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=vehicle_issue.driver.id))
 
     context = {
         'form': form,

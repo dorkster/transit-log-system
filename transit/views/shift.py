@@ -18,6 +18,7 @@ import datetime, uuid
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from transit.models import Shift, Driver, Vehicle, Trip, SiteSettings
 from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
@@ -63,6 +64,9 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + url_hash)
         elif 'delete' in request.POST:
             return HttpResponseRedirect(reverse('shift-delete', kwargs={'mode':mode, 'id':shift.id}))
+
+        if shift.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=shift.driver.id))
 
         if form.is_valid():
             prev = {
@@ -118,6 +122,8 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             'notes': shift.note,
         }
         form = EditShiftForm(initial=initial)
+        if shift.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=shift.driver.id))
 
     context = {
         'form': form,

@@ -401,6 +401,7 @@ class Driver(models.Model):
     name = models.CharField(max_length=FieldSizes.SM)
     color = models.CharField(default='FFFFFF', max_length=FieldSizes.COLOR, blank=True)
     is_logged = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['sort_index']

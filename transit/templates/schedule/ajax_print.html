@@ -95,7 +95,9 @@
                 <div class="dropdown-menu shadow">
                     <button class="dropdown-item {% if filter_driver is None %}active{% endif %}" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</button>
                     {% for driver in drivers %}
+                    {% if driver.is_active %}
                     <button class="dropdown-item {% if filter_driver == driver %}active{% endif %}" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</Button>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </span>

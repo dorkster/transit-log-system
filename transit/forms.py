@@ -128,7 +128,7 @@ class EditTripForm(forms.Form):
     tags = forms.CharField(required=False, widget=forms.HiddenInput())
     elderly = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
     ambulatory = forms.NullBooleanField(required=False, widget=forms.NullBooleanSelect(attrs=formWidgetAttrs.default))
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     start_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
@@ -148,7 +148,7 @@ class EditTripForm(forms.Form):
 
 class EditShiftForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
-    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True, is_active=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.all(), widget=forms.Select(attrs=formWidgetAttrs.default))
     start_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile_shift))
     start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
@@ -167,7 +167,7 @@ class shiftFuelForm(forms.Form):
 class tripStartForm(forms.Form):
     miles = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
     time = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.time))
-    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True, is_active=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.all(), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
@@ -211,6 +211,7 @@ class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
     is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    is_active = forms.BooleanField(label='Is active?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditVehicleForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
@@ -227,7 +228,7 @@ class UploadFileForm(forms.Form):
     dry_run = forms.BooleanField(label="Dry run? (i.e. don't write to database)", required=False, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditVehicleIssueForm(forms.Form):
-    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True, is_active=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
@@ -252,7 +253,7 @@ class EditTemplateTripForm(forms.Form):
     phone_address = forms.CharField(label='Phone (Pick-Up)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     phone_destination = forms.CharField(label='Phone (Destination)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     destination = forms.CharField(label='Destination Address', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.address))
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     pick_up_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     appointment_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
@@ -277,7 +278,7 @@ class EditTemplateActivityForm(forms.Form):
     description = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TemplateTrip.STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     activity_color = forms.ModelChoiceField(ActivityColor.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     driver_is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditScheduleMessageForm(forms.Form):
@@ -291,7 +292,7 @@ class EditActivityForm(forms.Form):
     status = forms.ChoiceField(required=False, choices=Trip.STATUS_LEVELS_ACTIVITY, widget=forms.Select(attrs=formWidgetAttrs.default))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     activity_color = forms.ModelChoiceField(ActivityColor.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     driver_is_available = forms.BooleanField(label='Driver is available?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class vehicleMaintainForm(forms.Form):
@@ -304,7 +305,7 @@ class vehicleMaintainForm(forms.Form):
 
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)
-    driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True, is_logged=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditFareForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

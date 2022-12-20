@@ -290,7 +290,9 @@
                 <div class="dropdown-menu shadow">
                     <a class="dropdown-item {% if trip.driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '---------')">---------</a>
                     {% for driver in drivers %}
+                    {% if driver.is_active or driver == trip.driver %}
                     <a class="dropdown-item {% if trip.driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '{{driver.id}}')">{{driver}}</a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

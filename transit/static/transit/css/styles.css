@@ -8,7 +8,7 @@
 
 .mytable td {
     padding: 0.25em;
-    border: 1px solid #777 !important;
+    border: 0.01px solid #777 !important;
 }
 
 .mytable td.edit_cell:hover {
@@ -117,7 +117,7 @@
     font-size: 8pt;
     padding: 1em;
     margin-top: 1em;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 0.01px solid rgba(0,0,0,0.1);
 }
 
 .text-bold {

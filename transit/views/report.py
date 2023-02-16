@@ -784,7 +784,6 @@ class Report():
                         rider.elderly = i.elderly
                         rider.ambulatory = i.ambulatory
 
-                        clients = Client.objects.filter(name=i.name)
                         for client in all_clients_list:
                             if client.name != i.name:
                                 continue
@@ -798,6 +797,7 @@ class Report():
                                     rider.elderly = client.elderly
                                 if rider.ambulatory == None:
                                     rider.ambulatory = client.ambulatory
+                            break
 
                         rider.trips.setTrips(1, i.passenger)
                         rider.total_fares += Report.Money(i.fare)
@@ -820,6 +820,7 @@ class Report():
                                 j.trips.addTrips(1, i.passenger)
                                 if log_status == Trip.LOG_COMPLETE:
                                     j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
+                                break
                         if not found_frequent_destination:
                             temp_fd = Report.FrequentDestination()
                             temp_fd.address = i.destination
@@ -827,6 +828,7 @@ class Report():
                             if log_status == Trip.LOG_COMPLETE:
                                 temp_fd.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                             self.frequent_destinations.append(temp_fd)
+                        break
 
             # handle payments from Clients that didn't ride (so far)
             for i in all_client_payments_list:

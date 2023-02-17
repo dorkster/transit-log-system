@@ -1,3 +1,4 @@
+{% load static %}
 <div class="alert {% if message %}alert-info{% endif %} p-1">
     <div class="row">
         <div class="col-auto pr-0">
@@ -265,6 +266,9 @@
             {{ trip.appointment_time }}
         </td>
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_name', row_movers)">
+            {% if trip.wheelchair %}
+            <img src="{% static 'transit/img/wheelchair.svg' %}" height="16px" class="align-text-bottom"/>
+            {% endif %}
             {{ trip.name }}
         </td>
         <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_address', row_movers)">

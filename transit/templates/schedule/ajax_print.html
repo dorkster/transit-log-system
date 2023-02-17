@@ -1,3 +1,4 @@
+{% load static %}
 <div class="container-fluid">
     <div class="row justify-content-between">
         <div class="col-md p-1">
@@ -222,7 +223,12 @@
             {% else %}
             <td class="mytable-col-sm">{{ trip.pick_up_time }}</td>
             <td class="mytable-col-sm">{{ trip.appointment_time }}</td>
-            <td class="mytable-col-lg">{{ trip.name }}</td>
+            <td class="mytable-col-lg">
+                {% if trip.wheelchair %}
+                <img src="{% static 'transit/img/wheelchair.svg' %}" height="16px" class="align-text-bottom"/>
+                {% endif %}
+                {{ trip.name }}
+            </td>
             <td class="mytable-col-lg">
                 {{ trip.address }}
                 {% if trip.phone_address and trip.address %}<br/>Phone #: {{ trip.phone_address }}{% endif %}
@@ -286,7 +292,7 @@
 </div>
 <script type="text/javascript">
     {% if show_dialog %}
-    window.print();
+    setTimeout(() => {  window.print(); }, 500);
     {% endif %}
     setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
 </script>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 12.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 51448)  -->
+
+<svg
+   version="1.1"
+   id="Layer_1"
+   width="650"
+   height="650"
+   viewBox="0 0 650 650"
+   overflow="visible"
+   enable-background="new 0 0 483.2226563 551.4306641"
+   xml:space="preserve"
+   sodipodi:docname="wheelchair.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:export-filename="wheelchair.png"
+   inkscape:export-xdpi="9.45231"
+   inkscape:export-ydpi="9.45231"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs9"><inkscape:path-effect
+     effect="fillet_chamfer"
+     id="path-effect952"
+     is_visible="true"
+     lpeversion="1"
+     nodesatellites_param="F,0,0,1,0,100,0,1 @ F,0,0,1,0,100,0,1 @ F,0,0,1,0,100,0,1 @ F,0,0,1,0,100,0,1"
+     unit="px"
+     method="auto"
+     mode="F"
+     radius="100"
+     chamfer_steps="1"
+     flexible="false"
+     use_knot_distance="true"
+     apply_no_radius="true"
+     apply_with_radius="true"
+     only_selected="false"
+     hide_knots="false" /></defs><sodipodi:namedview
+   id="namedview7"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   showgrid="false"
+   inkscape:zoom="0.427978"
+   inkscape:cx="142.531"
+   inkscape:cy="324.783"
+   inkscape:current-layer="Layer_1" />
+<path
+   style="fill:#003da6;fill-opacity:1;stroke-width:0.470193;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:8"
+   id="rect903"
+   width="650"
+   height="650"
+   x="0"
+   y="0"
+   ry="0"
+   inkscape:path-effect="#path-effect952"
+   d="M 100,0 H 550 A 100,100 45 0 1 650,100 V 550 A 100,100 135 0 1 550,650 H 100 A 100,100 45 0 1 0,550 V 100 A 100,100 135 0 1 100,0 Z"
+   sodipodi:type="rect" /><path
+   fill-rule="evenodd"
+   clip-rule="evenodd"
+   fill="#000000"
+   d="m 245.377,147.408 c 24.963,-2.304 44.358,-23.811 44.358,-48.9653 0,-27.0752 -22.083,-49.1582 -49.159,-49.1582 -27.075,0 -49.157,22.083 -49.157,49.1582 0,8.2563 2.304,16.7053 6.145,23.8103 l 17.515,246.467 180.397,0.05 73.991,173.366 97.145,-38.098 -15.043,-35.82 -54.367,19.625 -71.59,-165.281 -167.73,1.127 -2.303,-31.213 121.423,0.05 v -46.183 l -126.054,-0.05 z"
+   id="path2"
+   style="fill:#ffffff;fill-opacity:1" />
+<path
+   fill-rule="evenodd"
+   clip-rule="evenodd"
+   fill="#000000"
+   d="m 426.809,500.875 c -30.447,60.187 -94.175,99.84 -162.15,99.84 -99.841,0 -181.2705,-81.43 -181.2705,-181.27 0,-70.1 42.4855,-135.244 105.8825,-164.121 l 4.102,53.538 c -37.497,23.628 -60.612,66.262 -60.612,110.95 0,72.427 59.071,131.497 131.497,131.497 66.262,0 122.765,-50.851 130.47,-116.087 z"
+   id="path4"
+   style="fill:#ffffff;fill-opacity:1" />
+</svg>

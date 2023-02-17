@@ -205,6 +205,7 @@ class Trip(models.Model):
     cancel_date = models.DateField(default=None, null=True, blank=False)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
+    wheelchair = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -739,6 +740,7 @@ class TemplateTrip(models.Model):
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
+    wheelchair = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['parent', 'sort_index']

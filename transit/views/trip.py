@@ -181,6 +181,10 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 trip.passenger = form.cleaned_data['passenger']
                 trip.reminder_instructions = form.cleaned_data['reminder_instructions']
 
+                # set the wheelchair flag if the corresponding tag exists
+                tag_list = trip.get_tag_list()
+                trip.wheelchair = ('Wheelchair' in tag_list)
+
             trip.cancel_date = None
             try:
                 if int(trip.status) == Trip.STATUS_CANCELED:

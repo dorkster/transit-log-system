@@ -1,3 +1,4 @@
+{% load static %}
 {% if message %}
 <div class="alert alert-info p-1">
     <div class="row">
@@ -13,20 +14,17 @@
     {% for shift in shifts %}
     <div class="card mb-3 border-secondary" style="background: #{{ shift.get_driver_color }}; max-width: 960px;">
         <div class="card-body p-0">
-            <div class="d-flex flex-wrap">
-                <div class="p-1">
-                    <div class="dropdown ajax-blocker">
-                        <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="oi oi-pencil"></span>
+            <div>
+                <h4 class="card-title mb-0">
+                    <span class="dropdown ajax-blocker">
+                        <button class="btn btn-block dropdown-toggle text-left text-bold p-1 text-wrap" style="font-size: 0.8em;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ shift.driver }} ({{ shift.vehicle }})
                         </button>
                         <div class="dropdown-menu shadow">
                             <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Shift</a>
                         </div>
-                    </div>
-                </div>
-                <div class="p-1">
-                    <h4 class="card-text">{{ shift.driver }} ({{ shift.vehicle }})</h4>
-                </div>
+                    </span>
+                </h4>
             </div>
             <div>
                 <div class="list-group list-group-flush">
@@ -172,50 +170,46 @@
             <div style="background: rgba(255,255,255,.3); border-bottom: 1px solid rgba(0,0,0,.125);">
             <a id="trip_{{ trip.id }}"></a>
             <div>
-                <div class="d-flex">
-                    <div class="p-1">
-                        <div class="dropdown ajax-blocker">
-                            <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="oi oi-pencil"></span>
-                            </button>
-                            <div class="dropdown-menu shadow">
-                                {% if trip.format == Trip.FORMAT_ACTIVITY %}
-                                <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
-                                <div class="dropdown-divider"></div>
-                                {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                <h4 class="card-title mb-0">
+                    <span class="dropdown ajax-blocker">
+                        <button class="btn btn-block dropdown-toggle text-left text-bold p-1 text-wrap" style="font-size: 0.8em;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% if trip.format != Trip.FORMAT_NORMAL %}
+                            {% if trip.format == Trip.FORMAT_ACTIVITY %}
+                                {% if trip.driver %}
+                                {% if trip.passenger %}
+                                <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
                                 {% else %}
-                                <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
-                                <div class="dropdown-divider"></div>
-                                {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
-                                {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
+                                <span class="badge badge-light text-danger mr-1"><span class="oi oi-person"></span></span>
                                 {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-1">
-                        <h4 class="card-title mb-0">
-                            {% if trip.format != Trip.FORMAT_NORMAL %}
-                                {% if trip.format == Trip.FORMAT_ACTIVITY %}
-                                    {% if trip.driver %}
-                                    {% if trip.passenger %}
-                                    <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
-                                    {% else %}
-                                    <span class="badge badge-light text-danger mr-1"><span class="oi oi-person"></span></span>
-                                    {% endif %}
-                                    {% endif %}
-                                    {{ trip.note }}
                                 {% endif %}
-                            {% else %}
-                                {{ trip.name }}
-                                {% if trip.appointment_time %}
-                                <span class="oi oi-star small ml-1"></span>
-                                {% endif %}
+                                {{ trip.note }}
                             {% endif %}
-                        </h4>
-                    </div>
-                </div>
+                        {% else %}
+                            {% if trip.wheelchair %}
+                            <img src="{% static 'transit/img/wheelchair.svg' %}" height="24px" class="align-text-bottom"/>
+                            {% endif %}
+                            {% if trip.appointment_time %}
+                            <span class="oi oi-star"></span>
+                            {% endif %}
+                            {{ trip.name }}
+                        {% endif %}
+                        </button>
+                        <div class="dropdown-menu shadow">
+                            {% if trip.format == Trip.FORMAT_ACTIVITY %}
+                            <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
+                            <div class="dropdown-divider"></div>
+                            {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                            {% else %}
+                            <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
+                            <div class="dropdown-divider"></div>
+                            {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
+                            {% endif %}
+                        </div>
+                    </span>
+                </h4>
             </div>
             </div>
                 <div class="d-flex flex-wrap">

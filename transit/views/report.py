@@ -486,6 +486,8 @@ class Report():
         self.filtered_drivers = None
         self.total_vehicle_days_of_service = 0
         self.total_vehicle_mileage = Report.Mileage()
+        self.total_money = Report.Money(0)
+        self.total_odometer_miles = Report.Mileage()
 
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
@@ -1051,6 +1053,10 @@ class Report():
             if day.hasVehicleInShift():
                 self.total_vehicle_days_of_service += 1
 
+        self.total_money = self.all_vehicles.total_collected_money + self.money_payments_summary.cash + self.money_payments_summary.check
+
+        for vehicle_report in self.vehicle_reports:
+            self.total_odometer_miles += vehicle_report.total_miles
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])

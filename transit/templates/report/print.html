@@ -53,6 +53,90 @@
 </div>
 {% endif%}
 
+<div id="report_MAP">
+    <hr/>
+    <div class="row">
+        <div class="col">
+            <h3>Mobility Assistance Program (MAP)</h3>
+        </div>
+        <div class="col-auto">
+            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+        </div>
+    </div>
+    <h4>Passenger Description (Unduplicated riders)</h4>
+    <table class="mytable mytable-striped mb-3">
+        <thead>
+            <td class="mytable-col-md"></td>
+            <td class="mytable-col-md text-center">Elderly Ambulatory</td>
+            <td class="mytable-col-md text-center">Elderly Non-Ambulatory</td>
+            <td class="mytable-col-md text-center">Non-Elderly Ambulatory</td>
+            <td class="mytable-col-md text-center">Non-Elderly Non-Ambulatory</td>
+            <td class="mytable-col-md text-center">Unknown</td>
+            <td class="mytable-col-md text-center">Total</td>
+        </thead>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.elderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.elderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.nonelderly_ambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.nonelderly_nonambulatory.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.unknown.total }}</td>
+            <td class="mytable-col-md text-center">{{ report.unique_riders.all.total }}</td>
+        </tr>
+    </table>
+    <h4>Operational Information (All vehicles)</h4>
+    <table class="mytable mytable-striped mb-3">
+        <thead>
+            <td class="mytable-col-md"></td>
+            <td class="mytable-col-md text-center">Days of Service</td>
+            <td class="mytable-col-md text-center">Service Hours</td>
+            <td class="mytable-col-md text-center">Odometer Miles</td>
+        </thead>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            <td class="mytable-col-md text-center">{{ report.total_vehicle_days_of_service }}</td>
+            <td class="mytable-col-md text-center">{{ report.all_vehicles.service_hours|floatformat:2 }}</td>
+            <td class="mytable-col-md text-center">{{ report.total_odometer_miles }}</td>
+        </tr>
+    </table>
+    <h4>Total Number of One-Way Trips Provided</h4>
+    <table class="mytable mytable-striped mb-3">
+        <thead>
+            <td class="mytable-col-md"></td>
+            {% for key, value in report.all_vehicles.trip_types.items %}
+            <td class="mytable-col-sm">Trips: {{key}}</td>
+            {% endfor %}
+            <td class="mytable-col-sm">Total Trips</td>
+        </thead>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            {% for key, value in report.all_vehicles.trip_types.items %}
+            <td class="mytable-col-sm">{{value.total}}</td>
+            {% endfor %}
+            <td class="mytable-col-sm">{{report.all_vehicles.trip_types_total.total}}</td>
+        </tr>
+    </table>
+    <h4>Supplemental Information</h4>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-md"></td>
+            <td class="mytable-col-sm">Fuel</td>
+            <td class="mytable-col-sm">Deadhead Hours</td>
+            <td class="mytable-col-sm">Deadhead Miles</td>
+            <td class="mytable-col-sm">Passenger Miles</td>
+            <td class="mytable-col-sm">Total Money</td>
+        </thead>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.fuel|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.deadhead_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.deadhead_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.all_vehicles.pmt|floatformat:1}}</td>
+            <td class="mytable-col-sm">{{report.total_money}}</td>
+        </tr>
+    </table>
+</div>
+
 <div id="report_vehicle_totals">
     <hr/>
     <div class="row">
@@ -151,7 +235,8 @@
             <h3>Vehicle: {{v.vehicle}}</h3>
             {% if not v.start_miles.empty and not v.end_miles.empty %}
             <p>
-                Mileage Start: <strong>{{v.start_miles}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles}}</strong>
+            Mileage Start: <strong>{{v.start_miles}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles}}</strong><br/>
+                Total miles: <strong>{{v.total_miles}}</strong>
                 {% if v.days %}<br/>Days of service: <strong>{{ v.days|length }}</strong>{% endif %}
             </p>
             {% endif %}
@@ -667,6 +752,7 @@
 
     var visible = new ReportVisibility();
     visible.addSection("#report_errors", "#vis_errors");
+    visible.addSection("#report_MAP", "#vis_MAP");
     visible.addSection("#report_vehicle_totals", "#vis_vehicle_totals");
     {% for v in report.filtered_vehicles %}
     visible.addSection("#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}");

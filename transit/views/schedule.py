@@ -580,7 +580,10 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
 
     money_total = money_cash + money_check
 
-    trips_employment = report_summary.other_employment
+    try:
+        trips_employment = report_summary.other_employment
+    except:
+        trips_employment = 0
 
     # don't include employment/education in Other total
     trips_other = trips_other - trips_employment

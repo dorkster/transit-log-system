@@ -1247,6 +1247,20 @@ def reportMonthBase(request, driver_id, year, month):
         return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
 
 
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportYear(request, year):
+    return reportYearBase(request, None, year)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportYearBase(request, driver_id, year):
+    date_start = datetime.date(year, 1, 1)
+    date_end = datetime.date(year+1, 1, 1) + datetime.timedelta(days=-1)
+
+    if driver_id:
+        return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+    else:
+        return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportThisMonth(request):

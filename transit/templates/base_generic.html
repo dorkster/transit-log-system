@@ -88,8 +88,15 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Reports</a>
                         <div class="dropdown-menu shadow">
-                            <a class="dropdown-item" href="{% url 'report-last-month' %}"><span class="oi oi-graph mr-2"></span>View last month's report</a>
-                            <a class="dropdown-item" href="{% url 'report-this-month' %}"><span class="oi oi-graph mr-2"></span>View this month's report</a>
+                            <div class="pl-3 mb-2"><span class="oi oi-graph mr-2"></span><strong>By Month</strong></div>
+                            {% for month in report_months %}
+                            <a class="dropdown-item" href="{% url 'report-month' month.year month.month %}">{{month|date:'F Y'}}</a>
+                            {% endfor %}
+                            <div class="dropdown-divider"></div>
+                            <div class="pl-3 mb-2"><span class="oi oi-graph mr-2"></span><strong>By Year</strong></div>
+                            {% for year in report_years %}
+                            <a class="dropdown-item" href="{% url 'report-year' year.year %}">{{year|date:'Y'}}</a>
+                            {% endfor %}
                         </div>
                     </li>
                     {% endif %}

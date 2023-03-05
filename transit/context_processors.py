@@ -30,6 +30,24 @@ def globals(request):
 
     today = datetime.date.today()
 
+    report_months = []
+    for i in range(6):
+        if i == 0:
+            last_month = today
+        else:
+            last_month = report_months[i-1]
+            last_month = last_month.replace(day=1) - datetime.timedelta(days=1)
+        report_months.append(datetime.date(last_month.year, last_month.month, 1))
+
+    report_years = []
+    for i in range(3):
+        if i == 0:
+            last_year = today
+        else:
+            last_year = report_years[i-1]
+            last_year = last_year.replace(day=1, month=1) - datetime.timedelta(days=1)
+        report_years.append(datetime.date(last_year.year, 1, 1))
+
     if site_settings.pretrip_warning_threshold > 0:
         pretrip_threshold = today - datetime.timedelta(days=site_settings.pretrip_warning_threshold)
         pretrips = PreTrip.objects.filter(date__gte=pretrip_threshold)
@@ -79,5 +97,7 @@ def globals(request):
         'notify_vehicle_pretrips': vehicle_pretrips,
         'settings': site_settings,
         'version': VersionInfo.version_str,
+        'report_months': report_months,
+        'report_years': report_years,
     }
 

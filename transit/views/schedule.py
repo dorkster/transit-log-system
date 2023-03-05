@@ -541,7 +541,7 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
         current_shift = get_object_or_404(Shift, id=uuid.UUID(shift_id))
         report.load(day_date, day_date, daily_log_shift=uuid.UUID(shift_id))
         if len(report.report_all) > 0:
-            report_summary = report.report_all[0].by_vehicle[current_shift.vehicle]
+            report_summary = report.report_all[0].by_vehicle[Report.getVehicleIndex(current_shift.vehicle)]
 
     try:
         trips_medical = report_summary.trip_types[TripType.objects.get(name='Medical')]

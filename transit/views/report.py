@@ -906,7 +906,7 @@ class Report():
                     deadhead_hours = ((report_day.trips[shift.start_trip].start_time.value - shift.start_time.value).seconds + (shift.end_time.value - report_day.trips[shift.end_trip].end_time.value).seconds) / 60 / 60
 
                 # per-vehicle log
-                vehicle_index = Report.ReportDay.query_vehicles.index(shift.shift.vehicle)
+                vehicle_index = Report.getVehicleIndex(shift.shift.vehicle)
                 report_day.by_vehicle[vehicle_index].service_miles += service_miles
                 report_day.by_vehicle[vehicle_index].service_hours += service_hours
                 report_day.by_vehicle[vehicle_index].deadhead_miles += deadhead_miles
@@ -938,7 +938,7 @@ class Report():
                 report_day.by_vehicle[vehicle_index].fuel += shift.fuel.value
 
                 # per-driver log
-                driver_index = Report.ReportDay.query_drivers.index(shift.shift.driver)
+                driver_index = Report.getDriverIndex(shift.shift.driver)
                 report_day.by_driver[driver_index].service_miles += service_miles
                 report_day.by_driver[driver_index].service_hours += service_hours
                 report_day.by_driver[driver_index].deadhead_miles += deadhead_miles
@@ -978,7 +978,7 @@ class Report():
         for vehicle in self.filtered_vehicles:
             vehicle_report = Report.ReportOutputVehicles()
             vehicle_report.vehicle = vehicle
-            vehicle_index = Report.ReportDay.query_vehicles.index(vehicle)
+            vehicle_index = Report.getVehicleIndex(vehicle)
             for report_day in self.report_all:
                 if report_day.hasVehicleInShift(vehicle):
                     vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
@@ -1009,7 +1009,7 @@ class Report():
         for driver in self.filtered_drivers:
             driver_report = Report.ReportOutputDrivers()
             driver_report.driver = driver
-            driver_index = Report.ReportDay.query_drivers.index(driver)
+            driver_index = Report.getDriverIndex(driver)
             for report_day in self.report_all:
                 if report_day.hasDriverInShift(driver):
                     driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
@@ -1064,6 +1064,11 @@ class Report():
         for vehicle_report in self.vehicle_reports:
             self.total_odometer_miles += vehicle_report.total_miles
 
+    def getVehicleIndex(vehicle):
+        return Report.ReportDay.query_vehicles.index(vehicle)
+
+    def getDriverIndex(driver):
+        return Report.ReportDay.query_drivers.index(driver)
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def report(request, start_year, start_month, start_day, end_year, end_month, end_day):

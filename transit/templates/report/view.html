@@ -5,6 +5,11 @@
 
 {% block auth_content %}
 {% load static %}
+<form id="show_daily_data_form" action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="show_daily_data">
+</form>
+
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">
@@ -68,6 +73,13 @@
         </div>
     </div>
     <div class="row justify-content-end mt-3">
+        {% if not is_short_report %}
+        <div class="col-auto">
+            <button onclick="document.getElementById('show_daily_data_form').submit();" class="btn {% if show_daily_data %}btn-secondary{% else %}btn-warning{% endif %} btn-sm">
+                <span class="oi oi-calendar mr-2"></span>{% if show_daily_data %}Hide daily report data{% else %}Show daily report data{% endif %}
+            </button>
+        </div>
+        {% endif %}
         <div id="vis_all" class="col-auto d-none">
             <a href="#_" class="btn btn-warning btn-sm" onclick="visibleShowAll(visible)"><span class="oi oi-eye mr-2"></span>Show all sections</a>
         </div>
@@ -201,6 +213,7 @@
         </div>
     </div>
 </div>
+
 {% if selected_driver %}
 <div class="alert alert-warning">
     <p>This report is showing only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
@@ -363,6 +376,7 @@
             <td class="mytable-col-sm">Checks Collected</td>
             <td class="mytable-col-sm">Total Money</td>
         </thead>
+        {% if show_daily_data or is_short_report %}
         <tbody class="mytable-hoverhi">
             {% for day in report.report_all %}
             {% if day.hasVehicleInShift %}
@@ -405,6 +419,7 @@
             <td class="mytable-col-sm">Checks Collected</td>
             <td class="mytable-col-sm">Total Money</td>
         </thead>
+        {% endif %}
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-sm">{{report.all_vehicles.service_miles|floatformat:1}}</td>
@@ -425,6 +440,11 @@
             <td class="mytable-col-sm">{{report.all_vehicles.collected_check}}</td>
             <td class="mytable-col-sm">{{report.all_vehicles.total_collected_money}}</td>
         </tr>
+        {% if not show_daily_data and not is_short_report %}
+        <tr>
+            <td colspan="{{vehicle_table_colspan}}" class="small text-center alert-warning">Daily report data is hidden</td>
+        </tr>
+        {% endif %}
     </table>
 </div>
 {% for v in report.vehicle_reports %}
@@ -463,6 +483,7 @@
             <td class="mytable-col-sm">Checks Collected</td>
             <td class="mytable-col-sm">Total Money</td>
         </thead>
+        {% if show_daily_data or is_short_report %}
         <tbody class="mytable-hoverhi">
             {% for day in v.days %}
             <tr>
@@ -503,6 +524,7 @@
             <td class="mytable-col-sm">Checks Collected</td>
             <td class="mytable-col-sm">Total Money</td>
         </thead>
+        {% endif %}
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-sm">{{v.totals.service_miles|floatformat:1}}</td>
@@ -523,6 +545,11 @@
             <td class="mytable-col-sm">{{v.totals.collected_check}}</td>
             <td class="mytable-col-sm">{{v.totals.total_collected_money}}</td>
         </tr>
+        {% if not show_daily_data and not is_short_report %}
+        <tr>
+            <td colspan="{{vehicle_table_colspan}}" class="small text-center alert-warning">Daily report data is hidden</td>
+        </tr>
+        {% endif %}
     </table>
     {% else %}
     <p>No data for this vehicle is available.</p>
@@ -832,6 +859,7 @@
             <td class="mytable-col-md">Total Payments</td>
             <td class="mytable-col-md">Total Fares</td>
         </thead>
+        {% if show_daily_data or is_short_report %}
         <tbody class="mytable-hoverhi">
             {% for day in report.report_all %}
             {% if day.total_payments.value > 0 or day.total_fares.value > 0 %}
@@ -847,6 +875,7 @@
             {% endif %}
             {% endfor %}
         </tbody>
+        {% endif %}
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-md">{{ report.unique_riders.total_collected_cash }}</td>
@@ -856,6 +885,11 @@
             <td class="mytable-col-md">{{ report.unique_riders.total_total_payments }}</td>
             <td class="mytable-col-md">{{ report.unique_riders.total_total_fares }}</td>
         </tr>
+        {% if not show_daily_data and not is_short_report %}
+        <tr>
+            <td colspan="7" class="small text-center alert-warning">Daily report data is hidden</td>
+        </tr>
+        {% endif %}
     </table>
 </div>
 {% endif %}
@@ -878,6 +912,7 @@
             <td class="mytable-col-sm">Cash</td>
             <td class="mytable-col-sm">Check</td>
         </thead>
+        {% if show_daily_data or is_short_report %}
         <tbody class="mytable-hoverhi">
             {% for money_trip in report.money_trips %}
             <tr>
@@ -888,12 +923,18 @@
             </tr>
             {% endfor %}
         </tbody>
+        {% endif %}
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-lg"></td>
             <td class="mytable-col-sm">{{ report.money_trips_summary.collected_cash}}</td>
             <td class="mytable-col-sm">{{ report.money_trips_summary.collected_check}}</td>
         </tr>
+        {% if not show_daily_data and not is_short_report %}
+        <tr>
+            <td colspan="4" class="small text-center alert-warning">Daily report data is hidden</td>
+        </tr>
+        {% endif %}
     </table>
 </div>
 {% endif %}
@@ -916,6 +957,7 @@
             <td class="mytable-col-sm">Cash</td>
             <td class="mytable-col-sm">Check</td>
         </thead>
+        {% if show_daily_data or is_short_report %}
         <tbody class="mytable-hoverhi">
             {% for money_payment in report.money_payments %}
             <tr>
@@ -926,12 +968,18 @@
             </tr>
             {% endfor %}
         </tbody>
+        {% endif %}
         <tr class="bg-success text-light text-bold">
             <td class="mytable-col-md">TOTAL</td>
             <td class="mytable-col-lg"></td>
             <td class="mytable-col-sm">{{ report.money_payments_summary.cash}}</td>
             <td class="mytable-col-sm">{{ report.money_payments_summary.check}}</td>
         </tr>
+        {% if not show_daily_data and not is_short_report %}
+        <tr>
+            <td colspan="4" class="small text-center alert-warning">Daily report data is hidden</td>
+        </tr>
+        {% endif %}
     </table>
 </div>
 {% endif %}

@@ -1072,6 +1072,9 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
+    show_daily_data = request.session.get('report_show_daily_data', False)
+    request.session['report_show_daily_data'] = show_daily_data
+
     if date_start > date_end:
         swap_date = date_start
         date_start = date_end
@@ -1089,6 +1092,12 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
                     return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
                 else:
                     return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+        elif 'show_daily_data' in request.POST:
+            show_daily_data = request.session['report_show_daily_data'] = not request.session['report_show_daily_data']
+            if driver_id == None:
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':start_year, 'start_month':start_month, 'start_day':start_day, 'end_year':end_year, 'end_month':end_month, 'end_day':end_day}))
+            else:
+                return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':start_year, 'start_month':start_month, 'start_day':start_day, 'end_year':end_year, 'end_month':end_month, 'end_day':end_day}))
         else:
             if date_picker.is_valid():
                 date_picker_date = date_picker.cleaned_data['date']
@@ -1140,6 +1149,9 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'url_print_mile_summary': url_print_mile_summary,
         'url_xlsx': url_xlsx,
         'selected_driver': selected_driver,
+        'show_daily_data': show_daily_data,
+        'is_short_report': len(report.report_all) <= 31,
+        'vehicle_table_colspan': 13 + (3 * len(Report.ReportSummary.query_triptypes)),
     }
     return render(request, 'report/view.html', context)
 
@@ -1158,6 +1170,9 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
+    show_daily_data = request.session.get('report_show_daily_data', False)
+    request.session['report_show_daily_data'] = show_daily_data
+
     if date_start > date_end:
         swap_date = date_start
         date_start = date_end
@@ -1170,6 +1185,9 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'date_start': date_start,
         'date_end': date_end,
         'report': report,
+        'show_daily_data': show_daily_data,
+        'is_short_report': len(report.report_all) <= 31,
+        'vehicle_table_colspan': 13 + (3 * len(Report.ReportSummary.query_triptypes)),
     }
     return render(request, 'report/print.html', context)
 

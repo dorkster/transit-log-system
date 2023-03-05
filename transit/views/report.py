@@ -278,9 +278,6 @@ class Report():
             for i in self.query_triptypes:
                 self.trip_types[i] = Report.TripCount()
 
-            for i in self.query_tags:
-                self.tags[i.name] = Report.TripCount()
-
         def __add__(self, other):
             r = self
             r.service_miles += other.service_miles
@@ -935,7 +932,7 @@ class Report():
                     for tag in trip.tags:
                         if tag in report_day.by_vehicle[vehicle_index].tags:
                             report_day.by_vehicle[vehicle_index].tags[tag].addTrips(1, trip.trip.passenger)
-                        else:
+                        elif tag != '':
                             report_day.by_vehicle[vehicle_index].tags[tag] = Report.TripCount()
                             report_day.by_vehicle[vehicle_index].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_vehicle[vehicle_index].fuel += shift.fuel.value
@@ -967,7 +964,7 @@ class Report():
                     for tag in trip.tags:
                         if tag in report_day.by_driver[driver_index].tags:
                             report_day.by_driver[driver_index].tags[tag].addTrips(1, trip.trip.passenger)
-                        else:
+                        elif tag != '':
                             report_day.by_driver[driver_index].tags[tag] = Report.TripCount()
                             report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_driver[driver_index].fuel += shift.fuel.value
@@ -1000,6 +997,11 @@ class Report():
             self.vehicle_reports.append(vehicle_report)
 
         self.all_vehicles = Report.ReportSummary()
+
+        # make sure our pre-defined tags get placed first in the final list
+        for i in Report.ReportSummary.query_tags:
+            self.all_vehicles.tags[i.name] = Report.TripCount()
+
         for vehicle_report in self.vehicle_reports:
             self.all_vehicles += vehicle_report.totals
 

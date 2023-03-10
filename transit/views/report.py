@@ -905,96 +905,66 @@ class Report():
                     deadhead_miles = (report_day.trips[shift.start_trip].start_miles.value - shift.start_miles.value) + (shift.end_miles.value - report_day.trips[shift.end_trip].end_miles.value)
                     deadhead_hours = ((report_day.trips[shift.start_trip].start_time.value - shift.start_time.value).seconds + (shift.end_time.value - report_day.trips[shift.end_trip].end_time.value).seconds) / 60 / 60
 
-                # per-vehicle log
+                # per-vehicle and per-driver logs
                 vehicle_index = Report.getVehicleIndex(shift.shift.vehicle)
+                driver_index = Report.getDriverIndex(shift.shift.driver)
+
                 report_day.by_vehicle[vehicle_index].service_miles += service_miles
                 report_day.by_vehicle[vehicle_index].service_hours += service_hours
                 report_day.by_vehicle[vehicle_index].deadhead_miles += deadhead_miles
                 report_day.by_vehicle[vehicle_index].deadhead_hours += deadhead_hours
                 report_day.by_vehicle[vehicle_index].total_miles += service_miles + deadhead_miles
                 report_day.by_vehicle[vehicle_index].total_hours += service_hours + deadhead_hours
-                for trip in report_day.trips:
-                    if i != trip.shift:
-                        continue
-                    report_day.by_vehicle[vehicle_index].pmt += trip.end_miles.value - trip.start_miles.value
-                    if trip.trip != None:
-                        if trip.trip_type != None and trip.trip_type.is_trip_counted:
-                            report_day.by_vehicle[vehicle_index].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                            report_day.by_vehicle[vehicle_index].trip_types_total.addTrips(1, trip.trip.passenger)
-                        elif trip.trip_type == None:
-                            report_day.by_vehicle[vehicle_index].trip_types_unknown.addTrips(1, trip.trip.passenger)
-                            report_day.by_vehicle[vehicle_index].trip_types_total.addTrips(1, trip.trip.passenger)
-                    report_day.by_vehicle[vehicle_index].collected_cash += trip.collected_cash
-                    report_day.by_vehicle[vehicle_index].collected_check += trip.collected_check
-                    report_day.by_vehicle[vehicle_index].total_collected_money += (trip.collected_cash + trip.collected_check)
-                    if trip.other_employment:
-                        report_day.by_vehicle[vehicle_index].other_employment.addTrips(1, trip.trip.passenger)
-                    for tag in trip.tags:
-                        if tag in report_day.by_vehicle[vehicle_index].tags:
-                            report_day.by_vehicle[vehicle_index].tags[tag].addTrips(1, trip.trip.passenger)
-                        elif tag != '':
-                            report_day.by_vehicle[vehicle_index].tags[tag] = Report.TripCount()
-                            report_day.by_vehicle[vehicle_index].tags[tag].setTrips(1, trip.trip.passenger)
                 report_day.by_vehicle[vehicle_index].fuel += shift.fuel.value
 
-                # per-driver log
-                driver_index = Report.getDriverIndex(shift.shift.driver)
                 report_day.by_driver[driver_index].service_miles += service_miles
                 report_day.by_driver[driver_index].service_hours += service_hours
                 report_day.by_driver[driver_index].deadhead_miles += deadhead_miles
                 report_day.by_driver[driver_index].deadhead_hours += deadhead_hours
                 report_day.by_driver[driver_index].total_miles += service_miles + deadhead_miles
                 report_day.by_driver[driver_index].total_hours += service_hours + deadhead_hours
+                report_day.by_driver[driver_index].fuel += shift.fuel.value
                 for trip in report_day.trips:
                     if i != trip.shift:
                         continue
+                    report_day.by_vehicle[vehicle_index].pmt += trip.end_miles.value - trip.start_miles.value
+                    report_day.by_vehicle[vehicle_index].collected_cash += trip.collected_cash
+                    report_day.by_vehicle[vehicle_index].collected_check += trip.collected_check
+                    report_day.by_vehicle[vehicle_index].total_collected_money += (trip.collected_cash + trip.collected_check)
                     report_day.by_driver[driver_index].pmt += trip.end_miles.value - trip.start_miles.value
-                    if trip.trip != None:
-                        if trip.trip_type != None and trip.trip_type.is_trip_counted:
-                            report_day.by_driver[driver_index].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
-                            report_day.by_driver[driver_index].trip_types_total.addTrips(1, trip.trip.passenger)
-                        elif trip.trip_type == None:
-                            report_day.by_driver[driver_index].trip_types_unknown.addTrips(1, trip.trip.passenger)
-                            report_day.by_driver[driver_index].trip_types_total.addTrips(1, trip.trip.passenger)
                     report_day.by_driver[driver_index].collected_cash += trip.collected_cash
                     report_day.by_driver[driver_index].collected_check += trip.collected_check
                     report_day.by_driver[driver_index].total_collected_money += (trip.collected_cash + trip.collected_check)
+                    if trip.trip != None:
+                        if trip.trip_type != None and trip.trip_type.is_trip_counted:
+                            report_day.by_vehicle[vehicle_index].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
+                            report_day.by_vehicle[vehicle_index].trip_types_total.addTrips(1, trip.trip.passenger)
+                            report_day.by_driver[driver_index].trip_types[trip.trip_type].addTrips(1, trip.trip.passenger)
+                            report_day.by_driver[driver_index].trip_types_total.addTrips(1, trip.trip.passenger)
+                        elif trip.trip_type == None:
+                            report_day.by_vehicle[vehicle_index].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                            report_day.by_vehicle[vehicle_index].trip_types_total.addTrips(1, trip.trip.passenger)
+                            report_day.by_driver[driver_index].trip_types_unknown.addTrips(1, trip.trip.passenger)
+                            report_day.by_driver[driver_index].trip_types_total.addTrips(1, trip.trip.passenger)
                     if trip.other_employment:
+                        report_day.by_vehicle[vehicle_index].other_employment.addTrips(1, trip.trip.passenger)
                         report_day.by_driver[driver_index].other_employment.addTrips(1, trip.trip.passenger)
                     for tag in trip.tags:
+                        if tag in report_day.by_vehicle[vehicle_index].tags:
+                            report_day.by_vehicle[vehicle_index].tags[tag].addTrips(1, trip.trip.passenger)
+                        elif tag != '':
+                            report_day.by_vehicle[vehicle_index].tags[tag] = Report.TripCount()
+                            report_day.by_vehicle[vehicle_index].tags[tag].setTrips(1, trip.trip.passenger)
                         if tag in report_day.by_driver[driver_index].tags:
                             report_day.by_driver[driver_index].tags[tag].addTrips(1, trip.trip.passenger)
                         elif tag != '':
                             report_day.by_driver[driver_index].tags[tag] = Report.TripCount()
                             report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
-                report_day.by_driver[driver_index].fuel += shift.fuel.value
 
             for shift_vehicle in report_day.by_vehicle:
                 report_day.all += shift_vehicle
 
             self.report_all.append(report_day)
-
-        self.vehicle_reports = []
-        for vehicle in self.filtered_vehicles:
-            vehicle_report = Report.ReportOutputVehicles()
-            vehicle_report.vehicle = vehicle
-            vehicle_index = Report.getVehicleIndex(vehicle)
-            for report_day in self.report_all:
-                if report_day.hasVehicleInShift(vehicle):
-                    vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
-                    vehicle_report.totals += report_day.by_vehicle[vehicle_index]
-                    for shift_iter in report_day.shifts:
-                        if shift_iter.shift and vehicle.id == shift_iter.shift.vehicle.id:
-                            if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
-                                vehicle_report.start_miles = shift_iter.start_miles
-                            if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
-                                vehicle_report.end_miles = shift_iter.end_miles
-
-            if vehicle_report.end_miles >= vehicle_report.start_miles:
-                vehicle_report.total_miles = vehicle_report.end_miles - vehicle_report.start_miles
-            self.total_vehicle_mileage += vehicle_report.total_miles
-
-            self.vehicle_reports.append(vehicle_report)
 
         self.all_vehicles = Report.ReportSummary()
 
@@ -1002,20 +972,41 @@ class Report():
         for i in Report.ReportSummary.query_tags:
             self.all_vehicles.tags[i.name] = Report.TripCount()
 
-        for vehicle_report in self.vehicle_reports:
-            self.all_vehicles += vehicle_report.totals
+        self.vehicle_reports = []
+        for vehicle in self.filtered_vehicles:
+            vehicle_report = Report.ReportOutputVehicles()
+            vehicle_report.vehicle = vehicle
+            self.vehicle_reports.append(vehicle_report)
 
         self.driver_reports = []
         for driver in self.filtered_drivers:
             driver_report = Report.ReportOutputDrivers()
             driver_report.driver = driver
-            driver_index = Report.getDriverIndex(driver)
-            for report_day in self.report_all:
-                if report_day.hasDriverInShift(driver):
+            self.driver_reports.append(driver_report)
+
+        for report_day in self.report_all:
+            for vehicle_report in self.vehicle_reports:
+                if report_day.hasVehicleInShift(vehicle_report.vehicle):
+                    vehicle_index = Report.getVehicleIndex(vehicle_report.vehicle)
+                    vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
+                    vehicle_report.totals += report_day.by_vehicle[vehicle_index]
+                    for shift_iter in report_day.shifts:
+                        if shift_iter.shift and vehicle_report.vehicle.id == shift_iter.shift.vehicle.id:
+                            if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
+                                vehicle_report.start_miles = shift_iter.start_miles
+                            if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
+                                vehicle_report.end_miles = shift_iter.end_miles
+            for driver_report in self.driver_reports:
+                if report_day.hasDriverInShift(driver_report.driver):
+                    driver_index = Report.getDriverIndex(driver_report.driver)
                     driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
                     driver_report.totals += report_day.by_driver[driver_index]
 
-            self.driver_reports.append(driver_report)
+        for vehicle_report in self.vehicle_reports:
+            if vehicle_report.end_miles >= vehicle_report.start_miles:
+                vehicle_report.total_miles = vehicle_report.end_miles - vehicle_report.start_miles
+            self.total_vehicle_mileage += vehicle_report.total_miles
+            self.all_vehicles += vehicle_report.totals
 
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts

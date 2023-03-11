@@ -516,7 +516,7 @@ class Report():
         destination_list = list(all_destinations)
 
         # store our database lookups in dictionaries
-        all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one)
+        all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one).order_by('-date')
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
         all_shifts_list = list(all_shifts)
 
@@ -567,6 +567,8 @@ class Report():
             report_day.date = day_date
 
             for i in all_shifts_list:
+                if i.date < day_date:
+                    break
                 if i.date != day_date:
                     continue
 
@@ -621,6 +623,8 @@ class Report():
                 report_day.shifts.append(report_shift)
 
             for i in all_trips_list:
+                if i.date < day_date:
+                    break
                 if i.date != day_date:
                     continue
 

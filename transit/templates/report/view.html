@@ -1020,6 +1020,10 @@
 </div>
 {% endif %}
 
+<hr/>
+<div>
+    <span class="text-muted small"><strong>Report load times:</strong> Database - {{report.perf_database|floatformat:3}} seconds | Processing - {{report.perf_processing|floatformat:3}} seconds</span>
+</div>
 </div>
 <script type="text/javascript" src="{% static 'transit/js/report/common.js' %}"></script>
 <script type="text/javascript" src="{% static 'transit/js/report/view.js' %}"></script>

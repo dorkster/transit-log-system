@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
+from time import perf_counter
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment, Tag, Destination
 from transit.forms import DatePickerForm, DateRangePickerForm
@@ -486,6 +487,9 @@ class Report():
         self.total_money = Report.Money(0)
         self.total_odometer_miles = Report.Mileage()
 
+        self.perf_database = 0
+        self.perf_processing = 0
+
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
             daily_log_shift = None
@@ -493,6 +497,7 @@ class Report():
         # for filter() bounds
         date_end_plus_one = date_end + datetime.timedelta(days=1)
 
+        perf_start = perf_counter()
         # refresh related fields
         # without this, select_related can fail if new entries are used
         all_drivers = Driver.objects.all()
@@ -531,7 +536,9 @@ class Report():
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
         all_client_payments_list = list(all_client_payments)
+        self.perf_database = perf_counter() - perf_start
 
+        perf_start = perf_counter()
         Report.ReportDay.query_drivers = list(self.filtered_drivers)
         Report.ReportDay.query_vehicles = list(all_vehicles)
 
@@ -1054,6 +1061,8 @@ class Report():
 
         for vehicle_report in self.vehicle_reports:
             self.total_odometer_miles += vehicle_report.total_miles
+
+        self.perf_processing = perf_counter() - perf_start
 
     def getVehicleIndex(vehicle):
         return Report.ReportDay.query_vehicles.index(vehicle)

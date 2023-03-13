@@ -52,7 +52,6 @@ class Report():
         def __init__(self):
             self.value = 0
             self.string = ''
-            self.is_empty = True
             self.is_string_valid = True
         def __lt__(self, other):
             return self.value < other.value
@@ -67,19 +66,17 @@ class Report():
         def __ne__(self, other):
             return self.value != other.value
         def empty(self):
-            return self.is_empty
+            return self.string == ''
 
     class Mileage(ValueString):
         def __add__(self, other):
             r = Report.Mileage()
             r.value = self.value + other.value
-            r.is_empty = False
             r.is_string_valid = False
             return r
         def __sub__(self, other):
             r = Report.Mileage()
             r.value = self.value - other.value
-            r.is_empty = False
             r.is_string_valid = False
             return r
         def __str__(self):
@@ -93,11 +90,9 @@ class Report():
             except:
                 self.value = 0
                 self.string = ''
-                self.is_empty = True
                 self.is_string_valid = True
                 return 1
             self.string = string
-            self.is_empty = False
             self.is_string_valid = True
             return 0
         def mergeStrings(self, base, suffix):
@@ -132,11 +127,9 @@ class Report():
                 else:
                     self.value = 0
                     self.string = ''
-                self.is_empty = True
                 self.is_string_valid = True
                 return 1
             self.string = string
-            self.is_empty = False
             self.is_string_valid = True
             return 0
 
@@ -155,11 +148,9 @@ class Report():
                 except:
                     self.value = 0
                     self.string = ''
-                    self.is_empty = True
                     self.is_string_valid = True
                     return 1
             self.string = string
-            self.is_empty = False
             self.is_string_valid = True
             return 0
 

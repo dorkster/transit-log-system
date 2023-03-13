@@ -233,14 +233,8 @@ class Report():
             self.paid_check = Report.Money(0)
             self.total_payments = Report.Money(0)
             self.total_fares = Report.Money(0)
-
-            self.by_vehicle = []
-            for i in range(len(self.query_vehicles)):
-                self.by_vehicle.append(Report.ReportSummary())
-
-            self.by_driver = []
-            for i in range(len(self.query_drivers)):
-                self.by_driver.append(Report.ReportSummary())
+            self.by_vehicle = [None] * len(self.query_vehicles)
+            self.by_driver = [None] * len(self.query_drivers)
 
         def hasVehicleInShift(self, vehicle = None):
             for i in self.shifts:
@@ -920,6 +914,12 @@ class Report():
                 vehicle_index = Report.getVehicleIndex(shift.shift.vehicle)
                 driver_index = Report.getDriverIndex(shift.shift.driver)
 
+                if not report_day.by_vehicle[vehicle_index]:
+                    report_day.by_vehicle[vehicle_index] = Report.ReportSummary()
+
+                if not report_day.by_driver[driver_index]:
+                    report_day.by_driver[driver_index] = Report.ReportSummary()
+
                 report_day.by_vehicle[vehicle_index].service_miles += service_miles
                 report_day.by_vehicle[vehicle_index].service_hours += service_hours
                 report_day.by_vehicle[vehicle_index].deadhead_miles += deadhead_miles
@@ -973,7 +973,8 @@ class Report():
                             report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
 
             for shift_vehicle in report_day.by_vehicle:
-                report_day.all += shift_vehicle
+                if shift_vehicle:
+                    report_day.all += shift_vehicle
 
             self.report_all.append(report_day)
 

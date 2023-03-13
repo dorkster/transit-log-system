@@ -806,24 +806,24 @@ class Report():
                     report_trip.tags = i.get_tag_list()
 
                 # add destination to frequent destinations
-                for dest in destination_list:
-                    if dest.address == i.destination:
-                        found_frequent_destination = False
-                        for j in self.frequent_destinations:
-                            if j.address == i.destination:
-                                found_frequent_destination = True
-                                j.trips.addTrips(1, i.passenger)
-                                if log_status == Trip.LOG_COMPLETE:
-                                    j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
-                                break
-                        if not found_frequent_destination:
+                found_frequent_destination = False
+                for j in self.frequent_destinations:
+                    if j.address == i.destination:
+                        found_frequent_destination = True
+                        j.trips.addTrips(1, i.passenger)
+                        if log_status == Trip.LOG_COMPLETE:
+                            j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
+                        break
+                if not found_frequent_destination:
+                    for dest in destination_list:
+                        if dest.address == i.destination:
                             temp_fd = Report.FrequentDestination()
                             temp_fd.address = i.destination
                             temp_fd.trips.addTrips(1, i.passenger)
                             if log_status == Trip.LOG_COMPLETE:
                                 temp_fd.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
                             self.frequent_destinations.append(temp_fd)
-                        break
+                            break
 
             # handle payments from Clients that didn't ride (so far)
             for i in all_client_payments_list:

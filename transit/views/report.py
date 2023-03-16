@@ -948,20 +948,20 @@ class Report():
                             report_day.by_vehicle[vehicle_index].trip_types_total.addTrips(1, trip.trip.passenger)
                             report_day.by_driver[driver_index].trip_types_unknown.addTrips(1, trip.trip.passenger)
                             report_day.by_driver[driver_index].trip_types_total.addTrips(1, trip.trip.passenger)
-                    if trip.other_employment:
-                        report_day.by_vehicle[vehicle_index].other_employment.addTrips(1, trip.trip.passenger)
-                        report_day.by_driver[driver_index].other_employment.addTrips(1, trip.trip.passenger)
-                    for tag in trip.tags:
-                        if tag in report_day.by_vehicle[vehicle_index].tags:
-                            report_day.by_vehicle[vehicle_index].tags[tag].addTrips(1, trip.trip.passenger)
-                        elif tag != '':
-                            report_day.by_vehicle[vehicle_index].tags[tag] = Report.TripCount()
-                            report_day.by_vehicle[vehicle_index].tags[tag].setTrips(1, trip.trip.passenger)
-                        if tag in report_day.by_driver[driver_index].tags:
-                            report_day.by_driver[driver_index].tags[tag].addTrips(1, trip.trip.passenger)
-                        elif tag != '':
-                            report_day.by_driver[driver_index].tags[tag] = Report.TripCount()
-                            report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
+                        if trip.other_employment:
+                            report_day.by_vehicle[vehicle_index].other_employment.addTrips(1, trip.trip.passenger)
+                            report_day.by_driver[driver_index].other_employment.addTrips(1, trip.trip.passenger)
+                        for tag in trip.tags:
+                            if tag in report_day.by_vehicle[vehicle_index].tags:
+                                report_day.by_vehicle[vehicle_index].tags[tag].addTrips(1, trip.trip.passenger)
+                            elif tag != '':
+                                report_day.by_vehicle[vehicle_index].tags[tag] = Report.TripCount()
+                                report_day.by_vehicle[vehicle_index].tags[tag].setTrips(1, trip.trip.passenger)
+                            if tag in report_day.by_driver[driver_index].tags:
+                                report_day.by_driver[driver_index].tags[tag].addTrips(1, trip.trip.passenger)
+                            elif tag != '':
+                                report_day.by_driver[driver_index].tags[tag] = Report.TripCount()
+                                report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
 
             for shift_vehicle in report_day.by_vehicle:
                 if shift_vehicle:

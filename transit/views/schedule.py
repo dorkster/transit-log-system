@@ -276,33 +276,46 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 
     if request.user.has_perm('transit.change_trip'):
         if request_action == 'mv':
-            trip = get_object_or_404(Trip, id=request_id)
-            original_index = trip.sort_index
-            trip.sort_index = -1
+            try:
+                target_id = uuid.UUID(request_data)
+            except:
+                target_id = None
 
-            # "remove" the selected trip by shifting everything below it up by 1
-            below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gt=original_index)
-            for i in below_items:
-                i.sort_index -= 1;
-                i.save()
+            src = None
+            dest = None
 
-            if request_data == '':
-                new_index = 0
-            else:
-                target_item = get_object_or_404(Trip, id=request_data)
-                if trip.id != target_item.id:
-                    new_index = target_item.sort_index + 1
-                else:
-                    new_index = original_index
+            trips = Trip.objects.filter(date=date)
+            for i in trips:
+                if i.id == request_id:
+                    src = i
+                if i.id == target_id:
+                    dest = i
 
-            # prepare to insert the trip at the new index by shifting everything below it down by 1
-            below_items = Trip.objects.filter(date=trip.date).filter(sort_index__gte=new_index)
-            for i in below_items:
-                i.sort_index += 1
-                i.save()
+                if src and dest and src.id == dest.id:
+                    break
 
-            trip.sort_index = new_index
-            trip.save()
+                if src and not dest and target_id != None:
+                    if i.id != request_id:
+                        i.sort_index -= 1
+                        i.save(update_fields=['sort_index'])
+                elif not src and (dest or target_id == None):
+                    if i.id != target_id:
+                        i.sort_index += 1
+                        i.save(update_fields=['sort_index'])
+                elif src and dest:
+                    if dest.sort_index >= src.sort_index:
+                        src.sort_index = dest.sort_index
+                        dest.sort_index -= 1
+                        src.save(update_fields=['sort_index'])
+                        dest.save(update_fields=['sort_index'])
+                    else:
+                        src.sort_index = dest.sort_index + 1
+                        src.save(update_fields=['sort_index'])
+                    break
+                elif src and target_id == None:
+                    src.sort_index = 0
+                    src.save(update_fields=['sort_index'])
+                    break
         elif request_action == 'set_driver':
             trip = get_object_or_404(Trip, id=request_id)
             prev_driver = trip.driver

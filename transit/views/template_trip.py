@@ -38,7 +38,6 @@ def templateTripList(request, parent):
     context = {
         'parent':parent,
         'template': Template.objects.get(id=parent),
-        'template_trips': TemplateTrip.objects.filter(parent=parent),
     }
     return render(request, 'template/trip/list.html', context=context)
 
@@ -353,7 +352,7 @@ def ajaxTemplateTripList(request, parent):
     if request_action == 'toggle_extra_columns':
         request.session['template_extra_columns'] = not request.session.get('template_extra_columns', False)
 
-    trips = TemplateTrip.objects.filter(parent=parent)
+    trips = TemplateTrip.objects.filter(parent=parent).select_related('driver', 'vehicle', 'trip_type')
 
     context = {
         'parent': parent,

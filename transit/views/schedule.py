@@ -58,9 +58,6 @@ def schedule(request, mode, year, month, day):
                     for skip_delta in range(day_delta, date_week_range_max+1):
                         date_week[skip_delta] = date_week[skip_delta] + datetime.timedelta(days=2)
 
-    query_trips = Trip.objects.filter(date=day_date)
-    query_shifts = Shift.objects.filter(date=day_date)
-
     if request.method == 'POST':
         date_picker = DatePickerForm(request.POST)
         if date_picker.is_valid():
@@ -71,8 +68,6 @@ def schedule(request, mode, year, month, day):
 
     context = {
         'date': day_date,
-        'trips': query_trips,
-        'shifts': query_shifts,
         'date_picker': date_picker,
         'date_week': date_week,
     }
@@ -139,8 +134,8 @@ def ajaxSchedulePrint(request, year, month, day):
 
     day_date = datetime.date(year, month, day)
 
-    query_trips = Trip.objects.filter(date=day_date)
-    query_shifts = Shift.objects.filter(date=day_date)
+    query_trips = Trip.objects.filter(date=day_date).select_related('driver', 'vehicle', 'trip_type')
+    query_shifts = Shift.objects.filter(date=day_date).select_related('driver', 'vehicle')
 
     messages = ScheduleMessage.objects.filter(date=day_date)
     if len(messages) > 0:
@@ -363,7 +358,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
-            template_trips = TemplateTrip.objects.filter(parent=parent_template)
+            template_trips = TemplateTrip.objects.filter(parent=parent_template).select_related('driver', 'vehicle', 'trip_type')
 
             sort_index = 0
             query = Trip.objects.filter(date=date)
@@ -444,7 +439,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     filter_driver = request.session.get('schedule_view_driver', '')
     filter_vehicle = request.session.get('schedule_view_vehicle', '')
 
-    trips = Trip.objects.filter(date=date)
+    trips = Trip.objects.filter(date=date).select_related('driver', 'vehicle', 'trip_type')
 
     unfiltered_count = len(trips)
 
@@ -469,7 +464,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 
     filtered_count = len(trips)
 
-    shifts = Shift.objects.filter(date=date)
+    shifts = Shift.objects.filter(date=date).select_related('driver', 'vehicle')
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
 

@@ -10,7 +10,7 @@
     </thead>
     {% for driver in drivers %}
     {% if driver.sort_index == 0 %}
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="4"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="5"></td></tr>
     {% endif %}
     <tr style="background: #{{ driver.get_color }};">
         <td class="mytable-col-arrows">
@@ -48,7 +48,7 @@
             {% endif %}
         </td>
     </tr>
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ driver.id }}')"><td colspan="4"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ driver.id }}')"><td colspan="5"></td></tr>
     {% endfor %}
 </table>
 <script type="text/javascript">

@@ -153,6 +153,7 @@ function RowMover(row_class, ajax_ldr) {
         else {
             button.scrollIntoView({behavior: "smooth", block: "center"});
             self.clear();
+            self.ajax_loader.resume();
         }
     };
 

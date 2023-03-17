@@ -27,6 +27,8 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
+from transit.common.util import move_item_in_queryset
+
 @permission_required(['transit.view_driver'])
 def driverList(request):
     context = {
@@ -129,33 +131,7 @@ def ajaxDriverList(request):
 
     if request.user.has_perm('transit.change_driver'):
         if request_action == 'mv':
-            driver = get_object_or_404(Driver, id=request_id)
-            original_index = driver.sort_index
-            driver.sort_index = -1
-
-            # "remove" the selected item by shifting everything below it up by 1
-            below_items = Driver.objects.filter(sort_index__gt=original_index)
-            for i in below_items:
-                i.sort_index -= 1;
-                i.save()
-
-            if request_data == '':
-                new_index = 0
-            else:
-                target_item = get_object_or_404(Driver, id=request_data)
-                if driver.id != target_item.id:
-                    new_index = target_item.sort_index + 1
-                else:
-                    new_index = original_index
-
-            # prepare to insert the item at the new index by shifting everything below it down by 1
-            below_items = Driver.objects.filter(sort_index__gte=new_index)
-            for i in below_items:
-                i.sort_index += 1
-                i.save()
-
-            driver.sort_index = new_index
-            driver.save()
+            move_item_in_queryset(request_id, request_data, Driver.objects.all())
 
     drivers = Driver.objects.all()
     return render(request, 'driver/ajax_list.html', {'drivers': drivers})

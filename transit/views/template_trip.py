@@ -339,33 +339,7 @@ def ajaxTemplateTripList(request, parent):
 
     if request.user.has_perm('transit.change_templatetrip'):
         if request_action == 'mv':
-            template_trip = get_object_or_404(TemplateTrip, id=request_id)
-            original_index = template_trip.sort_index
-            template_trip.sort_index = -1
-
-            # "remove" the selected item by shifting everything below it up by 1
-            below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gt=original_index)
-            for i in below_items:
-                i.sort_index -= 1;
-                i.save()
-
-            if request_data == '':
-                new_index = 0
-            else:
-                target_item = get_object_or_404(TemplateTrip, id=request_data)
-                if template_trip.id != target_item.id:
-                    new_index = target_item.sort_index + 1
-                else:
-                    new_index = original_index
-
-            # prepare to insert the item at the new index by shifting everything below it down by 1
-            below_items = TemplateTrip.objects.filter(parent=template_trip.parent, sort_index__gte=new_index)
-            for i in below_items:
-                i.sort_index += 1
-                i.save()
-
-            template_trip.sort_index = new_index
-            template_trip.save()
+            move_item_in_queryset(request_id, request_data, TemplateTrip.objects.filter(parent=parent))
         elif request_action == 'toggle_canceled':
             trip = get_object_or_404(TemplateTrip, id=request_id)
             if request_data == '0':

@@ -27,6 +27,8 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
+from transit.common.util import move_item_in_queryset
+
 @permission_required(['transit.view_triptype'])
 def triptypeList(request):
     context = {
@@ -125,33 +127,7 @@ def ajaxTripTypeList(request):
 
     if request.user.has_perm('transit.change_triptype'):
         if request_action == 'mv':
-            triptype = get_object_or_404(TripType, id=request_id)
-            original_index = triptype.sort_index
-            triptype.sort_index = -1
-
-            # "remove" the selected item by shifting everything below it up by 1
-            below_items = TripType.objects.filter(sort_index__gt=original_index)
-            for i in below_items:
-                i.sort_index -= 1;
-                i.save()
-
-            if request_data == '':
-                new_index = 0
-            else:
-                target_item = get_object_or_404(TripType, id=request_data)
-                if triptype.id != target_item.id:
-                    new_index = target_item.sort_index + 1
-                else:
-                    new_index = original_index
-
-            # prepare to insert the item at the new index by shifting everything below it down by 1
-            below_items = TripType.objects.filter(sort_index__gte=new_index)
-            for i in below_items:
-                i.sort_index += 1
-                i.save()
-
-            triptype.sort_index = new_index
-            triptype.save()
+            move_item_in_queryset(request_id, request_data, TripType.objects.all())
 
     triptypes = TripType.objects.all()
     return render(request, 'triptype/ajax_list.html', {'triptypes': triptypes})

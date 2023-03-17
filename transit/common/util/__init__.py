@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License along with
 # The Transit Log System.  If not, see http://www.gnu.org/licenses/
 
-import re
+import re, uuid
 
 from django.core.paginator import Paginator
 
@@ -66,3 +66,44 @@ def get_paginated_ranges(page, page_range, items_per_page):
 
     return {'page_start': page_start, 'page_end': page_end, 'item_count_start': item_count_start, 'item_count_end': item_count_end }
 
+def move_item_in_queryset(request_id, request_data, query_set):
+    try:
+        target_id = uuid.UUID(request_data)
+    except:
+        target_id = None
+
+    src = None
+    dest = None
+
+    items = query_set
+    for i in items:
+        if i.id == request_id:
+            src = i
+        if i.id == target_id:
+            dest = i
+
+        if src and dest and src.id == dest.id:
+            break
+
+        if src and not dest and target_id != None:
+            if i.id != request_id:
+                i.sort_index -= 1
+                i.save(update_fields=['sort_index'])
+        elif not src and (dest or target_id == None):
+            if i.id != target_id:
+                i.sort_index += 1
+                i.save(update_fields=['sort_index'])
+        elif src and dest:
+            if dest.sort_index >= src.sort_index:
+                src.sort_index = dest.sort_index
+                dest.sort_index -= 1
+                src.save(update_fields=['sort_index'])
+                dest.save(update_fields=['sort_index'])
+            else:
+                src.sort_index = dest.sort_index + 1
+                src.save(update_fields=['sort_index'])
+            break
+        elif src and target_id == None:
+            src.sort_index = 0
+            src.save(update_fields=['sort_index'])
+            break

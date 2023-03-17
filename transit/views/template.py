@@ -27,6 +27,8 @@ from django.contrib.auth.decorators import permission_required
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
+from transit.common.util import move_item_in_queryset
+
 @permission_required(['transit.view_template'])
 def templateList(request):
     context = {
@@ -127,33 +129,7 @@ def ajaxTemplateList(request):
 
     if request.user.has_perm('transit.change_template'):
         if request_action == 'mv':
-            template = get_object_or_404(Template, id=request_id)
-            original_index = template.sort_index
-            template.sort_index = -1
-
-            # "remove" the selected item by shifting everything below it up by 1
-            below_items = Template.objects.filter(sort_index__gt=original_index)
-            for i in below_items:
-                i.sort_index -= 1;
-                i.save()
-
-            if request_data == '':
-                new_index = 0
-            else:
-                target_item = get_object_or_404(Template, id=request_data)
-                if template.id != target_item.id:
-                    new_index = target_item.sort_index + 1
-                else:
-                    new_index = original_index
-
-            # prepare to insert the item at the new index by shifting everything below it down by 1
-            below_items = Template.objects.filter(sort_index__gte=new_index)
-            for i in below_items:
-                i.sort_index += 1
-                i.save()
-
-            template.sort_index = new_index
-            template.save()
+            move_item_in_queryset(request_id, request_data, Template.objects.all())
 
     templates = Template.objects.all()
     return render(request, 'template/ajax_list.html', {'templates': templates})

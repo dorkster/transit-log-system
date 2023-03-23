@@ -991,19 +991,21 @@ class Report():
             for vehicle_report in self.vehicle_reports:
                 if report_day.hasVehicleInShift(vehicle_report.vehicle):
                     vehicle_index = Report.getVehicleIndex(vehicle_report.vehicle)
-                    vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
-                    vehicle_report.totals += report_day.by_vehicle[vehicle_index]
-                    for shift_iter in report_day.shifts:
-                        if shift_iter.shift and vehicle_report.vehicle.id == shift_iter.shift.vehicle.id:
-                            if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
-                                vehicle_report.start_miles = shift_iter.start_miles
-                            if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
-                                vehicle_report.end_miles = shift_iter.end_miles
+                    if report_day.by_vehicle[vehicle_index] != None:
+                        vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
+                        vehicle_report.totals += report_day.by_vehicle[vehicle_index]
+                        for shift_iter in report_day.shifts:
+                            if shift_iter.shift and vehicle_report.vehicle.id == shift_iter.shift.vehicle.id:
+                                if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
+                                    vehicle_report.start_miles = shift_iter.start_miles
+                                if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
+                                    vehicle_report.end_miles = shift_iter.end_miles
             for driver_report in self.driver_reports:
                 if report_day.hasDriverInShift(driver_report.driver):
                     driver_index = Report.getDriverIndex(driver_report.driver)
-                    driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
-                    driver_report.totals += report_day.by_driver[driver_index]
+                    if report_day.by_driver[driver_index] != None:
+                        driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
+                        driver_report.totals += report_day.by_driver[driver_index]
 
         for vehicle_report in self.vehicle_reports:
             if vehicle_report.end_miles >= vehicle_report.start_miles:

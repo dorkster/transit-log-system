@@ -241,8 +241,11 @@
 </div>
 <script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
 <script type="text/javascript" src="{% static 'transit/js/trip/edit.js' %}"></script>
+{% if trip.format == Trip.FORMAT_NORMAL %}
 {{ clients_json|json_script:"clients-tag" }}
 {{ destinations_json|json_script:"destinations-tag" }}
+{{ driver_vehicle_pairs|json_script:"driver-vehicle-pairs-tag" }}
+{% endif %}
 <script type="text/javascript">
     setStatusColor();
     setCancelDateVisibility();
@@ -250,12 +253,9 @@
     setupFormEvents();
 
     {% if trip.format == Trip.FORMAT_NORMAL %}
-    var ajax_set_vehicle_from_driver_url = "{% url 'ajax-set-vehicle-from-driver' %}";
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
-
-    var volunteer_driver = "{{ logged_volunteer.driver }}";
-    var volunteer_vehicle = "{{ logged_volunteer.vehicle }}";
+    var driver_vehicle_pairs = JSON.parse(JSON.parse(document.getElementById("driver-vehicle-pairs-tag").textContent));
 
     setupFormEventsTrip();
 

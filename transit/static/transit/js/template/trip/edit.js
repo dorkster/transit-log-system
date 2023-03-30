@@ -15,6 +15,7 @@ function setupFormEventsTrip() {
     $("#id_name").on("change", onNameChanged);
     $("#id_address").on("change", function() { onAddressChanged(0); });
     $("#id_destination").on("change", function() { onAddressChanged(1); });
+    $("#id_driver").on("change", onDriverChange);
     $("#id_trip_type").on("change", onTripTypeChange);
     $("#id_volunteer").on("change", onVolunteerChange);
 }
@@ -312,6 +313,18 @@ function toggleAddDestination(btn, target) {
     }
 }
 
+function onDriverChange() {
+    let driver_id = $("#id_driver option:selected").val();
+    if (driver_id != "") {
+        $("#id_vehicle option").filter(function() {
+            return $(this).val() == driver_vehicle_pairs[driver_id]["vehicle"];
+        }).prop("selected", true);
+    }
+    else {
+        $("#id_vehicle").prop("selectedIndex", 0);
+    }
+}
+
 function onTripTypeChange() {
     var other_selected = $("#id_trip_type option:selected").text() == "Other";
     if (other_selected && $("#id_tags").val() == "") {
@@ -320,13 +333,17 @@ function onTripTypeChange() {
 }
 
 function onVolunteerChange() {
+    let volunteer_driver = "";
+    for (driver in driver_vehicle_pairs) {
+        if (driver_vehicle_pairs[driver]['volunteer'] == 1) {
+            volunteer_driver = driver;
+        }
+    }
     if ($("#id_volunteer").val() != "") {
         $("#id_driver option").filter(function() {
             return $(this).val() == volunteer_driver;
         }).prop("selected", true);
-        $("#id_vehicle option").filter(function() {
-            return $(this).val() == volunteer_vehicle;
-        }).prop("selected", true);
+        onDriverChange();
     }
 }
 

@@ -186,7 +186,6 @@ urlpatterns = [
     path('ajax/schedule-read-only/', views.ajaxScheduleReadOnly, name='ajax-schedule-read-only'),
     path('ajax/schedule-print/<int:year>/<int:month>/<int:day>', views.ajaxSchedulePrint, name='ajax-schedule-print'),
     path('ajax/schedule-print-daily-log/<int:year>/<int:month>/<int:day>', views.ajaxSchedulePrintDailyLog, name='ajax-schedule-print-daily-log'),
-    path('ajax/set-vehicle-from-driver/', views.ajaxSetVehicleFromDriver, name='ajax-set-vehicle-from-driver'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),
     path('ajax/client-payment-list/<uuid:parent>/', views.ajaxClientPaymentList, name='ajax-client-payment-list'),
     path('ajax/destination-list/', views.ajaxDestinationList, name='ajax-destination-list'),

@@ -19,7 +19,6 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.http import JsonResponse
 from django.core import serializers
 from django.db.models import Q
 
@@ -338,12 +337,27 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
     clients = Client.objects.filter(is_active=True)
 
-    # TODO get from SiteSettings
-    volunteer_drivers = Driver.objects.filter(name='Volunteer')
-    volunteer_vehicles = Vehicle.objects.filter(is_logged=False)
-    logged_volunteer = {'driver': None, 'vehicle': None}
-    logged_volunteer['driver'] = volunteer_drivers[0].id if len(volunteer_drivers) > 0 else None
-    logged_volunteer['vehicle'] = volunteer_vehicles[0].id if len(volunteer_vehicles) == 1 else None
+    driver_vehicle_pairs = {}
+    nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+    active_drivers = Driver.objects.filter(is_active=True)
+    todays_shifts = Shift.objects.filter(date=trip.date)
+
+    for driver in active_drivers:
+        if driver.is_logged:
+            for shift in todays_shifts:
+                if driver == shift.driver:
+                    driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(shift.vehicle.id), 'volunteer': 0}
+                    break
+            if not str(driver.id) in driver_vehicle_pairs:
+                driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+        elif not driver.is_logged and len(nonlogged_vehicles) == 1:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
+        else:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+
+        # TODO get from SiteSettings
+        if driver.name == 'Volunteer':
+            driver_vehicle_pairs[str(driver.id)]['volunteer'] = 1
 
     context = {
         'form': form,
@@ -358,7 +372,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         'tags': Tag.objects.all(),
         'fares': Fare.objects.all(),
         'Trip': Trip,
-        'logged_volunteer': logged_volunteer,
+        'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
     }
 
     return render(request, 'trip/edit.html', context)
@@ -614,28 +628,4 @@ def tripEnd(request, id):
     }
 
     return render(request, 'trip/end.html', context)
-
-@permission_required(['transit.change_trip'])
-def ajaxSetVehicleFromDriver(request):
-    date = datetime.date(int(request.GET['year']), int(request.GET['month']), int(request.GET['day']))
-
-    data = {}
-
-    if request.GET['driver'] == '':
-        data['vehicle'] = ''
-    else:
-        driver = Driver.objects.filter(id=uuid.UUID(request.GET['driver']))[0]
-        shifts = Shift.objects.filter(date=date, driver=driver)
-        if len(shifts) > 0:
-            data['vehicle'] = str(shifts[0].vehicle.id)
-        else:
-            data['vehicle'] = ''
-
-            # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
-            if not driver.is_logged:
-                nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
-                if len(nonlogged_vehicles) == 1:
-                    data['vehicle'] = str(nonlogged_vehicles[0].id)
-
-    return JsonResponse(data)
 

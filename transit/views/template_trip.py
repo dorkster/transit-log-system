@@ -15,6 +15,7 @@
 
 import uuid
 import datetime
+import json
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -285,12 +286,21 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
     clients = Client.objects.filter(is_active=True)
 
-    # TODO get from SiteSettings
-    volunteer_drivers = Driver.objects.filter(name='Volunteer')
-    volunteer_vehicles = Vehicle.objects.filter(is_logged=False)
-    logged_volunteer = {'driver': None, 'vehicle': None}
-    logged_volunteer['driver'] = volunteer_drivers[0].id if len(volunteer_drivers) > 0 else None
-    logged_volunteer['vehicle'] = volunteer_vehicles[0].id if len(volunteer_vehicles) == 1 else None
+    driver_vehicle_pairs = {}
+    nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+    active_drivers = Driver.objects.filter(is_active=True)
+
+    for driver in active_drivers:
+        if driver.is_logged:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+        elif not driver.is_logged and len(nonlogged_vehicles) == 1:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
+        else:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+
+        # TODO get from SiteSettings
+        if driver.name == 'Volunteer':
+            driver_vehicle_pairs[str(driver.id)]['volunteer'] = 1
 
     context = {
         'form': form,
@@ -305,7 +315,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
         'tags': Tag.objects.all(),
         'fares': Fare.objects.all(),
         'Trip': Trip,
-        'logged_volunteer': logged_volunteer,
+        'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
     }
 
     return render(request, 'template/trip/edit.html', context)

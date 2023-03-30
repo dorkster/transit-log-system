@@ -194,7 +194,7 @@
             <td>Reminder Instructions</td>
         </thead>
         {% for trip in trips %}
-        <tr style="{{ trip.get_driver_style}}" class="{% if trip.is_medical or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}">
+        <tr style="{{ trip.get_driver_style}}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}">
             {% if trip.format != Trip.FORMAT_NORMAL %}
             <td colspan=2 class="text-center">
                 {% if trip.pick_up_time and trip.appointment_time %}

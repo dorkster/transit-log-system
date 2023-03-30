@@ -193,7 +193,7 @@
         {% endif %}
     </thead>
     {% for trip in trips %}
-    <tr style="{{ trip.get_driver_style }}" class="{% if trip.is_medical or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         {% if trip.format != Trip.FORMAT_NORMAL %}
         <td colspan=2 class="text-center">
             <a id="trip_{{ trip.id }}"></a>

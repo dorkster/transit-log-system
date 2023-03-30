@@ -53,6 +53,9 @@
                             {% if perms.transit.view_template %}
                             <a class="dropdown-item" href="{% url 'templates' %}"><span class="oi oi-list mr-2"></span>Templates</a>
                             {% endif %}
+                            {% if perms.transit.view_volunteer %}
+                            <a class="dropdown-item" href="{% url 'volunteers' %}"><span class="oi oi-heart mr-2"></span>Volunteers</a>
+                            {% endif %}
                             {% if perms.transit.view_driver or perms.transit.view_triptype %}
                             <div class="dropdown-divider"></div>
                             {% endif %}

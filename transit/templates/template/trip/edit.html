@@ -82,6 +82,7 @@
                     <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }}</strong></label><br/>{{ form.notes }}</div>
+                    <a href="#_" onclick="focusVolunteer()">Set a volunteer driver?</a>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.reminder_instructions.id_for_label }}"><strong>{{ form.reminder_instructions.label }}</strong></label><br/>{{ form.reminder_instructions }}</div>
                 </fieldset>
@@ -121,6 +122,7 @@
                     <legend>Log Information</legend>
                     <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
                     <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                    <div class="mb-2"><label for="{{ form.volunteer.id_for_label }}"><strong>{{ form.volunteer.label }}</strong></label><br/>{{ form.volunteer }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.fare.id_for_label }}"><strong>{{ form.fare.label }}</strong></label>
                         <a title="Show the fare selection dialog" href="#_" class="btn btn-secondary btn-sm ml-2" onclick="showFareDialog()"><span class="oi oi-dollar"></span></a>
@@ -227,6 +229,9 @@
     {% if trip.format == Trip.FORMAT_NORMAL %}
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
+
+    var volunteer_driver = "{{ logged_volunteer.driver }}";
+    var volunteer_vehicle = "{{ logged_volunteer.vehicle }}";
 
     setupFormEventsTrip();
 

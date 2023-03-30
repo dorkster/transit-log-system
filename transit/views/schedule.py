@@ -136,7 +136,7 @@ def ajaxSchedulePrint(request, year, month, day):
 
     day_date = datetime.date(year, month, day)
 
-    query_trips = Trip.objects.filter(date=day_date).select_related('driver', 'vehicle', 'trip_type')
+    query_trips = Trip.objects.filter(date=day_date).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
     query_shifts = Shift.objects.filter(date=day_date).select_related('driver', 'vehicle')
 
     messages = ScheduleMessage.objects.filter(date=day_date)
@@ -334,7 +334,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
-            template_trips = TemplateTrip.objects.filter(parent=parent_template).select_related('driver', 'vehicle', 'trip_type')
+            template_trips = TemplateTrip.objects.filter(parent=parent_template).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
             sort_index = 0
             query = Trip.objects.filter(date=date)
@@ -369,6 +369,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.passenger = temp_trip.passenger
                 trip.activity_color = temp_trip.activity_color
                 trip.reminder_instructions = temp_trip.reminder_instructions
+                trip.volunteer = temp_trip.volunteer
                 trip.wheelchair = temp_trip.wheelchair
 
                 if trip.status == Trip.STATUS_CANCELED:
@@ -415,7 +416,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     filter_driver = request.session.get('schedule_view_driver', '')
     filter_vehicle = request.session.get('schedule_view_vehicle', '')
 
-    trips = Trip.objects.filter(date=date).select_related('driver', 'vehicle', 'trip_type')
+    trips = Trip.objects.filter(date=date).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
     unfiltered_count = len(trips)
 

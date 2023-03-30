@@ -285,6 +285,10 @@
         </td>
         <td class="mytable-col-lg">
             {{ trip.note }}
+            {% if trip.volunteer %}
+            {% if trip.note %}<br/>{% endif %}
+            <span class="badge badge-secondary mr-1">Volunteer</span>{{ trip.volunteer.verbose_name }}
+            {% endif %}
         </td>
         {% if show_extra_columns %}
         <td class="mytable-col-md">

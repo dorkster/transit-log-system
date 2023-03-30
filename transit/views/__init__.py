@@ -37,4 +37,5 @@ from .client_report import *
 from .fare import *
 from .tag import *
 from .activity_color import *
+from .volunteer import *
 from .loggedevent import *

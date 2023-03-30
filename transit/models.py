@@ -97,6 +97,7 @@ class LoggedEventModel():
     VEHICLE_ISSUE = 17
     PRETRIP = 18
     ACTIVITY_COLOR = 19
+    VOLUNTEER = 20
 
     def get_str(val):
         if val == LoggedEventModel.CLIENT:
@@ -137,6 +138,8 @@ class LoggedEventModel():
             return "Pre-Trip"
         elif val == LoggedEventModel.ACTIVITY_COLOR:
             return "Activity Color"
+        elif val == LoggedEventModel.VOLUNTEER:
+            return "Volunteer"
         else: # UNKNOWN
             return "Unknown"
 
@@ -205,6 +208,7 @@ class Trip(models.Model):
     cancel_date = models.DateField(default=None, null=True, blank=False)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
+    volunteer = models.ForeignKey('Volunteer', on_delete=models.SET_NULL, null=True, blank=True)
     wheelchair = models.BooleanField(default=False)
 
     class Meta:
@@ -740,6 +744,7 @@ class TemplateTrip(models.Model):
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
+    volunteer = models.ForeignKey('Volunteer', on_delete=models.SET_NULL, null=True, blank=True)
     wheelchair = models.BooleanField(default=False)
 
     class Meta:
@@ -978,6 +983,36 @@ class ActivityColor(models.Model):
             color = 'FFFFFF00'
 
         return color
+
+class Volunteer(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
+    name = models.CharField(max_length=FieldSizes.MD)
+    vehicle = models.CharField(max_length=FieldSizes.MD, blank=True)
+    vehicle_color = models.CharField(max_length=FieldSizes.SM, blank=True)
+    vehicle_plate = models.CharField(max_length=FieldSizes.SM, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['sort_index']
+
+    def __str__(self):
+        return self.name
+
+    def verbose_name(self):
+        string = self.name
+        if self.vehicle:
+            string += ' ('
+            if self.vehicle_color:
+                string += self.vehicle_color + ' '
+            string += self.vehicle
+            if self.vehicle_plate:
+                string += ' #' + self.vehicle_plate
+            string += ')'
+        return string
+
+    def get_class_name(self):
+        return 'Volunteer'
 
 class LoggedEvent(models.Model):
     id = models.AutoField(primary_key=True)

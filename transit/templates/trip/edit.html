@@ -89,6 +89,7 @@
                     <div class="mb-2"><label for="{{ form.ambulatory.id_for_label }}"><strong>{{ form.ambulatory.label }}</strong></label><br/>{{ form.ambulatory }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.notes.id_for_label }}"><strong>{{ form.notes.label }}</strong></label><br/>{{ form.notes }}</div>
+                    <a href="#_" onclick="focusVolunteer()">Set a volunteer driver?</a>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.reminder_instructions.id_for_label }}"><strong>{{ form.reminder_instructions.label }}</strong></label><br/>{{ form.reminder_instructions }}</div>
                 </fieldset>
@@ -128,6 +129,7 @@
                     <legend>Log Information</legend>
                     <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
                     <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                    <div class="mb-2"><label for="{{ form.volunteer.id_for_label }}"><strong>{{ form.volunteer.label }}</strong></label><br/>{{ form.volunteer }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.start_miles.id_for_label }}"><strong>{{ form.start_miles.label }}</strong></label><br/>{{ form.start_miles }}</div>
                     <div class="mb-2"><label for="{{ form.start_time.id_for_label }}"><strong>{{ form.start_time.label }}</strong></label>
@@ -251,6 +253,9 @@
     var ajax_set_vehicle_from_driver_url = "{% url 'ajax-set-vehicle-from-driver' %}";
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
+
+    var volunteer_driver = "{{ logged_volunteer.driver }}";
+    var volunteer_vehicle = "{{ logged_volunteer.vehicle }}";
 
     setupFormEventsTrip();
 

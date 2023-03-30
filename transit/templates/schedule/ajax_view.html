@@ -298,10 +298,16 @@
                                 {% endif %}
                             </div>
                             {% endif %}
-                            {% if trip.note and trip.format == Trip.FORMAT_NORMAL %}
+                            {% if trip.format == Trip.FORMAT_NORMAL %}
+                            {% if trip.note or trip.volunteer %}
                             <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
                                 {{ trip.note }}
+                                {% if trip.volunteer %}
+                                {% if trip.note %}<br/>{% endif %}
+                                <span class="badge badge-secondary mr-2">Volunteer</span>{{ trip.volunteer.verbose_name }}
+                                {% endif %}
                             </div>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>

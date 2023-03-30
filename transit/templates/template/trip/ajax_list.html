@@ -195,8 +195,12 @@
             {{ trip.vehicle }}
             {% endif %}
         </td>
-        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_notes', row_movers)">
+        <td class="mytable-col-lg edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus={% if trip.volunteer and not trip.note %}id_volunteer{% else %}id_notes{% endif %}', row_movers)">
             {{ trip.note }}
+            {% if trip.volunteer %}
+            {% if trip.note %}<br/>{% endif %}
+            <span class="badge badge-secondary mr-1">Volunteer</span>{{ trip.volunteer.verbose_name }}
+            {% endif %}
         </td>
         {% if show_extra_columns %}
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'template-trip-edit' trip.parent.id trip.id %}?focus=id_reminder_instructions', row_movers)">

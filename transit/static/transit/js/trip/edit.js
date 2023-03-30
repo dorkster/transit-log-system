@@ -26,6 +26,7 @@ function setupFormEventsTrip() {
     $("#id_destination").on("change", function() { onAddressChanged(1); });
     $("#id_driver").on("change", ajaxSetVehicleFromDriver);
     $("#id_trip_type").on("change", onTripTypeChange);
+    $("#id_volunteer").on("change", onVolunteerChange);
 }
 
 function onNameChanged() {
@@ -349,5 +350,21 @@ function onTripTypeChange() {
     if (other_selected && $("#id_tags").val() == "") {
         showTagDialog();
     }
+}
+
+function onVolunteerChange() {
+    if ($("#id_volunteer").val() != "") {
+        $("#id_driver option").filter(function() {
+            return $(this).val() == volunteer_driver;
+        }).prop("selected", true);
+        $("#id_vehicle option").filter(function() {
+            return $(this).val() == volunteer_vehicle;
+        }).prop("selected", true);
+    }
+}
+
+function focusVolunteer() {
+    $("#id_volunteer").focus();
+    $("#id_volunteer")[0].scrollIntoView({behavior: "smooth", block: "center"});
 }
 

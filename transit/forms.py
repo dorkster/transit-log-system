@@ -17,7 +17,7 @@ import datetime
 
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip, ActivityColor
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip, ActivityColor, Volunteer
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -140,6 +140,7 @@ class EditTripForm(forms.Form):
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
+    volunteer = forms.ModelChoiceField(Volunteer.objects.filter(is_active=True), label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -266,6 +267,7 @@ class EditTemplateTripForm(forms.Form):
     fare = forms.CharField(label='Fare ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     passenger = forms.BooleanField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
+    volunteer = forms.ModelChoiceField(Volunteer.objects.filter(is_active=True), label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
@@ -317,6 +319,13 @@ class EditTagForm(forms.Form):
 class EditActivityColorForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))
+
+class EditVolunteerForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    vehicle = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    vehicle_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    vehicle_plate = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    is_active = forms.BooleanField(label='Is active?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class SearchTripsForm(forms.Form):
     TRIP_STATUS_LEVELS = (

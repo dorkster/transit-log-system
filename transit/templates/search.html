@@ -16,6 +16,7 @@
             <div class="col-md border m-1 p-2">
                 <div class="mb-2"><label for="{{ form.driver.id_for_label }}"><strong>{{ form.driver.label }}</strong></label><br/>{{ form.driver }}</div>
                 <div class="mb-2"><label for="{{ form.vehicle.id_for_label }}"><strong>{{ form.vehicle.label }}</strong></label><br/>{{ form.vehicle }}</div>
+                <div class="mb-2"><label for="{{ form.volunteer.id_for_label }}"><strong>{{ form.volunteer.label }}</strong></label><br/>{{ form.volunteer }}</div>
             </div>
             <div class="col-md border m-1 p-2">
                 <div class="mb-2"><label for="{{ form.start_date.id_for_label }}"><strong>{{ form.start_date.label }}</strong></label><br/>{{ form.start_date }}</div>
@@ -132,6 +133,10 @@
         </td>
         <td class="mytable-col-md">
             {{ trip.note }}
+            {% if trip.volunteer %}
+            {% if trip.note %}<br/>{% endif %}
+            <span class="badge badge-secondary mr-1">Volunteer</span>{{ trip.volunteer.verbose_name }}
+            {% endif %}
         </td>
         <td class="mytable-col-md">
             {{ trip.reminder_instructions }}

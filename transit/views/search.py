@@ -22,7 +22,7 @@ from django.http import FileResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
 
-from transit.models import Trip, Driver, Vehicle, TripType
+from transit.models import Trip, Driver, Vehicle, TripType, Volunteer
 from transit.forms import SearchTripsForm
 
 from django.contrib.auth.decorators import permission_required
@@ -53,6 +53,7 @@ def searchGetTrips(request):
     trip_type = request.GET.get('trip_type')
     tags = request.GET.get('tags')
     status = request.GET.get('status')
+    volunteer = request.GET.get('volunteer')
 
     trips = Trip.objects.all()
     searched = False
@@ -88,6 +89,16 @@ def searchGetTrips(request):
         if vehicle_obj:
             searched = True
             trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(vehicle=vehicle_obj)
+
+    if volunteer:
+        try:
+            volunteer_obj = Volunteer.objects.get(id=uuid.UUID(volunteer))
+        except:
+            volunteer_obj = None
+
+        if volunteer_obj:
+            searched = True
+            trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(volunteer=volunteer_obj)
 
     today = datetime.datetime.today()
 

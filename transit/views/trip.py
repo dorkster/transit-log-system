@@ -22,7 +22,7 @@ from django.urls import reverse
 from django.core import serializers
 from django.db.models import Q
 
-from transit.models import Trip, Driver, Vehicle, Client, Shift, Tag, SiteSettings, Destination, Fare
+from transit.models import Trip, Driver, Vehicle, Client, Shift, Tag, SiteSettings, Destination, Fare, Volunteer
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
 
 from django.contrib.auth.decorators import permission_required
@@ -134,6 +134,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
         if trip.driver:
             form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
+
+        if trip.volunteer:
+            form.fields['volunteer'].queryset = Volunteer.objects.filter(Q(is_active=True) | Q(id=trip.volunteer.id))
 
         if form.is_valid():
             old_date = trip.date
@@ -322,6 +325,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
         if trip.driver:
             form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True) | Q(id=trip.driver.id))
+
+        if trip.volunteer:
+            form.fields['volunteer'].queryset = Volunteer.objects.filter(Q(is_active=True) | Q(id=trip.volunteer.id))
 
     addresses = set()
     destinations = Destination.objects.filter(is_active=True)

@@ -147,7 +147,7 @@ function setupFormEvents(mile_data, trip_date=null) {
     $("#id_vehicle").on("change", function() { showFullMiles(mile_data); });
 
     if (trip_date != null) {
-        $("#id_driver").on("change", function() { ajaxSetVehicleFromDriver(mile_data, trip_date); });
+        $("#id_driver").on("change", function() { onDriverChange(); showFullMiles(mile_data); });
     }
 }
 
@@ -173,27 +173,15 @@ function toggleAdditionalPickup(item_id) {
     }
 }
 
-function ajaxSetVehicleFromDriver(mile_data, trip_date) {
-    $.ajax({
-        type: "GET",
-        url: ajax_set_vehicle_from_driver_url,
-        data: {
-            "year":trip_date["year"],
-            "month":trip_date["month"],
-            "day":trip_date["day"],
-            "driver":$("#id_driver option:selected").val(),
-        }
-    })
-    .done(function(response) {
-        if (response.vehicle != "") {
-            $("#id_vehicle option").filter(function() {
-                return $(this).val() == response.vehicle;
-            }).prop("selected", true);
-        }
-        else {
-            $("#id_vehicle").prop("selectedIndex", 0);
-        }
-        showFullMiles(mile_data);
-    });
+function onDriverChange() {
+    let driver_id = $("#id_driver option:selected").val();
+    if (driver_id != "") {
+        $("#id_vehicle option").filter(function() {
+            return $(this).val() == driver_vehicle_pairs[driver_id]["vehicle"];
+        }).prop("selected", true);
+    }
+    else {
+        $("#id_vehicle").prop("selectedIndex", 0);
+    }
 }
 

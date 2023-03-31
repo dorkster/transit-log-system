@@ -553,12 +553,35 @@ def tripStart(request, id):
             if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
                 additional_pickups.append(i)
 
+    driver_vehicle_pairs = {}
+    nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+    active_drivers = Driver.objects.filter(is_active=True)
+    todays_shifts = Shift.objects.filter(date=trip.date)
+
+    for driver in active_drivers:
+        if driver.is_logged:
+            for shift in todays_shifts:
+                if driver == shift.driver:
+                    driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(shift.vehicle.id), 'volunteer': 0}
+                    break
+            if not str(driver.id) in driver_vehicle_pairs:
+                driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+        elif not driver.is_logged and len(nonlogged_vehicles) == 1:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
+        else:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+
+        # TODO get from SiteSettings
+        if driver.name == 'Volunteer':
+            driver_vehicle_pairs[str(driver.id)]['volunteer'] = 1
+
     context = {
         'form': form,
         'trip': trip,
         'start_miles': start_miles,
         'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,
+        'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
     }
 
     return render(request, 'trip/start.html', context)

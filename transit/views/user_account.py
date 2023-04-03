@@ -80,6 +80,7 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='view_fare'))
         permissions.append(Permission.objects.get(codename='view_tag'))
         permissions.append(Permission.objects.get(codename='view_activitycolor'))
+        permissions.append(Permission.objects.get(codename='view_volunteer'))
     elif group_name == 'Staff':
         permissions.append(Permission.objects.get(codename='add_group'))
         permissions.append(Permission.objects.get(codename='change_group'))
@@ -149,6 +150,10 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='change_activitycolor'))
         permissions.append(Permission.objects.get(codename='delete_activitycolor'))
         permissions.append(Permission.objects.get(codename='view_activitycolor'))
+        permissions.append(Permission.objects.get(codename='add_volunteer'))
+        permissions.append(Permission.objects.get(codename='change_volunteer'))
+        permissions.append(Permission.objects.get(codename='delete_volunteer'))
+        permissions.append(Permission.objects.get(codename='view_volunteer'))
         permissions.append(Permission.objects.get(codename='view_loggedevent'))
 
     group.permissions.set(permissions)

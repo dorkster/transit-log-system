@@ -77,7 +77,7 @@ function AjaxLoader(url, div_id) {
                 if (!self.first_response) {
                     self.first_response = true;
                     var hash = window.location.hash.substr(1);
-                    if (hash && hash != '_')
+                    if (hash && hash != '_') {
                         var hash_element = document.getElementById(hash);
                         if (hash_element) {
                             // hash_element.scrollIntoView({behavior: "smooth", block: "center"});
@@ -86,6 +86,7 @@ function AjaxLoader(url, div_id) {
                             else
                                 hash_element.scrollIntoView({block: "center"});
                         }
+                    }
                 }
 
                 ajax_loading.addEventListener("animationend", self.animationDone);

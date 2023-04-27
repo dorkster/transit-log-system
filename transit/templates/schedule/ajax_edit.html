@@ -289,7 +289,7 @@
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.appointment_time %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% if trip.driver is None %}---------{% else %}{% for driver in drivers %}{% if trip.driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+                    {% if trip.driver is None %}---------{% else %}{{ trip.driver }}{% endif %}
                 </button>
                 <div class="dropdown-menu shadow">
                     <a class="dropdown-item {% if trip.driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_driver', '---------')">---------</a>
@@ -304,7 +304,7 @@
         <td class="mytable-col-md">
             <div class="dropdown ajax-blocker">
                 <button class="btn btn-outline-dark btn-sm w-100 dropdown-toggle {% if trip.appointment_time %}text-bold{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% if trip.vehicle is None %}---------{% else %}{% for vehicle in vehicles %}{% if trip.vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+                    {% if trip.vehicle is None %}---------{% else %}{{ trip.vehicle }}{% endif %}
                 </button>
                 <div class="dropdown-menu shadow">
                     <a class="dropdown-item {% if trip.vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('{{trip.id}}', 'set_vehicle', '---------')">---------</a>

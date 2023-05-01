@@ -587,12 +587,6 @@ def clientXLSX(request):
         ws.cell(i+2, 10, clients[i].is_transit_policy_acknowledged)
         ws.cell(i+2, 11, clients[i].reminder_instructions)
 
-        # display elderly/ambulatory as booleans
-        ws.cell(i+2, 6).number_format = 'BOOLEAN'
-        ws.cell(i+2, 7).number_format = 'BOOLEAN'
-        ws.cell(i+2, 9).number_format = 'BOOLEAN'
-        ws.cell(i+2, 10).number_format = 'BOOLEAN'
-
     # apply styles
     ws.row_dimensions[row_header].height = style_rowheight_header
     for i in range(1, 12):

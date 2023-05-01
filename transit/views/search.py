@@ -328,8 +328,6 @@ def searchExportXLSX(request):
         ws_results.cell(i, 1).number_format = 'MMM DD, YYYY'
         ws_results.cell(i, 15).number_format = '$0.00'
         ws_results.cell(i, 16).number_format = '$0.00'
-        ws_results.cell(i, 17).number_format = 'BOOLEAN'
-        ws_results.cell(i, 18).number_format = 'BOOLEAN'
 
     # apply styles
     ws_results.row_dimensions[row_header].height = style_rowheight_header

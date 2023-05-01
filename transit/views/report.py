@@ -1617,9 +1617,6 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     row_header_riders = row_total + 2
     for i in range(row_header_riders, row_header_riders + row_total_riders):
         ws_riders.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
-        if i > row_header_riders:
-            ws_riders.cell(i, 3).number_format = 'BOOLEAN'
-            ws_riders.cell(i, 4).number_format = 'BOOLEAN'
 
     ws_riders.cell(row_header_riders, 1, 'Name')
     ws_riders.cell(row_header_riders, 3, 'Elderly')

@@ -78,6 +78,7 @@ urlpatterns = [
     path('clients/create-from-trip/<uuid:trip_id>', views.clientCreateFromTrip, name='client-create-from-trip'),
     path('clients/create-from-template-trip/<uuid:trip_id>', views.clientCreateFromTemplateTrip, name='client-create-from-template-trip'),
     path('clients/xlsx', views.clientXLSX, name='client-xlsx'),
+    path('clients/<uuid:id>/update-trips', views.clientUpdateTrips, name='client-update-trips'),
 
     path('clients/<uuid:parent>/payments/', views.clientPaymentList, name='client-payments'),
     path('clients/<uuid:parent>/payments/create', views.clientPaymentCreate, name='client-payment-create'),

@@ -21,6 +21,7 @@ from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
+from django.utils.http import urlencode
 
 from transit.models import Trip, Driver, Vehicle, TripType, Volunteer
 from transit.forms import SearchTripsForm

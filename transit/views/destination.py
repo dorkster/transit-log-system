@@ -20,6 +20,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator
+from django.utils.http import urlencode
 
 from transit.models import Destination, Trip, SiteSettings, TemplateTrip
 from transit.forms import EditDestinationForm
@@ -73,8 +74,9 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             else:
                 unique_destination = destination
 
-            prev_address = unique_destination.address
-            prev_phone = unique_destination.phone
+            prev_destination = dict()
+            prev_destination['address'] = unique_destination.address
+            prev_destination['phone'] = unique_destination.phone
 
             unique_destination.address = form.cleaned_data['address']
             unique_destination.phone = form.cleaned_data['phone']
@@ -86,58 +88,13 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(unique_destination))
 
+            # when creating a new destination, there's no previous address. So just use the current address
+            if is_new and not is_existing_destination:
+                prev_destination['address'] = unique_destination.address
+
             if form.cleaned_data['update_trips']:
-                trips = Trip.objects.filter(Q(address=prev_address) | Q(destination=prev_address))
-                for trip in trips:
-                    updated = False
-
-                    # address
-                    if prev_address != unique_destination.address:
-                        if trip.address == prev_address:
-                            trip.address = unique_destination.address
-                            updated = True
-                        if trip.destination == prev_address:
-                            trip.destination = unique_destination.address
-                            updated = True
-
-                    # phone numbers
-                    if prev_phone != unique_destination.phone:
-                        if trip.address == prev_address and trip.phone_address == prev_phone:
-                            trip.phone_address = unique_destination.phone
-                            updated = True
-                        if trip.destination == prev_address and trip.phone_destination == prev_phone:
-                            trip.phone_destination = unique_destination.phone
-                            updated = True
-
-                    if updated:
-                        trip.save()
-
-                template_trips = TemplateTrip.objects.filter(Q(address=prev_address) | Q(destination=prev_address))
-                for trip in template_trips:
-                    updated = False
-
-                    # address
-                    if prev_address != unique_destination.address:
-                        if trip.address == prev_address:
-                            trip.address = unique_destination.address
-                            updated = True
-                        if trip.destination == prev_address:
-                            trip.destination = unique_destination.address
-                            updated = True
-
-                    # phone numbers
-                    if prev_phone != unique_destination.phone:
-                        if trip.address == prev_address and trip.phone_address == prev_phone:
-                            trip.phone_address = unique_destination.phone
-                            updated = True
-                        if trip.destination == prev_address and trip.phone_destination == prev_phone:
-                            trip.phone_destination = unique_destination.phone
-                            updated = True
-
-                    if updated:
-                        trip.save()
-
-            if src_trip != None:
+                return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': unique_destination.id}) + "?" + urlencode(prev_destination))
+            elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
                 return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
@@ -171,6 +128,108 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
     }
 
     return render(request, 'destination/edit.html', context)
+
+@permission_required(['transit.change_destination'])
+def destinationUpdateTrips(request, id):
+    destination = get_object_or_404(Destination, id=id)
+
+    address = request.GET.get('address')
+    phone = request.GET.get('phone')
+
+    trips = []
+    trip_query = Trip.objects.filter(Q(address=address) | Q(destination=address))
+    for trip in trip_query:
+        updated = [False for i in range(4)]
+
+        # address
+        if address != destination.address:
+            if trip.address == address:
+                updated[0] = True
+            if trip.destination == address:
+                updated[2] = True
+        # phone numbers
+        if phone != destination.phone:
+            if trip.phone_address == phone and trip.address == address:
+                updated[1] = True
+            if trip.phone_destination == phone and trip.destination == address:
+                updated[3] = True
+
+        for i in range(4):
+            if updated[i]:
+                trips.append({'trip': trip, 'updated': updated})
+                break
+
+    template_trips = []
+    template_trip_query = TemplateTrip.objects.filter(Q(address=address) | Q(destination=address))
+    for trip in trip_query:
+        updated = [False for i in range(4)]
+
+        # address
+        if address != destination.address:
+            if trip.address == address:
+                updated[0] = True
+            if trip.destination == address:
+                updated[2] = True
+        # phone numbers
+        if phone != destination.phone:
+            if trip.phone_address == phone and trip.address == address:
+                updated[1] = True
+            if trip.phone_destination == phone and trip.destination == address:
+                updated[3] = True
+
+        for i in range(4):
+            if updated[i]:
+                trips.append({'trip': trip, 'updated': updated})
+                break
+
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
+        elif 'save' in request.POST:
+            for item in trips:
+                trip = item['trip']
+                updated = item['updated']
+
+                if updated[0]:
+                    trip.address = destination.address
+                if updated[1]:
+                    trip.phone_address = destination.phone
+                if updated[2]:
+                    trip.destination = destination.address
+                if updated[3]:
+                    trip.phone_destination = destination.phone
+
+                trip.save()
+
+            for item in template_trips:
+                trip = item['trip']
+                updated = item['updated']
+
+                if updated[0]:
+                    trip.address = destination.address
+                if updated[1]:
+                    trip.phone_address = destination.phone
+                if updated[2]:
+                    trip.destination = destination.address
+                if updated[3]:
+                    trip.phone_destination = destination.phone
+
+                trip.save()
+
+            trip_count = len(trips) + len(template_trips)
+
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, "Updated " + str(trip_count) + " trip(s): " + str(destination))
+
+            return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
+    context = {
+        'destination': destination,
+        'trips': trips,
+        'template_trips': template_trips,
+    }
+
+    return render(request, 'destination/update_trips.html', context)
+
 
 @permission_required(['transit.delete_destination'])
 def destinationDelete(request, id):

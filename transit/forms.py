@@ -223,8 +223,14 @@ class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     is_trip_counted = forms.BooleanField(label='Include in report trip counts?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
-class UploadFileForm(forms.Form):
-    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True, 'accept':'.xlsx'}))
+class ExcelImportForm(forms.Form):
+    # Django versions > 3.2.19 dropped support for the multiple attribute
+    # The recommended fix is to write a custom multiple file class, but I don't think it's worth doing here.
+    # The Excel file importer isn't really utilized anymore, so we'll just fall back to a file field that supports a single file.
+    try:
+        file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':'true', 'accept':'.xlsx'}))
+    except:
+        file = forms.FileField(widget=forms.ClearableFileInput(attrs={'accept':'.xlsx'}))
     log_data_only = forms.BooleanField(label='Only include rows with full log data?', required=False, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     dry_run = forms.BooleanField(label="Dry run? (i.e. don't write to database)", required=False, initial=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 

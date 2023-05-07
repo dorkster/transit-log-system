@@ -22,14 +22,14 @@ from django.urls import reverse
 from openpyxl import load_workbook
 
 from transit.models import Shift, Trip, Driver, Vehicle, TripType
-from transit.forms import UploadFileForm
+from transit.forms import ExcelImportForm
 
 from django.contrib.auth.decorators import user_passes_test
 
 @user_passes_test(lambda u: u.is_superuser)
 def excelImport(request):
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
+        form = ExcelImportForm(request.POST, request.FILES)
         if form.is_valid():
             options = {}
             options['log_data_only'] = form.cleaned_data['log_data_only']
@@ -42,7 +42,7 @@ def excelImport(request):
             # return HttpResponseRedirect(reverse('excel-import'))
             return render(request, 'excel_import.html', {'form': form, 'import_done': True, 'trips':trips, 'shifts':shifts, 'errors':errors})
     else:
-        form = UploadFileForm()
+        form = ExcelImportForm()
     return render(request, 'excel_import.html', {'form': form, 'import_done': False, 'Trip': Trip, })
 
 def excelParseFile(file_obj, shifts, trips, errors, options):

@@ -37,5 +37,5 @@ Also, TLS uses the Django [sessions middleware](https://docs.djangoproject.com/e
 
 ## Copyright and License
 
-The Transit Log System is Copyright ©2019-2021 Justin Jacobs, and is released under GPL version 3 or later. See COPYING for the entire license text.
+The Transit Log System is Copyright ©2019-2023 Justin Jacobs, and is released under GPL version 3 or later. See COPYING for the entire license text.
 

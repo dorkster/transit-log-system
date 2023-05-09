@@ -1,0 +1,98 @@
+{% extends "base_generic.html" %}
+{% block title_section %}
+{% if user.is_authenticated %}Fix duplicates of Client | {{client.name}} | {% endif %}
+{% endblock %}
+
+{% block auth_content %}
+<h2>Fix duplicates of Client</h2>
+
+<div class="alert alert-warning">
+    There are duplicates of <strong>{{ client.name }}</strong>, which are listed below.<br/>
+    Select <strong>one</strong> to keep, and the others will be deleted.<br/>
+    If you wish to let the duplicates remain, <a class="alert-link" href="{% url 'clients' %}#client_{{client.id}}">click here</a> to return to the Clients list.
+</div>
+<form action="" method="post" onsubmit="return checkForm(this, event);">
+{% csrf_token %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td></td>
+        <td>Name</td>
+        <td>Address</td>
+        <td>Phone (Home)</td>
+        <td>Phone (Cell)</td>
+        <td>Phone (Alt)</td>
+        <td>Elderly?</td>
+        <td>Ambulatory?</td>
+        <td>Tags</td>
+        <td>Is staff member?</td>
+        <td>Is active?</td>
+        <td>Transit Policy Acknowledged?</td>
+        <td>Reminder Instructions</td>
+    </thead>
+    {% for existing_client in existing_clients %}
+    <tr>
+        <td class="mytable-col-md"><button class="btn btn-primary btn-sm w-100" type="submit" name="{{existing_client.id}}"><span class="oi oi-check mr-2"></span>Select</button></td>
+        <td class="mytable-col-lg">{{existing_client.name}}</td>
+        <td class="mytable-col-lg">{{existing_client.address}}</td>
+        <td class="mytable-col-md">{{existing_client.phone_home}}</td>
+        <td class="mytable-col-md">{{existing_client.phone_cell}}</td>
+        <td class="mytable-col-md">{{existing_client.phone_alt}}</td>
+        <td class="mytable-col-xs">
+            {% if existing_client.elderly %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif existing_client.elderly is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if existing_client.ambulatory %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif existing_client.ambulatory is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-md">
+            {% if existing_client.tags %}
+            {% for tag in existing_client.get_styled_tag_list %}
+            <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
+            {% endfor %}
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if existing_client.staff %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif existing_client.staff is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if existing_client.is_active %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif existing_client.is_active is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xs">
+            {% if existing_client.is_transit_policy_acknowledged %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif existing_client.is_transit_policy_acknowledged is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
+        <td class="mytable-col-xl">{{existing_client.reminder_instructions}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="d-flex flex-wrap mt-2">
+    <div class="mr-auto mb-3">
+        <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-arrow-left mr-2"></span>Keep Duplicates</button>
+    </div>
+</div>
+</form>
+
+{% endblock %}
+
+{% block content %}
+<p>You are not authorized. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
+{% endblock %}

@@ -71,56 +71,52 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             return HttpResponseRedirect(reverse('client-delete', kwargs={'id':client.id}))
 
         if form.is_valid():
-            is_existing_client = False
-            existing_clients = Client.objects.filter(name=form.cleaned_data['name'])
-            if len(existing_clients) > 0:
-                unique_client = existing_clients[0]
-                is_existing_client = True
-            else:
-                unique_client = client
-
             prev_client = dict()
-            prev_client['name'] = unique_client.name
-            prev_client['address'] = unique_client.address
-            prev_client['phone_home'] = unique_client.phone_home
-            prev_client['phone_cell'] = unique_client.phone_cell
-            prev_client['phone_alt'] = unique_client.phone_alt
-            prev_client['elderly'] = str(unique_client.elderly)
-            prev_client['ambulatory'] = str(unique_client.ambulatory)
-            prev_client['reminder_instructions'] = unique_client.reminder_instructions
+            prev_client['name'] = client.name
+            prev_client['address'] = client.address
+            prev_client['phone_home'] = client.phone_home
+            prev_client['phone_cell'] = client.phone_cell
+            prev_client['phone_alt'] = client.phone_alt
+            prev_client['elderly'] = str(client.elderly)
+            prev_client['ambulatory'] = str(client.ambulatory)
+            prev_client['reminder_instructions'] = client.reminder_instructions
 
-            unique_client.name = form.cleaned_data['name']
-            unique_client.address = form.cleaned_data['address']
-            unique_client.phone_home = form.cleaned_data['phone_home']
-            unique_client.phone_cell = form.cleaned_data['phone_cell']
-            unique_client.phone_alt = form.cleaned_data['phone_alt']
-            unique_client.elderly = form.cleaned_data['elderly']
-            unique_client.ambulatory = form.cleaned_data['ambulatory']
-            unique_client.tags = form.cleaned_data['tags']
-            unique_client.staff = form.cleaned_data['staff']
-            unique_client.is_active = form.cleaned_data['is_active']
-            unique_client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
-            unique_client.reminder_instructions = form.cleaned_data['reminder_instructions']
+            client.name = form.cleaned_data['name']
+            client.address = form.cleaned_data['address']
+            client.phone_home = form.cleaned_data['phone_home']
+            client.phone_cell = form.cleaned_data['phone_cell']
+            client.phone_alt = form.cleaned_data['phone_alt']
+            client.elderly = form.cleaned_data['elderly']
+            client.ambulatory = form.cleaned_data['ambulatory']
+            client.tags = form.cleaned_data['tags']
+            client.staff = form.cleaned_data['staff']
+            client.is_active = form.cleaned_data['is_active']
+            client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
+            client.reminder_instructions = form.cleaned_data['reminder_instructions']
 
-            unique_client.save()
+            client.save()
 
-            if is_new and not is_existing_client:
-                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(unique_client))
+            if is_new:
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.CLIENT, str(client))
             else:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(unique_client))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(client))
 
-            # when creating a new client, there's no previous name. So just use the current name
-            if is_new and not is_existing_client:
-                prev_client['name'] = unique_client.name
+            existing_clients = Client.objects.filter(name=client.name)
+            if len(existing_clients) > 1:
+                # TODO this ignores the 'update_trips' flag. Is this reasonable?
+                return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
             if form.cleaned_data['update_trips']:
-                return HttpResponseRedirect(reverse('client-update-trips', kwargs={'id': unique_client.id}) + "?" + urlencode(prev_client))
+                # when creating a new client, there's no previous name. So just use the current name
+                if is_new:
+                    prev_client['name'] = client.name
+                return HttpResponseRedirect(reverse('client-update-trips', kwargs={'id': client.id}) + "?" + urlencode(prev_client))
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
                 return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
             else:
-                return HttpResponseRedirect(reverse('clients') + '#client_' + str(unique_client.id))
+                return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
     else:
         initial = {
             'name': client.name,
@@ -340,6 +336,31 @@ def clientUpdateTrips(request, id):
     }
 
     return render(request, 'client/update_trips.html', context)
+
+@permission_required(['transit.change_client'])
+def clientFixDupes(request, id):
+    client = get_object_or_404(Client, id=id)
+
+    existing_clients = Client.objects.filter(name=client.name)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('clients') + "#client_" + str(client.id))
+
+        for existing_client in existing_clients:
+            if str(existing_client.id) in request.POST:
+                clients_to_delete = existing_clients.exclude(id=existing_client.id)
+                for client_to_delete in clients_to_delete:
+                    log_event(request, LoggedEventAction.DELETE, LoggedEventModel.CLIENT, "Remove duplicate: " + str(client_to_delete))
+                    client_to_delete.delete()
+                return HttpResponseRedirect(reverse('clients') + '#client_' + str(existing_client.id))
+
+    context = {
+        'client': client,
+        'existing_clients': existing_clients,
+    }
+
+    return render(request, 'client/fix_dupes.html', context)
 
 @permission_required(['transit.delete_client'])
 def clientDelete(request, id):

@@ -97,6 +97,7 @@ urlpatterns = [
     path('destinations/create-from-trip/<uuid:trip_id>/<int:use_address>', views.destinationCreateFromTrip, name='destination-create-from-trip'),
     path('destinations/create-from-template-trip/<uuid:trip_id>/<int:use_address>', views.destinationCreateFromTemplateTrip, name='destination-create-from-template-trip'),
     path('destinations/<uuid:id>/update-trips', views.destinationUpdateTrips, name='destination-update-trips'),
+    path('destinations/<uuid:id>/fix-dupes', views.destinationFixDupes, name='destination-fix-dupes'),
 
     path('drivers/', views.driverList, name='drivers'),
     path('drivers/create', views.driverCreate, name='driver-create'),

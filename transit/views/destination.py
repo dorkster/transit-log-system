@@ -66,40 +66,36 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             return HttpResponseRedirect(reverse('destination-delete', kwargs={'id':destination.id}))
 
         if form.is_valid():
-            is_existing_destination = False
-            existing_destinations = Destination.objects.filter(address=form.cleaned_data['address'])
-            if len(existing_destinations) > 0:
-                unique_destination = existing_destinations[0]
-                is_existing_destination = True
-            else:
-                unique_destination = destination
-
             prev_destination = dict()
-            prev_destination['address'] = unique_destination.address
-            prev_destination['phone'] = unique_destination.phone
+            prev_destination['address'] = destination.address
+            prev_destination['phone'] = destination.phone
 
-            unique_destination.address = form.cleaned_data['address']
-            unique_destination.phone = form.cleaned_data['phone']
-            unique_destination.is_active = form.cleaned_data['is_active']
-            unique_destination.save()
+            destination.address = form.cleaned_data['address']
+            destination.phone = form.cleaned_data['phone']
+            destination.is_active = form.cleaned_data['is_active']
+            destination.save()
 
-            if is_new and not is_existing_destination:
-                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.DESTINATION, str(unique_destination))
+            if is_new:
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.DESTINATION, str(destination))
             else:
-                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(unique_destination))
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(destination))
 
-            # when creating a new destination, there's no previous address. So just use the current address
-            if is_new and not is_existing_destination:
-                prev_destination['address'] = unique_destination.address
+            existing_destinations = Destination.objects.filter(address=destination.address)
+            if len(existing_destinations) > 1:
+                # TODO this ignores the 'update_trips' flag. Is this reasonable?
+                return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
             if form.cleaned_data['update_trips']:
-                return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': unique_destination.id}) + "?" + urlencode(prev_destination))
+                # when creating a new destination, there's no previous address. So just use the current address
+                if is_new:
+                    prev_destination['address'] = destination.address
+                return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': destination.id}) + "?" + urlencode(prev_destination))
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
                 return HttpResponseRedirect(reverse('template-trips', kwargs={'parent': src_template_trip.parent.id}) + '#trip_' + str(src_template_trip.id))
             else:
-                return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(unique_destination.id))
+                return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
     else:
         initial = {
             'address': destination.address,
@@ -230,6 +226,30 @@ def destinationUpdateTrips(request, id):
 
     return render(request, 'destination/update_trips.html', context)
 
+@permission_required(['transit.change_destination'])
+def destinationFixDupes(request, id):
+    destination = get_object_or_404(Destination, id=id)
+
+    existing_destinations = Destination.objects.filter(address=destination.address)
+
+    if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('destinations') + "#destination_" + str(destination.id))
+
+        for existing_destination in existing_destinations:
+            if str(existing_destination.id) in request.POST:
+                destinations_to_delete = existing_destinations.exclude(id=existing_destination.id)
+                for destination_to_delete in destinations_to_delete:
+                    log_event(request, LoggedEventAction.DELETE, LoggedEventModel.DESTINATION, "Remove duplicate: " + str(destination_to_delete))
+                    destination_to_delete.delete()
+                return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(existing_destination.id))
+
+    context = {
+        'destination': destination,
+        'existing_destinations': existing_destinations,
+    }
+
+    return render(request, 'destination/fix_dupes.html', context)
 
 @permission_required(['transit.delete_destination'])
 def destinationDelete(request, id):

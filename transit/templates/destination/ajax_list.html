@@ -90,6 +90,9 @@
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'destination-edit' destination.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Destination</a>
                     <div class="dropdown-divider"></div>
+                    <a href="{% url 'search' %}?address={{destination.address|urlencode}}" class="dropdown-item" target="_blank"><span class="oi oi-magnifying-glass mr-2"></span>Search for trips by address</a>
+                    <a href="{% url 'search' %}?destination={{destination.address|urlencode}}" class="dropdown-item" target="_blank"><span class="oi oi-magnifying-glass mr-2"></span>Search for trips by destination</a>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'destination-delete' destination.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete Destination</a>
                 </div>
             </div>

@@ -18,10 +18,12 @@ import datetime
 from transit.models import LoggedEvent
 
 def log_event(request, event_action, event_model, event_desc):
-    logged_events = LoggedEvent.objects.all()
-
-    while logged_events.count() >= 10000:
-        logged_events[0].delete()
+    # delete events older than 5 years
+    # TODO make this a site setting?
+    date_threshold = datetime.datetime.today() - datetime.timedelta(days=1825)
+    logged_events = LoggedEvent.objects.filter(timestamp__lt=date_threshold)
+    for i in logged_events:
+        i.delete()
 
     event = LoggedEvent()
     event.username = request.user.get_username()

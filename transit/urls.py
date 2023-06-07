@@ -89,6 +89,9 @@ urlpatterns = [
     path('clients/<uuid:parent>/report/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/', views.clientReport, name='client-report'),
     path('clients/<uuid:parent>/report/<int:year>/<int:month>/', views.clientReportMonth, name='client-report-month'),
     path('clients/<uuid:parent>/report/this-month/', views.clientReportThisMonth, name='client-report-this-month'),
+    path('clients/<uuid:parent>/report/by-driver/<uuid:driver_id>/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/', views.clientReportByDriver, name='client-report-by-driver'),
+    path('clients/<uuid:parent>/report/by-driver/<uuid:driver_id>/<int:year>/<int:month>/', views.clientReportByDriverMonth, name='client-report-by-driver-month'),
+    path('clients/<uuid:parent>/report/by-driver/<uuid:driver_id>/this-month/', views.clientReportByDriverThisMonth, name='client-report-by-driver-this-month'),
 
     path('destinations/', views.destinationList, name='destinations'),
     path('destinations/create', views.destinationCreate, name='destination-create'),

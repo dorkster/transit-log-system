@@ -83,7 +83,38 @@
             </div>
         </div>
     </div>
+    <div class="row justify-content-end">
+        <div class="col-auto p-1 top-right-nav">
+            <span class="dropdown">
+                <a href="#_" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Filter by driver">
+                    <span class="oi oi-eye mr-2"></span>Filter by driver{% if selected_driver %}: {{ selected_driver }}{% endif %}
+                </a>
+                    <div class="dropdown-menu shadow dropdown-menu-right">
+                        <a class="dropdown-item {% if selected_driver is None %}active{% endif %}" href="{% url 'client-report' client.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
+                            ---------
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        {% for driver in drivers %}
+                        <a class="dropdown-item {% if driver.id == selected_driver.id %}active{% endif %}" href="{% url 'client-report-by-driver' client.id driver.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
+                            {{ driver }}
+                        </a>
+                        {% endfor %}
+                    </div>
+            </span>
+        </div>
+    </div>
 </div>
+{% if selected_driver %}
+<div class="alert alert-warning">
+    <p>This report is showing only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
+    <p>Contrary to normal reports:</p>
+    <ul>
+        <li><strong>Trips with no mileage or time data are included</strong></li>
+        <li><strong>The "is logged" property of both the driver and any vehicles is ignored</strong></li>
+    </ul>
+    <p>To view the standard report, <a class="alert-link" href="{% url 'client-report' client.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">click here</a>.</p>
+</div>
+{% endif %}
 <ul class="nav nav-pills">
     <li class="nav-item"><a class="nav-link active" id="tab_trips_money" data-toggle="tab" data-target="#tab_content_trips_money" type="button">Fares &amp; Payments ({{ total_fares_and_payments }})</a></li>
     <li class="nav-item"><a class="nav-link" id="tab_trips_normal" data-toggle="tab" data-target="#tab_content_trips_normal" type="button">Trips ({{ trips_normal|length }})</a></li>

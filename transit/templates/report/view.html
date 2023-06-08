@@ -73,6 +73,24 @@
         </div>
     </div>
     <div class="row justify-content-end mt-3">
+        <div class="col-auto top-right-nav">
+            <span class="dropdown">
+                <a href="#_" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Filter by driver">
+                    <span class="oi oi-eye mr-2"></span>Filter by driver{% if selected_driver %}: {{ selected_driver }}{% endif %}
+                </a>
+                    <div class="dropdown-menu shadow dropdown-menu-right">
+                        <a class="dropdown-item {% if selected_driver is None %}active{% endif %}" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
+                            ---------
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        {% for driver in drivers %}
+                        <a class="dropdown-item {% if driver.id == selected_driver.id %}active{% endif %}" href="{% url 'report-driver' driver.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
+                            {{ driver }}
+                        </a>
+                        {% endfor %}
+                    </div>
+            </span>
+        </div>
         {% if not is_short_report %}
         <div class="col-auto">
             <button onclick="document.getElementById('show_daily_data_form').submit();" class="btn {% if show_daily_data %}btn-secondary{% else %}btn-warning{% endif %} btn-sm">
@@ -642,7 +660,11 @@
                             </a>
                             {% if rider.client_id %}
                             <div class="dropdown-divider"></div>
+                            {% if selected_driver %}
+                            <a target="_blank" href="{% url 'client-report-by-driver' rider.client_id selected_driver.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                            {% else %}
                             <a target="_blank" href="{% url 'client-report' rider.client_id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                            {% endif %}
                                 <span class="oi oi-graph mr-2"></span>View Client Report<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                             </a>
                             <div class="dropdown-divider"></div>
@@ -800,7 +822,11 @@
                             </a>
                             {% if rider.client_id %}
                             <div class="dropdown-divider"></div>
+                            {% if selected_driver %}
+                            <a target="_blank" href="{% url 'client-report-by-driver' rider.client_id selected_driver.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                            {% else %}
                             <a target="_blank" href="{% url 'client-report' rider.client_id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}" class="dropdown-item">
+                            {% endif %}
                                 <span class="oi oi-graph mr-2"></span>View Client Report<br/><span class="small">From {{date_start}} - {{date_end}}</span>
                             </a>
                             <div class="dropdown-divider"></div>

@@ -1199,6 +1199,7 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'show_daily_data': show_daily_data,
         'is_short_report': len(report.report_all) <= 31,
         'vehicle_table_colspan': 13 + (3 * len(Report.ReportSummary.query_triptypes)),
+        'vehicles': Vehicle.objects.all(),
     }
     return render(request, 'report/print.html', context)
 

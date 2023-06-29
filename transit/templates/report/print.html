@@ -789,7 +789,7 @@
     visible.addSection("#report_errors", "#vis_errors");
     visible.addSection("#report_MAP", "#vis_MAP");
     visible.addSection("#report_vehicle_totals", "#vis_vehicle_totals");
-    {% for v in report.filtered_vehicles %}
+    {% for v in vehicles %}
     visible.addSection("#report_vehicle_{{v.id}}", "#vis_vehicle_{{v.id}}");
     {% endfor %}
     visible.addSection("#report_riders", "#vis_riders");

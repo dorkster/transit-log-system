@@ -81,6 +81,7 @@ def userGetGroup(group_name):
         permissions.append(Permission.objects.get(codename='view_tag'))
         permissions.append(Permission.objects.get(codename='view_activitycolor'))
         permissions.append(Permission.objects.get(codename='view_volunteer'))
+        permissions.append(Permission.objects.get(codename='view_clientpayment'))
     elif group_name == 'Staff':
         permissions.append(Permission.objects.get(codename='add_group'))
         permissions.append(Permission.objects.get(codename='change_group'))

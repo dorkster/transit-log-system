@@ -196,6 +196,9 @@ class EditClientForm(forms.Form):
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     update_trips = forms.BooleanField(label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
+class EditClientFormRestricted(forms.Form):
+    is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+
 class EditClientPaymentForm(forms.Form):
     date_paid = forms.DateField(label='Date Paid', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     cash = forms.CharField(label='Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))

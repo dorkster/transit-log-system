@@ -26,7 +26,7 @@ from django.core.paginator import Paginator
 from django.utils.http import urlencode
 
 from transit.models import Client, Trip, Tag, TemplateTrip, SiteSettings
-from transit.forms import EditClientForm
+from transit.forms import EditClientForm, EditClientFormRestricted
 
 from django.contrib.auth.decorators import permission_required
 
@@ -52,7 +52,41 @@ def clientCreate(request):
 
 def clientEdit(request, id):
     client = get_object_or_404(Client, id=id)
-    return clientCreateEditCommon(request, client, is_new=False)
+
+    if request.user.has_perm('transit.change_client'):
+        return clientCreateEditCommon(request, client, is_new=False)
+    else:
+        return clientRestrictedEdit(request, client)
+
+@permission_required(['transit.view_client'])
+def clientRestrictedEdit(request, client):
+    if request.method == 'POST':
+        form = EditClientFormRestricted(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
+
+        if form.is_valid():
+            client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
+            client.save()
+
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(client))
+
+            return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
+    else:
+        initial = {
+            'is_transit_policy_acknowledged': client.is_transit_policy_acknowledged,
+        }
+        form = EditClientFormRestricted(initial=initial)
+
+    # site_settings = SiteSettings.load()
+
+    context = {
+        'form': form,
+        'client': client,
+    }
+
+    return render(request, 'client/restricted_edit.html', context)
 
 @permission_required(['transit.change_client'])
 def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None, src_template_trip=None):

@@ -22,6 +22,9 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
     date_end = datetime.date(end_year, end_month, end_day)
     date_end_plus_one = date_end + datetime.timedelta(days=1)
 
+    show_fares = request.session.get('client_report_show_fares', True)
+    request.session['client_report_show_fares'] = show_fares
+
     if date_start > date_end:
         swap_date = date_start
         date_start = date_end
@@ -45,6 +48,12 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
                     return HttpResponseRedirect(reverse('client-report-by-driver', kwargs={'parent':parent, 'driver_id': selected_driver.id, 'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
                 else:
                     return HttpResponseRedirect(reverse('client-report', kwargs={'parent':parent, 'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+        elif 'show_fares' in request.POST:
+            show_fares = request.session['client_report_show_fares'] = not request.session['client_report_show_fares']
+            if selected_driver:
+                return HttpResponseRedirect(reverse('client-report-by-driver', kwargs={'parent':parent, 'driver_id': selected_driver.id, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+            else:
+                return HttpResponseRedirect(reverse('client-report', kwargs={'parent':parent, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
         else:
             if date_picker.is_valid():
                 date_picker_date = date_picker.cleaned_data['date']
@@ -117,7 +126,8 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
         'total_fares_and_payments': total_fares_and_payments,
         'report': report,
         'selected_driver': selected_driver,
-        'drivers': Driver.objects.filter(is_active=True)
+        'drivers': Driver.objects.filter(is_active=True),
+        'show_fares': show_fares,
     }
     return render(request, 'client/report/view.html', context=context)
 

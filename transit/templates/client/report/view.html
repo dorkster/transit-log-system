@@ -10,6 +10,11 @@
 <link rel="stylesheet" href="{% static 'transit/css/client/report.css' %}">
 {% endblock %}
 
+<form id="show_fares_form" action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="show_fares">
+</form>
+
 <div class="container-fluid mt-4 mb-3">
     <div class="row">
         <div class="col p-1">
@@ -141,7 +146,13 @@
         </table>
         {% if trips_money %}
         <hr/>
-        <h4>Trips with a fare and/or payments ({{trips_money|length}})</h4>
+        <h4>
+            Trips with a fare and/or payments ({{trips_money|length}})
+            <button onclick="document.getElementById('show_fares_form').submit();" class="btn {% if show_fares %}btn-secondary{% else %}btn-warning{% endif %} btn-sm">
+                <span class="oi oi-calendar mr-2"></span>{% if show_fares %}Hide fare details{% else %}Show fare details{% endif %}
+            </button>
+
+        </h4>
         <table class="mytable mytable-striped mytable-has-edit-column">
             <thead>
                 <td class="mytable-col-md"></td>
@@ -152,6 +163,7 @@
                 <td class="mytable-col-md">Cash</td>
                 <td class="mytable-col-md">Check</td>
             </thead>
+            {% if show_fares %}
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_money %}
                 <tr>
@@ -165,6 +177,7 @@
                 </tr>
                 {% endfor %}
             </tbody>
+            {% endif %}
             <tr class="bg-success text-light text-bold">
                 <td></td>
                 <td colspan="3">TOTAL</td>
@@ -172,6 +185,11 @@
                 <td>{{ report.unique_riders.total_collected_cash }}</td>
                 <td>{{ report.unique_riders.total_collected_check }}</td>
             </tr>
+            {% if not show_fares %}
+            <tr>
+                <td colspan="7" class="small text-center alert-warning" style="display: table-cell !important";>Fare details are hidden</td>
+            </tr>
+            {% endif %}
         </table>
         {% endif %}
         {% if payments %}
@@ -197,13 +215,6 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            <thead>
-                <td></td>
-                <td>Date paid</td>
-                <td>Notes</td>
-                <td>Cash</td>
-                <td>Check</td>
-            </thead>
             <tr class="bg-success text-light text-bold">
                 <td></td>
                 <td colspan="2">TOTAL</td>

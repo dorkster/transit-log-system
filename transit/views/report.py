@@ -321,8 +321,9 @@ class Report():
         def __init__(self):
             self.errors = []
 
-        def add(self, date, error_code, error_shift=None, error_trip=None):
-            self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code, error_shift, error_trip)})
+        def add(self, date, daily_log_shift, error_code, error_shift=None, error_trip=None):
+            if daily_log_shift == None or daily_log_shift == error_shift.id:
+                self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code, error_shift, error_trip)})
 
         def getErrorMsg(self, error_code, error_shift=None, error_trip=None):
             if (error_shift):
@@ -573,37 +574,37 @@ class Report():
                 if log_status != Shift.LOG_COMPLETE or i.driver == None or i.vehicle == None:
                     # skip incomplete shift
                     if log_status == Shift.LOG_INCOMPLETE:
-                        self.report_errors.add(day_date, self.report_errors.SHIFT_INCOMPLETE, error_shift=i)
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_INCOMPLETE, error_shift=i)
                     continue
 
                 report_shift = Report.ReportShift()
                 report_shift.shift = i
 
                 if report_shift.start_miles.setFromString(i.start_miles) != 0:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.start_time.setFromString(i.start_time) != 0:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.end_miles.setFromString(i.end_miles) != 0:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.end_time.setFromString(i.end_time) != 0:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.fuel.setFromString(i.fuel) != 0:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
                 if report_shift.start_miles > report_shift.end_miles:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
                     report_shift.end_miles = report_shift.start_miles
 
                 if report_shift.start_time > report_shift.end_time:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
                     report_shift.end_time = report_shift.start_time
 
                 if report_shift.end_miles.value - report_shift.start_miles.value > Report.service_mile_warning_threshold:
-                    self.report_errors.add(day_date, self.report_errors.SHIFT_SERVICE_MILE_THRESHOLD, error_shift=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_SERVICE_MILE_THRESHOLD, error_shift=i)
 
                 report_day.shifts.append(report_shift)
 
@@ -636,13 +637,13 @@ class Report():
 
                 if log_status == Trip.LOG_INCOMPLETE:
                     # skip incomplete trip
-                    self.report_errors.add(day_date, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
                 if not i.driver or not i.vehicle:
                     # skip incomplete trip
                     if i.driver and i.vehicle:
-                        self.report_errors.add(day_date, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
                 report_trip = Report.ReportTrip()
@@ -668,7 +669,7 @@ class Report():
                                     found_shift = True
                                     break
                             if not found_shift:
-                                self.report_errors.add(day_date, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
+                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
                         continue
                     else:
                         dummy_shift = Report.ReportShift()
@@ -700,7 +701,7 @@ class Report():
                         parse_error = True
 
                     if parse_error:
-                        self.report_errors.add(day_date, self.report_errors.TRIP_PARSE, error_trip=i)
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_PARSE, error_trip=i)
 
                     # check for trip errors
                     # TODO the above execptions add errors to the report without adding the trip to the various trip counts
@@ -716,7 +717,7 @@ class Report():
                                 mile_error = True
                             if mile_error:
                                 report_trip.start_miles = shift.start_miles
-                                self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
                         if report_trip.end_miles > shift.end_miles:
                             mile_error = False
                             if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
@@ -726,7 +727,7 @@ class Report():
                                 mile_error = True
                             if mile_error:
                                 report_trip.end_miles = shift.end_miles
-                                self.report_errors.add(day_date, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
                     elif report_trip.start_miles > report_trip.end_miles:
                         mile_error = False
                         if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
@@ -737,17 +738,17 @@ class Report():
                         if mile_error:
                             report_trip.start_miles = shift.start_miles
                             report_trip.end_miles = shift.start_miles
-                            self.report_errors.add(day_date, self.report_errors.TRIP_MILES_LESS, error_shift=shift.shift, error_trip=i)
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_LESS, error_shift=shift.shift, error_trip=i)
 
                     if report_trip.start_time and shift.start_time and report_trip.end_time and shift.end_time:
                         if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
-                            self.report_errors.add(day_date, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
                             if report_trip.start_time < shift.start_time:
                                 report_trip.start_time = shift.start_time
                             if report_trip.end_time > shift.end_time:
                                 report_trip.end_time = shift.end_time
                         elif report_trip.start_time > report_trip.end_time:
-                            self.report_errors.add(day_date, self.report_errors.TRIP_TIME_LESS, error_trip=i)
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_LESS, error_trip=i)
                             report_trip.start_time = shift.start_time
                             report_trip.end_time = shift.start_time
 

@@ -322,7 +322,7 @@ class Report():
             self.errors = []
 
         def add(self, date, daily_log_shift, error_code, error_shift=None, error_trip=None):
-            if daily_log_shift == None or daily_log_shift == error_shift.id:
+            if daily_log_shift == None or (error_shift and daily_log_shift == error_shift.id):
                 self.errors.append({'date':date, 'error_code':error_code, 'error_shift': error_shift, 'error_trip': error_trip, 'error_msg': self.getErrorMsg(error_code, error_shift, error_trip)})
 
         def getErrorMsg(self, error_code, error_shift=None, error_trip=None):

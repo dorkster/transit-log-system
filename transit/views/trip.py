@@ -15,6 +15,7 @@
 
 import datetime, uuid
 import json
+from difflib import SequenceMatcher
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -556,8 +557,10 @@ def tripStart(request, id):
         for i in all_trips:
             if i.id == trip.id:
                 continue
-            if i.address == trip.address and (i.start_miles == '' and i.start_time == ''):
-                additional_pickups.append(i)
+            if i.start_miles == '' and i.start_time == '':
+                ratio = SequenceMatcher(None, i.address, trip.address).ratio()
+                if (ratio >= 0.5):
+                    additional_pickups.append((i, ratio))
 
     driver_vehicle_pairs = {}
     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
@@ -645,8 +648,10 @@ def tripEnd(request, id):
         for i in all_trips:
             if i.id == trip.id:
                 continue
-            if i.destination == trip.destination and (i.end_miles == '' and i.end_time == ''):
-                additional_pickups.append(i)
+            if i.end_miles == '' and i.end_time == '':
+                ratio = SequenceMatcher(None, i.destination, trip.destination).ratio()
+                if (ratio >= 0.5):
+                    additional_pickups.append((i, ratio))
 
     context = {
         'form': form,

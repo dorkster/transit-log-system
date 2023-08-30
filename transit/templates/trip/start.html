@@ -58,9 +58,10 @@
         </h3>
         <div class="list-group">
             {% for pickup in additional_pickups %}
-            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.id }}')" data-id="{{ pickup.id }}">
-                <h5>{{ pickup.name }}</h5>
-                To: <strong>{{ pickup.destination }}</strong>
+            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.0.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.0.id }}')" data-id="{{ pickup.0.id }}">
+                <h5>{{ pickup.0.name }}</h5>
+                {% if pickup.1 < 1 %}From: {{ pickup.0.address }}<br/>{%endif%}
+                To: <strong>{{ pickup.0.destination }}</strong>
             </a>
             {% endfor %}
         </div>

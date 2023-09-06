@@ -552,6 +552,7 @@ def tripStart(request, id):
         if trip.driver:
             form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=trip.driver.id))
 
+    site_settings = SiteSettings.load()
     additional_pickups = []
     if trip.address != '':
         for i in all_trips:
@@ -559,7 +560,7 @@ def tripStart(request, id):
                 continue
             if i.start_miles == '' and i.start_time == '':
                 ratio = SequenceMatcher(None, i.address, trip.address).ratio()
-                if (ratio >= 0.5):
+                if (ratio >= site_settings.additional_pickup_fuzziness):
                     additional_pickups.append((i, ratio))
 
     driver_vehicle_pairs = {}
@@ -643,6 +644,7 @@ def tripEnd(request, id):
         }
         form = tripEndForm(initial=initial)
 
+    site_settings = SiteSettings.load()
     additional_pickups = []
     if trip.destination != '':
         for i in all_trips:
@@ -650,7 +652,7 @@ def tripEnd(request, id):
                 continue
             if i.end_miles == '' and i.end_time == '':
                 ratio = SequenceMatcher(None, i.destination, trip.destination).ratio()
-                if (ratio >= 0.5):
+                if (ratio >= site_settings.additional_pickup_fuzziness):
                     additional_pickups.append((i, ratio))
 
     context = {

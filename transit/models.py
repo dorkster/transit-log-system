@@ -1044,6 +1044,7 @@ class SiteSettings(SingletonModel):
     pretrip_warning_threshold = models.IntegerField(default=14)
     page_title = models.CharField(max_length=FieldSizes.LG, blank=True)
     short_page_title = models.CharField(max_length=FieldSizes.MD, blank=True)
+    additional_pickup_fuzziness = models.FloatField(default=0.6)
 
     def get_color(self, context):
         if context == self.COLOR_ACTIVITY:

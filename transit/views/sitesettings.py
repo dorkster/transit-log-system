@@ -43,6 +43,7 @@ def sitesettingsEdit(request):
             settings.reset_filter_on_shift_change = form.cleaned_data['reset_filter_on_shift_change']
             settings.skip_weekends = form.cleaned_data['skip_weekends']
             settings.pretrip_warning_threshold = form.cleaned_data['pretrip_warning_threshold']
+            settings.additional_pickup_fuzziness = form.cleaned_data['additional_pickup_fuzziness']
             if request.user.is_superuser:
                 settings.page_title = form.cleaned_data['page_title']
                 settings.short_page_title = form.cleaned_data['short_page_title']
@@ -58,6 +59,7 @@ def sitesettingsEdit(request):
             'reset_filter_on_shift_change': settings.reset_filter_on_shift_change,
             'skip_weekends': settings.skip_weekends,
             'pretrip_warning_threshold': settings.pretrip_warning_threshold,
+            'additional_pickup_fuzziness': settings.additional_pickup_fuzziness,
             'page_title': settings.page_title,
             'short_page_title': settings.short_page_title,
         }

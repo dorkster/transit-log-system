@@ -99,6 +99,11 @@ class formWidgetAttrs():
     new_password = default.copy()
     new_password['autocomplete'] = 'new-password'
 
+    normalized_float = default.copy()
+    normalized_float['min'] = '0'
+    normalized_float['max'] = '1.0'
+    normalized_float['step'] = '0.1'
+
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
 
@@ -370,6 +375,7 @@ class SiteSettingsForm(forms.Form):
     pretrip_warning_threshold = forms.IntegerField(min_value=0, label='Pre-Trip Warning Threshold', help_text='If a vehicle has gone X days without a pre-trip inspection, a warning notification will be displayed. Set it to 0 to disable the warning altogether.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    additional_pickup_fuzziness = forms.FloatField(label='Additional Pickup/Drop-off Fuzziness', help_text='This determines how similar addresses can be when suggesting additional pickups/drop-offs, with 1 meaning that the addresses must match exactly.', widget=forms.NumberInput(attrs=formWidgetAttrs.normalized_float))
 
 class EditUserForm(forms.Form):
     USER_ACCOUNT_TYPES = [

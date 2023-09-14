@@ -554,14 +554,17 @@ def tripStart(request, id):
 
     site_settings = SiteSettings.load()
     additional_pickups = []
+    additional_pickups_fuzzy = []
     if trip.address != '':
         for i in all_trips:
             if i.id == trip.id:
                 continue
             if i.start_miles == '' and i.start_time == '':
                 ratio = SequenceMatcher(None, i.address, trip.address).ratio()
-                if (ratio >= site_settings.additional_pickup_fuzziness):
-                    additional_pickups.append((i, ratio))
+                if ratio >= 1:
+                    additional_pickups.append(i)
+                elif ratio >= site_settings.additional_pickup_fuzziness:
+                    additional_pickups_fuzzy.append(i)
 
     driver_vehicle_pairs = {}
     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
@@ -591,6 +594,7 @@ def tripStart(request, id):
         'start_miles': start_miles,
         'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,
+        'additional_pickups_fuzzy': additional_pickups_fuzzy,
         'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
     }
 
@@ -646,14 +650,17 @@ def tripEnd(request, id):
 
     site_settings = SiteSettings.load()
     additional_pickups = []
+    additional_pickups_fuzzy = []
     if trip.destination != '':
         for i in all_trips:
             if i.id == trip.id:
                 continue
             if i.end_miles == '' and i.end_time == '':
                 ratio = SequenceMatcher(None, i.destination, trip.destination).ratio()
-                if (ratio >= site_settings.additional_pickup_fuzziness):
-                    additional_pickups.append((i, ratio))
+                if ratio >= 1:
+                    additional_pickups.append(i)
+                elif ratio >= site_settings.additional_pickup_fuzziness:
+                    additional_pickups_fuzzy.append(i)
 
     context = {
         'form': form,
@@ -661,6 +668,7 @@ def tripEnd(request, id):
         'start_miles': start_miles,
         'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,
+        'additional_pickups_fuzzy': additional_pickups_fuzzy,
     }
 
     return render(request, 'trip/end.html', context)

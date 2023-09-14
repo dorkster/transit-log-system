@@ -51,19 +51,37 @@
                 </fieldset>
             </div>
         </div>
-        {% if additional_pickups %}
+        {% if additional_pickups or additional_pickups_fuzzy %}
         <hr/>
         <h3>More pick-ups at:<br/>
             <span class="badge badge-secondary text-wrap text-left">{{ trip.address }}</span>
         </h3>
         <div class="list-group">
+            {% if not additional_pickups %}
+            <div class="list-group-item list-group-item-light">
+                No exact matches found
+            </div>
+            {% endif %}
             {% for pickup in additional_pickups %}
-            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.0.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.0.id }}')" data-id="{{ pickup.0.id }}">
-                <h5>{{ pickup.0.name }}</h5>
-                {% if pickup.1 < 1 %}From: {{ pickup.0.address }}<br/>{%endif%}
-                To: <strong>{{ pickup.0.destination }}</strong>
+            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.id }}')" data-id="{{ pickup.id }}">
+                <h5>{{ pickup.name }}</h5>
+                To: <strong>{{ pickup.destination }}</strong>
             </a>
             {% endfor %}
+            {% if additional_pickups_fuzzy %}
+            <a href="#additional_pickups_fuzzy" class="list-group-item list-group-item-action list-group-item-secondary pt-3 pb-3" style="font-size: 1.20rem;" data-toggle="collapse">
+                <span class="oi oi-chevron-bottom mr-2 float-right"></span>Show more pickups at similar addresses
+            </a>
+            <div class="collapse" id="additional_pickups_fuzzy">
+            {% for pickup in additional_pickups_fuzzy %}
+            <a href="#_" class="list-group-item list-group-item-action" id="additional_pickup_{{ pickup.id }}" onclick="toggleAdditionalPickup('additional_pickup_{{ pickup.id }}')" data-id="{{ pickup.id }}">
+                <h5>{{ pickup.name }}</h5>
+                From: <strong>{{ pickup.address }}</strong><br/>
+                To: <strong>{{ pickup.destination }}</strong>
+            </a>
+            {% endfor %}
+            </div>
+            {% endif %}
         </div>
         {% endif %}
         <hr/>

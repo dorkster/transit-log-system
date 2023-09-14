@@ -102,7 +102,7 @@ class formWidgetAttrs():
     normalized_float = default.copy()
     normalized_float['min'] = '0'
     normalized_float['max'] = '1.0'
-    normalized_float['step'] = '0.1'
+    normalized_float['step'] = '0.01'
 
 class DatePickerForm(forms.Form):
     date = forms.DateField(label='', widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))

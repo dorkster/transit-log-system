@@ -55,6 +55,7 @@ def searchGetTrips(request):
     tags = request.GET.get('tags')
     status = request.GET.get('status')
     volunteer = request.GET.get('volunteer')
+    sort_mode = request.GET.get('sort_mode')
 
     trips = Trip.objects.all()
     searched = False
@@ -220,7 +221,15 @@ def searchGetTrips(request):
         elif status == '2':
             trips = trips.filter(status=Trip.STATUS_NO_SHOW)
 
-    return (searched, trips.order_by('-date', '-sort_index'))
+    if sort_mode:
+        if sort_mode == '0':
+            trips = trips.order_by('-date', '-sort_index')
+        elif sort_mode == '1':
+            trips = trips.order_by('date', 'sort_index')
+    else:
+        trips = trips.order_by('-date', '-sort_index')
+
+    return (searched, trips)
 
 @permission_required(['transit.view_trip'])
 def search(request):

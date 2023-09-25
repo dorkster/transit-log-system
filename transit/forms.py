@@ -364,6 +364,8 @@ class SearchTripsForm(forms.Form):
     ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    sort_mode = forms.IntegerField(label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Date - Descending'), (1, 'Date - Ascending'))))
+
 
 class SiteSettingsForm(forms.Form):
     activity_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.color))

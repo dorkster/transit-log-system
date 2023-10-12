@@ -665,7 +665,7 @@ class Report():
                         if i.driver and i.vehicle and i.vehicle.is_logged:
                             found_shift = False
                             for test_shift in all_shifts_list:
-                                if test_shift.driver == i.driver and test_shift.vehicle == test_shift.vehicle and i.date == test_shift.date:
+                                if test_shift.driver == i.driver and test_shift.vehicle == i.vehicle and test_shift.date == i.date:
                                     found_shift = True
                                     break
                             if not found_shift:

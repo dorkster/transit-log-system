@@ -335,7 +335,7 @@ def searchExportXLSX(request):
 
     # number formats
     for i in range(row_header + 1, row_header + trip_count + 1):
-        ws_results.cell(i, 1).number_format = 'MMM DD, YYYY'
+        ws_results.cell(i, 1).number_format = 'mmm dd, yyyy'
         ws_results.cell(i, 15).number_format = '$0.00'
         ws_results.cell(i, 16).number_format = '$0.00'
 

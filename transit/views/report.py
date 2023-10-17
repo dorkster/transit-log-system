@@ -1453,7 +1453,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     # number formats
     for i in range(row_header + 1, row_total + 1):
         if i < row_total:
-            ws_vehicle_total.cell(i, 1).number_format = 'MMM DD, YYYY'
+            ws_vehicle_total.cell(i, 1).number_format = 'mmm dd, yyyy'
         ws_vehicle_total.cell(i, 2).number_format = '0.0'
         ws_vehicle_total.cell(i, 3).number_format = '0.00'
         ws_vehicle_total.cell(i, 4).number_format = '0.0'
@@ -1560,7 +1560,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         # number formats
         for i in range(row_header + 1, row_total + 1):
             if i < row_total:
-                ws_vehicle.cell(i, 1).number_format = 'MMM DD, YYYY'
+                ws_vehicle.cell(i, 1).number_format = 'mmm dd, yyyy'
             ws_vehicle.cell(i, 2).number_format = '0.0'
             ws_vehicle.cell(i, 3).number_format = '0.00'
             ws_vehicle.cell(i, 4).number_format = '0.0'
@@ -1905,7 +1905,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     # number formats
     for i in range(row_header + 1, row_total + 1):
         if i < row_total:
-            ws_fares_by_date.cell(i, 1).number_format = 'MMM DD, YYYY'
+            ws_fares_by_date.cell(i, 1).number_format = 'mmm dd, yyyy'
         for j in range(2,8):
             ws_fares_by_date.cell(i, j).number_format = '$0.00'
 
@@ -1951,7 +1951,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     # number formats
     for i in range(row_header + 1, row_total + 1):
         if i < row_total:
-            ws_money.cell(i, 1).number_format = 'MMM DD, YYYY'
+            ws_money.cell(i, 1).number_format = 'mmm dd, yyyy'
         ws_money.cell(i, 3).number_format = '$0.00'
         ws_money.cell(i, 4).number_format = '$0.00'
 
@@ -1999,7 +1999,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     # number formats
     for i in range(row_header + 1, row_total + 1):
         if i < row_total:
-            ws_payments.cell(i, 1).number_format = 'MMM DD, YYYY'
+            ws_payments.cell(i, 1).number_format = 'mmm dd, yyyy'
         ws_payments.cell(i, 3).number_format = '$0.00'
         ws_payments.cell(i, 4).number_format = '$0.00'
 

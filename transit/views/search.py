@@ -238,11 +238,22 @@ def search(request):
     trips = results[1]
 
     results_per_page = 25
+    try:
+        results_per_page = int(request.GET.get('results_per_page'))
+        if results_per_page == 0:
+            results_per_page = 25
+    except:
+        pass
 
     result_pages = Paginator(trips, results_per_page)
     results_paginated = result_pages.get_page(request.GET.get('page'))
 
     page_ranges = get_paginated_ranges(page=results_paginated, page_range=5, items_per_page=results_per_page)
+
+    try:
+        column_layout = int(request.GET.get('column_layout'))
+    except:
+        column_layout = 0
 
     form = SearchTripsForm(request.GET)
     context = {
@@ -252,6 +263,7 @@ def search(request):
         'page_ranges': page_ranges,
         'query_string': request.GET.urlencode(),
         'Trip': Trip,
+        'column_layout': column_layout,
     }
     return render(request, 'search.html', context=context)
 

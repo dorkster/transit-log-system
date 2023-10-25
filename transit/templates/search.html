@@ -4,7 +4,13 @@
 {% endblock %}
 
 {% block auth_content %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'transit/css/search/print.css' %}">
+{% endblock %}
+
 <h2>Search for Trips</h2>
+<div class="search-form">
 <form class="mb-4" action="" method="get" onsubmit="return checkForm(this, event);">
     <div class="container ml-0">
         <div class="row">
@@ -37,6 +43,8 @@
             </div>
             <div class="col-md border m-1 p-2">
                 <div class="mb-2"><label for="{{ form.sort_mode.id_for_label }}"><strong>{{ form.sort_mode.label }}</strong></label><br/>{{ form.sort_mode }}</div>
+                <div class="mb-2"><label for="{{ form.column_layout.id_for_label }}"><strong>{{ form.column_layout.label }}</strong></label><br/>{{ form.column_layout }}</div>
+                <div class="mb-2"><label for="{{ form.results_per_page.id_for_label }}"><strong>{{ form.results_per_page.label }}</strong></label><br/>{{ form.results_per_page }}</div>
             </div>
         </div>
         <button class="btn btn-success btn-lg mt-4" type="submit" name="search"><span class="oi oi-magnifying-glass mr-2"></span>Search</button>
@@ -44,31 +52,41 @@
 </form>
 {% if results %}
 <hr/>
-<a class="btn btn-primary mb-3" href="{% url 'search-xlsx' %}?{{ query_string }}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+<div class="mb-3">
+<a class="btn btn-primary" href="{% url 'search-xlsx' %}?{{ query_string }}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+<button class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</button>
+</div>
+</div>
 <table class="mytable mytable-striped">
     <thead>
         {% if perms.transit.change_trip %}
         <td></td>
         {% endif %}
         <td>Date</td>
+        {% if column_layout < 2 %}
         <td>Pick up</td>
         <td>Appt. Time</td>
+        {% endif %}
         <td>Name</td>
         <td>Address</td>
         <td>Destination</td>
+        {% if column_layout < 2 %}
         <td>Driver</td>
         <td>Vehicle</td>
         <td>Start Miles</td>
         <td>Start Time</td>
         <td>End Miles</td>
         <td>End Time</td>
+        {% endif %}
         <td>Notes</td>
+        {% if column_layout == 0 %}
         <td>Reminder Instructions</td>
         <td>Trip Type / Tags</td>
         <td>Fare</td>
         <td>Money Collected</td>
         <td>Elderly?</td>
         <td>Ambulatory?</td>
+        {% endif %}
     </thead>
 {% for trip in results %}
 <tr style="{{ trip.get_driver_style }}">
@@ -79,7 +97,7 @@
         <td class="mytable-col-md"><a href="{% url 'schedule' 'read-only' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% endif %}
         {% if trip.format == Trip.FORMAT_ACTIVITY %}
-        <td colspan="2" class="text-center">
+        <td colspan="{% if column_layout < 2 %}2{% else %}1{% endif %}" class="text-center">
             {% if trip.pick_up_time and trip.appointment_time %}
             {{ trip.pick_up_time }} - {{ trip.appointment_time }}
             {% elif trip.pick_up_time %}
@@ -99,11 +117,14 @@
             {{ trip.note }}
         </td>
         {% else %}
+        {% if column_layout < 2 %}
         <td class="mytable-col-sm">{{trip.pick_up_time}}</td>
         <td class="mytable-col-sm">{{trip.appointment_time}}</td>
+        {% endif %}
         <td class="mytable-col-lg">{{trip.name}}</td>
         <td class="mytable-col-lg">{{trip.address}}</td>
         <td class="mytable-col-lg">{{trip.destination}}</td>
+        {% if column_layout < 2 %}
         <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>
         <td class="mytable-col-md">{% if trip.vehicle %}{{trip.vehicle}}{% endif %}</td>
         <td class="mytable-col-sm">
@@ -134,13 +155,15 @@
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
-        <td class="mytable-col-md">
+        {% endif %}
+        <td class="mytable-col-lg">
             {{ trip.note }}
             {% if trip.volunteer %}
             {% if trip.note %}<br/>{% endif %}
             <span class="badge badge-secondary mr-1">Volunteer</span>{{ trip.volunteer.verbose_name }}
             {% endif %}
         </td>
+        {% if column_layout == 0 %}
         <td class="mytable-col-md">
             {{ trip.reminder_instructions }}
         </td>
@@ -195,6 +218,7 @@
             <span class="oi oi-x"></span>
             {% endif %}
         </td>
+        {% endif %}
         {% endif %}
 </tr>
 {% endfor %}

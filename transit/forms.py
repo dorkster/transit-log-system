@@ -365,6 +365,8 @@ class SearchTripsForm(forms.Form):
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     sort_mode = forms.IntegerField(label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Date - Descending'), (1, 'Date - Ascending'))))
+    column_layout = forms.IntegerField(label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Show All'), (1, 'Standard'), (2, 'Volunteer Report'))))
+    results_per_page = forms.IntegerField(label='Results per Page', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((25, '25'), (50, '50'), (100, '100'), (200, '200'))))
 
 
 class SiteSettingsForm(forms.Form):

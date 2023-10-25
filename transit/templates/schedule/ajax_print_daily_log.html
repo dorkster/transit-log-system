@@ -75,6 +75,7 @@
             <p class="text-center text-muted small">Note: Rider counts are divided into three values: riders that have been on a vehicle at least once, those who haven't (e.g. deliveries), and a grand total.</p>
         </div>
     </div>
+    {% if not settings.simple_daily_logs %}
     <div class="row mb-3">
         <div class="col-md">
             Elderly Ambulatory riders
@@ -177,6 +178,7 @@
         </div>
     </div>
     {% endif %}
+    {% endif %}
     <div class="row mb-3">
         <div class="col-md">
             <strong>Total Riders</strong>
@@ -193,17 +195,18 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.total.total }}
+                <span class="text-bold">{{ report.unique_riders.total.total }}</span>
             </div>
         </div>
     </div>
     <hr/>
     <div class="row mb-4">
         <div class="col">
-            <h4 class="text-center">Types of Passenger Trips</h4>
+            <h4 class="text-center">Trips</h4>
             <p class="text-center text-muted small">Note: Trip counts are divided into three values: trips with passengers, trips without passengers, and a grand total.</p>
         </div>
     </div>
+    {% if not settings.simple_daily_logs %}
     <div class="row mb-3">
         <div class="col-md">
             Medical (Dr. appts., blood pressure clinic, podiatry, etc.)
@@ -341,6 +344,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     <div class="row mb-3">
         <div class="col-md">
             <strong>Total Trips</strong>
@@ -357,7 +361,7 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ trips_total.total }}
+                <span class="text-bold">{{ trips_total.total }}</span>
             </div>
         </div>
     </div>

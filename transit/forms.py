@@ -378,6 +378,7 @@ class SiteSettingsForm(forms.Form):
     page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     additional_pickup_fuzziness = forms.FloatField(label='Additional Pickup/Drop-off Fuzziness', help_text='This determines how similar addresses can be when suggesting additional pickups/drop-offs, with 1 meaning that the addresses must match exactly.', widget=forms.NumberInput(attrs=formWidgetAttrs.normalized_float))
+    simple_daily_logs = forms.BooleanField(label='Simple daily logs', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
 
 class EditUserForm(forms.Form):
     USER_ACCOUNT_TYPES = [

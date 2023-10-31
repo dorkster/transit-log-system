@@ -416,6 +416,29 @@
         </div>
     </div>
     {% endif %}
+    {% if drivers %}
+    <hr/>
+    {% for driver in drivers %}
+    <div class="row mb-3">
+        <div class="col">
+            <h5 class="mb-3">Name</h5>
+            <div class="blank-field">
+                {{ driver }}
+            </div>
+        </div>
+        <div class="col-7">
+            <h5 class="mb-3">Signature</h5>
+            <div class="blank-field">
+            </div>
+        </div>
+        <div class="col">
+            <h5 class="mb-3">Date</h5>
+            <div class="blank-field">
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 {% else %}
 <p>There are no completed shifts for this day.</p>
 {% endif %}

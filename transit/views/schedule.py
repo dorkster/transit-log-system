@@ -560,6 +560,12 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
     # don't include employment/education in Other total
     trips_other = trips_other - trips_employment
 
+    drivers = []
+    for shift in shifts:
+        if current_shift == None or current_shift == shift:
+            if not shift.driver in drivers:
+                drivers.append(shift.driver)
+
     context = {
         'date': day_date,
         'shifts': shifts,
@@ -575,6 +581,7 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
         'money_check': money_check,
         'money_total': money_total,
         'trips_employment': trips_employment,
+        'drivers': drivers,
     }
 
     return render(request, 'schedule/ajax_print_daily_log.html', context)

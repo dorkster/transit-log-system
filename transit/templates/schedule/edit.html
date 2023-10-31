@@ -11,20 +11,25 @@
             <h3 class="alert alert-info text-dark p-1">{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h3>
         </div>
         <div class="col-auto p-1">
-            <a href="{% url 'report' date.year date.month date.day date.year date.month date.day %}" class="btn btn-info" title="View the report for this particular day">
-                    <span class="oi oi-graph mr-2"></span>Report
-            </a>
-        </div>
-        <div class="col-auto p-1">
             <span class="dropdown">
                 <a href="#_" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Print the schedule or daily log">
-                    <span class="oi oi-print mr-2"></span>Print
+                    <span class="oi oi-cog mr-2"></span>Tools
                 </a>
                 <div class="dropdown-menu shadow dropdown-menu-right">
-                    <a class="dropdown-item" href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank"><span class="oi oi-spreadsheet mr-2"></span>Print Schedule</a>
-                    <a class="dropdown-item" href="{% url 'schedule-print-simple' date.year date.month date.day %}" target="_blank"><span class="oi oi-spreadsheet mr-2"></span>Print Schedule (Simple)</a>
+                    <h5 class="pl-3 pr-3"><span class="oi oi-graph mr-2"></span>Reports</h5>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{% url 'schedule-print-daily-log' date.year date.month date.day %}" target="_blank"><span class="oi oi-clock mr-2"></span>Print Daily Logs</a>
+                    <a class="dropdown-item" href="{% url 'report' date.year date.month date.day date.year date.month date.day %}"><span class="oi oi-target mr-2"></span>Daily Report: <strong>{{ date|date:"F d, Y" }}</strong></a>
+                    <a class="dropdown-item" href="{% url 'report-month' date.year date.month %}"><span class="oi oi-calendar mr-2"></span>Monthly Report: <strong>{{ date|date:"F Y" }}</strong></a>
+                    <h5 class="pl-3 pr-3 mt-3"><span class="oi oi-print mr-2"></span>Print</h5>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank"><span class="oi oi-spreadsheet mr-2"></span>Print Schedule</a>
+                    <a class="dropdown-item" href="{% url 'schedule-print-simple' date.year date.month date.day %}" target="_blank"><span class="oi oi-list mr-2"></span>Print Schedule (Simple)</a>
+                    <a class="dropdown-item" href="{% url 'schedule-print-daily-log' date.year date.month date.day %}" target="_blank"><span class="oi oi-clock mr-2"></span>Print Daily Log</a>
+                    {% if perms.transit.change_vehicle %}
+                    <h5 class="pl-3 pr-3 mt-3"><span class="oi oi-magnifying-glass mr-2"></span>View Mode</h5>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'schedule' 'view' date.year date.month date.day %}"><span class="oi oi-task mr-2"></span>Switch to <strong>Driver View</strong></a>
+                    {% endif %}
                 </div>
             </span>
         </div>
@@ -63,11 +68,6 @@
                 </a>
             </div>
         </div>
-        {% if perms.transit.change_vehicle %}
-        <div class="col-auto p-1">
-            <a href="{% url 'schedule' 'view' date.year date.month date.day %}" class="btn btn-info" title="Switch to the drivers' view"><span class="oi oi-task mr-2"></span>View</a>
-        </div>
-        {% endif %}
     </div>
 </div>
 <hr/>

@@ -26,11 +26,11 @@
                 </div>
             </span>
         </div>
-        {% endif %}
         {% if not current_shift %}
         <div class="col-auto p-1" id="print-shiftselect">
             <div class="alert alert-warning p-2 small"><span class="oi oi-arrow-left mr-2"></span>View a single shift</div>
         </div>
+        {% endif %}
         {% endif %}
         <div class="col-auto p-1" id="print-print">
             <button class="btn btn-info" onclick="window.print()"><span class="oi oi-print mr-2"></span>Print</button>

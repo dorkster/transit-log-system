@@ -1,9 +1,9 @@
 <div class="container-fluid">
     <div class="row justify-content-between">
-        <div class="col-md p-1">
+        <div class="col p-1">
             <h5>{{ date|date:"l"}}, <strong>{{ date|date:"F d" }}</strong>, {{ date|date:"Y" }}</h5>
         </div>
-        <div class="col-md p-1">
+        <div class="col p-1">
             <h5>Van Daily Log</h5>
         </div>
         {% if shifts %}
@@ -79,7 +79,7 @@
     </div>
     {% if not settings.simple_daily_logs %}
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Elderly Ambulatory riders
         </div>
         <div class="col-1">
@@ -99,7 +99,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Elderly Non-Ambulatory riders (wheel chair)
         </div>
         <div class="col-1">
@@ -119,7 +119,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Non-Elderly Ambulatory riders
         </div>
         <div class="col-1">
@@ -139,7 +139,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Non-Elderly Non-Ambulatory riders (wheel chair)
         </div>
         <div class="col-1">
@@ -160,7 +160,7 @@
     </div>
     {% if report.unique_riders.unknown.total > 0 %}
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Unknown riders (missing data)
         </div>
         <div class="col-1">
@@ -182,7 +182,7 @@
     {% endif %}
     {% endif %}
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             <strong>Total Riders</strong>
         </div>
         <div class="col-1">
@@ -210,7 +210,7 @@
     </div>
     {% if not settings.simple_daily_logs %}
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Medical (Dr. appts., blood pressure clinic, podiatry, etc.)
         </div>
         <div class="col-1">
@@ -230,7 +230,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Employment
         </div>
         <div class="col-1">
@@ -250,7 +250,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Nutrition (meal site, food pantry)
         </div>
         <div class="col-1">
@@ -270,7 +270,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Social/Recreation (adult day health, movie, lunch bunch)
         </div>
         <div class="col-1">
@@ -290,7 +290,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Education (talks, SHINE, lawyer, tax, classes)
         </div>
         <div class="col-1">
@@ -307,7 +307,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Shopping (groceries, etc.)
         </div>
         <div class="col-1">
@@ -327,7 +327,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Other (errands, barber/hairdresser, bank, etc.)
         </div>
         <div class="col-1">
@@ -348,7 +348,7 @@
     </div>
     {% endif %}
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             <strong>Total Trips</strong>
         </div>
         <div class="col-1">
@@ -374,7 +374,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Total Cash Collected
         </div>
         <div class="col-3">
@@ -384,7 +384,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Total Checks Collected
         </div>
         <div class="col-3">
@@ -394,7 +394,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md">
+        <div class="col">
             Total Both Cash &amp; Checks Collected
         </div>
         <div class="col-3">

@@ -363,6 +363,7 @@ class SearchTripsForm(forms.Form):
     elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
+    passenger = forms.IntegerField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((None, '---------'), (0, 'Yes'), (1, 'No'))))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     sort_mode = forms.IntegerField(label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Date - Descending'), (1, 'Date - Ascending'))))
     column_layout = forms.IntegerField(label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Show All'), (1, 'Standard'), (2, 'Volunteer Report'))))

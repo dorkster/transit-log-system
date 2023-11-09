@@ -54,6 +54,7 @@ def searchGetTrips(request):
     trip_type = request.GET.get('trip_type')
     tags = request.GET.get('tags')
     status = request.GET.get('status')
+    passenger = request.GET.get('passenger')
     volunteer = request.GET.get('volunteer')
     sort_mode = request.GET.get('sort_mode')
 
@@ -221,6 +222,13 @@ def searchGetTrips(request):
         elif status == '2':
             trips = trips.filter(status=Trip.STATUS_NO_SHOW)
 
+    if passenger:
+        searched = True
+        if passenger == '0':
+            trips = trips.filter(passenger=True)
+        elif passenger == '1':
+            trips = trips.filter(passenger=False, format=Trip.FORMAT_NORMAL)
+
     if sort_mode:
         if sort_mode == '0':
             trips = trips.order_by('-date', '-sort_index')
@@ -311,10 +319,11 @@ def searchExportXLSX(request):
     ws_results.cell(row_header, 12, 'End Time')
     ws_results.cell(row_header, 13, 'Notes')
     ws_results.cell(row_header, 14, 'Trip Type / Tags')
-    ws_results.cell(row_header, 15, 'Fare')
-    ws_results.cell(row_header, 16, 'Money Collected')
-    ws_results.cell(row_header, 17, 'Elderly?')
-    ws_results.cell(row_header, 18, 'Ambulatory?')
+    ws_results.cell(row_header, 15, 'Passenger on vehicle?')
+    ws_results.cell(row_header, 16, 'Fare')
+    ws_results.cell(row_header, 17, 'Money Collected')
+    ws_results.cell(row_header, 18, 'Elderly?')
+    ws_results.cell(row_header, 19, 'Ambulatory?')
 
     for i in range(0, trip_count):
         ws_results.cell(row_header + i + 1, 1, trips[i].date)
@@ -340,20 +349,21 @@ def searchExportXLSX(request):
         if trips[i].tags:
             tags_string += trips[i].tags
         ws_results.cell(row_header + i + 1, 14, tags_string)
-        ws_results.cell(row_header + i + 1, 15, trips[i].fare / 100)
-        ws_results.cell(row_header + i + 1, 16, (trips[i].collected_cash + trips[i].collected_check) / 100)
-        ws_results.cell(row_header + i + 1, 17, trips[i].elderly)
-        ws_results.cell(row_header + i + 1, 18, trips[i].ambulatory)
+        ws_results.cell(row_header + i + 1, 15, trips[i].passenger)
+        ws_results.cell(row_header + i + 1, 16, trips[i].fare / 100)
+        ws_results.cell(row_header + i + 1, 17, (trips[i].collected_cash + trips[i].collected_check) / 100)
+        ws_results.cell(row_header + i + 1, 18, trips[i].elderly)
+        ws_results.cell(row_header + i + 1, 19, trips[i].ambulatory)
 
     # number formats
     for i in range(row_header + 1, row_header + trip_count + 1):
         ws_results.cell(i, 1).number_format = 'mmm dd, yyyy'
-        ws_results.cell(i, 15).number_format = '$0.00'
         ws_results.cell(i, 16).number_format = '$0.00'
+        ws_results.cell(i, 17).number_format = '$0.00'
 
     # apply styles
     ws_results.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 19):
+    for i in range(1, 20):
         if i == 4 or i == 13 or i == 14:
             ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         elif i == 5 or i == 6:

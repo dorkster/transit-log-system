@@ -73,14 +73,27 @@
     <hr/>
     <div class="row mb-4">
         <div class="col">
-            <h4 class="text-center">Riders</h4>
-            <p class="text-center text-muted small">Note: Rider counts are divided into three values: riders that have been on a vehicle at least once, those who haven't (e.g. deliveries), and a grand total.</p>
+            <h4 class="text-center">Clients</h4>
+            <p class="text-center text-muted small">Note: Client counts are divided into three values: clients that have been on a vehicle at least once, those who haven't (e.g. deliveries), and a grand total.</p>
+        </div>
+    </div>
+    <div class="row mb-3 text-center" style="line-height: 1em;">
+        <div class="col">
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">On vehicle</span>
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">Not on vehicle</span>
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">Total</span>
         </div>
     </div>
     {% if not settings.simple_daily_logs %}
     <div class="row mb-3">
         <div class="col">
-            Elderly Ambulatory riders
+            Elderly Ambulatory clients
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -100,7 +113,7 @@
     </div>
     <div class="row mb-3">
         <div class="col">
-            Elderly Non-Ambulatory riders (wheel chair)
+            Elderly Non-Ambulatory clients (wheel chair)
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -120,7 +133,7 @@
     </div>
     <div class="row mb-3">
         <div class="col">
-            Non-Elderly Ambulatory riders
+            Non-Elderly Ambulatory clients
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -140,7 +153,7 @@
     </div>
     <div class="row mb-3">
         <div class="col">
-            Non-Elderly Non-Ambulatory riders (wheel chair)
+            Non-Elderly Non-Ambulatory clients (wheel chair)
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -161,7 +174,7 @@
     {% if report.unique_riders.unknown.total > 0 %}
     <div class="row mb-3">
         <div class="col">
-            Unknown riders (missing data)
+            Unknown clients (missing data)
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -183,7 +196,7 @@
     {% endif %}
     <div class="row mb-3">
         <div class="col">
-            <strong>Total Riders</strong>
+            <strong>Total Clients</strong>
         </div>
         <div class="col-1">
             <div class="blank-field">
@@ -206,6 +219,19 @@
         <div class="col">
             <h4 class="text-center">Trips</h4>
             <p class="text-center text-muted small">Note: Trip counts are divided into three values: trips with passengers, trips without passengers, and a grand total.</p>
+        </div>
+    </div>
+    <div class="row mb-3 text-center" style="line-height: 1em;">
+        <div class="col">
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">On vehicle</span>
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">Not on vehicle</span>
+        </div>
+        <div class="col-1">
+            <span class="text-muted small">Total</span>
         </div>
     </div>
     {% if not settings.simple_daily_logs %}

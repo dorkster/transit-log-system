@@ -711,7 +711,7 @@ class Report():
                         if report_trip.start_miles < shift.start_miles:
                             mile_error = False
                             if report_trip.start_miles.mergeStrings(str(shift.end_miles), i.start_miles) == 0:
-                                if report_trip.start_miles < shift.start_miles:
+                                if report_trip.start_miles < shift.start_miles or report_trip.start_miles > shift.end_miles:
                                     mile_error = True
                             else:
                                 mile_error = True
@@ -721,7 +721,7 @@ class Report():
                         if report_trip.end_miles > shift.end_miles:
                             mile_error = False
                             if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
-                                if report_trip.end_miles > shift.end_miles:
+                                if report_trip.end_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
                                     mile_error = True
                             else:
                                 mile_error = True
@@ -731,7 +731,7 @@ class Report():
                     elif report_trip.start_miles > report_trip.end_miles:
                         mile_error = False
                         if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
-                            if report_trip.start_miles > report_trip.end_miles:
+                            if report_trip.start_miles > report_trip.end_miles or report_trip.end_miles > shift.end_miles:
                                 mile_error = True
                         else:
                             mile_error = True

@@ -90,18 +90,26 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.SHIFT, str(shift))
 
+            # when updating trips that match the previous info, we only want to do so when there is a single matching shift
+            # for example: if there are 2 shifts with the same driver & vehicle, and we update the second, we want to keep the trips "assigned" to the first shift
+            prev_shift_matches = Shift.objects.filter(date=shift.date, driver=prev['driver'], vehicle=prev['vehicle'])
+            prev_shift_match_count = len(prev_shift_matches)
+
             new_day_trips = Trip.objects.filter(date=shift.date)
             for trip in new_day_trips:
                 if trip.driver is None and trip.vehicle is None:
                     continue
 
-                if trip.driver == prev['driver'] and trip.vehicle == prev['vehicle']:
+                if trip.driver == prev['driver'] and trip.vehicle == prev['vehicle'] and prev_shift_match_count < 1:
                     trip.driver = shift.driver
                     trip.vehicle = shift.vehicle
                 elif trip.driver is None and trip.vehicle == shift.vehicle:
                     trip.driver = shift.driver
                 elif trip.vehicle is None and trip.driver == shift.driver:
                     trip.vehicle = shift.vehicle
+                else:
+                    # no changes, don't save the trip
+                    continue
 
                 trip.save()
 

@@ -16,7 +16,11 @@
                     <div>
                         <span class="text-muted small">{{ trip.date }}</span><br/>
                         <span class="badge badge-light border text-muted text-wrap text-left"><span class="oi oi-home mr-2"></span><strong>{{ trip.address }}</strong></span><br/>
-                        <span class="badge badge-success border border-success text-wrap text-left"><span class="oi oi-arrow-right mr-2"></span><strong>{{ trip.destination }}</strong></span>
+                        <span class="badge badge-success border border-success text-wrap text-left"><span class="oi oi-arrow-right mr-2"></span><strong><span id="trip_dest_badge">{{ trip.destination }}</span></strong></span>
+                        <div class="mt-4">
+                            {{ form.home_drop_off }}
+                            <a id="home_drop_off_btn" class="btn btn-outline-dark mt-1 mb-1" href="#_" onclick="toggleHomeDropOff(this, '{{trip.destination}}', '{{client.address}}');"><span class="oi oi-circle-x mr-2"></span>Drop off at home?</a>
+                        </div>
                     </div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.miles.id_for_label }}"><strong>{{ form.miles.label }}</strong></label><br/>{{ form.miles }}</div>
@@ -52,7 +56,7 @@
         {% if additional_pickups or additional_pickups_fuzzy %}
         <hr/>
         <h3>More drop-offs at:<br/>
-            <span class="badge badge-secondary text-wrap text-left">{{ trip.destination }}</span>
+            <span id="additional_trips_dest" class="badge badge-secondary text-wrap text-left">{{ trip.destination }}</span>
         </h3>
         <div class="list-group">
             {% if not additional_pickups %}

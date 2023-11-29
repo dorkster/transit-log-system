@@ -185,3 +185,42 @@ function onDriverChange() {
     }
 }
 
+function toggleHomeDropOff(btn, trip_destination, client_address) {
+    var field = document.getElementById("id_home_drop_off");
+    var trip_dest_badge = document.getElementById("trip_dest_badge");
+    var additional_trips_dest = document.getElementById("additional_trips_dest");
+
+    if (field) {
+        if (field.value == "False") {
+            if (confirm("Change destination to '" + client_address + "'?") == true) {
+                field.value = "True";
+                btn.classList.remove("btn-outline-dark");
+                btn.classList.add("btn-primary");
+                btn.firstChild.classList.remove("oi-circle-x");
+                btn.firstChild.classList.add("oi-circle-check");
+
+                if (trip_dest_badge) {
+                    trip_dest_badge.innerHTML = client_address;
+                }
+                if (additional_trips_dest) {
+                    additional_trips_dest.innerHTML = client_address;
+                }
+            }
+        }
+        else {
+            field.value = "False";
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-outline-dark");
+            btn.firstChild.classList.remove("oi-circle-check");
+            btn.firstChild.classList.add("oi-circle-x");
+
+            if (trip_dest_badge) {
+                trip_dest_badge.innerHTML = trip_destination;
+            }
+            if (additional_trips_dest) {
+                additional_trips_dest.innerHTML = trip_destination;
+            }
+        }
+    }
+}
+

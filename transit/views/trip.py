@@ -610,6 +610,12 @@ def tripEnd(request, id):
     all_trips = Trip.objects.filter(date=trip.date, status=Trip.STATUS_NORMAL)
     getStartAndPrevMiles(date, start_miles, prev_miles, Vehicle.objects.filter(id=trip.vehicle.id, is_logged=True), all_trips)
 
+    clients = Client.objects.filter(name=trip.name)
+    if len(clients) == 1:
+        client = clients[0]
+    else:
+        client = None
+
     if request.method == 'POST':
         form = tripEndForm(request.POST)
 
@@ -621,6 +627,10 @@ def tripEnd(request, id):
             trip.end_time = form.cleaned_data['time']
             trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
             trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
+
+            if client and form.cleaned_data['home_drop_off'] == True:
+                trip.destination = client.address
+
             trip.save()
             log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(trip))
 
@@ -631,6 +641,10 @@ def tripEnd(request, id):
                         a_trip = Trip.objects.get(id=uuid.UUID(key))
                         a_trip.end_miles = form.cleaned_data['miles']
                         a_trip.end_time = form.cleaned_data['time']
+
+                        if client and form.cleaned_data['home_drop_off'] == True:
+                            a_trip.destination = client.address
+
                         a_trip.save()
                         log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(a_trip))
 
@@ -645,6 +659,7 @@ def tripEnd(request, id):
             'time': auto_time,
             'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
             'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
+            'home_drop_off': False,
         }
         form = tripEndForm(initial=initial)
 
@@ -665,6 +680,7 @@ def tripEnd(request, id):
     context = {
         'form': form,
         'trip': trip,
+        'client': client,
         'start_miles': start_miles,
         'prev_miles': prev_miles,
         'additional_pickups': additional_pickups,

@@ -185,6 +185,7 @@ class tripEndForm(forms.Form):
     collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
     additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
+    home_drop_off = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
 class EditClientForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.name))

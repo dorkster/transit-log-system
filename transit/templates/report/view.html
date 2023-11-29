@@ -1042,6 +1042,15 @@
             <td class="mytable-col-sm {% if d.totals.total_hours == 0 %}mytable-zero{%endif%}">{{d.totals.total_hours|floatformat:2}}</td>
         </tr>
         {% endfor %}
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.service_miles == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.service_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.service_hours == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.service_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.deadhead_miles == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.deadhead_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.deadhead_hours == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.deadhead_hours|floatformat:2}}</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.total_miles == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.total_miles|floatformat:1}}</td>
+            <td class="mytable-col-sm {% if report.driver_reports_total.totals.total_hours == 0 %}mytable-zero{%endif%}">{{report.driver_reports_total.totals.total_hours|floatformat:2}}</td>
+        </tr>
     </table>
 </div>
 {% endif %}

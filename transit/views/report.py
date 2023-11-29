@@ -458,6 +458,7 @@ class Report():
         self.report_all = []
         self.vehicle_reports = []
         self.driver_reports = []
+        self.driver_reports_total = Report.ReportOutputDrivers()
         self.all_vehicles = Report.ReportSummary()
         self.unique_riders = Report.UniqueRiderSummary()
         self.money_trips = []
@@ -1030,6 +1031,9 @@ class Report():
                     if report_day.by_driver[driver_index] != None:
                         driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
                         driver_report.totals += report_day.by_driver[driver_index]
+
+        for driver_report in self.driver_reports:
+            self.driver_reports_total.totals += driver_report.totals
 
         for vehicle_report in self.vehicle_reports:
             if vehicle_report.end_miles >= vehicle_report.start_miles:
@@ -2027,6 +2031,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     #####
     ws_drivers = wb.create_sheet('Per-Driver Summary')
     row_header = 1
+    row_total = len(report.driver_reports) + 2
 
     ws_drivers.cell(row_header, 1, 'Driver')
     ws_drivers.cell(row_header, 2, 'Service Miles')
@@ -2035,6 +2040,14 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_drivers.cell(row_header, 5, 'Deadhead Hours')
     ws_drivers.cell(row_header, 6, 'Total Miles')
     ws_drivers.cell(row_header, 7, 'Total Hours')
+
+    ws_drivers.cell(row_total, 1, 'TOTAL')
+    ws_drivers.cell(row_total, 2, report.driver_reports_total.totals.service_miles)
+    ws_drivers.cell(row_total, 3, report.driver_reports_total.totals.service_hours)
+    ws_drivers.cell(row_total, 4, report.driver_reports_total.totals.deadhead_miles)
+    ws_drivers.cell(row_total, 5, report.driver_reports_total.totals.deadhead_hours)
+    ws_drivers.cell(row_total, 6, report.driver_reports_total.totals.total_miles)
+    ws_drivers.cell(row_total, 7, report.driver_reports_total.totals.total_hours)
 
     for i in range(0, len(report.driver_reports)):
         ws_drivers.cell(row_header + i + 1, 1, str(report.driver_reports[i].driver))
@@ -2046,7 +2059,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         ws_drivers.cell(row_header + i + 1, 7, report.driver_reports[i].totals.total_hours)
 
     # number formats
-    for i in range(row_header + 1, row_header + len(report.driver_reports) + 1):
+    for i in range(row_header + 1, row_header + row_total):
         ws_drivers.cell(i, 2).number_format = '0.0'
         ws_drivers.cell(i, 3).number_format = '0.00'
         ws_drivers.cell(i, 4).number_format = '0.0'
@@ -2058,12 +2071,15 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws_drivers.row_dimensions[row_header].height = style_rowheight_header
     for i in range(1, 8):
         ws_drivers.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
-        for j in range(row_header, row_header + len(report.driver_reports) + 1):
+        for j in range(row_header, row_header + row_total):
             ws_drivers.cell(j, i).border = style_border_normal
             if j == row_header:
                 ws_drivers.cell(j, i).font = style_font_header
                 ws_drivers.cell(j, i).alignment = style_alignment_header
                 ws_drivers.cell(j, i).fill = style_fill_header
+            elif j == row_total:
+                ws_drivers.cell(j, i).font = style_font_total
+                ws_drivers.cell(j, i).fill = style_fill_total
             else:
                 ws_drivers.cell(j, i).font = style_font_normal
                 style_fill_driver = PatternFill(fill_type='solid', fgColor=report.driver_reports[j - row_header - 1].driver.get_color())

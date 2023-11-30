@@ -708,8 +708,14 @@ class Report():
                     # TODO the above execptions add errors to the report without adding the trip to the various trip counts
                     # BUT, the below errors still count the trips where possible. Not sure which is preferable, but it's probably bad that both behaviors exist?
                     # NOTE For mileage, we also check for validity by comparing against merges of shift *end* mileage and trip mileage.
-                    if report_trip.start_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
-                        if report_trip.start_miles < shift.start_miles:
+
+                    # mileage error checking
+                    if report_trip.start_miles < shift.start_miles or report_trip.start_miles > shift.end_miles or report_trip.end_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
+                        # out-of-bounds
+                        mile_error = False
+
+                        # start mileage
+                        if report_trip.start_miles < shift.start_miles or report_trip.start_miles > shift.end_miles:
                             mile_error = False
                             if report_trip.start_miles.mergeStrings(str(shift.end_miles), i.start_miles) == 0:
                                 if report_trip.start_miles < shift.start_miles or report_trip.start_miles > shift.end_miles:
@@ -718,8 +724,9 @@ class Report():
                                 mile_error = True
                             if mile_error:
                                 report_trip.start_miles = shift.start_miles
-                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
-                        if report_trip.end_miles > shift.end_miles:
+
+                        # end mileage
+                        if report_trip.end_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
                             mile_error = False
                             if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
                                 if report_trip.end_miles < shift.start_miles or report_trip.end_miles > shift.end_miles:
@@ -728,7 +735,10 @@ class Report():
                                 mile_error = True
                             if mile_error:
                                 report_trip.end_miles = shift.end_miles
-                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+
+                        if mile_error:
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_OOB, error_shift=shift.shift, error_trip=i)
+                    # end > start
                     elif report_trip.start_miles > report_trip.end_miles:
                         mile_error = False
                         if report_trip.end_miles.mergeStrings(str(shift.end_miles), i.end_miles) == 0:
@@ -741,13 +751,16 @@ class Report():
                             report_trip.end_miles = shift.start_miles
                             self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_MILES_LESS, error_shift=shift.shift, error_trip=i)
 
+                    # time error checking
                     if report_trip.start_time and shift.start_time and report_trip.end_time and shift.end_time:
+                        # out-of-bounds
                         if report_trip.start_time < shift.start_time or report_trip.end_time > shift.end_time:
                             self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_OOB, error_shift=shift.shift, error_trip=i)
                             if report_trip.start_time < shift.start_time:
                                 report_trip.start_time = shift.start_time
                             if report_trip.end_time > shift.end_time:
                                 report_trip.end_time = shift.end_time
+                        # end > start
                         elif report_trip.start_time > report_trip.end_time:
                             self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_LESS, error_trip=i)
                             report_trip.start_time = shift.start_time

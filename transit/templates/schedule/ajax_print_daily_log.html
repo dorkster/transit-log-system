@@ -70,6 +70,21 @@
     </div>
     {% endif %}
     {% endfor %}
+    {% if report.report_errors.errors %}
+    <hr/>
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-center">Errors</h4>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            {% for error in report.report_errors.errors %}
+            <div class="text-bold text-danger mb-3">{% if error.error_shift %}{{error.error_shift.driver}} / {{error.error_shift.vehicle}}{%endif%}{% if error.error_trip and error.error_shift %} - {%endif%}{% if error.error_trip %}{{error.error_trip.name}} from {{error.error_trip.address}} to {{error.error_trip.destination}}{%endif%}<br/>{{ error.error_msg }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     <hr/>
     <div class="row mb-4">
         <div class="col">
@@ -429,21 +444,6 @@
             </div>
         </div>
     </div>
-    {% if report.report_errors.errors %}
-    <hr/>
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-center">Errors</h4>
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            {% for error in report.report_errors.errors %}
-            <div class="text-bold text-danger mb-3">{% if error.error_shift %}{{error.error_shift.driver}} / {{error.error_shift.vehicle}}{%endif%}{% if error.error_trip and error.error_shift %} - {%endif%}{% if error.error_trip %}{{error.error_trip.name}} from {{error.error_trip.address}} to {{error.error_trip.destination}}{%endif%}<br/>{{ error.error_msg }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
     {% if drivers %}
     <hr/>
     {% for driver in drivers %}

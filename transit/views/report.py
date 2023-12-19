@@ -636,17 +636,6 @@ class Report():
                     # skip trip with no driver/vehicle
                     continue
 
-                if log_status == Trip.LOG_INCOMPLETE:
-                    # skip incomplete trip
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
-                    continue
-
-                if not i.driver or not i.vehicle:
-                    # skip incomplete trip
-                    if i.driver and i.vehicle:
-                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
-                    continue
-
                 report_trip = Report.ReportTrip()
                 report_trip.trip = i
 
@@ -682,6 +671,17 @@ class Report():
 
                 shift = report_day.shifts[report_trip.shift]
 
+                if log_status == Trip.LOG_INCOMPLETE:
+                    # skip incomplete trip
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    continue
+
+                if not i.driver or not i.vehicle:
+                    # skip incomplete trip
+                    if i.driver and i.vehicle:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    continue
+
                 # don't include trip if matching shift is incomplete
                 if log_status == Trip.LOG_COMPLETE and (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
                     continue
@@ -702,7 +702,7 @@ class Report():
                         parse_error = True
 
                     if parse_error:
-                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_PARSE, error_trip=i)
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_PARSE, error_shift=shift.shift, error_trip=i)
 
                     # check for trip errors
                     # TODO the above execptions add errors to the report without adding the trip to the various trip counts
@@ -762,7 +762,7 @@ class Report():
                                 report_trip.end_time = shift.end_time
                         # end > start
                         elif report_trip.start_time > report_trip.end_time:
-                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_LESS, error_trip=i)
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_TIME_LESS, error_shift=shift.shift, error_trip=i)
                             report_trip.start_time = shift.start_time
                             report_trip.end_time = shift.start_time
 

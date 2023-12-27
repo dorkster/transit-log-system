@@ -237,6 +237,7 @@ def searchGetTrips(request):
 
     if tags:
         searched = True
+        tags = tags.strip()
         trips = trips.filter(format=Trip.FORMAT_NORMAL)
         if tags == wildcard:
             trips = trips.exclude(tags='')

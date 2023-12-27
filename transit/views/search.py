@@ -36,9 +36,9 @@ from transit.common.util import *
 
 @permission_required(['transit.view_trip'])
 def searchGetTrips(request):
-    name = request.GET.get('name')
-    address = request.GET.get('address')
-    destination = request.GET.get('destination')
+    name = request.GET.get('name').strip()
+    address = request.GET.get('address').strip()
+    destination = request.GET.get('destination').strip()
     driver = request.GET.get('driver')
     vehicle = request.GET.get('vehicle')
     start_year = request.GET.get('start_date_year')
@@ -47,8 +47,8 @@ def searchGetTrips(request):
     end_year = request.GET.get('end_date_year')
     end_month = request.GET.get('end_date_month')
     end_day = request.GET.get('end_date_day')
-    notes = request.GET.get('notes')
-    reminder_instructions = request.GET.get('reminder_instructions')
+    notes = request.GET.get('notes').strip()
+    reminder_instructions = request.GET.get('reminder_instructions').strip()
     elderly = request.GET.get('elderly')
     ambulatory = request.GET.get('ambulatory')
     trip_type = request.GET.get('trip_type')
@@ -57,21 +57,35 @@ def searchGetTrips(request):
     passenger = request.GET.get('passenger')
     volunteer = request.GET.get('volunteer')
     sort_mode = request.GET.get('sort_mode')
+    result_type = request.GET.get('result_type')
 
     trips = Trip.objects.all()
     searched = False
+    wildcard = '*'
 
     if name:
         searched = True
-        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(name__icontains=name)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        if name == wildcard:
+            trips = trips.exclude(name='')
+        else:
+            trips = trips.filter(name__icontains=name)
 
     if address:
         searched = True
-        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(address__icontains=address)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        if address == wildcard:
+            trips = trips.exclude(address='')
+        else:
+            trips = trips.filter(address__icontains=address)
 
     if destination:
         searched = True
-        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(destination__icontains=destination)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        if destination == wildcard:
+            trips = trips.exclude(destination='')
+        else:
+            trips = trips.filter(destination__icontains=destination)
 
     if driver:
         try:
@@ -175,11 +189,18 @@ def searchGetTrips(request):
 
     if notes:
         searched = True
-        trips = trips.filter(note__icontains=notes)
+        if notes == wildcard:
+            trips = trips.exclude(note='')
+        else:
+            trips = trips.filter(note__icontains=notes)
 
     if reminder_instructions:
         searched = True
-        trips = trips.filter(reminder_instructions__icontains=reminder_instructions)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        if reminder_instructions == wildcard:
+            trips = trips.exclude(reminder_instructions='')
+        else:
+            trips = trips.filter(reminder_instructions__icontains=reminder_instructions)
 
     if elderly:
         searched = True
@@ -211,7 +232,11 @@ def searchGetTrips(request):
 
     if tags:
         searched = True
-        trips = trips.filter(format=Trip.FORMAT_NORMAL).filter(tags__icontains=tags)
+        trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        if tags == wildcard:
+            trips = trips.exclude(tags='')
+        else:
+            trips = trips.filter(tags__icontains=tags)
 
     if status:
         searched = True
@@ -236,6 +261,12 @@ def searchGetTrips(request):
             trips = trips.order_by('date', 'sort_index')
     else:
         trips = trips.order_by('-date', '-sort_index')
+
+    if result_type:
+        if result_type == '0':
+            trips = trips.filter(format=Trip.FORMAT_NORMAL)
+        elif result_type == '1':
+            trips = trips.filter(format=Trip.FORMAT_ACTIVITY)
 
     return (searched, trips)
 

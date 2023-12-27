@@ -22,13 +22,15 @@ from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
 
+CHOICE_NONE = '---------'
+
 BOOL_CHOICES = (
     (True, 'Yes'),
     (False, 'No')
 )
 
 NULL_BOOL_CHOICES = (
-    (None, '---------'),
+    (None, CHOICE_NONE),
     (0, 'Unknown'),
     (1, 'Yes'),
     (2, 'No')
@@ -344,10 +346,16 @@ class EditVolunteerForm(forms.Form):
 
 class SearchTripsForm(forms.Form):
     TRIP_STATUS_LEVELS = (
-        (None, '---------'),
+        (None, CHOICE_NONE),
         (0, 'Normal'),
         (1, 'Canceled'),
         (2, 'No Show')
+    )
+
+    RESULT_TYPES = (
+        (None, CHOICE_NONE),
+        (0, 'Trips'),
+        (1, 'Activities')
     )
 
     name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
@@ -364,11 +372,12 @@ class SearchTripsForm(forms.Form):
     elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    passenger = forms.IntegerField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((None, '---------'), (0, 'Yes'), (1, 'No'))))
+    passenger = forms.IntegerField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((None, CHOICE_NONE), (0, 'Yes'), (1, 'No'))))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     sort_mode = forms.IntegerField(label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Date - Descending'), (1, 'Date - Ascending'))))
     column_layout = forms.IntegerField(label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Show All'), (1, 'Standard'), (2, 'Volunteer Report'))))
     results_per_page = forms.IntegerField(label='Results per Page', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((25, '25'), (50, '50'), (100, '100'), (200, '200'))))
+    result_type = forms.ChoiceField(choices=RESULT_TYPES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 
 class SiteSettingsForm(forms.Form):

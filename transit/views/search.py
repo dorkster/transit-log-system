@@ -36,9 +36,9 @@ from transit.common.util import *
 
 @permission_required(['transit.view_trip'])
 def searchGetTrips(request):
-    name = request.GET.get('name').strip()
-    address = request.GET.get('address').strip()
-    destination = request.GET.get('destination').strip()
+    name = request.GET.get('name')
+    address = request.GET.get('address')
+    destination = request.GET.get('destination')
     driver = request.GET.get('driver')
     vehicle = request.GET.get('vehicle')
     start_year = request.GET.get('start_date_year')
@@ -47,8 +47,8 @@ def searchGetTrips(request):
     end_year = request.GET.get('end_date_year')
     end_month = request.GET.get('end_date_month')
     end_day = request.GET.get('end_date_day')
-    notes = request.GET.get('notes').strip()
-    reminder_instructions = request.GET.get('reminder_instructions').strip()
+    notes = request.GET.get('notes')
+    reminder_instructions = request.GET.get('reminder_instructions')
     elderly = request.GET.get('elderly')
     ambulatory = request.GET.get('ambulatory')
     trip_type = request.GET.get('trip_type')
@@ -64,6 +64,7 @@ def searchGetTrips(request):
     wildcard = '*'
 
     if name:
+        name = name.strip()
         searched = True
         trips = trips.filter(format=Trip.FORMAT_NORMAL)
         if name == wildcard:
@@ -72,6 +73,7 @@ def searchGetTrips(request):
             trips = trips.filter(name__icontains=name)
 
     if address:
+        address = address.strip()
         searched = True
         trips = trips.filter(format=Trip.FORMAT_NORMAL)
         if address == wildcard:
@@ -80,6 +82,7 @@ def searchGetTrips(request):
             trips = trips.filter(address__icontains=address)
 
     if destination:
+        destination = destination.strip()
         searched = True
         trips = trips.filter(format=Trip.FORMAT_NORMAL)
         if destination == wildcard:
@@ -188,6 +191,7 @@ def searchGetTrips(request):
         trips = trips.filter(date__lte=end_date)
 
     if notes:
+        notes = notes.strip()
         searched = True
         if notes == wildcard:
             trips = trips.exclude(note='')
@@ -195,6 +199,7 @@ def searchGetTrips(request):
             trips = trips.filter(note__icontains=notes)
 
     if reminder_instructions:
+        reminder_instructions = reminder_instructions.strip()
         searched = True
         trips = trips.filter(format=Trip.FORMAT_NORMAL)
         if reminder_instructions == wildcard:

@@ -16,11 +16,12 @@
 import datetime
 
 from transit.models import LoggedEvent
+from django.utils import timezone
 
 def log_event(request, event_action, event_model, event_desc):
     # delete events older than 5 years
     # TODO make this a site setting?
-    date_threshold = datetime.datetime.today() - datetime.timedelta(days=1825)
+    date_threshold = timezone.make_aware(datetime.datetime.today() - datetime.timedelta(days=1825))
     logged_events = LoggedEvent.objects.filter(timestamp__lt=date_threshold)
     for i in logged_events:
         i.delete()

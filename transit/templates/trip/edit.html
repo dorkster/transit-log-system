@@ -45,10 +45,10 @@
                     <div id="cancel_date" class="collapse">
                         <legend>{{ form.cancel_date.label }}</legend>
                         <div class="mb-2">{{ form.cancel_date }}</div>
-                        <div class="mb-2"><label for="{{ form.cancel_time.id_for_label }}"><strong>{{ form.cancel_time.label }}</strong></label>
+                        <legend>{{ form.cancel_time.label }}
                             <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_cancel_time')"><span class="oi oi-clock"></span></a>
-                            <br/>{{ form.cancel_time }}
-                        </div>
+                        </legend>
+                        <div class="mb-2">{{ form.cancel_time }}</div>
                     </div>
                 </fieldset>
             </div>

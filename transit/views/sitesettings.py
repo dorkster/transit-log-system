@@ -33,6 +33,8 @@ def sitesettingsEdit(request):
     if 'cancel' in request.POST:
         return HttpResponseRedirect(reverse('index'))
 
+    today = datetime.datetime.combine(datetime.datetime.now(), datetime.datetime.min.time())
+
     if request.method == 'POST':
         form = SiteSettingsForm(request.POST)
         if form.is_valid():
@@ -45,6 +47,13 @@ def sitesettingsEdit(request):
             settings.pretrip_warning_threshold = form.cleaned_data['pretrip_warning_threshold']
             settings.additional_pickup_fuzziness = form.cleaned_data['additional_pickup_fuzziness']
             settings.simple_daily_logs = form.cleaned_data['simple_daily_logs']
+            settings.trip_cancel_late_threshold = 0
+            try:
+                trip_cancel_late_threshold = datetime.datetime.strptime(form.cleaned_data['trip_cancel_late_threshold'], '%I:%M %p')
+                trip_cancel_late_threshold = datetime.datetime.combine(today, trip_cancel_late_threshold.time()) - datetime.timedelta(days=1)
+                settings.trip_cancel_late_threshold = int((today - trip_cancel_late_threshold).total_seconds())
+            except:
+                pass
             if request.user.is_superuser:
                 settings.page_title = form.cleaned_data['page_title']
                 settings.short_page_title = form.cleaned_data['short_page_title']
@@ -52,6 +61,8 @@ def sitesettingsEdit(request):
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.UNKNOWN, 'Updated site settings')
             updated = True
     else:
+        trip_cancel_late_threshold = today - datetime.timedelta(seconds=(settings.trip_cancel_late_threshold))
+
         initial = {
             'activity_color': '#' + settings.activity_color,
             'cancel_color': '#' + settings.cancel_color,
@@ -64,6 +75,7 @@ def sitesettingsEdit(request):
             'simple_daily_logs': settings.simple_daily_logs,
             'page_title': settings.page_title,
             'short_page_title': settings.short_page_title,
+            'trip_cancel_late_threshold': trip_cancel_late_threshold.strftime('%-I:%M %p'),
         }
         form = SiteSettingsForm(initial=initial)
 

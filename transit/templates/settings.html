@@ -4,6 +4,7 @@
 {% endblock %}
 
 {% block auth_content %}
+{% load static %}
 <h2>Settings</h2>
 {% if updated %}
 <div class="alert alert-success alert-dismissible show" role="alert">
@@ -36,6 +37,7 @@
                     <div class="mb-2"><label for="{{ form.pretrip_warning_threshold.id_for_label }}"><strong>{{ form.pretrip_warning_threshold.label }}</strong><br/><span class="small text-muted">{{ form.pretrip_warning_threshold.help_text }}</span></label><br/>{{ form.pretrip_warning_threshold }}</div>
                     <div class="mb-2"><label for="{{ form.additional_pickup_fuzziness.id_for_label }}"><strong>{{ form.additional_pickup_fuzziness.label }}</strong><br/><span class="small text-muted">{{ form.additional_pickup_fuzziness.help_text }}</span></label><br/>{{ form.additional_pickup_fuzziness }}</div>
                     <div class="mb-2"><label for="{{ form.simple_daily_logs.id_for_label }}"><strong>{{ form.simple_daily_logs.label }}</strong><br/><span class="small text-muted">{{ form.simple_daily_logs.help_text }}</span></label><br/>{{ form.simple_daily_logs }}</div>
+                    <div class="mb-2"><label for="{{ form.trip_cancel_late_threshold.id_for_label }}"><strong>{{ form.trip_cancel_late_threshold.label }}</strong><br/><span class="small text-muted">{{ form.trip_cancel_late_threshold.help_text }}</span></label><br/>{{ form.trip_cancel_late_threshold }}</div>
                 </fieldset>
             </div>
         </div>
@@ -59,6 +61,7 @@
         </div>
     </div>
 </form>
+<script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
 {% endblock %}
 
 {% block content %}

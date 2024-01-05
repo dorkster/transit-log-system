@@ -253,7 +253,7 @@
         <h4>Canceled trips ({{trips_canceled|length}})</h4>
         {% if trips_canceled_late %}
         <div class="mb-3">
-            <div class="small text-muted"><strong>Canceled late (After 12:00 PM the day before): {{trips_canceled_late|length}}</strong></div>
+            <div class="small text-muted"><strong>Canceled late{% if late_threshold > 0%} (After {{ late_threshold_date|date:"g:i A" }} the day before){% endif %}: {{trips_canceled_late|length}}</strong></div>
             {% if trips_canceled_very_late %}
             <div class="small text-muted">- Canceled on the same day or later: {{trips_canceled_very_late|length}}</div>
             {% endif %}

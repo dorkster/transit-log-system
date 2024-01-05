@@ -405,10 +405,12 @@ class Trip(models.Model):
         if self.cancel_date == None:
             return 0
 
+        site_settings = SiteSettings.load()
+
         aware_date = timezone.make_aware(datetime.datetime.combine(self.date, datetime.datetime.min.time())).astimezone(datetime.timezone.utc)
 
         # late cancellation (but not same day or later)
-        threshold_date = aware_date + datetime.timedelta(hours=-12)
+        threshold_date = aware_date - datetime.timedelta(seconds=site_settings.trip_cancel_late_threshold)
         if self.cancel_date >= threshold_date and self.cancel_date < aware_date:
             return 2
 
@@ -1064,6 +1066,7 @@ class SiteSettings(SingletonModel):
     short_page_title = models.CharField(max_length=FieldSizes.MD, blank=True)
     additional_pickup_fuzziness = models.FloatField(default=0.6)
     simple_daily_logs = models.BooleanField(default=False)
+    trip_cancel_late_threshold = models.IntegerField(default=0)
 
     def get_color(self, context):
         if context == self.COLOR_ACTIVITY:

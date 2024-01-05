@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.db.models import F
 
-from transit.models import Client, Trip, ClientPayment, Driver
+from transit.models import Client, Trip, ClientPayment, Driver, SiteSettings
 from transit.forms import DatePickerForm, DateRangePickerForm
 from transit.views.report import Report
 
@@ -115,6 +115,10 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
     else:
         report.load(date_start, date_end, client_name=client.name, filter_by_money=True)
 
+    site_settings = SiteSettings.load()
+    late_threshold = site_settings.trip_cancel_late_threshold
+    late_threshold_date = datetime.datetime.combine(datetime.datetime.now(), datetime.datetime.min.time()) - datetime.timedelta(seconds=late_threshold)
+
     context = {
         'date_start': date_start,
         'date_end': date_end,
@@ -136,6 +140,8 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
         'selected_driver': selected_driver,
         'drivers': Driver.objects.filter(is_active=True),
         'show_fares': show_fares,
+        'late_threshold': late_threshold,
+        'late_threshold_date': late_threshold_date,
     }
     return render(request, 'client/report/view.html', context=context)
 

@@ -205,7 +205,7 @@ class Trip(models.Model):
     collected_check = models.IntegerField(default=0)
     fare = models.IntegerField(default=0)
     passenger = models.BooleanField(verbose_name='Passenger on vehicle?', default=True)
-    cancel_date = models.DateField(default=None, null=True, blank=False)
+    cancel_date = models.DateTimeField(default=None, null=True)
     activity_color = models.ForeignKey('ActivityColor', on_delete=models.SET_NULL, null=True, blank=True)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
     volunteer = models.ForeignKey('Volunteer', on_delete=models.SET_NULL, null=True, blank=True)

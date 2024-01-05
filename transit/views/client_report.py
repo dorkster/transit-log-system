@@ -94,7 +94,14 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
         trips_normal = trips_normal.filter(blank_log | filled_log)
     trips_canceled = all_trips.filter(status=Trip.STATUS_CANCELED)
     trips_no_show = all_trips.filter(status=Trip.STATUS_NO_SHOW)
-    trips_canceled_late = trips_canceled.filter(cancel_date__gte=F('date'))
+    trips_canceled_late = []
+    trips_canceled_very_late = []
+    for canceled_trip in trips_canceled:
+        cancel_severity = canceled_trip.check_cancel_date()
+        if cancel_severity >= 2:
+            trips_canceled_late.append(canceled_trip)
+        if cancel_severity == 3:
+            trips_canceled_very_late.append(canceled_trip)
     trips_money = trips_normal.filter(Q(fare__gt=0) | Q(collected_cash__gt=0) | Q(collected_check__gt=0))
 
     payments = ClientPayment.objects.filter(parent=client.id, date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
@@ -121,6 +128,7 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
         'trips_canceled': trips_canceled,
         'trips_no_show': trips_no_show,
         'trips_canceled_late': trips_canceled_late,
+        'trips_canceled_very_late': trips_canceled_very_late,
         'trips_money': trips_money,
         'payments': payments,
         'total_fares_and_payments': total_fares_and_payments,

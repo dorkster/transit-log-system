@@ -149,6 +149,7 @@ class EditTripForm(forms.Form):
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     volunteer = forms.ModelChoiceField(Volunteer.objects.filter(is_active=True), label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     cancel_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    cancel_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
     create_return_trip = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_client = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
     add_dest1 = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)

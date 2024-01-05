@@ -19,6 +19,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q
+from django.utils import timezone
 
 from transit.models import Trip, Shift, Driver, Vehicle, Template, TemplateTrip, ScheduleMessage, SiteSettings, TripType
 from transit.forms import DatePickerForm, EditScheduleMessageForm
@@ -325,7 +326,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.cancel_date = None
             elif request_data == '1':
                 trip.status = Trip.STATUS_CANCELED
-                trip.cancel_date = datetime.date.today()
+                trip.cancel_date = timezone.now()
             elif request_data == '2':
                 trip.status = Trip.STATUS_NO_SHOW
                 trip.cancel_date = None

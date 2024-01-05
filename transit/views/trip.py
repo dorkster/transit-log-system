@@ -22,6 +22,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
 from django.db.models import Q
+from django.utils import timezone
 
 from transit.models import Trip, Driver, Vehicle, Client, Shift, Tag, SiteSettings, Destination, Fare, Volunteer
 from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
@@ -193,9 +194,17 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
             trip.cancel_date = None
             try:
                 if int(trip.status) == Trip.STATUS_CANCELED:
-                    trip.cancel_date = form.cleaned_data['cancel_date']
+                    trip.cancel_date = timezone.make_aware(datetime.datetime.combine(form.cleaned_data['cancel_date'], datetime.datetime.min.time()))
             except:
                 pass
+
+            if trip.cancel_date:
+                try:
+                    cancel_time = datetime.datetime.strptime(form.cleaned_data['cancel_time'], '%I:%M %p')
+                    cancel_datetime = datetime.datetime.combine(trip.cancel_date, cancel_time.time())
+                    trip.cancel_date = timezone.make_aware(cancel_datetime)
+                except:
+                    pass
 
             # trip date changed, which means sort indexes need to be updated
             if old_date != trip.date:
@@ -273,8 +282,19 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
         cancel_date = trip.cancel_date
+        cancel_time = ''
+
         if cancel_date == None:
-            cancel_date = datetime.date.today()
+            cancel_date = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time())
+
+        if timezone.is_aware(cancel_date):
+            cancel_date = timezone.make_naive(cancel_date)
+            try:
+                cancel_time = cancel_date.strftime('%-I:%M %p')
+            except:
+                pass
+        else:
+            cancel_time = datetime.datetime.now().strftime('%-I:%M %p')
 
         if trip.format == Trip.FORMAT_ACTIVITY:
             initial = {
@@ -283,7 +303,8 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'end_time': trip.appointment_time,
                 'description': trip.note,
                 'status': trip.status,
-                'cancel_date': cancel_date,
+                'cancel_date': cancel_date.date(),
+                'cancel_time': cancel_time,
                 'activity_color': trip.activity_color,
                 'driver': trip.driver,
                 'driver_is_available': False if is_new else trip.passenger
@@ -320,7 +341,8 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
                 'passenger': trip.passenger,
                 'reminder_instructions': trip.reminder_instructions,
                 'volunteer': trip.volunteer,
-                'cancel_date': cancel_date,
+                'cancel_date': cancel_date.date(),
+                'cancel_time': cancel_time,
             }
             form = EditTripForm(initial=initial)
 

@@ -252,7 +252,12 @@
     <div class="tab-pane fade" id="tab_content_trips_canceled">
         <h4>Canceled trips ({{trips_canceled|length}})</h4>
         {% if trips_canceled_late %}
-        <p class="small text-muted">Canceled on the same day (or later): {{trips_canceled_late|length}}</p>
+        <div class="mb-3">
+            <div class="small text-muted"><strong>Canceled late (After 12:00 PM the day before): {{trips_canceled_late|length}}</strong></div>
+            {% if trips_canceled_very_late %}
+            <div class="small text-muted">- Canceled on the same day or later: {{trips_canceled_very_late|length}}</div>
+            {% endif %}
+        </div>
         {% endif %}
         {% if trips_canceled %}
         <table class="mytable mytable-striped mytable-has-edit-column">
@@ -270,7 +275,13 @@
                     <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
-                    <td>{% if trip.cancel_date %}<span class="{% if trip.cancel_date >= trip.date %}text-danger text-bold{% endif %}">{{ trip.cancel_date|date:"F, j, Y" }}</span>{% endif %}</td>
+                    <td>
+                        {% with cancel_date=trip.check_cancel_date %}
+                        {% if cancel_date > 0 %}
+                        <span {% if cancel_date > 1 %}class="text-danger text-bold"{% endif %}>{% if cancel_date == 3 %}<span class="oi oi-warning mr-1"></span>{% endif %}{{ trip.cancel_date|date:"F, j, Y - g:i A" }}</span>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

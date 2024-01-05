@@ -16,6 +16,7 @@
 import uuid, re, datetime
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 
 from transit.common.util import *
 
@@ -399,6 +400,23 @@ class Trip(models.Model):
             return 'id_phone_cell'
         else:
             return 'id_phone_home'
+
+    def check_cancel_date(self):
+        if self.cancel_date == None:
+            return 0
+
+        aware_date = timezone.make_aware(datetime.datetime.combine(self.date, datetime.datetime.min.time())).astimezone(datetime.timezone.utc)
+
+        # late cancellation (but not same day or later)
+        threshold_date = aware_date + datetime.timedelta(hours=-12)
+        if self.cancel_date >= threshold_date and self.cancel_date < aware_date:
+            return 2
+
+        # same day or later cancellation
+        if self.cancel_date >= aware_date:
+            return 3
+
+        return 1
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

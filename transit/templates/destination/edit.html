@@ -35,6 +35,9 @@
                         <label for="{{ form.update_trips.id_for_label }}"><strong>{{ form.update_trips.label }}</strong><br/><span class="small text-muted">{{ form.update_trips.help_text }}</span></label>
                         <br/>{{ form.update_trips }}<span class="alert alert-warning p-1 ml-3 small"><span class="oi oi-warning mr-2"></span>Please use this option with caution!</span>
                     </div>
+                    <div id="update_trips_date" class="mb-2 collapse">
+                        {{ form.update_trips_date }}
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -53,6 +56,11 @@
     </div>
 </form>
 <script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
+<script type="text/javascript" src="{% static 'transit/js/destination/edit.js' %}"></script>
+<script type="text/javascript">
+    setUpdateTripsDateVisibility();
+    setupFormEvents();
+</script>
 {% endblock %}
 
 {% block content %}

@@ -85,11 +85,20 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
                 # TODO this ignores the 'update_trips' flag. Is this reasonable?
                 return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
-            if form.cleaned_data['update_trips']:
+            try:
+                update_trips = int(form.cleaned_data['update_trips'])
+            except:
+                update_trips = 0
+
+            if update_trips > 0:
+                update_trip_args = {
+                    'update_trips': update_trips,
+                    'update_trips_date': form.cleaned_data['update_trips_date'],
+                }
                 # when creating a new destination, there's no previous address. So just use the current address
                 if is_new:
                     prev_destination['address'] = destination.address
-                return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': destination.id}) + "?" + urlencode(prev_destination))
+                return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': destination.id}) + "?" + urlencode(prev_destination) + "&" + urlencode(update_trip_args))
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
@@ -102,6 +111,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             'phone': destination.phone,
             'is_active': destination.is_active,
             'update_trips': False,
+            'update_trips_date': datetime.date.today(),
         }
         form = EditDestinationForm(initial=initial)
 
@@ -132,51 +142,76 @@ def destinationUpdateTrips(request, id):
     address = request.GET.get('address')
     phone = request.GET.get('phone')
 
+    try:
+        update_trips = int(request.GET.get('update_trips'))
+    except:
+        # if we're on this page, we assume we're updating trips, so default to 1 (aka update all trips and templates)
+        update_trips = 1
+
+    try:
+        update_trips_date = datetime.datetime.strptime(request.GET.get('update_trips_date'), '%Y-%m-%d')
+    except:
+        update_trips_date = None
+
     trips = []
-    trip_query = Trip.objects.filter(Q(address=address) | Q(destination=address))
-    for trip in trip_query:
-        updated = [False for i in range(4)]
+    if update_trips != 4:
+        trip_query = Trip.objects.filter(Q(address=address) | Q(destination=address))
+        if update_trips_date:
+            if update_trips == 2:
+                trip_query = trip_query.filter(date__gte=update_trips_date)
+            elif update_trips == 3:
+                trip_query = trip_query.filter(date__lte=update_trips_date)
 
-        # address
-        if address != destination.address:
-            if trip.address == address:
-                updated[0] = True
-            if trip.destination == address:
-                updated[2] = True
-        # phone numbers
-        if phone != destination.phone:
-            if trip.phone_address == phone and trip.address == address:
-                updated[1] = True
-            if trip.phone_destination == phone and trip.destination == address:
-                updated[3] = True
+        for trip in trip_query:
+            updated = [False for i in range(4)]
 
-        for i in range(4):
-            if updated[i]:
-                trips.append({'trip': trip, 'updated': updated})
-                break
+            # address
+            if address != destination.address:
+                if trip.address == address:
+                    updated[0] = True
+                if trip.destination == address:
+                    updated[2] = True
+            # phone numbers
+            if phone != destination.phone:
+                if trip.phone_address == phone and trip.address == address:
+                    updated[1] = True
+                if trip.phone_destination == phone and trip.destination == address:
+                    updated[3] = True
+
+            for i in range(4):
+                if updated[i]:
+                    trips.append({'trip': trip, 'updated': updated})
+                    break
 
     template_trips = []
-    template_trip_query = TemplateTrip.objects.filter(Q(address=address) | Q(destination=address))
-    for trip in trip_query:
-        updated = [False for i in range(4)]
+    if update_trips == 1 or update_trips == 4:
+        template_trip_query = TemplateTrip.objects.filter(Q(address=address) | Q(destination=address))
+        if update_trips_date:
+            if update_trips == 2:
+                template_trip_query = template_trip_query.filter(date__gte=update_trips_date)
+            elif update_trips == 3:
+                template_trip_query = template_trip_query.filter(date__lte=update_trips_date)
 
-        # address
-        if address != destination.address:
-            if trip.address == address:
-                updated[0] = True
-            if trip.destination == address:
-                updated[2] = True
-        # phone numbers
-        if phone != destination.phone:
-            if trip.phone_address == phone and trip.address == address:
-                updated[1] = True
-            if trip.phone_destination == phone and trip.destination == address:
-                updated[3] = True
+        for trip in template_trip_query:
+            updated = [False for i in range(4)]
 
-        for i in range(4):
-            if updated[i]:
-                trips.append({'trip': trip, 'updated': updated})
-                break
+            # address
+            if address != destination.address:
+                if trip.address == address:
+                    updated[0] = True
+                if trip.destination == address:
+                    updated[2] = True
+            # phone numbers
+            if phone != destination.phone:
+                if trip.phone_address == phone and trip.address == address:
+                    updated[1] = True
+                if trip.phone_destination == phone and trip.destination == address:
+                    updated[3] = True
+
+            for i in range(4):
+                if updated[i]:
+                    template_trips.append({'trip': trip, 'updated': updated})
+                    break
 
 
     if request.method == 'POST':

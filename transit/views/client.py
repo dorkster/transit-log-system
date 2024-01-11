@@ -140,11 +140,20 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 # TODO this ignores the 'update_trips' flag. Is this reasonable?
                 return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
-            if form.cleaned_data['update_trips']:
+            try:
+                update_trips = int(form.cleaned_data['update_trips'])
+            except:
+                update_trips = 0
+
+            if update_trips > 0:
+                update_trip_args = {
+                    'update_trips': update_trips,
+                    'update_trips_date': form.cleaned_data['update_trips_date'],
+                }
                 # when creating a new client, there's no previous name. So just use the current name
                 if is_new:
                     prev_client['name'] = client.name
-                return HttpResponseRedirect(reverse('client-update-trips', kwargs={'id': client.id}) + "?" + urlencode(prev_client))
+                return HttpResponseRedirect(reverse('client-update-trips', kwargs={'id': client.id}) + "?" + urlencode(prev_client) + "&" + urlencode(update_trip_args)) 
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
@@ -166,6 +175,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'is_transit_policy_acknowledged': client.is_transit_policy_acknowledged,
             'reminder_instructions': client.reminder_instructions,
             'update_trips': False,
+            'update_trips_date': datetime.date.today(),
         }
         form = EditClientForm(initial=initial)
 
@@ -219,90 +229,114 @@ def clientUpdateTrips(request, id):
     elif ambulatory_str == 'False':
         ambulatory = False
 
+    try:
+        update_trips = int(request.GET.get('update_trips'))
+    except:
+        # if we're on this page, we assume we're updating trips, so default to 1 (aka update all trips and templates)
+        update_trips = 1
+
+    try:
+        update_trips_date = datetime.datetime.strptime(request.GET.get('update_trips_date'), '%Y-%m-%d')
+    except:
+        update_trips_date = None
+
     trips = []
-    trip_query = Trip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
-    for trip in trip_query:
-        # updated = False
-        updated = [False for i in range(9)]
+    if update_trips != 4:
+        trip_query = Trip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
+        if update_trips_date:
+            if update_trips == 2:
+                trip_query = trip_query.filter(date__gte=update_trips_date)
+            elif update_trips == 3:
+                trip_query = trip_query.filter(date__lte=update_trips_date)
 
-        # name
-        if name != client.name:
-            if trip.name == name:
-                updated[0] = True
-        # address
-        if address != client.address:
-            if trip.address == address:
-                updated[1] = True
-            if trip.destination == address:
-                updated[2] = True
-        # phone numbers
-        if phone_home != client.phone_home:
-            if trip.phone_home == phone_home:
-                updated[3] = True
-        if phone_cell != client.phone_cell:
-            if trip.phone_cell == phone_cell:
-                updated[4] = True
-        if phone_alt != client.phone_alt:
-            if trip.phone_alt == phone_alt:
-                updated[5] = True
-        # elderly/ambulatory
-        if elderly != client.elderly:
-            if trip.elderly == elderly:
-                updated[6] = True
-        if ambulatory != client.ambulatory:
-            if trip.ambulatory == ambulatory:
-                updated[7] = True
-        # reminder instructions
-        if reminder_instructions != client.reminder_instructions:
-            if trip.reminder_instructions == reminder_instructions:
-                updated[8] = True
+        for trip in trip_query:
+            updated = [False for i in range(9)]
 
-        for i in range(9):
-            if updated[i]:
-                trips.append({'trip': trip, 'updated': updated})
-                break
+            # name
+            if name != client.name:
+                if trip.name == name:
+                    updated[0] = True
+            # address
+            if address != client.address:
+                if trip.address == address:
+                    updated[1] = True
+                if trip.destination == address:
+                    updated[2] = True
+            # phone numbers
+            if phone_home != client.phone_home:
+                if trip.phone_home == phone_home:
+                    updated[3] = True
+            if phone_cell != client.phone_cell:
+                if trip.phone_cell == phone_cell:
+                    updated[4] = True
+            if phone_alt != client.phone_alt:
+                if trip.phone_alt == phone_alt:
+                    updated[5] = True
+            # elderly/ambulatory
+            if elderly != client.elderly:
+                if trip.elderly == elderly:
+                    updated[6] = True
+            if ambulatory != client.ambulatory:
+                if trip.ambulatory == ambulatory:
+                    updated[7] = True
+            # reminder instructions
+            if reminder_instructions != client.reminder_instructions:
+                if trip.reminder_instructions == reminder_instructions:
+                    updated[8] = True
+
+            for i in range(9):
+                if updated[i]:
+                    trips.append({'trip': trip, 'updated': updated})
+                    break
 
     template_trips = []
-    template_trip_query = TemplateTrip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
-    for trip in template_trip_query:
-        updated = [False for i in range(9)]
+    if update_trips == 1 or update_trips == 4:
+        template_trip_query = TemplateTrip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
+        if update_trips_date:
+            if update_trips == 2:
+                template_trip_query = template_trip_query.filter(date__gte=update_trips_date)
+            elif update_trips == 3:
+                template_trip_query = template_trip_query.filter(date__lte=update_trips_date)
 
-        # name
-        if name != client.name:
-            if trip.name == name:
-                updated[0] = True
-        # address
-        if address != client.address:
-            if trip.address == address:
-                updated[1] = True
-            if trip.destination == address:
-                updated[2] = True
-        # phone numbers
-        if phone_home != client.phone_home:
-            if trip.phone_home == phone_home:
-                updated[3] = True
-        if phone_cell != client.phone_cell:
-            if trip.phone_cell == phone_cell:
-                updated[4] = True
-        if phone_alt != client.phone_alt:
-            if trip.phone_alt == phone_alt:
-                updated[5] = True
-        # elderly/ambulatory
-        if elderly != client.elderly:
-            if trip.elderly == elderly:
-                updated[6] = True
-        if ambulatory != client.ambulatory:
-            if trip.ambulatory == ambulatory:
-                updated[7] = True
-        # reminder instructions
-        if reminder_instructions != client.reminder_instructions:
-            if trip.reminder_instructions == reminder_instructions:
-                updated[8] = True
+        for trip in template_trip_query:
+            updated = [False for i in range(9)]
 
-        for i in range(9):
-            if updated[i]:
-                template_trips.append({'trip': trip, 'updated': updated})
-                break
+            # name
+            if name != client.name:
+                if trip.name == name:
+                    updated[0] = True
+            # address
+            if address != client.address:
+                if trip.address == address:
+                    updated[1] = True
+                if trip.destination == address:
+                    updated[2] = True
+            # phone numbers
+            if phone_home != client.phone_home:
+                if trip.phone_home == phone_home:
+                    updated[3] = True
+            if phone_cell != client.phone_cell:
+                if trip.phone_cell == phone_cell:
+                    updated[4] = True
+            if phone_alt != client.phone_alt:
+                if trip.phone_alt == phone_alt:
+                    updated[5] = True
+            # elderly/ambulatory
+            if elderly != client.elderly:
+                if trip.elderly == elderly:
+                    updated[6] = True
+            if ambulatory != client.ambulatory:
+                if trip.ambulatory == ambulatory:
+                    updated[7] = True
+            # reminder instructions
+            if reminder_instructions != client.reminder_instructions:
+                if trip.reminder_instructions == reminder_instructions:
+                    updated[8] = True
+
+            for i in range(9):
+                if updated[i]:
+                    template_trips.append({'trip': trip, 'updated': updated})
+                    break
 
     if request.method == 'POST':
         if 'cancel' in request.POST:

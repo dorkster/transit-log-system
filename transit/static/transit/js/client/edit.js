@@ -109,6 +109,15 @@ function createTagList() {
     $('#tag_list').append('<a class="btn btn-sm btn-secondary" href="#_" onclick="showTagDialog()" title="Add a tag"><span class="oi oi-plus"></span></a> ');
 }
 
+function setUpdateTripsDateVisibility() {
+    if ($("#id_update_trips").val() == 2 || $("#id_update_trips").val() == 3) {
+        $("#update_trips_date").collapse('show');
+    }
+    else {
+        $("#update_trips_date").collapse('hide');
+    }
+}
+
 function setupFormEvents() {
     $("#toggle_address").on("click", function() { toggleFieldByCheckbox("#toggle_address", "#id_address"); checkAlertAddress(); } );
     $("#toggle_phone_home").on("click", function() { toggleFieldByCheckbox("#toggle_phone_home", "#id_phone_home"); checkAlertPhone(); } );
@@ -120,4 +129,5 @@ function setupFormEvents() {
     $("#id_phone_cell").on("change", checkAlertPhone);
     $("#id_elderly").on("change", checkAlertInfo);
     $("#id_ambulatory").on("change", checkAlertInfo);
+    $("#id_update_trips").on("change", setUpdateTripsDateVisibility);
 }

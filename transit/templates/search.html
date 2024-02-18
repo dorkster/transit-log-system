@@ -65,10 +65,8 @@
         <td></td>
         {% endif %}
         <td>Date</td>
-        {% if column_layout < 2 %}
         <td>Pick up</td>
         <td>Appt. Time</td>
-        {% endif %}
         <td>Name</td>
         <td>Address</td>
         <td>Destination</td>
@@ -100,7 +98,7 @@
         <td class="mytable-col-md"><a href="{% url 'schedule' 'read-only' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{trip.date}}</a></td>
         {% endif %}
         {% if trip.format == Trip.FORMAT_ACTIVITY %}
-        <td colspan="{% if column_layout < 2 %}2{% else %}1{% endif %}" class="text-center">
+        <td colspan="2" class="text-center">
             {% if trip.pick_up_time and trip.appointment_time %}
             {{ trip.pick_up_time }} - {{ trip.appointment_time }}
             {% elif trip.pick_up_time %}
@@ -120,10 +118,8 @@
             {{ trip.note }}
         </td>
         {% else %}
-        {% if column_layout < 2 %}
         <td class="mytable-col-sm">{{trip.pick_up_time}}</td>
         <td class="mytable-col-sm">{{trip.appointment_time}}</td>
-        {% endif %}
         <td class="mytable-col-lg">{{trip.name}}</td>
         <td class="mytable-col-lg">{{trip.address}}</td>
         <td class="mytable-col-lg">{{trip.destination}}</td>

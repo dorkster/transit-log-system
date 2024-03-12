@@ -5,6 +5,7 @@
         <td></td>
         <td></td>
         <td>Name</td>
+        <td>Is active?</td>
         <td>Is logged?</td>
         <td>Shown in notifications?</td>
     </thead>
@@ -31,6 +32,13 @@
             </div>
         </td>
         <td class="mytable-col-lg">{{ vehicle.name }}</td>
+        <td class="mytable-col-sm">
+            {% if vehicle.is_active %}
+            <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>
+            {% elif vehicle.is_active is False %}
+            <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
+            {% endif %}
+        </td>
         <td class="mytable-col-sm">
             {% if vehicle.is_logged %}
             <span class="alert alert-success p-0 pl-1 pr-1"><span class="oi oi-check"></span></span>

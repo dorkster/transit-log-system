@@ -454,6 +454,7 @@ class Vehicle(models.Model):
     oil_change_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     inspection_date = models.DateField(blank=True, null=True)
     is_shown_in_notifications = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['sort_index']

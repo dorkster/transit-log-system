@@ -68,6 +68,7 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
             vehicle.name = form.cleaned_data['name']
             vehicle.is_logged = form.cleaned_data['is_logged']
             vehicle.is_shown_in_notifications = form.cleaned_data['is_shown_in_notifications']
+            vehicle.is_active = form.cleaned_data['is_active']
             vehicle.save()
 
             if is_new:
@@ -81,6 +82,7 @@ def vehicleCreateEditCommon(request, vehicle, is_new):
             'name': vehicle.name,
             'is_logged': vehicle.is_logged,
             'is_shown_in_notifications': vehicle.is_shown_in_notifications,
+            'is_active': vehicle.is_active,
         }
         form = EditVehicleForm(initial=initial)
 

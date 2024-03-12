@@ -52,7 +52,7 @@ def globals(request):
         pretrip_threshold = today - datetime.timedelta(days=site_settings.pretrip_warning_threshold)
         pretrips = PreTrip.objects.filter(date__gte=pretrip_threshold)
 
-    for v in Vehicle.objects.filter(is_logged=True, is_shown_in_notifications=True):
+    for v in Vehicle.objects.filter(is_logged=True, is_shown_in_notifications=True, is_active=True):
         if v.inspection_date is not None:
             due_date = v.inspection_date
             if today >= due_date:
@@ -78,12 +78,12 @@ def globals(request):
             vehicle_pretrips.append(v)
 
 
-    vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False)
-    vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, is_resolved=False)
-    vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, is_resolved=False)
+    vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False, vehicle__is_active=True)
+    vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, is_resolved=False, vehicle__is_active=True)
+    vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, is_resolved=False, vehicle__is_active=True)
 
-    vehicle_issues_featured_medium = vehicle_issues_medium.filter(vehicle__is_shown_in_notifications=True)
-    vehicle_issues_featured_high = vehicle_issues_high.filter(vehicle__is_shown_in_notifications=True)
+    vehicle_issues_featured_medium = vehicle_issues_medium.filter(vehicle__is_shown_in_notifications=True, vehicle__is_active=True)
+    vehicle_issues_featured_high = vehicle_issues_high.filter(vehicle__is_shown_in_notifications=True, vehicle__is_active=True)
 
     return {
         'notifications': (len(vehicle_issues_low) > 0 or len(vehicle_issues_medium) > 0 or len(vehicle_issues_high) > 0 or len(vehicle_inspections) > 0 or len(vehicle_oil_changes) > 0 or len(vehicle_pretrips) > 0),

@@ -447,14 +447,24 @@ class Driver(models.Model):
 
 
 class Vehicle(models.Model):
+    NOTIF_ALL = 0
+    NOTIF_MAINTAINENCE = 1
+    NOTIF_NONE = 2
+
+    NOTIF_LEVELS = [
+        (NOTIF_ALL, 'All'),
+        (NOTIF_MAINTAINENCE, 'Maintainence Only'),
+        (NOTIF_NONE, 'None'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.SM)
     is_logged = models.BooleanField(default=True)
     oil_change_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     inspection_date = models.DateField(blank=True, null=True)
-    is_shown_in_notifications = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    notif_level = models.IntegerField(choices=NOTIF_LEVELS, default=NOTIF_ALL)
 
     class Meta:
         ordering = ['sort_index']
@@ -464,6 +474,9 @@ class Vehicle(models.Model):
 
     def get_class_name(self):
         return 'Vehicle'
+
+    def get_notif_level_str(self):
+        return self.NOTIF_LEVELS[self.notif_level][1]
 
 class TripType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

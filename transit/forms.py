@@ -247,8 +247,8 @@ class EditDriverForm(forms.Form):
 class EditVehicleForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     is_logged = forms.BooleanField(label='Is logged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
-    is_shown_in_notifications = forms.BooleanField(label='Shown in notifications?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_active = forms.BooleanField(label='Is active?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    notif_level = forms.ChoiceField(label='Notification level', required=False, choices=Vehicle.NOTIF_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

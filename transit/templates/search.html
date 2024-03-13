@@ -69,6 +69,7 @@
         <td>Appt. Time</td>
         <td>Name</td>
         <td>Address</td>
+        <td>Phone #</td>
         <td>Destination</td>
         {% if column_layout < 2 %}
         <td>Driver</td>
@@ -107,7 +108,7 @@
             {{ trip.appointment_time }}
             {% endif %}
         </td>
-        <td colspan="17">
+        <td colspan="18">
             {% if trip.driver %}
                 {% if trip.passenger %}
                 <span class="badge badge-light text-success mr-1"><span class="oi oi-person"></span></span>
@@ -122,6 +123,13 @@
         <td class="mytable-col-sm">{{trip.appointment_time}}</td>
         <td class="mytable-col-lg">{{trip.name}}</td>
         <td class="mytable-col-lg">{{trip.address}}</td>
+        <td class="mytable-col-md" style="white-space: nowrap;">
+            {{ trip.phone_home }}
+            {% if trip.phone_home and trip.phone_cell %}<br/>{% endif %}
+            {{ trip.phone_cell }}
+            {% if trip.phone_home or trip.phone_cell %}<br/>{% endif %}
+            {{ trip.phone_alt }}
+        </td>
         <td class="mytable-col-lg">{{trip.destination}}</td>
         {% if column_layout < 2 %}
         <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>

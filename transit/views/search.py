@@ -409,7 +409,9 @@ def searchExportXLSX(request):
         ws_results.cell(row_header + i + 1, 18, (trips[i].collected_cash + trips[i].collected_check) / 100)
         ws_results.cell(row_header + i + 1, 19, trips[i].elderly)
         ws_results.cell(row_header + i + 1, 20, trips[i].ambulatory)
-        ws_results.cell(row_header + i + 1, 21, trips[i].volunteer.verbose_name())
+
+        if trips[i].volunteer:
+            ws_results.cell(row_header + i + 1, 21, trips[i].volunteer.verbose_name())
 
     # number formats
     for i in range(row_header + 1, row_header + trip_count + 1):

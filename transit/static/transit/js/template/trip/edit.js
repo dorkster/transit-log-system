@@ -133,6 +133,8 @@ function onAddressChanged(target) {
     var add_dest_btn_id = (target == 1 ? "add_dest2_btn" : "add_dest1_btn");
     var add_dest_input = (target == 1 ? "#id_add_dest2" : "#id_add_dest1");
 
+    $(address_input).val($(address_input).val().trim());
+
     var found_destination = false;
     for (i in destinations) {
         if (destinations[i].fields.address == $(address_input).val()) {

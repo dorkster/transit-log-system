@@ -24,6 +24,8 @@ function onNameChanged() {
     var address_datalist = document.getElementById("addresses");
     address_datalist.children[0].value = "";
 
+    $("#id_name").val($("#id_name").val().trim());
+
     var found_client = false;
     for (let i in clients) {
         if (clients[i].fields.name == $("#id_name").val()) {

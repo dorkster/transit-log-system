@@ -729,6 +729,8 @@ def clientXLSX(request):
     if sort_mode_dir == 1:
         clients = clients.reverse()
 
+    client_count = len(clients)
+
     temp_file = tempfile.NamedTemporaryFile()
 
     wb = Workbook()
@@ -761,7 +763,7 @@ def clientXLSX(request):
     ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
     ws.cell(row_header, 11, 'Reminder Instructions')
 
-    for i in range(0, clients.count()):
+    for i in range(0, client_count):
         ws.cell(i+2, 1, clients[i].name)
         ws.cell(i+2, 2, clients[i].address)
         ws.cell(i+2, 3, clients[i].phone_home)
@@ -781,7 +783,7 @@ def clientXLSX(request):
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
-        for j in range(row_header, clients.count()+2):
+        for j in range(row_header, client_count+2):
             ws.cell(j, i).border = style_border_normal
             if j == row_header:
                 ws.cell(j, i).font = style_font_header

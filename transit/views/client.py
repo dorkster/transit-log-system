@@ -136,7 +136,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(client))
 
             existing_clients = Client.objects.filter(name=client.name)
-            if len(existing_clients) > 1:
+            if existing_clients.count() > 1:
                 # TODO this ignores the 'update_trips' flag. Is this reasonable?
                 return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
@@ -454,7 +454,7 @@ def clientCreateFromTrip(request, trip_id):
     trip = get_object_or_404(Trip, id=trip_id)
 
     existing_clients = Client.objects.filter(name=trip.name)
-    if len(existing_clients) > 0:
+    if existing_clients.count() > 0:
         return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True, src_trip=trip)
 
     client = Client()
@@ -473,7 +473,7 @@ def clientCreateFromTemplateTrip(request, trip_id):
     trip = get_object_or_404(TemplateTrip, id=trip_id)
 
     existing_clients = Client.objects.filter(name=trip.name)
-    if len(existing_clients) > 0:
+    if existing_clients.count() > 0:
         return clientCreateEditCommon(request, existing_clients[0], is_new=False, is_dupe=True, src_template_trip=trip)
 
     client = Client()
@@ -564,7 +564,7 @@ def ajaxClientList(request):
     filter_search = request.session.get('clients_search', '')
 
     clients = Client.objects.all()
-    unfiltered_count = len(clients)
+    unfiltered_count = clients.count()
 
     if filter_elderly == 1:
         clients = clients.filter(elderly=True)
@@ -598,7 +598,7 @@ def ajaxClientList(request):
     if filter_search != '':
         clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search))
 
-    filtered_count = len(clients)
+    filtered_count = clients.count()
 
     if sort_mode == SORT_NAME:
         clients = clients.order_by('name')
@@ -761,7 +761,7 @@ def clientXLSX(request):
     ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
     ws.cell(row_header, 11, 'Reminder Instructions')
 
-    for i in range(0, len(clients)):
+    for i in range(0, clients.count()):
         ws.cell(i+2, 1, clients[i].name)
         ws.cell(i+2, 2, clients[i].address)
         ws.cell(i+2, 3, clients[i].phone_home)
@@ -781,7 +781,7 @@ def clientXLSX(request):
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
         else:
             ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
-        for j in range(row_header, len(clients)+2):
+        for j in range(row_header, clients.count()+2):
             ws.cell(j, i).border = style_border_normal
             if j == row_header:
                 ws.cell(j, i).font = style_font_header

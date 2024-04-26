@@ -141,7 +141,7 @@ def ajaxSchedulePrint(request, year, month, day):
     query_shifts = Shift.objects.filter(date=day_date).select_related('driver', 'vehicle')
 
     messages = ScheduleMessage.objects.filter(date=day_date)
-    if len(messages) > 0:
+    if messages.count() > 0:
         message = messages[0].message
     else:
         message = ''
@@ -154,7 +154,7 @@ def ajaxSchedulePrint(request, year, month, day):
     filter_vehicle = request.session.get('schedule_print_filter_vehicle', '')
     filter_log_columns = request.session.get('schedule_print_filter_log_columns', True)
 
-    unfiltered_count = len(query_trips)
+    unfiltered_count = query_trips.count()
 
     if filter_hide_canceled:
         query_trips = query_trips.filter(status=Trip.STATUS_NORMAL)
@@ -176,7 +176,7 @@ def ajaxSchedulePrint(request, year, month, day):
         query_trips = query_trips.filter(Q(vehicle__id=filter_vehicle) | ~Q(format=Trip.FORMAT_NORMAL))
         query_shifts = query_shifts.filter(vehicle__id=filter_vehicle)
 
-    filtered_count = len(query_trips)
+    filtered_count = query_trips.count()
 
     # don't auto-show the print dialog if a filter has been set
     show_dialog = (request_action == '')
@@ -210,7 +210,7 @@ def scheduleMessage(request, year, month, day):
 
     is_new = True
     messages = ScheduleMessage.objects.filter(date=date)
-    if len(messages) > 0:
+    if messages.count() > 0:
         is_new = False
         message = messages[0]
     else:
@@ -294,13 +294,13 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 # if there's only 1 non-logged vehicle (e.g. 'personal'), use it for non-logged drivers
                 if not driver.is_logged:
                     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
-                    if len(nonlogged_vehicles) == 1:
+                    if nonlogged_vehicles.count() == 1:
                         trip.vehicle = nonlogged_vehicles[0]
 
             # attempt to set vehicle from Shift data
             if prev_driver != trip.driver:
                 new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
-                if len(new_query) > 0:
+                if new_query.count() > 0:
                     trip.vehicle = new_query[0].vehicle
                 elif trip.driver is None or trip.driver.is_logged == True:
                     trip.vehicle = None
@@ -339,8 +339,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 
             sort_index = 0
             query = Trip.objects.filter(date=date)
-            if (len(query) > 0):
-                sort_index = query[len(query)-1].sort_index + 1
+            if (query.count() > 0):
+                sort_index = query[query.count()-1].sort_index + 1
 
             for temp_trip in template_trips:
                 trip = Trip()
@@ -419,7 +419,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
 
     trips = Trip.objects.filter(date=date).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
-    unfiltered_count = len(trips)
+    unfiltered_count = trips.count()
 
     if has_filter:
         if filter_hide_canceled:
@@ -440,14 +440,14 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         if filter_vehicle != '':
             trips = trips.filter(Q(vehicle__id=filter_vehicle) | ~Q(format=Trip.FORMAT_NORMAL))
 
-    filtered_count = len(trips)
+    filtered_count = trips.count()
 
     shifts = Shift.objects.filter(date=date).select_related('driver', 'vehicle')
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
 
     messages = ScheduleMessage.objects.filter(date=date)
-    if len(messages) > 0:
+    if messages.count() > 0:
         message = messages[0].message
     else:
         message = ''

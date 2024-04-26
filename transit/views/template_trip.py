@@ -92,9 +92,8 @@ def templateTripEdit(request, parent, id):
 def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
     if is_new == True:
         query = TemplateTrip.objects.filter(parent=trip.parent).order_by('-sort_index')
-        if len(query) > 0:
-            last_trip = query[0]
-            trip.sort_index = last_trip.sort_index + 1
+        if query.count() > 0:
+            trip.sort_index = query[0].sort_index + 1
         else:
             trip.sort_index = 0
 
@@ -167,7 +166,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                         i.save()
                 # set the sort index on the new parent
                 query = TemplateTrip.objects.filter(parent=trip.parent).order_by('-sort_index')
-                if len(query) > 0:
+                if query.count() > 0:
                     trip.sort_index = query[0].sort_index + 1
                 else:
                     trip.sort_index = 0
@@ -187,7 +186,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
             # Update empty Elderly/Ambulatory fields in Client data if they've been defined in this Trip
             if trip.format == Trip.FORMAT_NORMAL and (trip.elderly != None or trip.ambulatory != None):
                 update_clients = Client.objects.filter(Q(elderly=None) | Q(ambulatory=None)).filter(name=trip.name)
-                if len(update_clients) == 1:
+                if update_clients.count() == 1:
                     update_client = update_clients[0]
                     client_was_updated = False
                     if update_client.elderly == None:
@@ -275,7 +274,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
     addresses = set()
     destinations = Destination.objects.filter(is_active=True)
 
-    if len(destinations) == 0:
+    if destinations.count() == 0:
         site_settings = SiteSettings.load()
         if site_settings.autocomplete_history_days > 0:
             for i in Trip.objects.filter(date__gte=(datetime.date.today() - datetime.timedelta(days=site_settings.autocomplete_history_days-1))):
@@ -293,7 +292,7 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
     for driver in active_drivers:
         if driver.is_logged:
             driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
-        elif not driver.is_logged and len(nonlogged_vehicles) == 1:
+        elif not driver.is_logged and nonlogged_vehicles.count() == 1:
             driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
         else:
             driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}

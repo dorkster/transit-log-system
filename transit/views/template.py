@@ -48,9 +48,8 @@ def templateEdit(request, id):
 def templateCreateEditCommon(request, template, is_new):
     if is_new == True:
         query = Template.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_template = query[0]
-            template.sort_index = last_template.sort_index + 1
+        if query.count() > 0:
+            template.sort_index = query[0].sort_index + 1
         else:
             template.sort_index = 0
 

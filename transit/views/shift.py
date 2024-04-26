@@ -93,7 +93,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             # when updating trips that match the previous info, we only want to do so when there is a single matching shift
             # for example: if there are 2 shifts with the same driver & vehicle, and we update the second, we want to keep the trips "assigned" to the first shift
             prev_shift_matches = Shift.objects.filter(date=shift.date, driver=prev['driver'], vehicle=prev['vehicle'])
-            prev_shift_match_count = len(prev_shift_matches)
+            prev_shift_match_count = prev_shift_matches.count()
 
             new_day_trips = Trip.objects.filter(date=shift.date)
             for trip in new_day_trips:

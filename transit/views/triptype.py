@@ -48,9 +48,8 @@ def triptypeEdit(request, id):
 def triptypeCreateEditCommon(request, triptype, is_new):
     if is_new == True:
         query = TripType.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_triptype = query[0]
-            triptype.sort_index = last_triptype.sort_index + 1
+        if query.count() > 0:
+            triptype.sort_index = query[0].sort_index + 1
         else:
             triptype.sort_index = 0
 

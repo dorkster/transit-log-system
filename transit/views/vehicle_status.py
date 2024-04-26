@@ -90,7 +90,7 @@ def ajaxVehicleStatus(request):
         vehicle_issues = vehicle_issues.filter(is_resolved=False)
 
     # don't count resolved issues towards filter count
-    issue_unfiltered_count = len(vehicle_issues)
+    issue_unfiltered_count = vehicle_issues.count()
 
     if filter_driver != '':
         vehicle_issues = vehicle_issues.filter(driver__id=filter_driver)
@@ -101,7 +101,7 @@ def ajaxVehicleStatus(request):
     if filter_priority != '':
         vehicle_issues = vehicle_issues.filter(priority=int(filter_priority))
 
-    issue_filtered_count = len(vehicle_issues)
+    issue_filtered_count = vehicle_issues.count()
 
     pretrips_per_page = 50
     pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), pretrips_per_page)

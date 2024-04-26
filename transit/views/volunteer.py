@@ -49,9 +49,8 @@ def volunteerEdit(request, id):
 def volunteerCreateEditCommonn(request, volunteer, is_new):
     if is_new == True:
         query = Volunteer.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_volunteer = query[0]
-            volunteer.sort_index = last_volunteer.sort_index + 1
+        if query.count() > 0:
+            volunteer.sort_index = query[0].sort_index + 1
         else:
             volunteer.sort_index = 0
 

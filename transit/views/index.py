@@ -48,7 +48,7 @@ def index(request):
             if form.is_valid():
                 user.username = form.cleaned_data['username']
                 user.set_password(form.cleaned_data['password'])
-                if len(User.objects.filter(username=user.username)) > 0:
+                if User.objects.filter(username=user.username).count() > 0:
                     form.add_error('username', 'Username already exists')
 
                 if form.cleaned_data['password'] != '':

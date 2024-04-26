@@ -50,9 +50,8 @@ def tagEdit(request, id):
 def tagCreateEditCommon(request, tag, is_new):
     if is_new == True:
         query = Tag.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_tag = query[0]
-            tag.sort_index = last_tag.sort_index + 1
+        if query.count() > 0:
+            tag.sort_index = query[0].sort_index + 1
         else:
             tag.sort_index = 0
 

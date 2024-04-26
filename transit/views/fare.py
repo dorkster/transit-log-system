@@ -50,9 +50,8 @@ def fareEdit(request, id):
 def fareCreateEditCommon(request, fare, is_new):
     if is_new == True:
         query = Fare.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_fare = query[0]
-            fare.sort_index = last_fare.sort_index + 1
+        if query.count() > 0:
+            fare.sort_index = query[0].sort_index + 1
         else:
             fare.sort_index = 0
 

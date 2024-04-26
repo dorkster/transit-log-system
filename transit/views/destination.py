@@ -81,7 +81,7 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(destination))
 
             existing_destinations = Destination.objects.filter(address=destination.address)
-            if len(existing_destinations) > 1:
+            if existing_destinations.count() > 1:
                 # TODO this ignores the 'update_trips' flag. Is this reasonable?
                 return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
@@ -318,7 +318,7 @@ def destinationCreateFromTrip(request, trip_id, use_address):
         target_phone = trip.phone_destination
 
     existing_destinations = Destination.objects.filter(address=target_address)
-    if len(existing_destinations) > 0:
+    if existing_destinations.count() > 0:
         return destinationCreateEditCommon(request, existing_destinations[0], is_new=False, is_dupe=True, src_trip=trip)
 
     destination = Destination()
@@ -339,7 +339,7 @@ def destinationCreateFromTemplateTrip(request, trip_id, use_address):
         target_phone = trip.phone_destination
 
     existing_destinations = Destination.objects.filter(address=target_address)
-    if len(existing_destinations) > 0:
+    if existing_destinations.count() > 0:
         return destinationCreateEditCommon(request, existing_destinations[0], is_new=False, is_dupe=True, src_template_trip=trip)
 
     destination = Destination()
@@ -394,7 +394,7 @@ def ajaxDestinationList(request):
     filter_search = request.session.get('destinations_search', '')
 
     destinations = Destination.objects.all()
-    unfiltered_count = len(destinations)
+    unfiltered_count = destinations.count()
 
     if filter_active == 1:
         destinations = destinations.filter(is_active=True)
@@ -404,7 +404,7 @@ def ajaxDestinationList(request):
     if filter_search != '':
         destinations = destinations.filter(address__icontains=filter_search)
 
-    filtered_count = len(destinations)
+    filtered_count = destinations.count()
 
     if sort_mode == SORT_ADDRESS:
         destinations = destinations.order_by('address')

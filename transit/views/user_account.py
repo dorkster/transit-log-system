@@ -48,7 +48,7 @@ def userGetGroupInt(user):
 
 def userGetGroup(group_name):
     query = Group.objects.filter(name=group_name)
-    if len(query) > 0:
+    if query.count() > 0:
         group = query[0]
     else:
         group = Group()
@@ -205,7 +205,7 @@ def userCreateEdit(request, user, is_new):
             if is_new:
                 user.username = form.cleaned_data['username']
                 user.set_password(form.cleaned_data['password'])
-                if len(User.objects.filter(username=user.username)) > 0:
+                if User.objects.filter(username=user.username).count() > 0:
                     form.add_error('username', 'Username already exists')
 
             if form.cleaned_data['password'] != '':
@@ -286,7 +286,7 @@ def userDelete(request, username):
         can_delete = False
 
     staff_users = User.objects.filter(groups__name='Staff')
-    if len(staff_users) == 1 and len(user.groups.all().filter(name='Staff')) != 0:
+    if staff_users.count() == 1 and user.groups.all().filter(name='Staff').count() != 0:
         can_delete = False
 
     if request.method == 'POST':

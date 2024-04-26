@@ -48,9 +48,8 @@ def activityColorEdit(request, id):
 def activityColorCreateEditCommon(request, activity_color, is_new):
     if is_new == True:
         query = ActivityColor.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_activity_color = query[0]
-            activity_color.sort_index = last_activity_color.sort_index + 1
+        if query.count() > 0:
+            activity_color.sort_index = query[0].sort_index + 1
         else:
             activity_color.sort_index = 0
 

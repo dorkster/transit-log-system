@@ -164,7 +164,7 @@ def ajaxLoggedEventList(request):
     # TODO filter by date?
     logged_events = LoggedEvent.objects.all()
 
-    unfiltered_count = len(logged_events)
+    unfiltered_count = logged_events.count()
     is_filtered = False
 
     if filter_action != '':
@@ -197,7 +197,7 @@ def ajaxLoggedEventList(request):
         except:
             pass
 
-    filtered_count = len(logged_events)
+    filtered_count = logged_events.count()
 
     logged_events = logged_events.order_by('-timestamp')
 

@@ -31,7 +31,7 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
         date_end = swap_date
 
     filtered_drivers = Driver.objects.filter(id=driver_id, is_active=True)
-    if len(filtered_drivers) > 0:
+    if filtered_drivers.count() > 0:
         selected_driver = filtered_drivers[0]
     else:
         selected_driver = None
@@ -106,7 +106,7 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
 
     payments = ClientPayment.objects.filter(parent=client.id, date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
 
-    total_fares_and_payments = len(trips_money) + len(payments)
+    total_fares_and_payments = trips_money.count() + payments.count()
 
     # run report to get all fares/payments
     report = Report()

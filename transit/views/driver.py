@@ -48,9 +48,8 @@ def driverEdit(request, id):
 def driverCreateEditCommon(request, driver, is_new):
     if is_new == True:
         query = Driver.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_driver = query[0]
-            driver.sort_index = last_driver.sort_index + 1
+        if query.count() > 0:
+            driver.sort_index = query[0].sort_index + 1
         else:
             driver.sort_index = 0
 

@@ -49,9 +49,8 @@ def vehicleEdit(request, id):
 def vehicleCreateEditCommon(request, vehicle, is_new):
     if is_new == True:
         query = Vehicle.objects.all().order_by('-sort_index')
-        if len(query) > 0:
-            last_vehicle = query[0]
-            vehicle.sort_index = last_vehicle.sort_index + 1
+        if query.count() > 0:
+            vehicle.sort_index = query[0].sort_index + 1
         else:
             vehicle.sort_index = 0
 
@@ -186,7 +185,7 @@ def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
         pretrip_vehicle = shift.vehicle
 
         # Pretrip was already logged, return to the schedule
-        if len(PreTrip.objects.filter(shift_id=shift_id)) > 0:
+        if PreTrip.objects.filter(shift_id=shift_id).count() > 0:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     elif vehicle_id:
         shift = None

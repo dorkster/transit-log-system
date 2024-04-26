@@ -59,7 +59,8 @@ def searchGetTrips(request):
     sort_mode = request.GET.get('sort_mode')
     result_type = request.GET.get('result_type')
 
-    trips = Trip.objects.all()
+    trips = Trip.objects.all().select_related('driver', 'vehicle', 'trip_type', 'volunteer')
+
     searched = False
     wildcard = '*'
 
@@ -364,85 +365,91 @@ def searchExportXLSX(request):
     ws_results.cell(row_header, 20, 'Ambulatory?')
     ws_results.cell(row_header, 21, 'Volunteer Driver')
 
-    for i in range(0, trip_count):
-        ws_results.cell(row_header + i + 1, 1, trips[i].date)
-        ws_results.cell(row_header + i + 1, 2, trips[i].pick_up_time)
-        ws_results.cell(row_header + i + 1, 3, trips[i].appointment_time)
-        ws_results.cell(row_header + i + 1, 4, trips[i].name)
-        ws_results.cell(row_header + i + 1, 5, trips[i].address)
+    for i in range(0, row_header + trip_count):
+        row = i + 1
+
+        # apply styles
+        if row > row_header:
+            trip = trips[i-1]
+            fill_color = trip.get_driver_color()[0:6]
+
+        for col in range(1, 22):
+            if col == 4 or col == 6 or col == 14 or col == 15:
+                ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_large
+            elif col == 5 or col == 7 or col == 21:
+                ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_xlarge
+            else:
+                ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
+
+            ws_results.cell(row, col).border = style_border_normal
+            ws_results.cell(row, col).font = style_font_normal
+
+            if row == row_header:
+                ws_results.cell(row, col).font = style_font_header
+                ws_results.cell(row, col).alignment = style_alignment_header
+                ws_results.cell(row, col).fill = style_fill_header
+            else:
+                if col == 1:
+                    ws_results.cell(row, col).alignment = style_alignment_date
+
+                ws_results.cell(row, col).fill = PatternFill(fill_type='solid', fgColor=fill_color)
+
+                # number formats
+                ws_results.cell(row, 1).number_format = 'mmm dd, yyyy'
+                ws_results.cell(row, 17).number_format = '$0.00'
+                ws_results.cell(row, 18).number_format = '$0.00'
+
+
+        if row == row_header:
+            continue
+
+        ws_results.cell(row, 1, trip.date)
+        ws_results.cell(row, 2, trip.pick_up_time)
+        ws_results.cell(row, 3, trip.appointment_time)
+        ws_results.cell(row, 4, trip.name)
+        ws_results.cell(row, 5, trip.address)
 
         phone_string = ''
-        phone_string += trips[i].phone_home
-        if trips[i].phone_home and trips[i].phone_cell:
+        phone_string += trip.phone_home
+        if trip.phone_home and trip.phone_cell:
             phone_string += ' / '
-        phone_string += trips[i].phone_cell
-        if trips[i].phone_alt and (trips[i].phone_home or trips[i].phone_cell):
+        phone_string += trip.phone_cell
+        if trip.phone_alt and (trip.phone_home or trip.phone_cell):
             phone_string += ' / '
-        phone_string += trips[i].phone_alt
+        phone_string += trip.phone_alt
 
-        ws_results.cell(row_header + i + 1, 6, phone_string)
+        ws_results.cell(row, 6, phone_string)
 
-        ws_results.cell(row_header + i + 1, 7, trips[i].destination)
+        ws_results.cell(row, 7, trip.destination)
 
-        if trips[i].driver:
-            ws_results.cell(row_header + i + 1, 8, str(trips[i].driver))
-        if trips[i].vehicle:
-            ws_results.cell(row_header + i + 1, 9, str(trips[i].vehicle))
+        if trip.driver:
+            ws_results.cell(row, 8, str(trip.driver))
+        if trip.vehicle:
+            ws_results.cell(row, 9, str(trip.vehicle))
 
-        ws_results.cell(row_header + i + 1, 10, trips[i].start_miles)
-        ws_results.cell(row_header + i + 1, 11, trips[i].start_time)
-        ws_results.cell(row_header + i + 1, 12, trips[i].end_miles)
-        ws_results.cell(row_header + i + 1, 13, trips[i].end_time)
-        ws_results.cell(row_header + i + 1, 14, trips[i].note)
+        ws_results.cell(row, 10, trip.start_miles)
+        ws_results.cell(row, 11, trip.start_time)
+        ws_results.cell(row, 12, trip.end_miles)
+        ws_results.cell(row, 13, trip.end_time)
+        ws_results.cell(row, 14, trip.note)
 
         tags_string = ''
-        if trips[i].trip_type:
-            tags_string += str(trips[i].trip_type)
-            if trips[i].tags:
+        if trip.trip_type:
+            tags_string += str(trip.trip_type)
+            if trip.tags:
                 tags_string += ' / '
-        if trips[i].tags:
-            tags_string += trips[i].tags
-        ws_results.cell(row_header + i + 1, 15, tags_string)
+        if trip.tags:
+            tags_string += trip.tags
+        ws_results.cell(row, 15, tags_string)
 
-        ws_results.cell(row_header + i + 1, 16, trips[i].passenger)
-        ws_results.cell(row_header + i + 1, 17, trips[i].fare / 100)
-        ws_results.cell(row_header + i + 1, 18, (trips[i].collected_cash + trips[i].collected_check) / 100)
-        ws_results.cell(row_header + i + 1, 19, trips[i].elderly)
-        ws_results.cell(row_header + i + 1, 20, trips[i].ambulatory)
+        ws_results.cell(row, 16, trip.passenger)
+        ws_results.cell(row, 17, trip.fare / 100)
+        ws_results.cell(row, 18, (trip.collected_cash + trip.collected_check) / 100)
+        ws_results.cell(row, 19, trip.elderly)
+        ws_results.cell(row, 20, trip.ambulatory)
 
-        if trips[i].volunteer:
-            ws_results.cell(row_header + i + 1, 21, trips[i].volunteer.verbose_name())
-
-    # number formats
-    for i in range(row_header + 1, row_header + trip_count + 1):
-        ws_results.cell(i, 1).number_format = 'mmm dd, yyyy'
-        ws_results.cell(i, 17).number_format = '$0.00'
-        ws_results.cell(i, 18).number_format = '$0.00'
-
-    # apply styles
-    ws_results.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 22):
-        if i == 4 or i == 6 or i == 14 or i == 15:
-            ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_large
-        elif i == 5 or i == 7 or i == 21:
-            ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_xlarge
-        else:
-            ws_results.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
-
-        for j in range(row_header, row_header + trip_count + 1):
-            trip_index = j - row_header - 1
-
-            ws_results.cell(j, i).border = style_border_normal
-            if j == row_header:
-                ws_results.cell(j, i).font = style_font_header
-                ws_results.cell(j, i).alignment = style_alignment_header
-                ws_results.cell(j, i).fill = style_fill_header
-            else:
-                if i == 1:
-                    ws_results.cell(j, i).alignment = style_alignment_date
-
-                ws_results.cell(j, i).font = style_font_normal
-                ws_results.cell(j, i).fill = PatternFill(fill_type='solid', fgColor=trips[trip_index].get_driver_color()[0:6])
+        if trip.volunteer:
+            ws_results.cell(row, 21, trip.volunteer.verbose_name())
 
     wb.save(filename=temp_file.name)
 

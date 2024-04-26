@@ -751,6 +751,8 @@ def clientXLSX(request):
 
     row_header = 1
 
+    ws.row_dimensions[row_header].height = style_rowheight_header
+
     ws.cell(row_header, 1, 'Name')
     ws.cell(row_header, 2, 'Address')
     ws.cell(row_header, 3, 'Phone (Home)')
@@ -763,34 +765,40 @@ def clientXLSX(request):
     ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
     ws.cell(row_header, 11, 'Reminder Instructions')
 
-    for i in range(0, client_count):
-        ws.cell(i+2, 1, clients[i].name)
-        ws.cell(i+2, 2, clients[i].address)
-        ws.cell(i+2, 3, clients[i].phone_home)
-        ws.cell(i+2, 4, clients[i].phone_cell)
-        ws.cell(i+2, 5, clients[i].phone_alt)
-        ws.cell(i+2, 6, clients[i].elderly)
-        ws.cell(i+2, 7, clients[i].ambulatory)
-        ws.cell(i+2, 8, clients[i].tags)
-        ws.cell(i+2, 9, clients[i].is_active)
-        ws.cell(i+2, 10, clients[i].is_transit_policy_acknowledged)
-        ws.cell(i+2, 11, clients[i].reminder_instructions)
+    for i in range(0, row_header + client_count):
+        row = i + 1
 
-    # apply styles
-    ws.row_dimensions[row_header].height = style_rowheight_header
-    for i in range(1, 12):
-        if i == 1 or i == 2 or i == 8 or i == 11:
-            ws.column_dimensions[get_column_letter(i)].width = style_colwidth_large
-        else:
-            ws.column_dimensions[get_column_letter(i)].width = style_colwidth_normal
-        for j in range(row_header, client_count+2):
-            ws.cell(j, i).border = style_border_normal
-            if j == row_header:
-                ws.cell(j, i).font = style_font_header
-                ws.cell(j, i).alignment = style_alignment_header
-                ws.cell(j, i).fill = style_fill_header
+        # apply styles
+        for col in range(1, 12):
+            if col == 1 or col == 2 or col == 8 or col == 11:
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_large
             else:
-                ws.cell(j, i).font = style_font_normal
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
+
+            ws.cell(row, col).border = style_border_normal
+            if row == row_header:
+                ws.cell(row, col).font = style_font_header
+                ws.cell(row, col).alignment = style_alignment_header
+                ws.cell(row, col).fill = style_fill_header
+            else:
+                ws.cell(row, col).font = style_font_normal
+
+        if row == row_header:
+            continue
+
+        client = clients[i-1]
+
+        ws.cell(row, 1, client.name)
+        ws.cell(row, 2, client.address)
+        ws.cell(row, 3, client.phone_home)
+        ws.cell(row, 4, client.phone_cell)
+        ws.cell(row, 5, client.phone_alt)
+        ws.cell(row, 6, client.elderly)
+        ws.cell(row, 7, client.ambulatory)
+        ws.cell(row, 8, client.tags)
+        ws.cell(row, 9, client.is_active)
+        ws.cell(row, 10, client.is_transit_policy_acknowledged)
+        ws.cell(row, 11, client.reminder_instructions)
 
     wb.save(filename=temp_file.name)
 

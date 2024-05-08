@@ -398,6 +398,38 @@
     <br/>
     <table class="mytable mytable-striped">
         <thead>
+            <td class="mytable-col-md"></td>
+            <td class="mytable-col-md text-center">Elderly Ambulatory</td>
+            <td class="mytable-col-md text-center">Elderly Non-Ambulatory</td>
+            <td class="mytable-col-md text-center">Non-Elderly Ambulatory</td>
+            <td class="mytable-col-md text-center">Non-Elderly Non-Ambulatory</td>
+            <td class="mytable-col-md text-center">Unknown</td>
+            <td class="mytable-col-md text-center">Total</td>
+            <td class="mytable-col-md text-center">Staff</td>
+            <td class="mytable-col-md text-center">Total (with staff)</td>
+        </thead>
+        <tr>
+            <td class="mytable-col-md">Trips on vehicle</td>
+            {% for trip_count in report.unique_riders.by_trips %}
+            <td class="mytable-col-sm {% if trip_count.passenger == 0 %}mytable-zero{%endif%}">{{trip_count.passenger}}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="mytable-col-md">Trips not on vehicle</td>
+            {% for trip_count in report.unique_riders.by_trips %}
+            <td class="mytable-col-sm {% if trip_count.no_passenger == 0 %}mytable-zero{%endif%}">{{trip_count.no_passenger}}</td>
+            {% endfor %}
+        </tr>
+        <tr class="bg-success text-light text-bold">
+            <td class="mytable-col-md">TOTAL</td>
+            {% for trip_count in report.unique_riders.by_trips %}
+            <td class="mytable-col-sm text-center{% if trip_count.total == 0 %}mytable-zero{%endif%}">{{trip_count.total}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+    <br/>
+    <table class="mytable mytable-striped">
+        <thead>
             <td class="mytable-col-lg">Name</td>
             <td class="mytable-col-sm">Elderly</td>
             <td class="mytable-col-sm">Ambulatory</td>

@@ -183,6 +183,10 @@ class Report():
             else:
                 self.passenger = value
             self.total = self.passenger + self.no_passenger
+        def addTripsFromTripCount(self, value):
+            self.passenger += value.passenger
+            self.no_passenger += value.no_passenger
+            self.total = self.passenger + self.no_passenger
 
     class ReportShift():
         def __init__(self):
@@ -425,10 +429,10 @@ class Report():
             self.nonelderly_ambulatory = Report.TripCount()
             self.nonelderly_nonambulatory = Report.TripCount()
             self.unknown = Report.TripCount()
-            self.total = Report.TripCount()
             self.staff = Report.TripCount()
             self.all = Report.TripCount()
             self.all_with_staff = Report.TripCount()
+            self.by_trips = [Report.TripCount() for i in range(8)]
             # fares & payments totals
             self.total_collected_cash = Report.Money(0)
             self.total_collected_check = Report.Money(0)
@@ -1057,22 +1061,37 @@ class Report():
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
             if rider.trips.total > 0:
+                # All (with staff)
                 self.unique_riders.all_with_staff.addTrips(1, (rider.trips.passenger > 0))
+                self.unique_riders.by_trips[7].addTripsFromTripCount(rider.trips)
                 if rider.staff:
+                    # Staff
                     self.unique_riders.staff.addTrips(1, (rider.trips.passenger > 0))
+                    self.unique_riders.by_trips[6].addTripsFromTripCount(rider.trips)
                 else:
+                    # Total
                     self.unique_riders.all.addTrips(1, (rider.trips.passenger > 0))
-                    self.unique_riders.total.addTrips(1, (rider.trips.passenger > 0))
+                    self.unique_riders.by_trips[5].addTripsFromTripCount(rider.trips)
                     if rider.elderly == None or rider.ambulatory == None:
+                        # Unknown
                         self.unique_riders.unknown.addTrips(1, (rider.trips.passenger > 0))
+                        self.unique_riders.by_trips[4].addTripsFromTripCount(rider.trips)
                     elif rider.elderly and rider.ambulatory:
+                        # Elderly / Ambulatory
                         self.unique_riders.elderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
+                        self.unique_riders.by_trips[0].addTripsFromTripCount(rider.trips)
                     elif rider.elderly and not rider.ambulatory:
+                        # Elderly / Non-Ambulatory
                         self.unique_riders.elderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
+                        self.unique_riders.by_trips[1].addTripsFromTripCount(rider.trips)
                     elif not rider.elderly and rider.ambulatory:
+                        # Non-Elderly / Ambulatory
                         self.unique_riders.nonelderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
+                        self.unique_riders.by_trips[2].addTripsFromTripCount(rider.trips)
                     elif not rider.elderly and not rider.ambulatory:
+                        # Non-Elderly / Non-Ambulatory
                         self.unique_riders.nonelderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
+                        self.unique_riders.by_trips[3].addTripsFromTripCount(rider.trips)
 
             # calculate total owed money
             rider.total_payments = rider.collected_cash + rider.collected_check + rider.paid_cash + rider.paid_check
@@ -1655,12 +1674,17 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws = wb.create_sheet('Rider Summary')
 
     row_header = 1
-    row_total = 4
-    row_header_riders = row_total + 2
+    row_total = row_header + 3
+
+    row_header_trips = row_total + 2
+    row_total_trips = row_header_trips + 3
+
+    row_header_riders = row_total_trips + 2
     row_riders = row_header_riders + 1
     row_riders_end = row_riders + len(report.unique_riders.names)
 
     ws.row_dimensions[row_header].height = style_rowheight_header
+    ws.row_dimensions[row_header_trips].height = style_rowheight_header
     ws.row_dimensions[row_header_riders].height = style_rowheight_header
 
     ws.cell(row_header, 2, 'Elderly Ambulatory')
@@ -1702,6 +1726,23 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws.cell(row_total, 8, report.unique_riders.staff.total)
     ws.cell(row_total, 9, report.unique_riders.all_with_staff.total)
 
+    ws.cell(row_header_trips, 2, 'Elderly Ambulatory')
+    ws.cell(row_header_trips, 3, 'Elderly Non-Ambulatory')
+    ws.cell(row_header_trips, 4, 'Non-Elderly Ambulatory')
+    ws.cell(row_header_trips, 5, 'Non-Elderly Non-Ambulatory')
+    ws.cell(row_header_trips, 6, 'Unknown')
+    ws.cell(row_header_trips, 7, 'Total')
+    ws.cell(row_header_trips, 8, 'Staff')
+    ws.cell(row_header_trips, 9, 'Total (with staff)')
+
+    ws.cell(row_header_trips+1, 1, 'Trips on vehicle')
+    ws.cell(row_header_trips+2, 1, 'Not on vehicle')
+    ws.cell(row_total, 1, 'TOTAL')
+    for i in range(0,8):
+        ws.cell(row_header_trips+1, i+2, report.unique_riders.by_trips[i].passenger)
+        ws.cell(row_header_trips+2, i+2, report.unique_riders.by_trips[i].no_passenger)
+        ws.cell(row_total_trips, i+2, report.unique_riders.by_trips[i].total)
+
     ws.cell(row_header_riders, 1, 'Name')
     ws.cell(row_header_riders, 3, 'Elderly')
     ws.cell(row_header_riders, 4, 'Ambulatory')
@@ -1715,15 +1756,15 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         row = i + 1
 
         # apply styles
-        if row <= row_total:
+        if row <= row_total_trips:
             for col in range(1, 10):
                 ws.cell(row, col).border = style_border_normal
-                if row == row_header:
+                if row == row_header or row == row_header_trips:
                     ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
                     ws.cell(row, col).font = style_font_header
                     ws.cell(row, col).alignment = style_alignment_header
                     ws.cell(row, col).fill = style_fill_header
-                elif row == row_total:
+                elif row == row_total or row == row_total_trips:
                     ws.cell(row, col).font = style_font_total
                     ws.cell(row, col).fill = style_fill_total
                 else:

@@ -112,17 +112,17 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.elderly_ambulatory.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.0.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.elderly_ambulatory.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.0.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.elderly_ambulatory.total }}
+                {{ report.unique_riders.by_individuals.0.total }}
             </div>
         </div>
     </div>
@@ -132,17 +132,17 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.elderly_nonambulatory.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.1.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.elderly_nonambulatory.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.1.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.elderly_nonambulatory.total }}
+                {{ report.unique_riders.by_individuals.1.total }}
             </div>
         </div>
     </div>
@@ -152,17 +152,17 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.nonelderly_ambulatory.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.2.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.nonelderly_ambulatory.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.2.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.nonelderly_ambulatory.total }}
+                {{ report.unique_riders.by_individuals.2.total }}
             </div>
         </div>
     </div>
@@ -172,38 +172,38 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.nonelderly_nonambulatory.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.3.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.nonelderly_nonambulatory.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.3.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.nonelderly_nonambulatory.total }}
+                {{ report.unique_riders.by_individuals.3.total }}
             </div>
         </div>
     </div>
-    {% if report.unique_riders.unknown.total > 0 %}
+    {% if report.unique_riders.by_individuals.4.total > 0 %}
     <div class="row mb-3">
         <div class="col">
             Unknown clients (missing data)
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.unknown.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.4.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.unknown.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.4.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                {{ report.unique_riders.unknown.total }}
+                {{ report.unique_riders.by_individuals.4.total }}
             </div>
         </div>
     </div>
@@ -215,17 +215,17 @@
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.all.passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.5.passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-muted small">{{ report.unique_riders.all.no_passenger }}</span>
+                <span class="text-muted small">{{ report.unique_riders.by_individuals.5.no_passenger }}</span>
             </div>
         </div>
         <div class="col-1">
             <div class="blank-field">
-                <span class="text-bold">{{ report.unique_riders.all.total }}</span>
+                <span class="text-bold">{{ report.unique_riders.by_individuals.5.total }}</span>
             </div>
         </div>
     </div>

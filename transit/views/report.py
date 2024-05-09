@@ -36,6 +36,15 @@ from transit.common.util import *
 class Report():
     service_mile_warning_threshold = 1000
 
+    RIDER_ELDERLY_AMBULATORY = 0
+    RIDER_ELDERLY_NONAMBULATORY = 1
+    RIDER_NONELDERLY_AMBULATORY = 2
+    RIDER_NONELDERLY_NONAMBULATORY = 3
+    RIDER_UNKNOWN = 4
+    RIDER_TOTAL = 5
+    RIDER_STAFF = 6
+    RIDER_TOTAL_WITH_STAFF = 7
+
     class Money():
         def __init__(self, default_value=0):
             self.value = default_value
@@ -424,14 +433,7 @@ class Report():
 
         def __init__(self):
             self.names = []
-            self.elderly_ambulatory = Report.TripCount()
-            self.elderly_nonambulatory = Report.TripCount()
-            self.nonelderly_ambulatory = Report.TripCount()
-            self.nonelderly_nonambulatory = Report.TripCount()
-            self.unknown = Report.TripCount()
-            self.staff = Report.TripCount()
-            self.all = Report.TripCount()
-            self.all_with_staff = Report.TripCount()
+            self.by_individuals = [Report.TripCount() for i in range(8)]
             self.by_trips = [Report.TripCount() for i in range(8)]
             # fares & payments totals
             self.total_collected_cash = Report.Money(0)
@@ -1061,37 +1063,33 @@ class Report():
         for rider in self.unique_riders.names:
             # total elderly/ambulatory counts
             if rider.trips.total > 0:
-                # All (with staff)
-                self.unique_riders.all_with_staff.addTrips(1, (rider.trips.passenger > 0))
-                self.unique_riders.by_trips[7].addTripsFromTripCount(rider.trips)
+                is_passenger = rider.trips.passenger > 0
+
+                self.unique_riders.by_individuals[Report.RIDER_TOTAL_WITH_STAFF].addTrips(1, is_passenger)
+                self.unique_riders.by_trips[Report.RIDER_TOTAL_WITH_STAFF].addTripsFromTripCount(rider.trips)
+
                 if rider.staff:
-                    # Staff
-                    self.unique_riders.staff.addTrips(1, (rider.trips.passenger > 0))
-                    self.unique_riders.by_trips[6].addTripsFromTripCount(rider.trips)
+                    self.unique_riders.by_individuals[Report.RIDER_STAFF].addTrips(1, is_passenger)
+                    self.unique_riders.by_trips[Report.RIDER_STAFF].addTripsFromTripCount(rider.trips)
                 else:
-                    # Total
-                    self.unique_riders.all.addTrips(1, (rider.trips.passenger > 0))
-                    self.unique_riders.by_trips[5].addTripsFromTripCount(rider.trips)
+                    self.unique_riders.by_individuals[Report.RIDER_TOTAL].addTrips(1, is_passenger)
+                    self.unique_riders.by_trips[Report.RIDER_TOTAL].addTripsFromTripCount(rider.trips)
+
                     if rider.elderly == None or rider.ambulatory == None:
-                        # Unknown
-                        self.unique_riders.unknown.addTrips(1, (rider.trips.passenger > 0))
-                        self.unique_riders.by_trips[4].addTripsFromTripCount(rider.trips)
+                        self.unique_riders.by_individuals[Report.RIDER_UNKNOWN].addTrips(1, is_passenger)
+                        self.unique_riders.by_trips[Report.RIDER_UNKNOWN].addTripsFromTripCount(rider.trips)
                     elif rider.elderly and rider.ambulatory:
-                        # Elderly / Ambulatory
-                        self.unique_riders.elderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
-                        self.unique_riders.by_trips[0].addTripsFromTripCount(rider.trips)
+                        self.unique_riders.by_individuals[Report.RIDER_ELDERLY_AMBULATORY].addTrips(1, is_passenger)
+                        self.unique_riders.by_trips[Report.RIDER_ELDERLY_AMBULATORY].addTripsFromTripCount(rider.trips)
                     elif rider.elderly and not rider.ambulatory:
-                        # Elderly / Non-Ambulatory
-                        self.unique_riders.elderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
-                        self.unique_riders.by_trips[1].addTripsFromTripCount(rider.trips)
+                        self.unique_riders.by_individuals[Report.RIDER_ELDERLY_NONAMBULATORY].addTrips(1, is_passenger)
+                        self.unique_riders.by_trips[Report.RIDER_ELDERLY_NONAMBULATORY].addTripsFromTripCount(rider.trips)
                     elif not rider.elderly and rider.ambulatory:
-                        # Non-Elderly / Ambulatory
-                        self.unique_riders.nonelderly_ambulatory.addTrips(1, (rider.trips.passenger > 0))
-                        self.unique_riders.by_trips[2].addTripsFromTripCount(rider.trips)
+                        self.unique_riders.by_individuals[Report.RIDER_NONELDERLY_AMBULATORY].addTrips(1, is_passenger)
+                        self.unique_riders.by_trips[Report.RIDER_NONELDERLY_AMBULATORY].addTripsFromTripCount(rider.trips)
                     elif not rider.elderly and not rider.ambulatory:
-                        # Non-Elderly / Non-Ambulatory
-                        self.unique_riders.nonelderly_nonambulatory.addTrips(1, (rider.trips.passenger > 0))
-                        self.unique_riders.by_trips[3].addTripsFromTripCount(rider.trips)
+                        self.unique_riders.by_individuals[Report.RIDER_NONELDERLY_NONAMBULATORY].addTrips(1, is_passenger)
+                        self.unique_riders.by_trips[Report.RIDER_NONELDERLY_NONAMBULATORY].addTripsFromTripCount(rider.trips)
 
             # calculate total owed money
             rider.total_payments = rider.collected_cash + rider.collected_check + rider.paid_cash + rider.paid_check
@@ -1697,34 +1695,12 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws.cell(row_header, 9, 'Total (with staff)')
 
     ws.cell(row_header+1, 1, 'On vehicle')
-    ws.cell(row_header+1, 2, report.unique_riders.elderly_ambulatory.passenger)
-    ws.cell(row_header+1, 3, report.unique_riders.elderly_nonambulatory.passenger)
-    ws.cell(row_header+1, 4, report.unique_riders.nonelderly_ambulatory.passenger)
-    ws.cell(row_header+1, 5, report.unique_riders.nonelderly_nonambulatory.passenger)
-    ws.cell(row_header+1, 6, report.unique_riders.unknown.passenger)
-    ws.cell(row_header+1, 7, report.unique_riders.all.passenger)
-    ws.cell(row_header+1, 8, report.unique_riders.staff.passenger)
-    ws.cell(row_header+1, 9, report.unique_riders.all_with_staff.passenger)
-
     ws.cell(row_header+2, 1, 'Not on vehicle')
-    ws.cell(row_header+2, 2, report.unique_riders.elderly_ambulatory.no_passenger)
-    ws.cell(row_header+2, 3, report.unique_riders.elderly_nonambulatory.no_passenger)
-    ws.cell(row_header+2, 4, report.unique_riders.nonelderly_ambulatory.no_passenger)
-    ws.cell(row_header+2, 5, report.unique_riders.nonelderly_nonambulatory.no_passenger)
-    ws.cell(row_header+2, 6, report.unique_riders.unknown.no_passenger)
-    ws.cell(row_header+2, 7, report.unique_riders.all.no_passenger)
-    ws.cell(row_header+2, 8, report.unique_riders.staff.no_passenger)
-    ws.cell(row_header+2, 9, report.unique_riders.all_with_staff.no_passenger)
-
     ws.cell(row_total, 1, 'TOTAL')
-    ws.cell(row_total, 2, report.unique_riders.elderly_ambulatory.total)
-    ws.cell(row_total, 3, report.unique_riders.elderly_nonambulatory.total)
-    ws.cell(row_total, 4, report.unique_riders.nonelderly_ambulatory.total)
-    ws.cell(row_total, 5, report.unique_riders.nonelderly_nonambulatory.total)
-    ws.cell(row_total, 6, report.unique_riders.unknown.total)
-    ws.cell(row_total, 7, report.unique_riders.all.total)
-    ws.cell(row_total, 8, report.unique_riders.staff.total)
-    ws.cell(row_total, 9, report.unique_riders.all_with_staff.total)
+    for i in range(0, 8):
+        ws.cell(row_header+1, i+2, report.unique_riders.by_individuals[i].passenger)
+        ws.cell(row_header+2, i+2, report.unique_riders.by_individuals[i].no_passenger)
+        ws.cell(row_total, i+2, report.unique_riders.by_individuals[i].total)
 
     ws.cell(row_header_trips, 2, 'Elderly Ambulatory')
     ws.cell(row_header_trips, 3, 'Elderly Non-Ambulatory')

@@ -1045,8 +1045,12 @@ class Report():
                         driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
                         driver_report.totals += report_day.by_driver[driver_index]
 
+        cleaned_driver_reports = []
         for driver_report in self.driver_reports:
-            self.driver_reports_total.totals += driver_report.totals
+            if len(driver_report.days) > 0:
+                cleaned_driver_reports.append(driver_report)
+                self.driver_reports_total.totals += driver_report.totals
+        self.driver_reports = cleaned_driver_reports
 
         self.all_vehicles.type = Report.ReportSummary.TYPE_LOGGED
         for vehicle_report in self.vehicle_reports:
@@ -2223,6 +2227,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws.cell(row_header, 5, 'Deadhead Hours')
     ws.cell(row_header, 6, 'Total Miles')
     ws.cell(row_header, 7, 'Total Hours')
+    ws.cell(row_header, 8, 'Days of Service')
 
     ws.row_dimensions[row_header].height = style_rowheight_header
 
@@ -2233,7 +2238,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
 
         if row == row_header:
             # apply styles
-            for col in range(1, 8):
+            for col in range(1, 9):
                 ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
                 ws.cell(row, col).border = style_border_normal
                 ws.cell(row, col).font = style_font_header
@@ -2253,10 +2258,11 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                 ws.cell(row, 5, rdata.totals.deadhead_hours)
                 ws.cell(row, 6, rdata.totals.total_miles)
                 ws.cell(row, 7, rdata.totals.total_hours)
+                ws.cell(row, 8, len(rdata.days))
 
                 # apply styles
                 style_fill_driver = PatternFill(fill_type='solid', fgColor=rdata.driver.get_color())
-                for col in range(1, 8):
+                for col in range(1, 9):
                     ws.cell(row, col).border = style_border_normal
                     ws.cell(row, col).font = style_font_normal
                     ws.cell(row, col).fill = style_fill_driver
@@ -2275,9 +2281,10 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                 ws.cell(row, 5, report.driver_reports_total.totals.deadhead_hours)
                 ws.cell(row, 6, report.driver_reports_total.totals.total_miles)
                 ws.cell(row, 7, report.driver_reports_total.totals.total_hours)
+                ws.cell(row, 8, report.total_vehicle_days_of_service)
 
                 # apply styles
-                for col in range(1, 8):
+                for col in range(1, 9):
                     ws.cell(row, col).border = style_border_normal
                     ws.cell(row, col).font = style_font_total
                     ws.cell(row, col).fill = style_fill_total

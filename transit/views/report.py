@@ -256,6 +256,11 @@ class Report():
         query_triptypes = ()
         query_tags = ()
 
+        # summary types
+        TYPE_NORMAL = 0
+        TYPE_LOGGED = 1
+        TYPE_NONLOGGED = 2
+
         def __init__(self):
             self.service_miles = 0
             self.service_hours = 0
@@ -274,19 +279,23 @@ class Report():
             self.total_collected_money = Report.Money(0)
             self.other_employment = Report.TripCount()
 
+            # flag to mark if this summary can be added to the grand total (i.e. "All Vehicles")
+            self.type = Report.ReportSummary.TYPE_NORMAL
+
             for i in self.query_triptypes:
                 self.trip_types[i] = Report.TripCount()
 
         def __add__(self, other):
             r = self
-            r.service_miles += other.service_miles
-            r.service_hours += other.service_hours
-            r.deadhead_miles += other.deadhead_miles
-            r.deadhead_hours += other.deadhead_hours
-            r.total_miles += other.total_miles
-            r.total_hours += other.total_hours
-            r.pmt += other.pmt
-            r.fuel += other.fuel
+            if not (r.type == Report.ReportSummary.TYPE_LOGGED and other.type == Report.ReportSummary.TYPE_NONLOGGED):
+                r.service_miles += other.service_miles
+                r.service_hours += other.service_hours
+                r.deadhead_miles += other.deadhead_miles
+                r.deadhead_hours += other.deadhead_hours
+                r.total_miles += other.total_miles
+                r.total_hours += other.total_hours
+                r.pmt += other.pmt
+                r.fuel += other.fuel
             for i in self.query_triptypes:
                 r.trip_types[i] += other.trip_types[i]
             r.trip_types_unknown += other.trip_types_unknown
@@ -497,18 +506,18 @@ class Report():
         all_vehicles = Vehicle.objects.all()
         all_triptypes = TripType.objects.all()
 
+        self.filtered_vehicles = all_vehicles
+
         if driver_id == None:
-            self.filtered_vehicles = all_vehicles.filter(is_logged=True)
             self.filtered_drivers = all_drivers.filter(is_logged=True)
         else:
-            self.filtered_vehicles = all_vehicles
             self.filtered_drivers = all_drivers.filter(id=driver_id)
 
         # also cache destinations
         all_destinations = Destination.objects.all()
         destination_list = list(all_destinations)
 
-        # store our database lookups in dictionaries
+        # store our database lookups
         all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one).order_by('-date')
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
         all_shifts_list = list(all_shifts)
@@ -557,6 +566,7 @@ class Report():
 
         for day_date in all_dates:
             report_day = Report.ReportDay()
+            report_day.all.type = Report.ReportSummary.TYPE_LOGGED
             report_day.date = day_date
 
             for i in all_shifts_list:
@@ -568,10 +578,6 @@ class Report():
                 if driver_id == None:
                     if i.driver and not i.driver.is_logged:
                         # skip non-logged drivers
-                        continue
-
-                    if i.vehicle and not i.vehicle.is_logged:
-                        # skip non-logged vehicles
                         continue
                 elif i.driver:
                     if i.driver.id != driver_id:
@@ -621,51 +627,50 @@ class Report():
                 if i.date != day_date:
                     continue
 
+                if not i.driver and not i.vehicle:
+                    continue
+
                 log_status = i.check_log()
 
                 if driver_id == None:
                     if i.driver and not i.driver.is_logged:
                         # skip non-logged drivers
                         continue
-
-                    if i.vehicle and not i.vehicle.is_logged:
-                        # skip non-logged vehicles
-                        continue
-
-                    if log_status == Trip.LOG_EMPTY:
-                        # skip empty trip
-                        continue
                 elif i.driver:
                     if i.driver.id != driver_id:
                         continue
-                elif not i.driver or not i.vehicle:
-                    # skip trip with no driver/vehicle
+
+                # skip trip with no driver/vehicle
+                if (i.driver and not i.vehicle) or (not i.driver and i.vehicle):
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    continue
+
+                # skip incomplete trip (logged vehicles only)
+                if i.vehicle.is_logged and log_status == Trip.LOG_INCOMPLETE:
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
                 report_trip = Report.ReportTrip()
                 report_trip.trip = i
 
+                # find shift attempt 1: match driver and vehicle
                 for j in range(0, len(report_day.shifts)):
                     if report_day.shifts[j].shift and i.driver == report_day.shifts[j].shift.driver and i.vehicle == report_day.shifts[j].shift.vehicle:
                         report_trip.shift = j
                         break
 
+                # find shift attempt 2: match vehicle
                 if report_trip.shift == None:
                     for j in range(0, len(report_day.shifts)):
                         if report_day.shifts[j].shift and i.vehicle == report_day.shifts[j].shift.vehicle:
                             report_trip.shift = j
                             break
 
+                # find shift attempt 3: create a dummy shift (or skip the trip if the vehicle is logged)
                 if report_trip.shift == None:
-                    if driver_id == None:
-                        if i.driver and i.vehicle and i.vehicle.is_logged:
-                            found_shift = False
-                            for test_shift in all_shifts_list:
-                                if test_shift.driver == i.driver and test_shift.vehicle == i.vehicle and test_shift.date == i.date:
-                                    found_shift = True
-                                    break
-                            if not found_shift:
-                                self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
+                    if i.vehicle.is_logged:
+                        if log_status != Trip.LOG_EMPTY:
+                            self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_NO_SHIFT, error_trip=i)
                         continue
                     else:
                         dummy_shift = Report.ReportShift()
@@ -677,22 +682,7 @@ class Report():
 
                 shift = report_day.shifts[report_trip.shift]
 
-                if log_status == Trip.LOG_INCOMPLETE:
-                    # skip incomplete trip
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
-                    continue
-
-                if not i.driver or not i.vehicle:
-                    # skip incomplete trip
-                    if i.driver and i.vehicle:
-                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
-                    continue
-
-                # don't include trip if matching shift is incomplete
-                if log_status == Trip.LOG_COMPLETE and (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
-                    continue
-
-                if log_status == Trip.LOG_COMPLETE:
+                if log_status == Trip.LOG_COMPLETE and report_day.shifts[report_trip.shift].shift.check_log() == Shift.LOG_COMPLETE:
                     parse_error = False
 
                     if report_trip.start_miles.mergeStrings(str(shift.start_miles), i.start_miles) != 0:
@@ -939,7 +929,7 @@ class Report():
                 service_hours = 0
                 deadhead_miles = 0
                 deadhead_hours = 0
-                if not (shift.start_miles.empty() or shift.start_time.empty() or shift.end_miles.empty() or shift.end_time.empty()):
+                if shift.shift.check_log() == Shift.LOG_COMPLETE:
                     service_miles = shift.end_miles.value - shift.start_miles.value
                     service_hours = (shift.end_time.value - shift.start_time.value).seconds / 60 / 60
                     deadhead_miles = (report_day.trips[shift.start_trip].start_miles.value - shift.start_miles.value) + (shift.end_miles.value - report_day.trips[shift.end_trip].end_miles.value)
@@ -954,6 +944,9 @@ class Report():
 
                 if not report_day.by_driver[driver_index]:
                     report_day.by_driver[driver_index] = Report.ReportSummary()
+
+                if not shift.shift.vehicle.is_logged:
+                    report_day.by_vehicle[vehicle_index].type = Report.ReportSummary.TYPE_NONLOGGED
 
                 report_day.by_vehicle[vehicle_index].service_miles += service_miles
                 report_day.by_vehicle[vehicle_index].service_hours += service_hours
@@ -1036,6 +1029,7 @@ class Report():
                 if report_day.hasVehicleInShift(vehicle_report.vehicle):
                     vehicle_index = Report.getVehicleIndex(vehicle_report.vehicle)
                     if report_day.by_vehicle[vehicle_index] != None:
+                        vehicle_report.totals.type = report_day.by_vehicle[vehicle_index].type
                         vehicle_report.days.append({'date':report_day.date, 'data': report_day.by_vehicle[vehicle_index]})
                         vehicle_report.totals += report_day.by_vehicle[vehicle_index]
                         for shift_iter in report_day.shifts:
@@ -1054,6 +1048,7 @@ class Report():
         for driver_report in self.driver_reports:
             self.driver_reports_total.totals += driver_report.totals
 
+        self.all_vehicles.type = Report.ReportSummary.TYPE_LOGGED
         for vehicle_report in self.vehicle_reports:
             if vehicle_report.end_miles >= vehicle_report.start_miles:
                 vehicle_report.total_miles = vehicle_report.end_miles - vehicle_report.start_miles
@@ -1116,7 +1111,8 @@ class Report():
         self.total_money = self.all_vehicles.total_collected_money + self.money_payments_summary.cash + self.money_payments_summary.check
 
         for vehicle_report in self.vehicle_reports:
-            self.total_odometer_miles += vehicle_report.total_miles
+            if vehicle_report.totals.type == Report.ReportSummary.TYPE_NORMAL:
+                self.total_odometer_miles += vehicle_report.total_miles
 
         self.perf_processing = perf_counter() - perf_start
 

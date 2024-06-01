@@ -240,6 +240,19 @@
     <div class="row">
         <div class="col">
             <h3>Vehicle: {{v.vehicle}}</h3>
+            {% if v.days and not v.vehicle.is_logged %}
+            <div class="alert alert-info p-2 small w-50">
+                The mileage and time data for this vehicle <strong>WILL NOT</strong> be included in:
+                <ul class="mb-0">
+                    <li><em>Mobility Assistance Program (MAP)</em></li>
+                    <li><em>Totals for All Vehicles</em></li>
+                </ul>
+                The mileage and time data <strong>WILL</strong> be included in:
+                <ul class="mb-0">
+                    <li><em>Per-Driver Summary</em></li>
+                </ul>
+            </div>
+            {% endif %}
             {% if not v.start_miles.empty and not v.end_miles.empty %}
             <p>
                 Mileage Start: <strong>{{v.start_miles}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles}}</strong><br/>

@@ -21,7 +21,8 @@
 <ul>
 <li><strong>Name</strong> - The name of the driver</li>
 <li><strong>Color</strong> - The background color used for the driver on the schedule</li>
-<li><strong>Is logged?</strong> - Whether or not this driver is displayed in various places. Generally, employed drivers should be logged, and volunteers should not be logged.</li>
+<li><strong>Is active?</strong> - Determines if the driver will be shown in various places. The most common usage is to flag former (or current) employees that no longer drive for your team.</li>
+<li><strong>Include in general reports?</strong> - Log data from trips by this driver will be included on reports. Also determines if the driver can be selected in certain places, such as when filing a vehicle issue. Generally, employed drivers should be included, while volunteers should not.</li>
 </ul>
 
 <hr/>
@@ -30,9 +31,13 @@
 
 <p>The <strong><a href="{% url 'vehicles' %}">Vehicles</a></strong> page can be accessed via the main menu under <em>Vehicles &gt;&gt; Vehicles</em>.</p>
 
-<p>Everything here is similar to dealing with drivers, except vehicles only have two properties: <strong>Name</strong> and <strong>Is logged?</strong></p>
+<p>When creating or editing a vehicle, the following properties can be changed:</p>
 
-<p>In most scenarios, all vehicles will be logged. The notable exception being a "personal" vehicle.</p>
+<ul>
+<li><strong>Name</strong> - The name of the vehicle</li>
+<li><strong>Is active?</strong> - Determines if the vehicle will be shown in various places. The most common usage is to flag decommissioned vehicles.</li>
+<li><strong>Report mileage/service hours?</strong> - Log data for trips by with this vehicle will be included entirely on reports. When turned off, this data won't be applied to certain totals. It may make sense to turn this off, for example, on a staff member's personal vehicle.</li>
+</ul>
 
 <hr/>
 
@@ -40,5 +45,11 @@
 
 <p>The <strong><a href="{% url 'triptypes' %}">Trip Types</a></strong> page can be accessed via the main menu under <em>Schedule &gt;&gt; Trip Types</em>.</p>
 
-<p>For monthly reports that require a breakdown of trips by type, said types can be set up here. Again, the interface here is identical to editing drivers and vehicles. Trip types only have one property, which is their display <strong>Name</strong>.</p>
+<p>For monthly reports that require a breakdown of trips by type, said types can be set up here. Again, the interface here is identical to editing drivers and vehicles. Trip types have the following properties:</p>
+
+<ul>
+<li><strong>Name</strong> - The name of the trip type</li>
+<li><strong>Report trip counts?</strong> - Determines if trips flagged with this type are counted in the relevant sections of reports.</li>
+</ul>
+
 {% endblock %}

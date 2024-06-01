@@ -520,11 +520,11 @@ class Shift(models.Model):
 
     def check_log(self):
         if not self.start_miles and not self.start_time and not self.end_miles and not self.end_time:
-            return Trip.LOG_EMPTY
+            return Shift.LOG_EMPTY
         elif self.start_miles and self.start_time and self.end_miles and self.end_time:
-            return Trip.LOG_COMPLETE
+            return Shift.LOG_COMPLETE
         else:
-            return Trip.LOG_INCOMPLETE
+            return Shift.LOG_INCOMPLETE
 
     def check_pretrip(self):
         return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)

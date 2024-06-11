@@ -869,7 +869,7 @@ class Report():
 
                 report_day.paid_cash += Report.Money(i.money_cash)
                 report_day.paid_check += Report.Money(i.money_check)
-                report_day.total_payments += report_day.paid_cash + report_day.paid_check
+                report_day.total_payments = report_day.paid_cash + report_day.paid_check
 
                 found_unique_rider = False
                 for j in self.unique_riders.names:

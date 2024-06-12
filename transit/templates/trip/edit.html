@@ -180,6 +180,12 @@
             </div>
             {% endif %}
         </div>
+        <hr/>
+        {% if not is_new %}
+        <div class="d-flex flex-wrap m-2">
+            <a href="{% url 'loggedevent-list' %}?quicksearch={{event_log_query|urlencode}}" target="_blank" class="btn btn-secondary btn-sm"><span class="oi oi-browser mr-2"></span>Search event log for this trip</a>
+        </div>
+        {% endif %}
     </div>
 </form>
 

@@ -401,6 +401,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         'fares': Fare.objects.all(),
         'Trip': Trip,
         'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
+        'event_log_query': str(trip),
     }
 
     return render(request, 'trip/edit.html', context)

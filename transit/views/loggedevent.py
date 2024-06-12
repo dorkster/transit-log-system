@@ -30,6 +30,10 @@ from transit.common.util import *
 
 @permission_required(['transit.view_loggedevent'])
 def loggedEventList(request):
+    quick_search = request.GET.get('quicksearch', None)
+    if quick_search:
+        request.session['eventlog_filter_search'] = quick_search
+
     context = {
         'logged_events': LoggedEvent.objects.all(),
     }

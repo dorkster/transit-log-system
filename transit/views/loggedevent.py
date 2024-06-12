@@ -33,6 +33,16 @@ def loggedEventList(request):
     quick_search = request.GET.get('quicksearch', None)
     if quick_search:
         request.session['eventlog_filter_search'] = quick_search
+        # reset other search params
+        request.session['eventlog_filter_action'] = ''
+        request.session['eventlog_filter_target'] = ''
+        request.session['eventlog_filter_username'] = ''
+        request.session['eventlog_filter_date_start_month'] = 0
+        request.session['eventlog_filter_date_start_day'] = 0
+        request.session['eventlog_filter_date_start_year'] = 0
+        request.session['eventlog_filter_date_end_month'] = 0
+        request.session['eventlog_filter_date_end_day'] = 0
+        request.session['eventlog_filter_date_end_year'] = 0
 
     context = {
         'logged_events': LoggedEvent.objects.all(),

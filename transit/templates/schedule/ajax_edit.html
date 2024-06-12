@@ -196,6 +196,8 @@
                     {% endif %}
                     <a href="{% url 'trip-create-return' 'edit' trip.id %}" class="dropdown-item"><span class="oi oi-loop mr-2"></span>Create Return Trip</a>
                     <div class="dropdown-divider"></div>
+                    <a href="{% url 'loggedevent-list' %}?quicksearch={{trip|urlencode}}" class="dropdown-item" target="_blank"><span class="oi oi-magnifying-glass mr-2"></span>Search for trip in Event Log</a>
+                    <div class="dropdown-divider"></div>
                     <a href="{% url 'trip-delete' 'edit' trip.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete trip</a>
                     {% endif %}
                 </div>

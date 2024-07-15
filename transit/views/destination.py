@@ -138,6 +138,8 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
 def destinationUpdateTrips(request, id):
     destination = get_object_or_404(Destination, id=id)
 
+    existing_destinations = Destination.objects.filter(address=destination.address)
+
     address = request.GET.get('address')
     phone = request.GET.get('phone')
 
@@ -212,9 +214,11 @@ def destinationUpdateTrips(request, id):
                     template_trips.append({'trip': trip, 'updated': updated})
                     break
 
-
     if request.method == 'POST':
         if 'cancel' in request.POST:
+            if existing_destinations.count() > 1:
+                return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
+
             return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
         elif 'save' in request.POST:
             for item in trips:
@@ -251,7 +255,6 @@ def destinationUpdateTrips(request, id):
 
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, "Updated " + str(trip_count) + " trip(s): " + str(destination))
 
-            existing_destinations = Destination.objects.filter(address=destination.address)
             if existing_destinations.count() > 1:
                 return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
@@ -260,6 +263,7 @@ def destinationUpdateTrips(request, id):
         'destination': destination,
         'trips': trips,
         'template_trips': template_trips,
+        'existing_destinations': existing_destinations,
     }
 
     return render(request, 'destination/update_trips.html', context)

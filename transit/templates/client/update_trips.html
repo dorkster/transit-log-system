@@ -226,7 +226,11 @@
 <div class="mb-4">
     <div class="d-flex flex-wrap mt-2">
         <div class="mr-auto mb-3">
+            {% if existing_clients|length > 1 %}
+            <a href="{% url 'client-fix-dupes' client.id %}" class="btn btn-primary btn-lg m-2"><span class="oi oi-arrow-left mr-2"></span>Return to Clients</a>
+            {% else %}
             <a href="{% url 'clients' %}#client_{{client.id}}" class="btn btn-primary btn-lg m-2"><span class="oi oi-arrow-left mr-2"></span>Return to Clients</a>
+            {% endif %}
         </div>
     </div>
 </div>

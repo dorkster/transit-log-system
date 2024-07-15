@@ -144,7 +144,11 @@
 <div class="mb-4">
     <div class="d-flex flex-wrap mt-2">
         <div class="mr-auto mb-3">
+            {% if existing_destinations|length > 1 %}
+            <a href="{% url 'destination-fix-dupes' destination.id %}" class="btn btn-primary btn-lg m-2"><span class="oi oi-arrow-left mr-2"></span>Return to Destinations</a>
+            {% else %}
             <a href="{% url 'destinations' %}#destination_{{destination.id}}" class="btn btn-primary btn-lg m-2"><span class="oi oi-arrow-left mr-2"></span>Return to Destinations</a>
+            {% endif %}
         </div>
     </div>
 </div>

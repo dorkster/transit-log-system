@@ -207,6 +207,8 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
 def clientUpdateTrips(request, id):
     client = get_object_or_404(Client, id=id)
 
+    existing_clients = Client.objects.filter(name=client.name)
+
     name = request.GET.get('name')
     address = request.GET.get('address')
     phone_home = request.GET.get('phone_home')
@@ -339,6 +341,9 @@ def clientUpdateTrips(request, id):
 
     if request.method == 'POST':
         if 'cancel' in request.POST:
+            if existing_clients.count() > 1:
+                return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
+
             return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
         elif 'save' in request.POST:
             for item in trips:
@@ -395,7 +400,6 @@ def clientUpdateTrips(request, id):
 
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, "Updated " + str(trip_count) + " trip(s): " + str(client))
 
-            existing_clients = Client.objects.filter(name=client.name)
             if existing_clients.count() > 1:
                 return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
@@ -404,6 +408,7 @@ def clientUpdateTrips(request, id):
         'client': client,
         'trips': trips,
         'template_trips': template_trips,
+        'existing_clients': existing_clients,
     }
 
     return render(request, 'client/update_trips.html', context)

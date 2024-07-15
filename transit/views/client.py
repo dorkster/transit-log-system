@@ -136,9 +136,6 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, str(client))
 
             existing_clients = Client.objects.filter(name=client.name)
-            if existing_clients.count() > 1:
-                # TODO this ignores the 'update_trips' flag. Is this reasonable?
-                return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
             try:
                 update_trips = int(form.cleaned_data['update_trips'])
@@ -154,6 +151,8 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
                 if is_new:
                     prev_client['name'] = client.name
                 return HttpResponseRedirect(reverse('client-update-trips', kwargs={'id': client.id}) + "?" + urlencode(prev_client) + "&" + urlencode(update_trip_args)) 
+            elif existing_clients.count() > 1:
+                return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
@@ -395,6 +394,10 @@ def clientUpdateTrips(request, id):
             trip_count = len(trips) + len(template_trips)
 
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, "Updated " + str(trip_count) + " trip(s): " + str(client))
+
+            existing_clients = Client.objects.filter(name=client.name)
+            if existing_clients.count() > 1:
+                return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
 
             return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
     context = {

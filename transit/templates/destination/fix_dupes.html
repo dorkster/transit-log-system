@@ -21,7 +21,7 @@
         <td>Is active?</td>
     </thead>
     {% for existing_destination in existing_destinations %}
-    <tr>
+    <tr {% if destination.id == existing_destination.id %}class="text-bold"{% endif %}>
         <td class="mytable-col-md"><button class="btn btn-primary btn-sm w-100" type="submit" name="{{existing_destination.id}}"><span class="oi oi-check mr-2"></span>Select</button></td>
         <td class="mytable-col-lg">{{existing_destination.address}}</td>
         <td class="mytable-col-md">{{existing_destination.phone}}</td>

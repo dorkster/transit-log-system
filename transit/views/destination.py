@@ -81,9 +81,6 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, str(destination))
 
             existing_destinations = Destination.objects.filter(address=destination.address)
-            if existing_destinations.count() > 1:
-                # TODO this ignores the 'update_trips' flag. Is this reasonable?
-                return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
             try:
                 update_trips = int(form.cleaned_data['update_trips'])
@@ -99,6 +96,8 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
                 if is_new:
                     prev_destination['address'] = destination.address
                 return HttpResponseRedirect(reverse('destination-update-trips', kwargs={'id': destination.id}) + "?" + urlencode(prev_destination) + "&" + urlencode(update_trip_args))
+            elif existing_destinations.count() > 1:
+                return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
             elif src_trip != None:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'edit', 'year':src_trip.date.year, 'month':src_trip.date.month, 'day':src_trip.date.day}) + '#trip_' + str(src_trip.id))
             elif src_template_trip != None:
@@ -251,6 +250,10 @@ def destinationUpdateTrips(request, id):
             trip_count = len(trips) + len(template_trips)
 
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, "Updated " + str(trip_count) + " trip(s): " + str(destination))
+
+            existing_destinations = Destination.objects.filter(address=destination.address)
+            if existing_destinations.count() > 1:
+                return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
 
             return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
     context = {

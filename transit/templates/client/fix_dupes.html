@@ -30,7 +30,7 @@
         <td>Reminder Instructions</td>
     </thead>
     {% for existing_client in existing_clients %}
-    <tr>
+    <tr {% if client.id == existing_client.id %}class="text-bold"{% endif %}>
         <td class="mytable-col-md"><button class="btn btn-primary btn-sm w-100" type="submit" name="{{existing_client.id}}"><span class="oi oi-check mr-2"></span>Select</button></td>
         <td class="mytable-col-lg">{{existing_client.name}}</td>
         <td class="mytable-col-lg">{{existing_client.address}}</td>

@@ -642,7 +642,7 @@ class Report():
 
                 # skip trip with no driver/vehicle
                 if (i.driver and not i.vehicle) or (not i.driver and i.vehicle):
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
                 # skip incomplete trip (logged vehicles only)

@@ -49,6 +49,19 @@
                 <div class="mb-2"><label for="{{ form.result_type.id_for_label }}"><strong>{{ form.result_type.label }}</strong></label><br/>{{ form.result_type }}</div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}</div>
+                <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
+            </div>
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.completed_log.id_for_label }}"><strong>{{ form.completed_log.label }}</strong></label><br/>{{ form.completed_log }}</div>
+            </div>
+            <div class="col-md border m-1 p-2">
+                <div class="mb-2"><label for="{{ form.fare.id_for_label }}"><strong>{{ form.fare.label }}</strong></label><br/>{{ form.fare }}</div>
+                <div class="mb-2"><label for="{{ form.money_collected.id_for_label }}"><strong>{{ form.money_collected.label }}</strong></label><br/>{{ form.money_collected }}</div>
+            </div>
+        </div>
         <button class="btn btn-success btn-lg mt-4" type="submit" name="search"><span class="oi oi-magnifying-glass mr-2"></span>Search</button>
     </div>
 </form>

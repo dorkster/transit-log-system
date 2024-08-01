@@ -22,6 +22,7 @@ from django.http import FileResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.utils.http import urlencode
+from django.db.models import Q
 
 from transit.models import Trip, Driver, Vehicle, TripType, Volunteer
 from transit.forms import SearchTripsForm
@@ -58,6 +59,11 @@ def searchGetTrips(request):
     volunteer = request.GET.get('volunteer')
     sort_mode = request.GET.get('sort_mode')
     result_type = request.GET.get('result_type')
+    pick_up_time = request.GET.get('pick_up_time')
+    appointment_time = request.GET.get('appointment_time')
+    completed_log = request.GET.get('completed_log')
+    fare = request.GET.get('fare')
+    money_collected = request.GET.get('money_collected')
 
     trips = Trip.objects.all().select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
@@ -260,6 +266,41 @@ def searchGetTrips(request):
             trips = trips.filter(passenger=True)
         elif passenger == '1':
             trips = trips.filter(passenger=False, format=Trip.FORMAT_NORMAL)
+
+    if pick_up_time:
+        searched = True
+        if pick_up_time == '1':
+            trips = trips.exclude(pick_up_time='')
+        elif pick_up_time == '2':
+            trips = trips.filter(pick_up_time='')
+
+    if appointment_time:
+        searched = True
+        if appointment_time == '1':
+            trips = trips.exclude(appointment_time='')
+        elif appointment_time == '2':
+            trips = trips.filter(appointment_time='')
+
+    if completed_log:
+        searched = True
+        if completed_log == '1':
+            trips = trips.exclude(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))
+        elif completed_log == '2':
+            trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time=''))
+
+    if fare:
+        searched = True
+        if fare == '1':
+            trips = trips.filter(fare__gt=0)
+        elif fare == '2':
+            trips = trips.filter(fare=0)
+
+    if money_collected:
+        searched = True
+        if money_collected == '1':
+            trips = trips.filter(Q(collected_cash__gt=0) | Q(collected_check__gt=0))
+        elif money_collected == '2':
+            trips = trips.filter(collected_cash=0, collected_check=0)
 
     if sort_mode:
         if sort_mode == '0':

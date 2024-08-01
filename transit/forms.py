@@ -31,6 +31,12 @@ BOOL_CHOICES = (
 
 NULL_BOOL_CHOICES = (
     (None, CHOICE_NONE),
+    (1, 'Yes'),
+    (2, 'No')
+)
+
+NULL_BOOL_CHOICES_UNKNOWN = (
+    (None, CHOICE_NONE),
     (0, 'Unknown'),
     (1, 'Yes'),
     (2, 'No')
@@ -390,8 +396,8 @@ class SearchTripsForm(forms.Form):
     reminder_instructions = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     trip_type = forms.ModelChoiceField(TripType.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     tags = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
-    elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     passenger = forms.IntegerField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((None, CHOICE_NONE), (0, 'Yes'), (1, 'No'))))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
@@ -399,6 +405,11 @@ class SearchTripsForm(forms.Form):
     column_layout = forms.IntegerField(label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Show All'), (1, 'Standard'), (2, 'Volunteer Report'))))
     results_per_page = forms.IntegerField(label='Results per Page', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((25, '25'), (50, '50'), (100, '100'), (200, '200'))))
     result_type = forms.ChoiceField(choices=RESULT_TYPES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    pick_up_time = forms.ChoiceField(label='Has pick-up time?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    appointment_time = forms.ChoiceField(label='Has appointment time?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    completed_log = forms.ChoiceField(label='Has completed log data?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    fare = forms.ChoiceField(label='Has fare?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    money_collected = forms.ChoiceField(label='Has money collected?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 
 class SiteSettingsForm(forms.Form):

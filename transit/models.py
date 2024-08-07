@@ -420,6 +420,23 @@ class Trip(models.Model):
 
         return 1
 
+    def get_appt_dropoff_diff(self):
+        if self.appointment_time == '' or self.end_time == '':
+            return ''
+
+        try:
+            parsed_appointment = datetime.datetime.strptime(self.appointment_time, '%I:%M %p')
+            parsed_dropoff = datetime.datetime.strptime(self.end_time, '%I:%M %p')
+            diff_seconds = (parsed_dropoff - parsed_appointment).total_seconds() / 60
+            if diff_seconds > 0:
+                return '<span class="badge badge-danger" style="font-size:inherit;">{value:.0f} min. late</span>'.format(value=diff_seconds)
+            elif diff_seconds < 0:
+                return '<span class="badge badge-success" style="font-size:inherit;">{value:.0f} min. early</span>'.format(value=abs(diff_seconds))
+            else:
+                return '<span class="badge badge-secondary" style="font-size:inherit;">0 min.</span>'
+        except:
+            return ''
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)

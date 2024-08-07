@@ -385,13 +385,41 @@ class SearchTripsForm(forms.Form):
         (1, 'Activities')
     )
 
+    # TODO just use NULL_BOOL_CHOICES instead. Will need to update views/search.py
+    PASSENGER_CHOICES = (
+        (None, CHOICE_NONE),
+        (0, 'Yes'),
+        (1, 'No')
+    )
+
+    SORT_METHODS = (
+        (0, 'Date - Descending'),
+        (1, 'Date - Ascending')
+    )
+
+    COLUMN_LAYOUTS = (
+        (0, 'Show All'),
+        (1, 'Standard'),
+        (2, 'Volunteer Report'),
+        (3, 'Drop-off Time Report')
+    )
+
+    RESULTS_PER_PAGE = (
+        (25, '25'),
+        (50, '50'),
+        (100, '100'),
+        (200, '200')
+    )
+
+    BLANK_DATE = ('-- Year--', '-- Month --', '-- Day --')
+
     name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     destination = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     driver = forms.ModelChoiceField(Driver.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     vehicle = forms.ModelChoiceField(Vehicle.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
-    end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=('-- Year--', '-- Month --', '-- Day --')))
+    start_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=BLANK_DATE))
+    end_date = forms.DateField(required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS, empty_label=BLANK_DATE))
     notes = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     reminder_instructions = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     trip_type = forms.ModelChoiceField(TripType.objects, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
@@ -399,11 +427,11 @@ class SearchTripsForm(forms.Form):
     elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    passenger = forms.IntegerField(label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((None, CHOICE_NONE), (0, 'Yes'), (1, 'No'))))
+    passenger = forms.ChoiceField(choices=PASSENGER_CHOICES, label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
-    sort_mode = forms.IntegerField(label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Date - Descending'), (1, 'Date - Ascending'))))
-    column_layout = forms.IntegerField(label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((0, 'Show All'), (1, 'Standard'), (2, 'Volunteer Report'))))
-    results_per_page = forms.IntegerField(label='Results per Page', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=((25, '25'), (50, '50'), (100, '100'), (200, '200'))))
+    sort_mode = forms.ChoiceField(choices=SORT_METHODS, label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    column_layout = forms.ChoiceField(choices=COLUMN_LAYOUTS, label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    results_per_page = forms.ChoiceField(choices=RESULTS_PER_PAGE, label='Results per Page', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     result_type = forms.ChoiceField(choices=RESULT_TYPES, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     pick_up_time = forms.ChoiceField(label='Has pick-up time?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))
     appointment_time = forms.ChoiceField(label='Has appointment time?', required=False, choices=NULL_BOOL_CHOICES, widget=forms.Select(attrs=formWidgetAttrs.default))

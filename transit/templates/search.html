@@ -78,11 +78,15 @@
         <td></td>
         {% endif %}
         <td>Date</td>
+        {% if column_layout < 3 %}
         <td>Pick up</td>
         <td>Appt. Time</td>
+        {% endif %}
         <td>Name</td>
+        {% if column_layout < 3 %}
         <td>Address</td>
         <td>Phone #</td>
+        {% endif %}
         <td>Destination</td>
         {% if column_layout < 2 %}
         <td>Driver</td>
@@ -91,6 +95,11 @@
         <td>Start Time</td>
         <td>End Miles</td>
         <td>End Time</td>
+        {% endif %}
+        {% if column_layout == 3 %}
+        <td>Appt. Time</td>
+        <td>End Time</td>
+        <td>Time Difference</td>
         {% endif %}
         <td>Notes</td>
         {% if column_layout == 0 %}
@@ -132,9 +141,12 @@
             {{ trip.note }}
         </td>
         {% else %}
+        {% if column_layout < 3 %}
         <td class="mytable-col-sm">{{trip.pick_up_time}}</td>
         <td class="mytable-col-sm">{{trip.appointment_time}}</td>
+        {% endif %}
         <td class="mytable-col-lg">{{trip.name}}</td>
+        {% if column_layout < 3 %}
         <td class="mytable-col-lg">{{trip.address}}</td>
         <td class="mytable-col-md" style="white-space: nowrap;">
             {{ trip.phone_home }}
@@ -143,6 +155,7 @@
             {% if trip.phone_home or trip.phone_cell %}<br/>{% endif %}
             {{ trip.phone_alt }}
         </td>
+        {% endif %}
         <td class="mytable-col-lg">{{trip.destination}}</td>
         {% if column_layout < 2 %}
         <td class="mytable-col-md">{% if trip.driver %}{{trip.driver}}{% endif %}</td>
@@ -175,6 +188,17 @@
                 <span title="Missing log data" class="oi oi-minus lg-icon"></span>
             {% endif %}
         </td>
+        {% endif %}
+        {% if column_layout == 3 %}
+        <td class="mytable-col-sm">{{trip.appointment_time}}</td>
+        <td class="mytable-col-sm">
+            {% if trip.end_time or trip.check_log != Trip.LOG_INCOMPLETE %}
+                {{ trip.end_time }}
+            {% else %}
+                <span title="Missing log data" class="oi oi-minus lg-icon"></span>
+            {% endif %}
+        </td>
+        <td>{{ trip.get_appt_dropoff_diff|safe }}</td>
         {% endif %}
         <td class="mytable-col-lg">
             {{ trip.note }}

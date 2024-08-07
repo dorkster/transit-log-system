@@ -262,9 +262,9 @@ def searchGetTrips(request):
 
     if passenger:
         searched = True
-        if passenger == '0':
+        if passenger == '1':
             trips = trips.filter(passenger=True)
-        elif passenger == '1':
+        elif passenger == '2':
             trips = trips.filter(passenger=False, format=Trip.FORMAT_NORMAL)
 
     if pick_up_time:

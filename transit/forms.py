@@ -385,13 +385,6 @@ class SearchTripsForm(forms.Form):
         (1, 'Activities')
     )
 
-    # TODO just use NULL_BOOL_CHOICES instead. Will need to update views/search.py
-    PASSENGER_CHOICES = (
-        (None, CHOICE_NONE),
-        (0, 'Yes'),
-        (1, 'No')
-    )
-
     SORT_METHODS = (
         (0, 'Date - Descending'),
         (1, 'Date - Ascending')
@@ -427,7 +420,7 @@ class SearchTripsForm(forms.Form):
     elderly = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     ambulatory = forms.ChoiceField(choices=NULL_BOOL_CHOICES_UNKNOWN, required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     status = forms.ChoiceField(required=False, choices=TRIP_STATUS_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    passenger = forms.ChoiceField(choices=PASSENGER_CHOICES, label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    passenger = forms.ChoiceField(choices=NULL_BOOL_CHOICES, label='Passenger on vehicle?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     volunteer = forms.ModelChoiceField(Volunteer.objects, label='Volunteer Driver', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     sort_mode = forms.ChoiceField(choices=SORT_METHODS, label='Sort Results', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     column_layout = forms.ChoiceField(choices=COLUMN_LAYOUTS, label='Column Layout', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))

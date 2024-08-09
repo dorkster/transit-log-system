@@ -869,7 +869,6 @@ class Report():
 
                 report_day.paid_cash += Report.Money(i.money_cash)
                 report_day.paid_check += Report.Money(i.money_check)
-                report_day.total_payments = report_day.paid_cash + report_day.paid_check
 
                 found_unique_rider = False
                 for j in self.unique_riders.names:
@@ -903,6 +902,8 @@ class Report():
                 self.money_payments.append(payment)
                 self.money_payments_summary.cash += payment.cash
                 self.money_payments_summary.check += payment.check
+
+            report_day.total_payments += report_day.paid_cash + report_day.paid_check
 
             for i in range(0, len(report_day.shifts)):
                 shift = report_day.shifts[i]

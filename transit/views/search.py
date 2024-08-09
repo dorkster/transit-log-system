@@ -64,6 +64,7 @@ def searchGetTrips(request):
     completed_log = request.GET.get('completed_log')
     fare = request.GET.get('fare')
     money_collected = request.GET.get('money_collected')
+    column_layout = request.GET.get('column_layout')
 
     trips = Trip.objects.all().select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
@@ -316,7 +317,11 @@ def searchGetTrips(request):
         elif result_type == '1':
             trips = trips.filter(format=Trip.FORMAT_ACTIVITY)
 
-    return (searched, trips)
+    try:
+        column_layout_int = int(column_layout)
+    except:
+        column_layout_int = 0
+    return (searched, trips, column_layout_int)
 
 @permission_required(['transit.view_trip'])
 def search(request):
@@ -359,6 +364,7 @@ def searchExportXLSX(request):
     results = searchGetTrips(request)
     searched = results[0]
     trips = results[1]
+    column_layout = results[2]
 
     temp_file = tempfile.NamedTemporaryFile()
 
@@ -378,33 +384,108 @@ def searchExportXLSX(request):
 
     style_alignment_date = Alignment(horizontal='left')
 
+    style_alignment_wrapped = Alignment(wrap_text = True, vertical = 'top')
+
     ws_results = wb.active
     ws_results.title = 'Search Results'
 
     row_header = 1
     trip_count = len(trips)
 
-    ws_results.cell(row_header, 1, 'Date')
-    ws_results.cell(row_header, 2, 'Pick up')
-    ws_results.cell(row_header, 3, 'Appt. Time')
-    ws_results.cell(row_header, 4, 'Name')
-    ws_results.cell(row_header, 5, 'Address')
-    ws_results.cell(row_header, 6, 'Phone #')
-    ws_results.cell(row_header, 7, 'Destination')
-    ws_results.cell(row_header, 8, 'Driver')
-    ws_results.cell(row_header, 9, 'Vehicle')
-    ws_results.cell(row_header, 10, 'Start Miles')
-    ws_results.cell(row_header, 11, 'Start Time')
-    ws_results.cell(row_header, 12, 'End Miles')
-    ws_results.cell(row_header, 13, 'End Time')
-    ws_results.cell(row_header, 14, 'Notes')
-    ws_results.cell(row_header, 15, 'Trip Type / Tags')
-    ws_results.cell(row_header, 16, 'Passenger on vehicle?')
-    ws_results.cell(row_header, 17, 'Fare')
-    ws_results.cell(row_header, 18, 'Money Collected')
-    ws_results.cell(row_header, 19, 'Elderly?')
-    ws_results.cell(row_header, 20, 'Ambulatory?')
-    ws_results.cell(row_header, 21, 'Volunteer Driver')
+    ws_results.row_dimensions[row_header].height = style_rowheight_header
+
+    # "Show All" columns
+    COL_DATE = 1
+    COL_PICKUP = 2
+    COL_APPOINTMENT = 3
+    COL_NAME = 4
+    COL_ADDRESS = 5
+    COL_PHONE = 6
+    COL_DESTINATION = 7
+    COL_DRIVER = 8
+    COL_VEHICLE = 9
+    COL_START_MILES = 10
+    COL_START_TIME = 11
+    COL_END_MILES = 12
+    COL_END_TIME = 13
+    COL_NOTES = 14
+    # NOTE Reminder instructions?
+    COL_TRIPTYPE = 15
+    COL_PASSENGER = 16
+    COL_FARE = 17
+    COL_MONEY = 18
+    COL_ELDERLY = 19
+    COL_AMBULATORY = 20
+    COL_VOLUNTEER = 21
+    COL_DROPOFF_TIME = 0
+
+    if column_layout >= 1:
+        # "Standard" Columns
+        COL_VOLUNTEER = 15
+        COL_TRIPTYPE = 0
+        COL_PASSENGER = 0
+        COL_FARE = 0
+        COL_MONEY = 0
+        COL_ELDERLY = 0
+        COL_AMBULATORY = 0
+    if column_layout >= 2:
+        # "Volunteer Report" Columns
+        COL_NOTES = 8
+        COL_VOLUNTEER = 9
+        COL_DRIVER = 0
+        COL_VEHICLE = 0
+        COL_START_MILES = 0
+        COL_START_TIME = 0
+        COL_END_MILES = 0
+        COL_END_TIME = 0
+    if column_layout == 3:
+        # "Drop-off Time Report" Columns
+        COL_NAME = 2
+        COL_DESTINATION = 3
+        COL_APPOINTMENT = 4
+        COL_END_TIME = 5
+        COL_DROPOFF_TIME = 6
+        COL_NOTES = 7
+        COL_VOLUNTEER = 8
+        COL_PICKUP = 0
+        COL_ADDRESS = 0
+        COL_PHONE = 0
+
+    COL_TITLES = [
+        (COL_DATE, 'Date'),
+        (COL_PICKUP, 'Pick up'),
+        (COL_APPOINTMENT, 'Appt. Time'),
+        (COL_NAME, 'Name'),
+        (COL_ADDRESS, 'Address'),
+        (COL_PHONE, 'Phone #'),
+        (COL_DESTINATION, 'Destination'),
+        (COL_DRIVER, 'Driver'),
+        (COL_VEHICLE, 'Vehicle'),
+        (COL_START_MILES, 'Start Miles'),
+        (COL_START_TIME, 'Start Time'),
+        (COL_END_MILES, 'End Miles'),
+        (COL_END_TIME, 'End Time'),
+        (COL_NOTES, 'Notes'),
+        (COL_TRIPTYPE, 'Trip Type / Tags'),
+        (COL_PASSENGER, 'Passenger on vehicle?'),
+        (COL_FARE, 'Fare'),
+        (COL_MONEY, 'Money Collected'),
+        (COL_ELDERLY, 'Elderly?'),
+        (COL_AMBULATORY, 'Ambulatory?'),
+        (COL_VOLUNTEER, 'Volunteer Driver'),
+        (COL_DROPOFF_TIME, 'Time Difference'),
+    ]
+
+    COL_LAYOUT = []
+
+    for i in range(0, len(COL_TITLES)):
+        if COL_TITLES[i][0] != 0:
+            COL_LAYOUT.append((COL_TITLES[i][0], i))
+
+    COL_LAYOUT = sorted(COL_LAYOUT, key=lambda x: x[0])
+
+    for col in COL_LAYOUT:
+        ws_results.cell(row_header, col[0], COL_TITLES[col[1]][1])
 
     for i in range(0, row_header + trip_count):
         row = i + 1
@@ -414,10 +495,10 @@ def searchExportXLSX(request):
             trip = trips[i-1]
             fill_color = trip.get_driver_color()[0:6]
 
-        for col in range(1, 22):
-            if col == 4 or col == 6 or col == 14 or col == 15:
+        for col in range(1, len(COL_LAYOUT)+1):
+            if col == COL_NAME or col == COL_PHONE or col == COL_NOTES or col == COL_TRIPTYPE:
                 ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_large
-            elif col == 5 or col == 7 or col == 21:
+            elif col == COL_ADDRESS or col == COL_DESTINATION or col == COL_VOLUNTEER:
                 ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_xlarge
             else:
                 ws_results.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
@@ -430,67 +511,119 @@ def searchExportXLSX(request):
                 ws_results.cell(row, col).alignment = style_alignment_header
                 ws_results.cell(row, col).fill = style_fill_header
             else:
-                if col == 1:
+                if COL_DATE != 0 and col == COL_DATE:
                     ws_results.cell(row, col).alignment = style_alignment_date
 
                 ws_results.cell(row, col).fill = PatternFill(fill_type='solid', fgColor=fill_color)
 
+                # text wrapping
+                # TODO should all columns be wrapped?
+                if COL_NOTES != 0:
+                    ws_results.cell(row, COL_NOTES).alignment = style_alignment_wrapped
+                if COL_NAME != 0:
+                    ws_results.cell(row, COL_NAME).alignment = style_alignment_wrapped
+                if COL_ADDRESS != 0:
+                    ws_results.cell(row, COL_ADDRESS).alignment = style_alignment_wrapped
+                if COL_DESTINATION != 0:
+                    ws_results.cell(row, COL_DESTINATION).alignment = style_alignment_wrapped
+                if COL_VOLUNTEER != 0:
+                    ws_results.cell(row, COL_VOLUNTEER).alignment = style_alignment_wrapped
+                if COL_TRIPTYPE != 0:
+                    ws_results.cell(row, COL_TRIPTYPE).alignment = style_alignment_wrapped
+
                 # number formats
-                ws_results.cell(row, 1).number_format = 'mmm dd, yyyy'
-                ws_results.cell(row, 17).number_format = '$0.00'
-                ws_results.cell(row, 18).number_format = '$0.00'
+                if COL_DATE != 0:
+                    ws_results.cell(row, COL_DATE).number_format = 'mmm dd, yyyy'
+                if COL_FARE != 0:
+                    ws_results.cell(row, COL_FARE).number_format = '$0.00'
+                if COL_MONEY != 0:
+                    ws_results.cell(row, COL_MONEY).number_format = '$0.00'
 
 
         if row == row_header:
             continue
 
-        ws_results.cell(row, 1, trip.date)
-        ws_results.cell(row, 2, trip.pick_up_time)
-        ws_results.cell(row, 3, trip.appointment_time)
-        ws_results.cell(row, 4, trip.name)
-        ws_results.cell(row, 5, trip.address)
+        if COL_DATE != 0:
+            ws_results.cell(row, COL_DATE, trip.date)
 
-        phone_string = ''
-        phone_string += trip.phone_home
-        if trip.phone_home and trip.phone_cell:
-            phone_string += ' / '
-        phone_string += trip.phone_cell
-        if trip.phone_alt and (trip.phone_home or trip.phone_cell):
-            phone_string += ' / '
-        phone_string += trip.phone_alt
+        if COL_PICKUP != 0:
+            ws_results.cell(row, COL_PICKUP, trip.pick_up_time)
 
-        ws_results.cell(row, 6, phone_string)
+        if COL_APPOINTMENT != 0:
+            ws_results.cell(row, COL_APPOINTMENT, trip.appointment_time)
 
-        ws_results.cell(row, 7, trip.destination)
+        if COL_NAME != 0:
+            ws_results.cell(row, COL_NAME, trip.name)
 
-        if trip.driver:
-            ws_results.cell(row, 8, str(trip.driver))
-        if trip.vehicle:
-            ws_results.cell(row, 9, str(trip.vehicle))
+        if COL_ADDRESS != 0:
+            ws_results.cell(row, COL_ADDRESS, trip.address)
 
-        ws_results.cell(row, 10, trip.start_miles)
-        ws_results.cell(row, 11, trip.start_time)
-        ws_results.cell(row, 12, trip.end_miles)
-        ws_results.cell(row, 13, trip.end_time)
-        ws_results.cell(row, 14, trip.note)
+        if COL_PHONE != 0:
+            phone_string = ''
+            phone_string += trip.phone_home
+            if trip.phone_home and trip.phone_cell:
+                phone_string += ' / '
+            phone_string += trip.phone_cell
+            if trip.phone_alt and (trip.phone_home or trip.phone_cell):
+                phone_string += ' / '
+            phone_string += trip.phone_alt
 
-        tags_string = ''
-        if trip.trip_type:
-            tags_string += str(trip.trip_type)
+            ws_results.cell(row, COL_PHONE, phone_string)
+
+        if COL_DESTINATION != 0:
+            ws_results.cell(row, COL_DESTINATION, trip.destination)
+
+        if COL_DRIVER != 0 and trip.driver:
+            ws_results.cell(row, COL_DRIVER, str(trip.driver))
+
+        if COL_VEHICLE != 0 and trip.vehicle:
+            ws_results.cell(row, COL_VEHICLE, str(trip.vehicle))
+
+        if COL_START_MILES != 0:
+            ws_results.cell(row, COL_START_MILES, trip.start_miles)
+
+        if COL_START_TIME != 0:
+            ws_results.cell(row, COL_START_TIME, trip.start_time)
+
+        if COL_END_MILES != 0:
+            ws_results.cell(row, COL_END_MILES, trip.end_miles)
+
+        if COL_END_TIME != 0:
+            ws_results.cell(row, COL_END_TIME, trip.end_time)
+
+        if COL_NOTES != 0:
+            ws_results.cell(row, COL_NOTES, trip.note)
+
+        if COL_TRIPTYPE != 0:
+            tags_string = ''
+            if trip.trip_type:
+                tags_string += str(trip.trip_type)
+                if trip.tags:
+                    tags_string += ' / '
             if trip.tags:
-                tags_string += ' / '
-        if trip.tags:
-            tags_string += trip.tags
-        ws_results.cell(row, 15, tags_string)
+                tags_string += trip.tags
+            ws_results.cell(row, COL_TRIPTYPE, tags_string)
 
-        ws_results.cell(row, 16, trip.passenger)
-        ws_results.cell(row, 17, trip.fare / 100)
-        ws_results.cell(row, 18, (trip.collected_cash + trip.collected_check) / 100)
-        ws_results.cell(row, 19, trip.elderly)
-        ws_results.cell(row, 20, trip.ambulatory)
+        if COL_PASSENGER != 0:
+            ws_results.cell(row, COL_PASSENGER, trip.passenger)
 
-        if trip.volunteer:
-            ws_results.cell(row, 21, trip.volunteer.verbose_name())
+        if COL_FARE != 0:
+            ws_results.cell(row, COL_FARE, trip.fare / 100)
+
+        if COL_MONEY != 0:
+            ws_results.cell(row, COL_MONEY, (trip.collected_cash + trip.collected_check) / 100)
+
+        if COL_ELDERLY != 0:
+            ws_results.cell(row, COL_ELDERLY, trip.elderly)
+
+        if COL_AMBULATORY != 0:
+            ws_results.cell(row, COL_AMBULATORY, trip.ambulatory)
+
+        if COL_VOLUNTEER != 0 and trip.volunteer:
+            ws_results.cell(row, COL_VOLUNTEER, trip.volunteer.verbose_name())
+
+        if COL_DROPOFF_TIME != 0:
+            ws_results.cell(row, COL_DROPOFF_TIME, trip.get_appt_dropoff_diff_xlsx())
 
     wb.save(filename=temp_file.name)
 

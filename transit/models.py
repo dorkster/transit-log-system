@@ -422,20 +422,38 @@ class Trip(models.Model):
 
     def get_appt_dropoff_diff(self):
         if self.appointment_time == '' or self.end_time == '':
-            return ''
+            return None
 
         try:
             parsed_appointment = datetime.datetime.strptime(self.appointment_time, '%I:%M %p')
             parsed_dropoff = datetime.datetime.strptime(self.end_time, '%I:%M %p')
-            diff_seconds = (parsed_dropoff - parsed_appointment).total_seconds() / 60
-            if diff_seconds > 0:
-                return '<span class="badge badge-danger" style="font-size:inherit;">{value:.0f} min. late</span>'.format(value=diff_seconds)
-            elif diff_seconds < 0:
-                return '<span class="badge badge-success" style="font-size:inherit;">{value:.0f} min. early</span>'.format(value=abs(diff_seconds))
-            else:
-                return '<span class="badge badge-secondary" style="font-size:inherit;">0 min.</span>'
+            return (parsed_dropoff - parsed_appointment).total_seconds() / 60
         except:
+            return None
+
+    def get_appt_dropoff_diff_html(self):
+        diff_time = self.get_appt_dropoff_diff()
+
+        if diff_time == None:
             return ''
+        elif diff_time > 0:
+            return '<span class="badge badge-danger" style="font-size:inherit;">{value:.0f} min. late</span>'.format(value=diff_time)
+        elif diff_time < 0:
+            return '<span class="badge badge-success" style="font-size:inherit;">{value:.0f} min. early</span>'.format(value=abs(diff_time))
+        elif diff_time == 0:
+            return '<span class="badge badge-secondary" style="font-size:inherit;">0 min.</span>'
+
+    def get_appt_dropoff_diff_xlsx(self):
+        diff_time = self.get_appt_dropoff_diff()
+
+        if diff_time == None:
+            return ''
+        elif diff_time > 0:
+            return '{value:.0f} min. late'.format(value=diff_time)
+        elif diff_time < 0:
+            return '{value:.0f} min. early'.format(value=abs(diff_time))
+        elif diff_time == 0:
+            return '0 min.'
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

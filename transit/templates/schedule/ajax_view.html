@@ -9,6 +9,99 @@
 </div>
 <hr/>
 {% endif %}
+<div class="container ml-0 p-2 mb-3 border" style="background: #eee; position: sticky; top: 0; z-index:1;">
+    <div class="row">
+        <div class="col">
+            <div class="btn-group">
+                <button type="button" class="btn {% if is_filtered %}btn-warning{% else %}btn-secondary{% endif %}" data-toggle="modal" data-target="#modal_filter">
+                    <span class="oi oi-magnifying-glass mr-2"></span>Filter {% if filtered_count < unfiltered_count or is_filtered %}<strong>({{filtered_count}}/{{unfiltered_count}}</strong>){% endif %}
+                </button>
+                {% if is_filtered %}
+                <button class="btn btn-danger" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete"></span></button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-auto">
+            <a href="#top" class="btn btn-outline-secondary"><span class="oi oi-caret-top"></span></a>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal ajax-blocker" id="modal_filter" tabindex="-1" role="dialog" aria-labelledby="modal_filter_title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_filter_title">Filter Trips</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mt-2">
+                    <div class="list-group w-100">
+                        <div class="dropdown ajax-blocker">
+                            <a class="list-group-item list-group-item-action dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}Driver: <strong>{{ driver }}</strong>{% endif %}{% endfor %}{% endif %}
+                            </a>
+                            <div class="dropdown-menu shadow">
+                                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
+                                {% for driver in drivers %}
+                                {% if driver.is_active %}
+                                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group w-100">
+                        <div class="dropdown ajax-blocker">
+                            <a class="list-group-item list-group-item-action dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}Vehicle: <strong>{{ vehicle }}</strong>{% endif %}{% endfor %}{% endif %}
+                            </a>
+                            <div class="dropdown-menu shadow">
+                                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                                {% for vehicle in vehicles %}
+                                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group w-100">
+                        <a class="list-group-item list-group-item-action {% if filter_hide_completed %}list-group-item-danger{% else %}list-group-item-success{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_toggle_completed', '')">
+                            <span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed
+                        </a>
+                        <a class="list-group-item list-group-item-action {% if filter_hide_canceled %}list-group-item-danger{% else %}list-group-item-success{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')">
+                            <span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled
+                        </a>
+                        <a class="list-group-item list-group-item-action {% if filter_hide_nolog %}list-group-item-danger{% else %}list-group-item-success{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')">
+                            <span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged
+                        </a>
+                    </div>
+                </div>
+                <hr/>
+                <div class="mt-2">
+                    <form id="filter_search_form" class="form-inline">
+                        <div class="btn-group">
+                            {% if filter_search %}
+                            <button class="btn btn-danger" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete"></span></button>
+                            {% endif %}
+                            <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="oi oi-magnifying-glass pl-2 pr-2"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if is_filtered %}
+            <div class="modal-footer">
+                <button class="btn btn-outline-danger" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Clear Filters</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<hr/>
 <h3>Shifts <a class="btn btn-success btn-sm" href="{% url 'shift-create' 'view' date.year date.month date.day %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
 {% if shifts %}
     {% for shift in shifts %}
@@ -81,88 +174,6 @@
         </div>
     </span>
 </h3>
-<div class="container ml-0 border p-2 mb-3" style="background: #eee;">
-    <div class="row">
-        <div class="col">
-            <h5>Filter{% if filtered_count < unfiltered_count %} ({{filtered_count}}/{{unfiltered_count}} visible){% endif %}</h5>
-        </div>
-        {% if is_filtered %}
-        <div class="col-auto">
-            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
-        </div>
-        {% endif %}
-    </div>
-    <div class="mt-2">
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
-                {% for driver in drivers %}
-                {% if driver.is_active %}
-                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
-                {% endif %}
-                {% endfor %}
-            </div>
-        </span>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
-                {% for vehicle in vehicles %}
-                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
-                {% endfor %}
-            </div>
-        </span>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Show...
-            </button>
-            <div class="dropdown-menu shadow dropdown-menu-right">
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_completed', '')"><span class="mr-2 oi {% if filter_hide_completed %}oi-x{% else %}oi-check{% endif %}"></span>Completed</a>
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_canceled', '')"><span class="mr-2 oi {% if filter_hide_canceled %}oi-x{% else %}oi-check{% endif %}"></span>Canceled</a>
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')"><span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged</a>
-            </div>
-        </span>
-    </div>
-    <div class="mt-2">
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#modal_filter_search">
-                <span class="oi oi-magnifying-glass mr-2"></span>Search
-            </button>
-
-            <!-- Modal -->
-            <div class="modal ajax-blocker" id="modal_filter_search" tabindex="-1" role="dialog" aria-labelledby="modal_filter_search_title" aria-hidden="true">
-                <div class="modal-dialog modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modal_filter_search_title">Filter trips by name/address/etc.</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form id="filter_search_form">
-                            <div class="modal-body">
-                                <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="oi oi-magnifying-glass mr-2"></span>Search
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-    {% if filter_search %}
-    <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete mr-2"></span>Remove filter: <strong>{{ filter_search }}</strong></button>
-    {% endif %}
-    </div>
-</div>
 {% if trips %}
     {% for trip in trips %}
     <div class="card mb-3 border-secondary" style="{{ trip.get_driver_style }}; max-width: 960px;">
@@ -361,7 +372,7 @@
     </div>
     {% endfor %}
 <script type="text/javascript">
-    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+    setSearchModal('#filter_search_form', '#modal_filter', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
 </script>
 {% else %}
 <p>There are no trips for this day. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all trips.{% endif %}</p>

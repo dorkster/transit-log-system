@@ -62,46 +62,50 @@ function AjaxLoader(url, div_id) {
         ajax_loading.style.display = "initial";
         ajax_loading.addEventListener("animationend", self.animationDoneEarly);
 
-        $.ajax({
-            type: "GET",
-            url: self.url,
-            data: Object.assign({}, {
-                "target_id": target_id, 
-                "target_action": target_action, 
-                "target_data": target_data
-            }, self.extra_data)
-        })
-        .done(function(response) {
-            if ( $('.ajax-blocker.show').length == 0 ) {
-                $(self.div_id).html(response);
-                if (!self.first_response) {
-                    self.first_response = true;
-                    var hash = window.location.hash.substr(1);
-                    if (hash && hash != '_') {
-                        var hash_element = document.getElementById(hash);
-                        if (hash_element) {
-                            // hash_element.scrollIntoView({behavior: "smooth", block: "center"});
-                            if (hash_element.dataset.scrollintoview == "start")
-                                hash_element.scrollIntoView({block: "start"});
-                            else
-                                hash_element.scrollIntoView({block: "center"});
+        if ( $('.ajax-blocker.show').length == 0 || target_action != "") {
+            $('.modal.ajax-blocker.show').off('hidden.bs.modal');
+            $('.modal.ajax-blocker.show').modal('hide');
+            $('.dropdown.ajax-blocker.show').off('hidden.bs.dropdown');
+
+            $.ajax({
+                type: "GET",
+                url: self.url,
+                data: Object.assign({}, {
+                    "target_id": target_id,
+                    "target_action": target_action,
+                    "target_data": target_data
+                }, self.extra_data)
+            })
+            .done(function(response) {
+                    $(self.div_id).html(response);
+                    if (!self.first_response) {
+                        self.first_response = true;
+                        var hash = window.location.hash.substr(1);
+                        if (hash && hash != '_') {
+                            var hash_element = document.getElementById(hash);
+                            if (hash_element) {
+                                // hash_element.scrollIntoView({behavior: "smooth", block: "center"});
+                                if (hash_element.dataset.scrollintoview == "start")
+                                    hash_element.scrollIntoView({block: "start"});
+                                else
+                                    hash_element.scrollIntoView({block: "center"});
+                            }
                         }
                     }
-                }
 
-                ajax_loading.addEventListener("animationend", self.animationDone);
-                if (ajax_loading.p_done) {
-                    ajax_loading.style.display = "none";
-                }
-                self.restart();
-            }
-            else {
-                self.stop();
-                // when the ajax blocker is hidden, fire a new ajax request
-                $('.modal.ajax-blocker.show').one('hidden.bs.modal', self.resume);
-                $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', self.resume);
-            }
-        });
+                    ajax_loading.addEventListener("animationend", self.animationDone);
+                    if (ajax_loading.p_done) {
+                        ajax_loading.style.display = "none";
+                    }
+                    self.restart();
+            });
+        }
+        else {
+            self.stop();
+            // when the ajax blocker is hidden, fire a new ajax request
+            $('.modal.ajax-blocker.show').one('hidden.bs.modal', self.resume);
+            $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', self.resume);
+        }
     }
 }
 
@@ -276,10 +280,6 @@ function setSearchModal(form_id, modal_id, search_id, search_text, search_func) 
     });
     $(modal_id).on('show.bs.modal', function(){
         $(search_id).val(search_text);
-    });
-    $(modal_id).on('shown.bs.modal', function(){
-        $(search_id).focus();
-        $(search_id).select();
     });
 }
 

@@ -388,6 +388,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         request.session['schedule_view_hide_canceled'] = not request.session.get('schedule_view_hide_canceled', False)
     elif request_action == 'filter_toggle_nolog':
         request.session['schedule_view_hide_nolog'] = not request.session.get('schedule_view_hide_nolog', False)
+    elif request_action == 'filter_toggle_activities':
+        request.session['schedule_view_hide_activities'] = not request.session.get('schedule_view_hide_activities', False)
     elif request_action == 'filter_search':
         request.session['schedule_view_search'] = request_data
     elif request_action == 'filter_driver':
@@ -398,6 +400,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         request.session['schedule_view_hide_completed'] = False
         request.session['schedule_view_hide_canceled'] = False
         request.session['schedule_view_hide_nolog'] = False
+        request.session['schedule_view_hide_activities'] = False
         request.session['schedule_view_search'] = ''
         request.session['schedule_view_driver'] = ''
         request.session['schedule_view_vehicle'] = ''
@@ -416,6 +419,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     filter_hide_canceled = request.session.get('schedule_view_hide_canceled', False)
     filter_hide_completed = request.session.get('schedule_view_hide_completed', False)
     filter_hide_nolog = request.session.get('schedule_view_hide_nolog', False)
+    filter_hide_activities = request.session.get('schedule_view_hide_activities', False)
     filter_search = request.session.get('schedule_view_search', '')
     filter_driver = request.session.get('schedule_view_driver', '')
     filter_vehicle = request.session.get('schedule_view_vehicle', '')
@@ -423,24 +427,35 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     trips = Trip.objects.filter(date=date).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
 
     unfiltered_count = trips.count()
+    is_filtered = False
 
     if has_filter:
         if filter_hide_canceled:
+            is_filtered = True
             trips = trips.filter(status=Trip.STATUS_NORMAL)
 
         if filter_hide_completed:
+            is_filtered = True
             trips = trips.filter(Q(start_miles='') | Q(start_time='') | Q(end_miles='') | Q(end_time='') | ~Q(format=Trip.FORMAT_NORMAL))
 
         if filter_hide_nolog:
+            is_filtered = True
             trips = trips.filter(Q(driver=None) | Q(driver__is_logged=True) | ~Q(format=Trip.FORMAT_NORMAL))
 
+        if filter_hide_activities:
+            is_filtered = True
+            trips = trips.exclude(format=Trip.FORMAT_ACTIVITY)
+
         if filter_search != '':
+            is_filtered = True
             trips = trips.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(destination__icontains=filter_search) | Q(note__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(trip_type__name__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search))
 
         if filter_driver != '':
+            is_filtered = True
             trips = trips.filter(Q(driver__id=filter_driver) | ~Q(format=Trip.FORMAT_NORMAL))
 
         if filter_vehicle != '':
+            is_filtered = True
             trips = trips.filter(Q(vehicle__id=filter_vehicle) | ~Q(format=Trip.FORMAT_NORMAL))
 
     filtered_count = trips.count()
@@ -461,12 +476,13 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'date': date,
         'drivers': drivers,
         'vehicles': vehicles,
-        'is_filtered': (filter_hide_canceled or filter_hide_completed or filter_hide_nolog or filter_search != '' or filter_driver != '' or filter_vehicle != ''),
+        'is_filtered': is_filtered,
         'filtered_count': filtered_count,
         'unfiltered_count': unfiltered_count,
         'filter_hide_canceled': filter_hide_canceled,
         'filter_hide_completed': filter_hide_completed,
         'filter_hide_nolog': filter_hide_nolog,
+        'filter_hide_activities': filter_hide_activities,
         'filter_search': filter_search,
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),

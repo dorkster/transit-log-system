@@ -76,6 +76,9 @@
                         <a class="list-group-item list-group-item-action {% if filter_hide_nolog %}list-group-item-danger{% else %}list-group-item-success{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_toggle_nolog', '')">
                             <span class="mr-2 oi {% if filter_hide_nolog %}oi-x{% else %}oi-check{% endif %}"></span>Non-logged
                         </a>
+                        <a class="list-group-item list-group-item-action {% if filter_hide_activities %}list-group-item-danger{% else %}list-group-item-success{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_toggle_activities', '')">
+                            <span class="mr-2 oi {% if filter_hide_activities %}oi-x{% else %}oi-check{% endif %}"></span>Activities
+                        </a>
                     </div>
                 </div>
                 <hr/>

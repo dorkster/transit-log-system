@@ -281,6 +281,15 @@ function setSearchModal(form_id, modal_id, search_id, search_text, search_func) 
     $(modal_id).on('show.bs.modal', function(){
         $(search_id).val(search_text);
     });
+
+    if (modal_id == "#modal_filter_search") {
+        // this modal has no other controls other than the search box
+        // so, we can focus the text box automatically
+        $(modal_id).on('shown.bs.modal', function(){
+            $(search_id).focus();
+            $(search_id).select();
+        });
+    }
 }
 
 function datePickerDaysEnabled(year_id, month_id, day_id) {

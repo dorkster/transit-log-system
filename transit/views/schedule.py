@@ -467,6 +467,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     # create lists of active/inactive drivers & vehicles for filter
     shift_drivers = None
     shift_vehicles = None
+    inactive_drivers = None
+    inactive_vehicles = None
     if has_filter:
         shift_driver_q = Q()
         shift_vehicle_q = Q()

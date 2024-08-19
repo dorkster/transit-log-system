@@ -464,6 +464,26 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
 
+    # create lists of active/inactive drivers & vehicles for filter
+    shift_drivers = None
+    shift_vehicles = None
+    if has_filter:
+        shift_driver_q = Q()
+        shift_vehicle_q = Q()
+        for shift in shifts:
+            if shift.driver:
+                shift_driver_q |= Q(id=shift.driver.id)
+            if shift.vehicle:
+                shift_vehicle_q |= Q(id=shift.vehicle.id)
+
+        if shift_driver_q != Q():
+            shift_drivers = drivers.filter(shift_driver_q).filter(is_active=True)
+        inactive_drivers= drivers.exclude(shift_driver_q).filter(is_active=True)
+
+        if shift_vehicle_q != Q():
+            shift_vehicles = vehicles.filter(shift_vehicle_q).filter(is_active=True)
+        inactive_vehicles= vehicles.exclude(shift_vehicle_q).filter(is_active=True)
+
     messages = ScheduleMessage.objects.filter(date=date)
     if messages.count() > 0:
         message = messages[0].message
@@ -489,6 +509,10 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'templates': Template.objects.all(),
         'message': message,
         'show_extra_columns': request.session.get('schedule_edit_extra_columns', False),
+        'shift_drivers': shift_drivers,
+        'inactive_drivers': inactive_drivers,
+        'shift_vehicles': shift_vehicles,
+        'inactive_vehicles': inactive_vehicles,
         'Trip': Trip,
         'Shift': Shift,
     }

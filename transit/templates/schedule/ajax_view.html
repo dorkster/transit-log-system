@@ -25,6 +25,29 @@
             <a href="#top" class="btn btn-outline-secondary"><span class="oi oi-caret-top"></span></a>
         </div>
     </div>
+    <div class="row small text-muted">
+        {% if filter_driver is not None %}
+        <div class="col-auto">Driver: <strong>{{filter_driver}}</strong></div>
+        {% endif %}
+        {% if filter_vehicle is not None %}
+        <div class="col-auto">Vehicle: <strong>{{filter_vehicle}}</strong></div>
+        {% endif %}
+        {% if filter_hide_completed %}
+        <div class="col-auto"><span class="oi oi-circle-x mr-1"></span>Hide completed</div>
+        {% endif %}
+        {% if filter_hide_canceled %}
+        <div class="col-auto"><span class="oi oi-circle-x mr-1"></span>Hide canceled</div>
+        {% endif %}
+        {% if filter_hide_nolog %}
+        <div class="col-auto"><span class="oi oi-circle-x mr-1"></span>Hide non-logged</div>
+        {% endif %}
+        {% if filter_hide_activities %}
+        <div class="col-auto"><span class="oi oi-circle-x mr-1"></span>Hide activities</div>
+        {% endif %}
+        {% if filter_search %}
+        <div class="col-auto"><span class="oi oi-magnifying-glass mr-1"></span><strong>{{filter_search}}</strong></div>
+        {% endif %}
+    </div>
 </div>
 <!-- Modal -->
 <div class="modal ajax-blocker" id="modal_filter" tabindex="-1" role="dialog" aria-labelledby="modal_filter_title" aria-hidden="true">
@@ -44,11 +67,13 @@
                                 {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}Driver: <strong>{{ driver }}</strong>{% endif %}{% endfor %}{% endif %}
                             </a>
                             <div class="dropdown-menu shadow">
-                                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
-                                {% for driver in drivers %}
-                                {% if driver.is_active %}
-                                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
-                                {% endif %}
+                                <a class="dropdown-item {% if filter_driver is None %}active{% endif %} pt-2 pb-2" style="font-size: 1.2em;" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
+                                {% for driver in shift_drivers %}
+                                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %} pt-2 pb-2" style="font-size: 1.2em;" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
+                                {% endfor %}
+                                {% if inactive_drivers %}<div class="dropdown-divider"></div>{% endif %}
+                                {% for driver in inactive_drivers %}
+                                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %} list-group-item-light" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
                                 {% endfor %}
                             </div>
                         </div>
@@ -59,9 +84,13 @@
                                 {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}Vehicle: <strong>{{ vehicle }}</strong>{% endif %}{% endfor %}{% endif %}
                             </a>
                             <div class="dropdown-menu shadow">
-                                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
-                                {% for vehicle in vehicles %}
-                                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %} pt-2 pb-2" style="font-size: 1.2em;" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                                {% for vehicle in shift_vehicles %}
+                                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %} pt-2 pb-2" style="font-size: 1.2em;" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                                {% endfor %}
+                                {% if inactive_drivers %}<div class="dropdown-divider"></div>{% endif %}
+                                {% for vehicle in inactive_vehicles %}
+                                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %} list-group-item-light" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
                                 {% endfor %}
                             </div>
                         </div>
@@ -83,10 +112,11 @@
                 </div>
                 <hr/>
                 <div class="mt-2">
+                    <h5>Filter by name/address/note</h5>
                     <form id="filter_search_form" class="form-inline">
                         <div class="btn-group">
                             {% if filter_search %}
-                            <button class="btn btn-danger" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete"></span></button>
+                            <button type="reset" class="btn btn-danger" onclick="ajax_loader.run('', 'filter_search', '')"><span class="oi oi-delete"></span></button>
                             {% endif %}
                             <input id="filter_search" type="text" class="form-control" placeholder="Enter search terms"></input>
                             <button type="submit" class="btn btn-primary">
@@ -374,9 +404,9 @@
         </div>
     </div>
     {% endfor %}
-<script type="text/javascript">
-    setSearchModal('#filter_search_form', '#modal_filter', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
-</script>
 {% else %}
 <p>There are no trips for this day. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all trips.{% endif %}</p>
 {% endif %}
+<script type="text/javascript">
+    setSearchModal('#filter_search_form', '#modal_filter', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>

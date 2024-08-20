@@ -9,7 +9,7 @@
 </div>
 <hr/>
 {% endif %}
-<div class="container ml-0 p-2 mb-3 border" style="background: #eee; position: sticky; top: 0; z-index:1;">
+<div class="container ml-0 p-2 mb-3 border w-100" style="background: #eee; position: sticky; top: 0; z-index:1;">
     <div class="row">
         <div class="col">
             <div class="btn-group">
@@ -161,31 +161,41 @@
                     {% endif %}
                 </div>
                 <div class="text-right p-1 card-footer w-100">
-                    {% if shift.check_pretrip %}
-                        <span class="d-inline-block alert alert-warning pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
-                            Pre-Trip<br/>
-                            Complete
-                        </span>
-                    {% else %}
-                    <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn btn-warning">Pre-Trip</a>
-                    {% endif %}
-                    {% if shift.start_miles %}
-                        <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
-                            {{ shift.start_miles }}<br/>
-                            {{ shift.start_time }}
-                        </span>
-                    {% else %}
-                    <a href="{% url 'shift-start' shift.id %}" class="btn btn-primary">Start</a>
-                    {% endif %}
-                    {% if shift.end_miles %}
-                        <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
-                            {{ shift.end_miles }}<br/>
-                            {{ shift.end_time }}
-                        </span>
-                    {% else %}
-                    <a href="{% url 'shift-end' shift.id %}" class="btn {% if not shift.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
-                    {% endif %}
-                    <a href="{% url 'shift-fuel' shift.id %}" class="btn btn-info">Fuel</a>
+                    <div class="d-flex flex-wrap justify-content-end">
+                        <div class="mr-1">
+                        {% if shift.check_pretrip %}
+                            <span class="d-inline-block alert alert-warning pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                Pre-Trip<br/>
+                                Complete
+                            </span>
+                        {% else %}
+                            <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn pl-2 pr-2 btn-warning">Pre-Trip</a>
+                        {% endif %}
+                        </div>
+                        <div class="mr-1">
+                        {% if shift.start_miles %}
+                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                {{ shift.start_miles }}<br/>
+                                {{ shift.start_time }}
+                            </span>
+                        {% else %}
+                            <a href="{% url 'shift-start' shift.id %}" class="btn pl-2 pr-2 btn-primary">Start</a>
+                        {% endif %}
+                        </div>
+                        <div class="mr-1">
+                        {% if shift.end_miles %}
+                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                {{ shift.end_miles }}<br/>
+                                {{ shift.end_time }}
+                            </span>
+                        {% else %}
+                            <a href="{% url 'shift-end' shift.id %}" class="btn pl-2 pr-2 {% if not shift.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                        {% endif %}
+                        </div>
+                        <div>
+                            <a href="{% url 'shift-fuel' shift.id %}" class="btn pl-2 pr-2 btn-info">Fuel</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -282,7 +292,7 @@
                             {% else %}
                             {% if trip.address or trip.pick_up_time %}
                             <div class="list-group-item bg-transparent p-1" style="display: table;">
-                                <div class="pr-2" style="width: 90px; display: table-cell;">
+                                <div class="pr-1" style="width: {%if trip.pick_up_time or trip.appointment_time %}80px{% else %}24px{% endif %}; display: table-cell">
                                     {% if trip.pick_up_time %}
                                     <span class="badge badge-primary">
                                         <span class="oi oi-home"></span>
@@ -303,7 +313,7 @@
                             {% endif %}
                             {% if trip.destination or trip.appointment_time %}
                             <div class="list-group-item bg-transparent p-1 display: table;">
-                                <div class="pr-2" style="width: 90px; display: table-cell">
+                                <div class="pr-1" style="width: {%if trip.pick_up_time or trip.appointment_time %}80px{% else %}24px{% endif %}; display: table-cell">
                                     {% if trip.appointment_time %}
                                     <span class="badge badge-success">
                                         <span class="oi oi-arrow-right"></span>
@@ -323,13 +333,8 @@
                             </div>
                             {% endif %}
                             {% endif %}
-                            {% if trip.trip_type or trip.status != Trip.STATUS_NORMAL or trip.tags%}
+                            {% if trip.trip_type or trip.tags%}
                             <div class="list-group-item bg-transparent p-1">
-                                {% if trip.status == Trip.STATUS_CANCELED %}
-                                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>Canceled</span>
-                                {% elif trip.status == Trip.STATUS_NO_SHOW %}
-                                <span class="badge badge-secondary"><span class="oi oi-ban mr-1"></span>No Show</span>
-                                {% endif %}
                                 {% if trip.is_medical %}
                                 <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
                                 {% elif trip.trip_type %}
@@ -347,8 +352,9 @@
                             <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
                                 {{ trip.note }}
                                 {% if trip.volunteer %}
-                                {% if trip.note %}<br/>{% endif %}
+                                <div class="small">
                                 <span class="badge badge-secondary mr-2">Volunteer</span>{{ trip.volunteer.verbose_name }}
+                                </div>
                                 {% endif %}
                             </div>
                             {% endif %}
@@ -357,46 +363,68 @@
                     </div>
                     {% if trip.format == Trip.FORMAT_NORMAL %}
                     <div class="text-right p-1 card-footer w-100">
-                        {% if trip.status == Trip.STATUS_NORMAL %}
+                        <div class="d-flex flex-wrap justify-content-end">
+                            {% if trip.status == Trip.STATUS_NORMAL %}
                             {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
-                            <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
-                                Cash: ${{ trip.get_collected_cash_str }}<br/>
-                                Check: ${{ trip.get_collected_check_str }}
-                            </span>
-                            {% endif %}
-                            {% if trip.start_miles %}
-                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
-                                {{ trip.start_miles }}<br/>
-                                {{ trip.start_time }}
-                            </span>
-                            {% else %}
-                            <a href="{% url 'trip-start' trip.id %}" class="btn btn-primary">Pick Up</a>
-                            {% endif %}
-                            {% if trip.end_miles %}
-                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 6em;">
-                                {{ trip.end_miles }}<br/>
-                                {{ trip.end_time }}
-                            </span>
-                            {% else %}
-                            <a href="{% url 'trip-end' trip.id %}" class="btn {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
-                            {% endif %}
-                        {% endif %}
-                        {% if trip.get_phone_number_count > 1 %}
-                        <span class="dropdown ajax-blocker">
-                            <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Call
-                            </button>
-                            <div class="dropdown-menu shadow dropdown-menu-right" style="width: 300px;">
-                                {% for number in trip.get_phone_number_list %}
-                                <a href="tel:{{ number.tel }}" class="dropdown-item" style="white-space: normal;">{{ number.label }}<br/><span class="text-muted">({{ number.value }})</span></a>
-                                {% endfor %}
+                            <div class="mr-1">
+                                <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
+                                    <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
+                                    <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
+                                </span>
                             </div>
-                        </span>
-                        {% elif trip.get_phone_number_count == 1 %}
-                        <a href="tel:{{ trip.get_phone_number_list.0.tel }}" class="btn btn-info">Call</a>
-                        {% else %}
-                        <a href="#_" class="btn btn-secondary disabled">Call</a>
-                        {% endif %}
+                            {% endif %}
+                            <div class="mr-1">
+                                {% if trip.start_miles %}
+                                <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                    {{ trip.start_miles }}<br/>
+                                    {{ trip.start_time }}
+                                </span>
+                                {% else %}
+                                <a href="{% url 'trip-start' trip.id %}" class="btn pl-2 pr-2 btn-primary">Pick Up</a>
+                                {% endif %}
+                            </div>
+                            <div class="mr-1">
+                                {% if trip.end_miles %}
+                                <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                    {{ trip.end_miles }}<br/>
+                                    {{ trip.end_time }}
+                                </span>
+                                {% else %}
+                                <a href="{% url 'trip-end' trip.id %}" class="btn pl-2 pr-2 {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
+                                {% endif %}
+                            </div>
+                            {% elif trip.status == Trip.STATUS_CANCELED %}
+                            <div class="mr-1">
+                                <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
+                                    <span class="oi oi-ban mr-1"></span>Canceled
+                                </span>
+                            </div>
+                            {% elif trip.status == Trip.STATUS_NO_SHOW %}
+                            <div class="mr-1">
+                                <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
+                                    <span class="oi oi-ban mr-1"></span>No Show
+                                </span>
+                            </div>
+                            {% endif %}
+                            <div>
+                            {% if trip.get_phone_number_count > 1 %}
+                            <span class="dropdown ajax-blocker">
+                                <button class="btn pl-2 pr-2 btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Call
+                                </button>
+                                <div class="dropdown-menu shadow dropdown-menu-right" style="width: 300px;">
+                                    {% for number in trip.get_phone_number_list %}
+                                    <a href="tel:{{ number.tel }}" class="dropdown-item" style="white-space: normal;">{{ number.label }}<br/><span class="text-muted">({{ number.value }})</span></a>
+                                    {% endfor %}
+                                </div>
+                            </span>
+                            {% elif trip.get_phone_number_count == 1 %}
+                            <a href="tel:{{ trip.get_phone_number_list.0.tel }}" class="btn btn-info">Call</a>
+                            {% else %}
+                            <a href="#_" class="btn btn-secondary disabled">Call</a>
+                            {% endif %}
+                            </div>
+                        </div>
                     </div>
                     {% endif %}
                 </div>

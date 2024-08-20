@@ -275,7 +275,6 @@ function setEditButtonStyleFromHash(prefix, hash, style = 0) {
 function setSearchModal(form_id, modal_id, search_id, search_text, search_func) {
     $(form_id).on('submit', function(e){
         e.preventDefault();
-        $(modal_id).modal('hide');
         search_func(search_id);
     });
     $(modal_id).on('show.bs.modal', function(){

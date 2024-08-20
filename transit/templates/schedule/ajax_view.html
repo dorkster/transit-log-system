@@ -323,67 +323,136 @@
                             </div>
                             {% endif %}
                             {% endif %}
-                            {% if trip.trip_type or trip.tags%}
-                            <div class="list-group-item bg-transparent p-1">
-                                {% if trip.is_medical %}
-                                <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
-                                {% elif trip.trip_type %}
-                                <span class="badge badge-info"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
-                                {% endif %}
-                                {% if trip.tags %}
-                                {% for tag in trip.get_styled_tag_list %}
-                                <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
-                                {% endfor %}
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                            {% if trip.format == Trip.FORMAT_NORMAL %}
-                            {% if trip.note or trip.volunteer %}
-                            <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
-                                {{ trip.note }}
-                                {% if trip.volunteer %}
-                                <div class="small">
-                                <span class="badge badge-secondary mr-2">Volunteer</span>{{ trip.volunteer.verbose_name }}
+                            {% if trip.status == Trip.STATUS_CANCELED or trip.status == Trip.STATUS_NO_SHOW or trip.check_log == Trip.LOG_COMPLETE %}
+                            {% else %}
+                                {% if trip.trip_type or trip.tags%}
+                                <div class="list-group-item bg-transparent p-1">
+                                    {% if trip.is_medical %}
+                                    <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
+                                    {% elif trip.trip_type %}
+                                    <span class="badge badge-info"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
+                                    {% endif %}
+                                    {% if trip.tags %}
+                                    {% for tag in trip.get_styled_tag_list %}
+                                    <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
+                                    {% endfor %}
+                                    {% endif %}
                                 </div>
                                 {% endif %}
-                            </div>
-                            {% endif %}
-                            {% endif %}
+                                {% if trip.format == Trip.FORMAT_NORMAL %}
+                                {% if trip.note or trip.volunteer %}
+                                <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
+                                    {{ trip.note }}
+                                    {% if trip.volunteer %}
+                                    <div class="small">
+                                    <span class="badge badge-secondary mr-2">Volunteer</span>{{ trip.volunteer.verbose_name }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                        {% endif %}
                         </div>
                     </div>
                     {% if trip.format == Trip.FORMAT_NORMAL %}
                     <div class="text-right p-1 card-footer w-100">
-                        {% if trip.status == Trip.STATUS_NORMAL %}
-                            {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
-                            <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
-                                <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
-                                <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
+                        {% if trip.status == Trip.STATUS_CANCELED or trip.status == Trip.STATUS_NO_SHOW or trip.check_log == Trip.LOG_COMPLETE %}
+                            <span class="dropdown ajax-blocker">
+                                {% if trip.status == Trip.STATUS_NORMAL %}
+                                <button class="btn pl-2 pr-2 btn-success text-bold dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-check mr-2"></span>Completed
+                                </button>
+                                {% elif trip.status == Trip.STATUS_CANCELED %}
+                                <button class="btn pl-2 pr-2 btn-secondary text-bold dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-ban mr-2"></span>Canceled
+                                </button>
+                                {% elif trip.status == Trip.STATUS_NO_SHOW %}
+                                <button class="btn pl-2 pr-2 btn-dark text-bold dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="oi oi-ban mr-2"></span>No-Show
+                                </button>
+                                {% endif %}
+                                <div class="dropdown-menu shadow dropdown-menu-right border border-dark pt-0 pb-0" style="background: #{{trip.get_driver_color}}; width: 300px;">
+                                        {% if trip.status == Trip.STATUS_NORMAL %}
+                                        <div class="text-right p-1 m-0 w-100" style="background-color: rgba(0,0,0,.03);">
+                                            {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
+                                            <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
+                                                <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
+                                                <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
+                                            </span>
+                                            {% endif %}
+                                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                                {{ trip.start_miles }}<br/>
+                                                {{ trip.start_time }}
+                                            </span>
+                                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                                {{ trip.end_miles }}<br/>
+                                                {{ trip.end_time }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    <div class="list-group">
+                                        {% if trip.trip_type or trip.tags%}
+                                        <div class="list-group-item bg-transparent p-1">
+                                            {% if trip.is_medical %}
+                                            <span class="badge badge-danger"><span class="oi oi-medical-cross mr-1"></span>{{trip.trip_type}}</span>
+                                            {% elif trip.trip_type %}
+                                            <span class="badge badge-info"><span class="oi oi-bookmark mr-1"></span>{{trip.trip_type}}</span>
+                                            {% endif %}
+                                            {% if trip.tags %}
+                                            {% for tag in trip.get_styled_tag_list %}
+                                            <span class="badge {{ tag.1 }}"><span class="oi oi-tag mr-1"></span>{{ tag.0 }}</span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% if trip.format == Trip.FORMAT_NORMAL %}
+                                        {% if trip.note or trip.volunteer %}
+                                        <div class="list-group-item list-group-item-warning p-0 pl-2">
+                                            {{ trip.note }}
+                                            {% if trip.volunteer %}
+                                            <div class="small">
+                                            <span class="badge badge-secondary mr-2">Volunteer</span>{{ trip.volunteer.verbose_name }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </span>
+                        {% else %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}
+                                {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
+                                <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
+                                    <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
+                                    <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
+                                </span>
+                                {% endif %}
+                                {% if trip.start_miles %}
+                                <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                    {{ trip.start_miles }}<br/>
+                                    {{ trip.start_time }}
+                                </span>
+                                {% else %}
+                                <a href="{% url 'trip-start' trip.id %}" class="btn pl-2 pr-2 btn-primary">Pick Up</a>
+                                {% endif %}
+                                {% if trip.end_miles %}
+                                <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                    {{ trip.end_miles }}<br/>
+                                    {{ trip.end_time }}
+                                </span>
+                                {% else %}
+                                <a href="{% url 'trip-end' trip.id %}" class="btn pl-2 pr-2 {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
+                                {% endif %}
+                            {% elif trip.status == Trip.STATUS_CANCELED %}
+                                <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
+                                    <span class="oi oi-ban mr-1"></span>Canceled
+                                </span>
+                            {% elif trip.status == Trip.STATUS_NO_SHOW %}
+                                <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
+                                    <span class="oi oi-ban mr-1"></span>No Show
+                                </span>
                             {% endif %}
-                            {% if trip.start_miles %}
-                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
-                                {{ trip.start_miles }}<br/>
-                                {{ trip.start_time }}
-                            </span>
-                            {% else %}
-                            <a href="{% url 'trip-start' trip.id %}" class="btn pl-2 pr-2 btn-primary">Pick Up</a>
-                            {% endif %}
-                            {% if trip.end_miles %}
-                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
-                                {{ trip.end_miles }}<br/>
-                                {{ trip.end_time }}
-                            </span>
-                            {% else %}
-                            <a href="{% url 'trip-end' trip.id %}" class="btn pl-2 pr-2 {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
-                            {% endif %}
-                        {% elif trip.status == Trip.STATUS_CANCELED %}
-                            <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
-                                <span class="oi oi-ban mr-1"></span>Canceled
-                            </span>
-                        {% elif trip.status == Trip.STATUS_NO_SHOW %}
-                            <span class="d-inline-block alert alert-secondary p-1 m-0 align-middle border-secondary text-bold" style="min-width: 5em;">
-                                <span class="oi oi-ban mr-1"></span>No Show
-                            </span>
                         {% endif %}
 
                         {% if trip.get_phone_number_count > 1 %}

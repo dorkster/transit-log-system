@@ -367,9 +367,11 @@
 {% endif %}
 <p>Showing results {{ client_page_ranges.item_count_start }}-{{ client_page_ranges.item_count_end }} of {{ clients.paginator.count }}</p>
 <script type="text/javascript">
-    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
     setEditButtonStyleFromHash('#client_', window.location.hash);
 </script>
 {% else %}
 <p>There are no clients. {% if filtered_count < unfiltered_count %}Try <a href="#_" onclick="ajax_loader.run('', 'filter_reset', '')">resetting the filter</a> to view all clients.{% endif %}</p>
 {% endif %}
+<script type="text/javascript">
+    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>

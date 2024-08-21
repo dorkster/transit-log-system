@@ -435,9 +435,9 @@
     </tr>
     {% endfor %}
 </table>
-<script type="text/javascript">
-    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
-</script>
 {% else %}
 <p>There are no trips for this day.</p>
 {% endif %}
+<script type="text/javascript">
+    setSearchModal('#filter_search_form', '#modal_filter_search', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+</script>

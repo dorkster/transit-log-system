@@ -473,9 +473,9 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         shift_driver_q = Q()
         shift_vehicle_q = Q()
         for shift in shifts:
-            if shift.driver:
+            if shift.driver and (filter_vehicle == '' or str(shift.vehicle.id) == filter_vehicle):
                 shift_driver_q |= Q(id=shift.driver.id)
-            if shift.vehicle:
+            if shift.vehicle and (filter_driver == '' or str(shift.driver.id) == filter_driver):
                 shift_vehicle_q |= Q(id=shift.vehicle.id)
 
         if shift_driver_q != Q():

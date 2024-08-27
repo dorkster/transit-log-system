@@ -583,6 +583,7 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
         'money_total': money_total,
         'trips_employment': trips_employment,
         'drivers': drivers,
+        'current_timestamp': datetime.datetime.now(),
     }
 
     return render(request, 'schedule/ajax_print_daily_log.html', context)

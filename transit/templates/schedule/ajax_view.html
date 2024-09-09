@@ -60,6 +60,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                {% if filtered_count < unfiltered_count or is_filtered %}<div class="small text-muted">Currently showing: <strong>{{filtered_count}}/{{unfiltered_count}}</strong></div>{% endif %}
                 <div class="mt-2">
                     <div class="list-group w-100">
                         <div class="dropdown ajax-blocker">
@@ -126,11 +127,14 @@
                     </form>
                 </div>
             </div>
-            {% if is_filtered %}
             <div class="modal-footer">
+            {% if is_filtered %}
                 <button class="btn btn-outline-danger" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Clear Filters</button>
-            </div>
             {% endif %}
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">
+                    <span class="oi oi-x mr-2"></span>Close
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -483,4 +487,7 @@
 {% endif %}
 <script type="text/javascript">
     setSearchModal('#filter_search_form', '#modal_filter', '#filter_search', '{{filter_search}}', function(s) { ajax_loader.run('', 'filter_search', $(s).val()); });
+    {% if filter_changed %}
+    $('#modal_filter').modal('show');
+    {% endif %}
 </script>

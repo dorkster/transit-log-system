@@ -382,20 +382,29 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                 trip.save()
             log_event(request, LoggedEventAction.CREATE, LoggedEventModel.TRIP, 'Insert Template -> ' + str(parent_template) + ' | [' + str(date) + ']')
 
+    filter_changed = False
+
     if request_action == 'filter_toggle_completed':
         request.session['schedule_view_hide_completed'] = not request.session.get('schedule_view_hide_completed', False)
+        filter_changed = True
     elif request_action == 'filter_toggle_canceled':
         request.session['schedule_view_hide_canceled'] = not request.session.get('schedule_view_hide_canceled', False)
+        filter_changed = True
     elif request_action == 'filter_toggle_nolog':
         request.session['schedule_view_hide_nolog'] = not request.session.get('schedule_view_hide_nolog', False)
+        filter_changed = True
     elif request_action == 'filter_toggle_activities':
         request.session['schedule_view_hide_activities'] = not request.session.get('schedule_view_hide_activities', False)
+        filter_changed = True
     elif request_action == 'filter_search':
         request.session['schedule_view_search'] = request_data
+        filter_changed = True
     elif request_action == 'filter_driver':
         request.session['schedule_view_driver'] = request_data
+        filter_changed = True
     elif request_action == 'filter_vehicle':
         request.session['schedule_view_vehicle'] = request_data
+        filter_changed = True
     elif request_action == 'filter_reset':
         request.session['schedule_view_hide_completed'] = False
         request.session['schedule_view_hide_canceled'] = False
@@ -508,6 +517,7 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'filter_search': filter_search,
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
+        'filter_changed': filter_changed,
         'templates': Template.objects.all(),
         'message': message,
         'show_extra_columns': request.session.get('schedule_edit_extra_columns', False),

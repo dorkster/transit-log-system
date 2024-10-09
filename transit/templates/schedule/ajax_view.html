@@ -150,8 +150,8 @@
                         <button class="btn btn-block dropdown-toggle text-left text-bold p-1 text-wrap" style="font-size: 1.3rem;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ shift.driver }} ({{ shift.vehicle }})
                         </button>
-                        <div class="dropdown-menu shadow">
-                            <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit Shift</a>
+                        <div class="dropdown-menu shadow" style="font-size: 1.2rem;">
+                            <a href="{% url 'shift-edit' 'view' shift.id %}" class="dropdown-item pt-2 pb-2"><span class="oi oi-pencil mr-2"></span>Edit Shift</a>
                         </div>
                     </span>
                 </h4>
@@ -242,18 +242,23 @@
                             {{ trip.name }}
                         {% endif %}
                         </button>
-                        <div class="dropdown-menu shadow">
+                        <div class="dropdown-menu shadow" style="font-size: 1.2rem;">
                             {% if trip.format == Trip.FORMAT_ACTIVITY %}
-                            <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
+                            <a href="{% url 'trip-edit-activity' 'view' trip.id %}" class="dropdown-item pt-2 pb-2"><span class="oi oi-pencil mr-2"></span>Edit activity</a>
                             <div class="dropdown-divider"></div>
-                            {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
+                            {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item pt-2 pb-2"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item pt-2 pb-2"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                             {% else %}
-                            <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
+                            <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item pt-2 pb-2"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                             <div class="dropdown-divider"></div>
-                            {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
-                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
-                            {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item"><span class="oi oi-warning mr-2"></span>Set as no show</a>{% endif %}
+                            {% if trip.status != Trip.STATUS_NORMAL %}
+                            <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item pt-2 pb-2"><span class="oi oi-reload mr-2"></span>Reset Status</a>
+                            {% endif %}
+                            {% if trip.status == Trip.STATUS_NORMAL %}
+                            <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item pt-2 pb-2"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '2')" class="dropdown-item pt-2 pb-2"><span class="oi oi-warning mr-2"></span>Set as no show</a>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </span>

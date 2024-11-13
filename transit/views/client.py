@@ -142,10 +142,22 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             except:
                 update_trips = 0
 
-            if update_trips > 0:
+            try:
+                update_templates = int(form.cleaned_data['update_templates'])
+            except:
+                update_templates = 0
+
+            try:
+                update_method = int(form.cleaned_data['update_method'])
+            except:
+                update_method = 0
+
+            if update_trips > 0 or update_templates:
                 update_trip_args = {
                     'update_trips': update_trips,
                     'update_trips_date': form.cleaned_data['update_trips_date'],
+                    'update_templates': update_templates,
+                    'update_method': update_method,
                 }
                 # when creating a new client, there's no previous name. So just use the current name
                 if is_new:
@@ -237,12 +249,24 @@ def clientUpdateTrips(request, id):
         update_trips = 1
 
     try:
+        update_templates = int(request.GET.get('update_templates'))
+    except:
+        # if we're on this page, we assume we're updating trips, so default to 1 (aka update all trips and templates)
+        update_templates = 1
+
+    try:
         update_trips_date = datetime.datetime.strptime(request.GET.get('update_trips_date'), '%Y-%m-%d')
     except:
         update_trips_date = None
 
+    try:
+        update_method = int(request.GET.get('update_method'))
+    except:
+        # default to the most broad method
+        update_method = 0
+
     trips = []
-    if update_trips != 4:
+    if update_trips > 0:
         trip_query = Trip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
         if update_trips_date:
             if update_trips == 2:
@@ -253,6 +277,7 @@ def clientUpdateTrips(request, id):
         for trip in trip_query:
             updated = [False for i in range(9)]
 
+            # this is update_method == 1, but it is also used for 0
             # name
             if name != client.name:
                 if trip.name == name:
@@ -283,6 +308,22 @@ def clientUpdateTrips(request, id):
             # reminder instructions
             if reminder_instructions != client.reminder_instructions:
                 if trip.reminder_instructions == reminder_instructions:
+                    updated[8] = True
+
+            if update_method == 0:
+                if trip.name != client.name:
+                    updated[0] = True
+                if trip.phone_home != client.phone_home:
+                    updated[3] = True
+                if trip.phone_cell != client.phone_cell:
+                    updated[4] = True
+                if trip.phone_alt != client.phone_alt:
+                    updated[5] = True
+                if trip.elderly != client.elderly:
+                    updated[6] = True
+                if trip.ambulatory != client.ambulatory:
+                    updated[7] = True
+                if trip.reminder_instructions != client.reminder_instructions:
                     updated[8] = True
 
             for i in range(9):
@@ -291,17 +332,12 @@ def clientUpdateTrips(request, id):
                     break
 
     template_trips = []
-    if update_trips == 1 or update_trips == 4:
+    if update_templates > 0:
         template_trip_query = TemplateTrip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
-        if update_trips_date:
-            if update_trips == 2:
-                template_trip_query = template_trip_query.filter(date__gte=update_trips_date)
-            elif update_trips == 3:
-                template_trip_query = template_trip_query.filter(date__lte=update_trips_date)
-
         for trip in template_trip_query:
             updated = [False for i in range(9)]
 
+            # this is update_method == 1, but it is also used for 0
             # name
             if name != client.name:
                 if trip.name == name:
@@ -334,12 +370,34 @@ def clientUpdateTrips(request, id):
                 if trip.reminder_instructions == reminder_instructions:
                     updated[8] = True
 
+            if update_method == 0:
+                if trip.name != client.name:
+                    updated[0] = True
+                if trip.phone_home != client.phone_home:
+                    updated[3] = True
+                if trip.phone_cell != client.phone_cell:
+                    updated[4] = True
+                if trip.phone_alt != client.phone_alt:
+                    updated[5] = True
+                if trip.elderly != client.elderly:
+                    updated[6] = True
+                if trip.ambulatory != client.ambulatory:
+                    updated[7] = True
+                if trip.reminder_instructions != client.reminder_instructions:
+                    updated[8] = True
+
             for i in range(9):
                 if updated[i]:
                     template_trips.append({'trip': trip, 'updated': updated})
                     break
 
     if request.method == 'POST':
+        checked_trips = request.POST.getlist('trips')
+        checked_templates = request.POST.getlist('templates')
+
+        unchecked_trips = (len(trips) != len(checked_trips))
+        unchecked_templates = (len(template_trips) != len(checked_templates))
+
         if 'cancel' in request.POST:
             if existing_clients.count() > 1:
                 return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))
@@ -347,6 +405,9 @@ def clientUpdateTrips(request, id):
             return HttpResponseRedirect(reverse('clients') + '#client_' + str(client.id))
         elif 'save' in request.POST:
             for item in trips:
+                if unchecked_trips and not (str(item['trip'].id) in checked_trips):
+                    continue
+
                 trip = item['trip']
                 updated = item['updated']
 
@@ -372,6 +433,9 @@ def clientUpdateTrips(request, id):
                 trip.save()
 
             for item in template_trips:
+                if unchecked_templates and not (str(item['trip'].id) in checked_templates):
+                    continue
+
                 trip = item['trip']
                 updated = item['updated']
 

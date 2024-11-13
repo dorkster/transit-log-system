@@ -199,10 +199,17 @@ class tripEndForm(forms.Form):
 class EditClientForm(forms.Form):
     UPDATE_TRIP_OPTIONS = (
         (0, 'No'),
-        (1, 'Yes, all trips and templates'),
+        (1, 'Yes, all trips'),
         (2, 'Yes, only trips on or after...'),
         (3, 'Yes, only trips on or before...'),
-        (4, 'Yes, only templates'),
+    )
+    UPDATE_TEMPLATE_OPTIONS = (
+        (0, 'No'),
+        (1, 'Yes'),
+    )
+    UPDATE_METHOD_OPTIONS = (
+        (0, 'Default'),
+        (1, 'Only if a field\'s previous value matches the trip')
     )
 
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.name))
@@ -217,8 +224,10 @@ class EditClientForm(forms.Form):
     is_active = forms.BooleanField(label='Is active?', help_text='Inactive clients will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
-    update_trips = forms.ChoiceField(choices=UPDATE_TRIP_OPTIONS, label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    update_trips = forms.ChoiceField(choices=UPDATE_TRIP_OPTIONS, label='Update existing trips?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     update_trips_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    update_templates = forms.ChoiceField(choices=UPDATE_TEMPLATE_OPTIONS, label='Update existing templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on templates with this client.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    update_method = forms.ChoiceField(choices=UPDATE_METHOD_OPTIONS, label='Update method', help_text='Determines which trips/templates are selected for updating.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditClientFormRestricted(forms.Form):
     is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))

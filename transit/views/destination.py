@@ -87,10 +87,16 @@ def destinationCreateEditCommon(request, destination, is_new, is_dupe=False, src
             except:
                 update_trips = 0
 
-            if update_trips > 0:
+            try:
+                update_templates = int(form.cleaned_data['update_templates'])
+            except:
+                update_templates = 0
+
+            if update_trips > 0 or update_templates > 0:
                 update_trip_args = {
                     'update_trips': update_trips,
                     'update_trips_date': form.cleaned_data['update_trips_date'],
+                    'update_templates': update_templates,
                 }
                 # when creating a new destination, there's no previous address. So just use the current address
                 if is_new:
@@ -150,12 +156,18 @@ def destinationUpdateTrips(request, id):
         update_trips = 1
 
     try:
+        update_templates = int(request.GET.get('update_templates'))
+    except:
+        # if we're on this page, we assume we're updating trips, so default to 1 (aka update all trips and templates)
+        update_templates = 1
+
+    try:
         update_trips_date = datetime.datetime.strptime(request.GET.get('update_trips_date'), '%Y-%m-%d')
     except:
         update_trips_date = None
 
     trips = []
-    if update_trips != 4:
+    if update_trips > 0:
         trip_query = Trip.objects.filter(Q(address=address) | Q(destination=address))
         if update_trips_date:
             if update_trips == 2:
@@ -185,7 +197,7 @@ def destinationUpdateTrips(request, id):
                     break
 
     template_trips = []
-    if update_trips == 1 or update_trips == 4:
+    if update_templates > 0:
         template_trip_query = TemplateTrip.objects.filter(Q(address=address) | Q(destination=address))
         if update_trips_date:
             if update_trips == 2:
@@ -215,6 +227,12 @@ def destinationUpdateTrips(request, id):
                     break
 
     if request.method == 'POST':
+        checked_trips = request.POST.getlist('trips')
+        checked_templates = request.POST.getlist('templates')
+
+        unchecked_trips = (len(trips) != len(checked_trips))
+        unchecked_templates = (len(template_trips) != len(checked_templates))
+
         if 'cancel' in request.POST:
             if existing_destinations.count() > 1:
                 return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))
@@ -222,6 +240,9 @@ def destinationUpdateTrips(request, id):
             return HttpResponseRedirect(reverse('destinations') + '#destination_' + str(destination.id))
         elif 'save' in request.POST:
             for item in trips:
+                if unchecked_trips and not (str(item['trip'].id) in checked_trips):
+                    continue
+
                 trip = item['trip']
                 updated = item['updated']
 
@@ -237,6 +258,9 @@ def destinationUpdateTrips(request, id):
                 trip.save()
 
             for item in template_trips:
+                if unchecked_templates and not (str(item['trip'].id) in checked_templates):
+                    continue
+
                 trip = item['trip']
                 updated = item['updated']
 
@@ -251,9 +275,10 @@ def destinationUpdateTrips(request, id):
 
                 trip.save()
 
-            trip_count = len(trips) + len(template_trips)
+            trip_count = len(checked_trips) + len(checked_templates)
 
-            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, "Updated " + str(trip_count) + " trip(s): " + str(destination))
+            if trip_count > 0:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.DESTINATION, "Updated " + str(trip_count) + " trip(s): " + str(destination))
 
             if existing_destinations.count() > 1:
                 return HttpResponseRedirect(reverse('destination-fix-dupes', kwargs={'id': destination.id}))

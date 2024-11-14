@@ -152,7 +152,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             except:
                 update_method = 0
 
-            if update_trips > 0 or update_templates:
+            if update_trips > 0 or update_templates > 0:
                 update_trip_args = {
                     'update_trips': update_trips,
                     'update_trips_date': form.cleaned_data['update_trips_date'],

@@ -38,6 +38,10 @@
                     <div id="update_trips_date" class="mb-2 collapse">
                         {{ form.update_trips_date }}
                     </div>
+                    <div class="mb-2">
+                        <label for="{{ form.update_templates.id_for_label }}"><strong>{{ form.update_templates.label }}</strong><br/><span class="small text-muted">{{ form.update_templates.help_text }}</span></label>
+                        <br/>{{ form.update_templates }}<span class="alert alert-warning p-1 ml-3 small"><span class="oi oi-warning mr-2"></span>Please use this option with caution!</span>
+                    </div>
                 </fieldset>
             </div>
         </div>

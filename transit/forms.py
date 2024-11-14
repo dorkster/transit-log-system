@@ -241,17 +241,21 @@ class EditClientPaymentForm(forms.Form):
 class EditDestinationForm(forms.Form):
     UPDATE_TRIP_OPTIONS = (
         (0, 'No'),
-        (1, 'Yes, all trips and templates'),
+        (1, 'Yes, all trips'),
         (2, 'Yes, only trips on or after...'),
         (3, 'Yes, only trips on or before...'),
-        (4, 'Yes, only templates'),
+    )
+    UPDATE_TEMPLATE_OPTIONS = (
+        (0, 'No'),
+        (1, 'Yes'),
     )
 
     address = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.address))
     phone = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.phone))
     is_active = forms.BooleanField(label='Is active?', help_text='Inactive destinations will not appear in autocomplete drop-downs.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
-    update_trips = forms.ChoiceField(choices=UPDATE_TRIP_OPTIONS, label='Update existing trips and templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on trips that use this destination.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    update_trips = forms.ChoiceField(choices=UPDATE_TRIP_OPTIONS, label='Update existing trips?', help_text='If "Yes" is selected, this will perform a search-and-replace on trips that use this destination.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     update_trips_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
+    update_templates = forms.ChoiceField(choices=UPDATE_TEMPLATE_OPTIONS, label='Update existing templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on templates with this destination.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditDriverForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

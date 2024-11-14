@@ -14,10 +14,15 @@
     {% endif %}
 </div>
 <hr/>
+{% if trips or template_trips %}
+<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
+{% csrf_token %}
+{% endif %}
 <h3>Trips</h3>
 {% if trips %}
 <table class="mytable mytable-striped">
     <thead>
+        <td></td>
         <td>Date</td>
         <td>Name</td>
         <td>Address</td>
@@ -27,6 +32,9 @@
     </thead>
     {% for trip in trips %}
     <tr class="small">
+        <td class="mytable-col-sm">
+            <input type="checkbox" name="trips" value="{{trip.trip.id}}" checked/>
+        </td>
         <td class="mytable-col-md">{{trip.trip.date}}</td>
         <td class="mytable-col-lg">
             {{ trip.trip.name }}
@@ -76,6 +84,7 @@
 {% if template_trips %}
 <table class="mytable mytable-striped">
     <thead>
+        <td></td>
         <td>Date</td>
         <td>Name</td>
         <td>Address</td>
@@ -85,6 +94,9 @@
     </thead>
     {% for trip in template_trips %}
     <tr class="small">
+        <td class="mytable-col-sm">
+            <input type="checkbox" name="templates" value="{{trip.trip.id}}" checked/>
+        </td>
         <td class="mytable-col-md">{{trip.trip.date}}</td>
         <td class="mytable-col-lg">
             {{ trip.trip.name }}
@@ -131,14 +143,12 @@
 <hr/>
 
 {% if trips or template_trips %}
-<form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
-    {% csrf_token %}
-    <div class="d-flex flex-wrap mt-2">
-        <div class="mr-auto mb-3">
-            <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Update</button>
-            <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel</button>
-        </div>
+<div class="d-flex flex-wrap mt-2">
+    <div class="mr-auto mb-3">
+        <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Update</button>
+        <button class="btn btn-secondary btn-lg m-2" type="submit" name="cancel" formnovalidate><span class="oi oi-x mr-2"></span>Cancel</button>
     </div>
+</div>
 </form>
 {% else %}
 <div class="mb-4">

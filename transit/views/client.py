@@ -460,9 +460,10 @@ def clientUpdateTrips(request, id):
 
                 trip.save()
 
-            trip_count = len(trips) + len(template_trips)
+            trip_count = len(checked_trips) + len(checked_templates)
 
-            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, "Updated " + str(trip_count) + " trip(s): " + str(client))
+            if trip_count > 0:
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.CLIENT, "Updated " + str(trip_count) + " trip(s): " + str(client))
 
             if existing_clients.count() > 1:
                 return HttpResponseRedirect(reverse('client-fix-dupes', kwargs={'id': client.id}))

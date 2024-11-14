@@ -17,6 +17,7 @@
 {% if trips or template_trips %}
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
 {% csrf_token %}
+{% endif %}
 <h3>Trips</h3>
 {% if trips %}
 <table class="mytable mytable-striped">
@@ -223,6 +224,7 @@
 
 <hr/>
 
+{% if trips or template_trips %}
 <div class="d-flex flex-wrap mt-2">
     <div class="mr-auto mb-3">
         <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Update</button>

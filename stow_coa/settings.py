@@ -136,3 +136,7 @@ X_FRAME_OPTIONS = 'DENY'
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# the "update trips" function for clients POSTs a value for each trip, which can be well over the default 1000 fields
+# so, we'll instead rely on DATA_UPLOAD_MAX_MEMORY_SIZE, which has a more generous default of 2.5MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None

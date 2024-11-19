@@ -15,9 +15,11 @@
 
 import uuid
 import datetime
+import tempfile
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
+from django.http import FileResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.utils.http import urlencode
@@ -28,6 +30,10 @@ from transit.forms import EditDestinationForm
 from django.contrib.auth.decorators import permission_required
 
 from django.db.models import Q
+
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.workbook import Workbook
+from openpyxl.utils import get_column_letter
 
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
@@ -466,3 +472,96 @@ def ajaxDestinationList(request):
     }
     return render(request, 'destination/ajax_list.html', context=context)
 
+@permission_required(['transit.view_destination'])
+def destinationXLSX(request):
+    SORT_ADDRESS = 0
+    SORT_PHONE = 1
+    SORT_IS_ACTIVE = 2
+
+    sort_mode = request.session.get('destinations_sort', SORT_ADDRESS)
+    sort_mode_dir = request.session.get('destinations_sort_dir', 0)
+
+    filter_active = request.session.get('destinations_active', 0)
+    filter_search = request.session.get('destinations_search', '')
+
+    destinations = Destination.objects.all()
+
+    if filter_active == 1:
+        destinations = destinations.filter(is_active=True)
+    elif filter_active == 2:
+        destinations = destinations.filter(is_active=False)
+
+    if filter_search != '':
+        destinations = destinations.filter(address__icontains=filter_search)
+
+    if sort_mode == SORT_ADDRESS:
+        destinations = destinations.order_by('address')
+    elif sort_mode == SORT_PHONE:
+        destinations = destinations.order_by('phone', 'address')
+    elif sort_mode == SORT_IS_ACTIVE:
+        destinations = destinations.order_by('is_active', 'address')
+
+    if sort_mode_dir == 1:
+        destinations = destinations.reverse()
+
+    destination_count = len(destinations)
+
+    temp_file = tempfile.NamedTemporaryFile()
+
+    wb = Workbook()
+
+    style_font_normal = Font(name='Arial', size=10)
+    style_border_normal_side = Side(border_style='thin', color='FF000000')
+    style_border_normal = Border(left=style_border_normal_side, right=style_border_normal_side, top=style_border_normal_side, bottom=style_border_normal_side)
+    style_colwidth_normal = 13
+    style_colwidth_large = 30
+    style_colwidth_xlarge = 120
+
+    style_font_header = Font(name='Arial', size=10, bold=True)
+    style_alignment_header = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    style_fill_header = PatternFill(fill_type='solid', fgColor='DFE0E1')
+    style_rowheight_header = 25
+
+    ws = wb.active
+    ws.title = 'Destinations'
+
+    row_header = 1
+
+    ws.row_dimensions[row_header].height = style_rowheight_header
+
+    ws.cell(row_header, 1, 'Address')
+    ws.cell(row_header, 2, 'Phone')
+    ws.cell(row_header, 3, 'Is active?')
+
+    for i in range(0, row_header + destination_count):
+        row = i + 1
+
+        # apply styles
+        for col in range(1, 4):
+            if col == 1:
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_xlarge
+            elif col == 1:
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_large
+            else:
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
+
+            ws.cell(row, col).border = style_border_normal
+            if row == row_header:
+                ws.cell(row, col).font = style_font_header
+                ws.cell(row, col).alignment = style_alignment_header
+                ws.cell(row, col).fill = style_fill_header
+            else:
+                ws.cell(row, col).font = style_font_normal
+
+        if row == row_header:
+            continue
+
+        destination = destinations[i-1]
+
+        ws.cell(row, 1, destination.address)
+        ws.cell(row, 2, destination.phone)
+        ws.cell(row, 3, destination.is_active)
+
+    wb.save(filename=temp_file.name)
+
+    return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Destinations.xlsx', as_attachment=True)

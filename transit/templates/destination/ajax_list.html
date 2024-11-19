@@ -1,4 +1,13 @@
-<h3>Destinations <a class="btn btn-success btn-sm" href="{% url 'destination-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<div class="container ml-0">
+    <div class="row">
+        <div class="col p-0">
+            <h3>Destinations <a class="btn btn-success btn-sm" href="{% url 'destination-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+        </div>
+        <div class="col-auto p-0">
+            <a class="btn btn-primary" href="{% url 'destination-xlsx' %}"><span class="oi oi-data-transfer-download mr-2"></span>Download as Excel</a>
+        </div>
+    </div>
+</div>
 <div class="container ml-0 border p-2 mb-3" style="background: #eee;">
     <div class="row">
         <div class="col">

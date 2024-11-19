@@ -216,12 +216,18 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
                     destination = Destination()
                     destination.address = form.cleaned_data['address']
                     destination.phone = form.cleaned_data['phone_address']
-                    destination.save()
+                    dest_clients = Client.objects.filter(address=destination.address)
+                    if dest_clients.count() == 0:
+                        destination.save()
+                        log_event(request, LoggedEventAction.CREATE, LoggedEventModel.DESTINATION, str(destination))
                 if form.cleaned_data['add_dest2'] == True:
                     destination = Destination()
                     destination.address = form.cleaned_data['destination']
                     destination.phone = form.cleaned_data['phone_destination']
-                    destination.save()
+                    dest_clients = Client.objects.filter(address=destination.address)
+                    if dest_clients.count() == 0:
+                        destination.save()
+                        log_event(request, LoggedEventAction.CREATE, LoggedEventModel.DESTINATION, str(destination))
 
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('template-trip-create-return', kwargs={'parent':trip.parent.id, 'id':trip.id}))

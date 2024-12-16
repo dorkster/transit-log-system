@@ -80,10 +80,17 @@ def activityColorCreateEditCommon(request, activity_color, is_new):
         }
         form = EditActivityColorForm(initial=initial)
 
+    color_list = []
+    query = ActivityColor.objects.all()
+    for i in query:
+        if not i.color in color_list:
+            color_list.append(i.color)
+
     context = {
         'form': form,
         'activity_color': activity_color,
         'is_new': is_new,
+        'color_list': color_list,
     }
 
     return render(request, 'activitycolor/edit.html', context)

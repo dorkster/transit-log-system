@@ -84,10 +84,17 @@ def driverCreateEditCommon(request, driver, is_new):
         }
         form = EditDriverForm(initial=initial)
 
+    color_list = []
+    query = Driver.objects.all()
+    for i in query:
+        if not i.color in color_list:
+            color_list.append(i.color)
+
     context = {
         'form': form,
         'driver': driver,
         'is_new': is_new,
+        'color_list': color_list,
     }
 
     return render(request, 'driver/edit.html', context)

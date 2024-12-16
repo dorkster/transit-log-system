@@ -19,6 +19,11 @@
                 <fieldset class="form-group">
                     <div class="mb-2"><label for="{{ form.name.id_for_label }}"><strong>{{ form.name.label }}</strong></label><br/>{{ form.name }}</div>
                     <div class="mb-2"><label for="{{ form.color.id_for_label }}"><strong>{{ form.color.label }}</strong></label><br/>{{ form.color }}</div>
+                    <div class="mb-2">
+                        {% for color in color_list %}
+                        <button type="button" onclick="setColorPicker('{{color}}')" class="btn btn-outline-secondary" style="color: #{{color}}; background: #{{color}};">&#x25A0;</button>
+                        {% endfor %}
+                    </div>
                     <div class="mb-2"><label for="{{ form.is_active.id_for_label }}"><strong>{{ form.is_active.label }}</strong></label><br/>{{ form.is_active }}</div>
                     <div class="mb-2"><label for="{{ form.is_logged.id_for_label }}"><strong>{{ form.is_logged.label }}</strong></label><br/>{{ form.is_logged }}</div>
                 </fieldset>
@@ -38,6 +43,11 @@
         </div>
     </div>
 </form>
+<script type="text/javascript">
+    function setColorPicker(color) {
+        $("#id_color").val("#" + color);
+    }
+</script>
 {% endblock %}
 
 {% block content %}

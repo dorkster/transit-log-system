@@ -645,11 +645,6 @@ class Report():
                     self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
                     continue
 
-                # skip incomplete trip (logged vehicles only)
-                if i.vehicle.is_logged and log_status == Trip.LOG_INCOMPLETE:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_trip=i)
-                    continue
-
                 report_trip = Report.ReportTrip()
                 report_trip.trip = i
 
@@ -681,6 +676,11 @@ class Report():
                         report_trip.shift = len(report_day.shifts)-1
 
                 shift = report_day.shifts[report_trip.shift]
+
+                # skip incomplete trip (logged vehicles only)
+                if i.vehicle.is_logged and log_status == Trip.LOG_INCOMPLETE:
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    continue
 
                 if log_status == Trip.LOG_COMPLETE and report_day.shifts[report_trip.shift].shift.check_log() == Shift.LOG_COMPLETE:
                     parse_error = False

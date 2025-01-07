@@ -276,7 +276,7 @@ class Trip(models.Model):
 
     def get_phone_number(self, phone_type):
         num_only = ''
-        num_regex = '\d*'
+        num_regex = r'\d*'
         if phone_type == Trip.PHONE_HOME:
             matches = re.findall(num_regex, self.phone_home)
         elif phone_type == Trip.PHONE_CELL:

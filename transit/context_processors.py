@@ -18,11 +18,21 @@ import subprocess
 
 from transit.models import SiteSettings, VehicleIssue, Vehicle, Shift, PreTrip
 
+from transit.forms import YEARS
+
 class VersionInfo():
     version_str = subprocess.run(['git', 'describe', '--tags'], stdout=subprocess.PIPE).stdout.decode('utf-8')
 
 def globals(request):
     site_settings = SiteSettings.load()
+
+    # HACK the list of years for form fields is init on app startup
+    # we probably shouldn't be doing this check on every page load, but I'm lazy
+    next_year = datetime.date.today().year + 1
+    if next_year not in YEARS:
+        YEARS.clear()
+        for year in range(2019, next_year + 1):
+            YEARS.append(year)
 
     vehicle_inspections = []
     vehicle_oil_changes = []

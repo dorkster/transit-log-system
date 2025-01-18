@@ -441,7 +441,7 @@ class Report():
                 return self.name < other.name
 
         def __init__(self):
-            self.names = []
+            self.names = {}
             self.by_individuals = [Report.TripCount() for i in range(8)]
             self.by_trips = [Report.TripCount() for i in range(8)]
             # fares & payments totals
@@ -452,11 +452,6 @@ class Report():
             self.total_total_payments = Report.Money(0)
             self.total_total_fares = Report.Money(0)
             self.total_total_owed = Report.Money(0)
-
-        def __contains__(self, item):
-            for i in self.names:
-                if i.name == item:
-                    return True
 
     class ReportPayment():
         def __init__(self):
@@ -480,7 +475,7 @@ class Report():
         self.money_trips_summary = Report.ReportSummary()
         self.money_payments = []
         self.money_payments_summary = Report.ReportPayment()
-        self.frequent_destinations = []
+        self.frequent_destinations = {}
         self.report_errors = Report.ReportErrors()
         self.filtered_vehicles = None
         self.filtered_drivers = None
@@ -515,12 +510,21 @@ class Report():
 
         # also cache destinations
         all_destinations = Destination.objects.all()
-        destination_list = list(all_destinations)
+        destination_dict = {}
+        for i in all_destinations:
+            destination_dict[i.address] = i
+
+        all_clients = Client.objects.all()
+        if client_name != None:
+            all_clients = all_clients.filter(name=client_name)
+
+        client_dict = {}
+        for i in all_clients:
+            client_dict[i.name] = i
 
         # store our database lookups
         all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one).order_by('-date')
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
-        all_shifts_list = list(all_shifts)
 
         all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, format=Trip.FORMAT_NORMAL)
         if filter_by_money:
@@ -528,16 +532,11 @@ class Report():
         if client_name != None:
             all_trips = all_trips.filter(name=client_name)
         all_trips = all_trips.select_related('driver').select_related('vehicle').select_related('trip_type')
-        all_trips_list = list(all_trips)
-
-        all_clients = Client.objects.all()
-        if client_name != None:
-            all_clients = all_clients.filter(name=client_name)
-        all_clients_list = list(all_clients)
 
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
-        all_client_payments_list = list(all_client_payments)
+        if client_name != None:
+            all_client_payments = all_client_payments.filter(parent__name=client_name)
         self.perf_database = perf_counter() - perf_start
 
         perf_start = perf_counter()
@@ -546,35 +545,48 @@ class Report():
 
         all_dates = []
 
-        # process days where non-driver money is collected, even if there were no shifts/trips
-        for i in all_client_payments_list:
-            if i.date_paid not in all_dates:
-                all_dates.append(i.date_paid)
+        all_dates_dict = {}
+        for i in all_shifts:
+            if i.date not in all_dates_dict:
+                all_dates_dict[i.date] = [[], [], []]
+            all_dates_dict[i.date][0].append(i)
 
-        for i in all_trips_list:
-            if i.date not in all_dates:
-                all_dates.append(i.date)
+        for i in all_trips:
+            if i.date not in all_dates_dict:
+                all_dates_dict[i.date] = [[], [], []]
+            all_dates_dict[i.date][1].append(i)
 
-        # when given a client name, it is because we are only interested in fares/payments
-        # since shifts don't contain that data, we can skip looking at the shift list (which takes more time than the filtered trip list)
-        if client_name == None:
-            for i in all_shifts_list:
-                if i.date not in all_dates:
-                    all_dates.append(i.date)
+        for i in all_client_payments:
+            if i.date_paid not in all_dates_dict:
+                all_dates_dict[i.date_paid] = [[], [], []]
+            all_dates_dict[i.date_paid][2].append(i)
 
-        all_dates = sorted(all_dates)
+        all_dates_dict = {k: v for k, v in sorted(all_dates_dict.items(), key=lambda x: x[0])}
 
-        for day_date in all_dates:
+        self.all_vehicles = Report.ReportSummary()
+
+        # make sure our pre-defined tags get placed first in the final list
+        for i in Report.ReportSummary.query_tags:
+            self.all_vehicles.tags[i.name] = Report.TripCount()
+
+        self.vehicle_reports = []
+        for vehicle in self.filtered_vehicles:
+            vehicle_report = Report.ReportOutputVehicles()
+            vehicle_report.vehicle = vehicle
+            self.vehicle_reports.append(vehicle_report)
+
+        self.driver_reports = []
+        for driver in self.filtered_drivers:
+            driver_report = Report.ReportOutputDrivers()
+            driver_report.driver = driver
+            self.driver_reports.append(driver_report)
+
+        for day_date in all_dates_dict:
             report_day = Report.ReportDay()
             report_day.all.type = Report.ReportSummary.TYPE_LOGGED
             report_day.date = day_date
 
-            for i in all_shifts_list:
-                if i.date < day_date:
-                    break
-                if i.date != day_date:
-                    continue
-
+            for i in all_dates_dict[day_date][0]:
                 if driver_id == None:
                     if i.driver and not i.driver.is_logged:
                         # skip non-logged drivers
@@ -621,12 +633,7 @@ class Report():
 
                 report_day.shifts.append(report_shift)
 
-            for i in all_trips_list:
-                if i.date < day_date:
-                    break
-                if i.date != day_date:
-                    continue
-
+            for i in all_dates_dict[day_date][1]:
                 if not i.driver and not i.vehicle:
                     continue
 
@@ -792,105 +799,63 @@ class Report():
                         self.money_trips_summary.collected_check += report_trip.collected_check
 
                     # add unique rider
-                    found_unique_rider = False
-                    for j in self.unique_riders.names:
-                        if j.name == i.name:
-                            if j.elderly == None:
-                                j.elderly = i.elderly
-                            if j.ambulatory == None:
-                                j.ambulatory = i.ambulatory
+                    if i.name not in self.unique_riders.names:
+                        self.unique_riders.names[i.name] = Report.UniqueRiderSummary.Rider(i.name)
 
-                            found_unique_rider = True
-                            j.trips.addTrips(1, i.passenger)
+                    rider = self.unique_riders.names[i.name]
+                    rider.elderly = i.elderly
+                    rider.ambulatory = i.ambulatory
 
-                            j.total_fares += Report.Money(i.fare)
-                            j.collected_cash += Report.Money(i.collected_cash)
-                            j.collected_check += Report.Money(i.collected_check)
+                    if i.name in client_dict:
+                        client = client_dict[i.name]
 
-                            break
-                    if not found_unique_rider:
-                        rider = Report.UniqueRiderSummary.Rider(i.name)
-                        rider.elderly = i.elderly
-                        rider.ambulatory = i.ambulatory
+                        rider.client_id = client.id
+                        rider.staff = client.staff
 
-                        for client in all_clients_list:
-                            if client.name != i.name:
-                                continue
+                        if i.elderly == None or i.ambulatory == None:
+                            # try to get info from Clients
+                            if rider.elderly == None:
+                                rider.elderly = client.elderly
+                            if rider.ambulatory == None:
+                                rider.ambulatory = client.ambulatory
 
-                            rider.client_id = client.id
-                            rider.staff = client.staff
-
-                            if i.elderly == None or i.ambulatory == None:
-                                # try to get info from Clients
-                                if rider.elderly == None:
-                                    rider.elderly = client.elderly
-                                if rider.ambulatory == None:
-                                    rider.ambulatory = client.ambulatory
-                            break
-
-                        rider.trips.setTrips(1, i.passenger)
-                        rider.total_fares += Report.Money(i.fare)
-                        rider.collected_cash += Report.Money(i.collected_cash)
-                        rider.collected_check += Report.Money(i.collected_check)
-
-                        self.unique_riders.names.append(rider)
-                        self.unique_riders.names = sorted(self.unique_riders.names)
+                    rider.trips.setTrips(1, i.passenger)
+                    rider.total_fares += Report.Money(i.fare)
+                    rider.collected_cash += Report.Money(i.collected_cash)
+                    rider.collected_check += Report.Money(i.collected_check)
 
                 if i.tags != "":
                     report_trip.tags = i.get_tag_list()
 
                 # add destination to frequent destinations
-                found_frequent_destination = False
-                for j in self.frequent_destinations:
-                    if j.address == i.destination:
-                        found_frequent_destination = True
-                        j.trips.addTrips(1, i.passenger)
-                        if log_status == Trip.LOG_COMPLETE:
-                            j.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
-                        break
-                if not found_frequent_destination:
-                    for dest in destination_list:
-                        if dest.address == i.destination:
-                            temp_fd = Report.FrequentDestination()
-                            temp_fd.address = i.destination
-                            temp_fd.trips.addTrips(1, i.passenger)
-                            if log_status == Trip.LOG_COMPLETE:
-                                temp_fd.averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
-                            self.frequent_destinations.append(temp_fd)
-                            break
+                if i.destination in destination_dict:
+                    if i.destination not in self.frequent_destinations:
+                        self.frequent_destinations[i.destination] = Report.FrequentDestination()
+                        self.frequent_destinations[i.destination].address = i.destination
+                    self.frequent_destinations[i.destination].trips.addTrips(1, i.passenger)
+                    if log_status == Trip.LOG_COMPLETE:
+                        self.frequent_destinations[i.destination].averageMiles(report_trip.end_miles.value - report_trip.start_miles.value)
 
             # handle payments from Clients that didn't ride (so far)
-            for i in all_client_payments_list:
-                if i.date_paid != day_date:
-                    continue
-
-                if client_name and i.parent.name != client_name:
-                    continue
+            for i in all_dates_dict[day_date][2]:
+                # if client_name and i.parent.name != client_name:
+                #     continue
 
                 report_day.paid_cash += Report.Money(i.money_cash)
                 report_day.paid_check += Report.Money(i.money_check)
 
-                found_unique_rider = False
-                for j in self.unique_riders.names:
-                    if j.name == i.parent.name:
-                        found_unique_rider = True
-
-                        j.paid_cash += Report.Money(i.money_cash)
-                        j.paid_check += Report.Money(i.money_check)
-
-                        break
-                if not found_unique_rider:
-                    rider = Report.UniqueRiderSummary.Rider(i.parent.name)
+                if i.parent.name not in self.unique_riders.names:
+                    self.unique_riders.names[i.parent.name] = Report.UniqueRiderSummary.Rider(i.parent.name)
+                    rider = self.unique_riders.names[i.parent.name]
                     rider.trips.setTrips(0, False)
                     rider.elderly = i.parent.elderly
                     rider.ambulatory = i.parent.ambulatory
                     rider.client_id = i.parent.id
+                else:
+                    rider = self.unique_riders.names[i.parent.name]
 
-                    rider.paid_cash += Report.Money(i.money_cash)
-                    rider.paid_check += Report.Money(i.money_check)
-
-                    self.unique_riders.names.append(rider)
-                    self.unique_riders.names = sorted(self.unique_riders.names)
+                rider.paid_cash += Report.Money(i.money_cash)
+                rider.paid_check += Report.Money(i.money_check)
 
                 # create a summary of only non-driver payments
                 payment = Report.ReportPayment()
@@ -1007,25 +972,6 @@ class Report():
 
             self.report_all.append(report_day)
 
-        self.all_vehicles = Report.ReportSummary()
-
-        # make sure our pre-defined tags get placed first in the final list
-        for i in Report.ReportSummary.query_tags:
-            self.all_vehicles.tags[i.name] = Report.TripCount()
-
-        self.vehicle_reports = []
-        for vehicle in self.filtered_vehicles:
-            vehicle_report = Report.ReportOutputVehicles()
-            vehicle_report.vehicle = vehicle
-            self.vehicle_reports.append(vehicle_report)
-
-        self.driver_reports = []
-        for driver in self.filtered_drivers:
-            driver_report = Report.ReportOutputDrivers()
-            driver_report.driver = driver
-            self.driver_reports.append(driver_report)
-
-        for report_day in self.report_all:
             for vehicle_report in self.vehicle_reports:
                 if report_day.hasVehicleInShift(vehicle_report.vehicle):
                     vehicle_index = Report.getVehicleIndex(vehicle_report.vehicle)
@@ -1046,6 +992,10 @@ class Report():
                         driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
                         driver_report.totals += report_day.by_driver[driver_index]
 
+            if report_day.hasVehicleInShift():
+                self.total_vehicle_days_of_service += 1
+
+
         cleaned_driver_reports = []
         for driver_report in self.driver_reports:
             if len(driver_report.days) > 0:
@@ -1060,7 +1010,8 @@ class Report():
             self.total_vehicle_mileage += vehicle_report.total_miles
             self.all_vehicles += vehicle_report.totals
 
-        for rider in self.unique_riders.names:
+        for rider_name in self.unique_riders.names:
+            rider = self.unique_riders.names[rider_name]
             # total elderly/ambulatory counts
             if rider.trips.total > 0:
                 is_passenger = rider.trips.passenger > 0
@@ -1107,11 +1058,10 @@ class Report():
             self.unique_riders.total_total_owed += rider.total_owed
 
         # sort frequent destinations by total trips
-        self.frequent_destinations.sort(reverse=True)
+        self.frequent_destinations = {k: v for k, v in sorted(self.frequent_destinations.items(), key=lambda x: x[1], reverse=True)}
 
-        for day in self.report_all:
-            if day.hasVehicleInShift():
-                self.total_vehicle_days_of_service += 1
+        # sort unique riders by name
+        self.unique_riders.names = {k: v for k, v in sorted(self.unique_riders.names.items(), key=lambda x: x[0])}
 
         self.total_money = self.all_vehicles.total_collected_money + self.money_payments_summary.cash + self.money_payments_summary.check
 
@@ -1729,6 +1679,8 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
 
     rider_index = 0
 
+    unique_rider_list = list(report.unique_riders.names.values())
+
     for i in range(0, row_riders_end):
         row = i + 1
 
@@ -1761,8 +1713,8 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         if rider_index >= len(report.unique_riders.names):
             break
 
-        while rider_index < len(report.unique_riders.names):
-            rdata = report.unique_riders.names[rider_index]
+        while rider_index < len(unique_rider_list):
+            rdata = unique_rider_list[rider_index]
             rider_index += 1
             if rdata.trips.total > 0:
                 ws.cell(row, 1, rdata.name)
@@ -1876,6 +1828,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws.row_dimensions[row_header].height = style_rowheight_header
     ws.column_dimensions[get_column_letter(1)].width = style_colwidth_normal * 2
 
+    frequent_destinations = list(report.frequent_destinations.values())
     for i in range(0, row_dest_end):
         row = i + 1
 
@@ -1897,7 +1850,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         if row < row_dest or row == row_dest_end:
             continue
 
-        rdata = report.frequent_destinations[i-1]
+        rdata = frequent_destinations[i-1]
 
         ws.cell(row, 1, rdata.address)
         ws.cell(row, 2, rdata.trips.passenger)
@@ -1945,8 +1898,8 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
         else:
             row_total = row
 
-            while data_index < len(report.unique_riders.names):
-                rdata = report.unique_riders.names[data_index]
+            while data_index < len(unique_rider_list):
+                rdata = unique_rider_list[data_index]
                 data_index += 1
 
                 if rdata.total_payments.value > 0 or rdata.total_fares.value > 0:

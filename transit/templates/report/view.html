@@ -672,7 +672,7 @@
             <td class="mytable-col-sm">Total Trips</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for rider in report.unique_riders.names %}
+            {% for key, rider in report.unique_riders.names.items %}
             {% if rider.trips.total > 0 %}
             <tr>
                 <td class="mytable-col-lg">
@@ -800,7 +800,7 @@
             <td class="mytable-col-sm">Average Mileage</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for destination in report.frequent_destinations %}
+            {% for key, destination in report.frequent_destinations.items %}
             <tr>
                 <td class="mytable-col-lg">{{ destination.address }}</td>
                 <td class="mytable-col-sm {% if destination.trips.passenger == 0 %}mytable-zero{%endif%}">{{destination.trips.passenger}}</td>
@@ -837,7 +837,7 @@
             <td class="mytable-col-md">Total Owed</td>
         </thead>
         <tbody class="mytable-hoverhi">
-            {% for rider in report.unique_riders.names %}
+            {% for key, rider in report.unique_riders.names.items %}
             {% if rider.total_payments.value > 0 or rider.total_fares.value > 0 %}
             <tr>
                 <td class="mytable-col-lg">

@@ -74,17 +74,25 @@ def fareCheckOneWayBase(request, start_year, start_month, start_day, end_year, e
 
     matched_trips = []
 
-    return_trip_query = Q()
+    try:
+        return_trip_query = Q()
 
-    for trip in all_trips:
-        return_trip_query |= Q(date=trip.date, name=trip.name, address=trip.destination, destination=trip.address, status=Trip.STATUS_NORMAL, fare=0, vehicle__is_logged=True, format=Trip.FORMAT_NORMAL)
+        for trip in all_trips:
+            return_trip_query |= Q(date=trip.date, name=trip.name, address=trip.destination, destination=trip.address, status=Trip.STATUS_NORMAL, fare=0, vehicle__is_logged=True, format=Trip.FORMAT_NORMAL)
 
-    return_trips = Trip.objects.filter(return_trip_query)
+        return_trips = Trip.objects.filter(return_trip_query)
 
-    for trip in all_trips:
-        for return_trip in return_trips:
-            if trip.date == return_trip.date and trip.name == return_trip.name and trip.address == return_trip.destination and trip.destination == return_trip.address:
-                matched_trips.append((trip, return_trip))
+        for trip in all_trips:
+            for return_trip in return_trips:
+                if trip.date == return_trip.date and trip.name == return_trip.name and trip.address == return_trip.destination and trip.destination == return_trip.address:
+                    matched_trips.append((trip, return_trip))
+    except:
+        # slow path
+        # if we end up here, it's likely because the expression tree is too large for sqlite
+        for trip in all_trips:
+            return_trips = Trip.objects.filter(date=trip.date, name=trip.name, address=trip.destination, destination=trip.address, status=Trip.STATUS_NORMAL, fare=0, vehicle__is_logged=True, format=Trip.FORMAT_NORMAL)
+            if len(return_trips) > 0:
+                matched_trips.append((trip, return_trips[0]))
 
     context = {
         'date_start': date_start,

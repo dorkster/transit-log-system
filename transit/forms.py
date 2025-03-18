@@ -482,3 +482,7 @@ class EditUserForm(forms.Form):
 
         return cleaned_data
 
+class FareCheckOneWayFixForm(forms.Form):
+    trip_src = forms.CharField(required=False, widget=forms.HiddenInput())
+    trip_dst = forms.CharField(required=False, widget=forms.HiddenInput())
+

@@ -173,6 +173,10 @@ urlpatterns = [
     path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-trip/<uuid:id>', views.tripEditFromReport, name='report-trip-edit'),
     path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-shift/<uuid:id>', views.shiftEditFromReport, name='report-shift-edit'),
 
+    path('report/fare-check-oneway/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/', views.fareCheckOneWay, name='report-fare-check-oneway'),
+    path('report/fare-check-oneway/<int:year>/<int:month>/', views.fareCheckOneWayMonth, name='report-fare-check-oneway-month'),
+    path('report/fare-check-oneway/this-month/', views.fareCheckOneWayThisMonth, name='report-fare-check-oneway-this-month'),
+
     path('vehicle-status/', views.vehicleStatus, name='vehicle-status'),
     path('vehicle-status/issues/create', views.vehicleIssueCreate, name='vehicle-issue-create'),
     path('vehicle-status/issues/<uuid:id>/edit', views.vehicleIssueEdit, name='vehicle-issue-edit'),

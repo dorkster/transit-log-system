@@ -39,3 +39,4 @@ from .tag import *
 from .activity_color import *
 from .volunteer import *
 from .loggedevent import *
+from .fare_check_oneway import *

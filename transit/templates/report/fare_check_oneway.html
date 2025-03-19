@@ -63,7 +63,7 @@
     <p>Round trips are typically entered as two trips: one to the destination and one back. Usually, fares are only assigned to one of these trips. When the trip with the fare gets canceled, the round trip as a whole no longer has a fare to be counted.</p>
     <p>This page offers a way to fix the fares that would otherwise go uncounted. Clicking on the <b>Fix Fare</b> button will clear the fare from the canceled trip and assign it to the reverse trip.</p>
     {% if matched_trips %}
-    <table class="mytable mytable-striped mytable-hoverhi">
+    <table class="mytable mytable-striped">
         <thead>
             <td class="mytable-col-md">Date</td>
             <td class="mytable-col-lg">Name</td>
@@ -71,29 +71,31 @@
             <td class="mytable-col-xl">Completed trip</td>
             <td class="mytable-col-md"></td>
         </thead>
-    {% for trip_pair in matched_trips %}
-    <tr>
-        <td><a target="_blank" href="{% url 'schedule' 'edit' trip_pair.0.date.year trip_pair.0.date.month trip_pair.0.date.day %}">{{trip_pair.0.date|date:"M j, Y"}}</a></td>
-        <td>{{trip_pair.0.name}}</td>
-        <td>
-            <a target="_blank" href="{% url 'trip-edit' 'edit' trip_pair.0.id %}">{{trip_pair.0.address}} to {{ trip_pair.0.destination }}</a>
-            <br/>Fare: <span class="text-danger text-bold">${{trip_pair.0.get_fare_str}}</span>
-        </td>
-        <td>
-            <a target="_blank" href="{% url 'trip-edit' 'edit' trip_pair.1.id %}">{{trip_pair.1.address}} to {{ trip_pair.1.destination }}</a>
-            {% if trip_pair.1.collected_cash > 0 %}<br/>Cash: <span class="text-success text-bold">${{trip_pair.1.get_collected_cash_str}}</span>{% endif %}
-            {% if trip_pair.1.collected_check > 0 %}<br/>Check: <span class="text-success text-bold">${{trip_pair.1.get_collected_check_str}}</span>{% endif %}
-        </td>
-        <td class="text-center">
-            <form action="" method="post" class="date-picker">
-                {% csrf_token %}
-                <input type="hidden" name="trip_src" value="{{trip_pair.0.id}}"/>
-                <input type="hidden" name="trip_dst" value="{{trip_pair.1.id}}"/>
-                <button class="btn btn-sm btn-warning" type="submit" name="fix_fare"><span class="oi oi-dollar mr-1"></span>Fix Fare</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+        <tbody class="mytable-hoverhi">
+            {% for trip_pair in matched_trips %}
+            <tr>
+                <td><a target="_blank" href="{% url 'schedule' 'edit' trip_pair.0.date.year trip_pair.0.date.month trip_pair.0.date.day %}">{{trip_pair.0.date|date:"M j, Y"}}</a></td>
+                <td>{{trip_pair.0.name}}</td>
+                <td>
+                    <a target="_blank" href="{% url 'trip-edit' 'edit' trip_pair.0.id %}">{{trip_pair.0.address}} to {{ trip_pair.0.destination }}</a>
+                    <br/>Fare: <span class="text-danger text-bold">${{trip_pair.0.get_fare_str}}</span>
+                </td>
+                <td>
+                    <a target="_blank" href="{% url 'trip-edit' 'edit' trip_pair.1.id %}">{{trip_pair.1.address}} to {{ trip_pair.1.destination }}</a>
+                    {% if trip_pair.1.collected_cash > 0 %}<br/>Cash: <span class="text-success text-bold">${{trip_pair.1.get_collected_cash_str}}</span>{% endif %}
+                    {% if trip_pair.1.collected_check > 0 %}<br/>Check: <span class="text-success text-bold">${{trip_pair.1.get_collected_check_str}}</span>{% endif %}
+                </td>
+                <td class="text-center">
+                    <form action="" method="post" class="date-picker">
+                        {% csrf_token %}
+                        <input type="hidden" name="trip_src" value="{{trip_pair.0.id}}"/>
+                        <input type="hidden" name="trip_dst" value="{{trip_pair.1.id}}"/>
+                        <button class="btn btn-sm btn-warning" type="submit" name="fix_fare"><span class="oi oi-dollar mr-1"></span>Fix Fare</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
     {% else %}
     <p>No one-way fare errors found.</p>

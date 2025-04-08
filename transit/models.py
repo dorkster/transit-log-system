@@ -462,6 +462,7 @@ class Driver(models.Model):
     color = models.CharField(default='FFFFFF', max_length=FieldSizes.COLOR, blank=True)
     is_logged = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    default_vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['sort_index']

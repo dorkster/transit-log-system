@@ -297,12 +297,15 @@ def ajaxScheduleCommon(request, template, has_filter=False):
                     if nonlogged_vehicles.count() == 1:
                         trip.vehicle = nonlogged_vehicles[0]
 
+                if driver.default_vehicle:
+                    trip.vehicle = driver.default_vehicle
+
             # attempt to set vehicle from Shift data
             if prev_driver != trip.driver:
                 new_query = Shift.objects.filter(date=trip.date).filter(driver=trip.driver)
                 if new_query.count() > 0:
                     trip.vehicle = new_query[0].vehicle
-                elif trip.driver is None or trip.driver.is_logged == True:
+                elif trip.driver is None or (trip.driver.is_logged == True and not driver.default_vehicle):
                     trip.vehicle = None
 
             trip.save()

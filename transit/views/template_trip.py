@@ -297,7 +297,12 @@ def templateTripCreateEditCommon(request, trip, is_new, is_return_trip=False):
 
     for driver in active_drivers:
         if driver.is_logged:
-            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+            if driver.default_vehicle:
+                driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(driver.default_vehicle.id), 'volunteer': 0}
+            else:
+                driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+        elif driver.default_vehicle:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(driver.default_vehicle.id), 'volunteer': 0}
         elif not driver.is_logged and nonlogged_vehicles.count() == 1:
             driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
         else:

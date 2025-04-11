@@ -819,7 +819,7 @@ class Report():
                             if rider.ambulatory == None:
                                 rider.ambulatory = client.ambulatory
 
-                    rider.trips.setTrips(1, i.passenger)
+                    rider.trips.addTrips(1, i.passenger)
                     rider.total_fares += Report.Money(i.fare)
                     rider.collected_cash += Report.Money(i.collected_cash)
                     rider.collected_check += Report.Money(i.collected_check)

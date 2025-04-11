@@ -437,6 +437,9 @@ class Report():
                 self.total_fares = Report.Money(0)
                 self.total_owed = Report.Money(0)
                 self.staff = False
+                self.trips_no_show = Report.TripCount()
+                self.trips_canceled_late = Report.TripCount()
+                self.trips_canceled_very_late = Report.TripCount()
             def __lt__(self, other):
                 return self.name < other.name
 
@@ -526,7 +529,7 @@ class Report():
         all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one).order_by('-date')
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
 
-        all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Trip.STATUS_NORMAL, format=Trip.FORMAT_NORMAL)
+        all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, format=Trip.FORMAT_NORMAL)
         if filter_by_money:
             all_trips = all_trips.exclude(fare=0, collected_cash=0, collected_check=0)
         if client_name != None:
@@ -581,6 +584,29 @@ class Report():
             driver_report.driver = driver
             self.driver_reports.append(driver_report)
 
+        def UniqueRiderInit(trip):
+            if trip.name not in self.unique_riders.names:
+                self.unique_riders.names[trip.name] = Report.UniqueRiderSummary.Rider(trip.name)
+
+            rider = self.unique_riders.names[trip.name]
+            rider.elderly = trip.elderly
+            rider.ambulatory = trip.ambulatory
+
+            if trip.name in client_dict:
+                client = client_dict[trip.name]
+
+                rider.client_id = client.id
+                rider.staff = client.staff
+
+                if trip.elderly == None or trip.ambulatory == None:
+                    # try to get info from Clients
+                    if rider.elderly == None:
+                        rider.elderly = client.elderly
+                    if rider.ambulatory == None:
+                        rider.ambulatory = client.ambulatory
+
+            return rider
+
         for day_date in all_dates_dict:
             report_day = Report.ReportDay()
             report_day.all.type = Report.ReportSummary.TYPE_LOGGED
@@ -634,6 +660,19 @@ class Report():
                 report_day.shifts.append(report_shift)
 
             for i in all_dates_dict[day_date][1]:
+                if i.status == Trip.STATUS_NO_SHOW:
+                    rider = UniqueRiderInit(i)
+                    rider.trips_no_show.addTrips(1, i.passenger)
+                    continue
+                elif i.status == Trip.STATUS_CANCELED:
+                    rider = UniqueRiderInit(i)
+                    cancel_status = i.check_cancel_date()
+                    if cancel_status == 3:
+                        rider.trips_canceled_very_late.addTrips(1, i.passenger)
+                    elif cancel_status == 2:
+                        rider.trips_canceled_late.addTrips(1, i.passenger)
+                    continue
+
                 if not i.driver and not i.vehicle:
                     continue
 
@@ -799,25 +838,7 @@ class Report():
                         self.money_trips_summary.collected_check += report_trip.collected_check
 
                     # add unique rider
-                    if i.name not in self.unique_riders.names:
-                        self.unique_riders.names[i.name] = Report.UniqueRiderSummary.Rider(i.name)
-
-                    rider = self.unique_riders.names[i.name]
-                    rider.elderly = i.elderly
-                    rider.ambulatory = i.ambulatory
-
-                    if i.name in client_dict:
-                        client = client_dict[i.name]
-
-                        rider.client_id = client.id
-                        rider.staff = client.staff
-
-                        if i.elderly == None or i.ambulatory == None:
-                            # try to get info from Clients
-                            if rider.elderly == None:
-                                rider.elderly = client.elderly
-                            if rider.ambulatory == None:
-                                rider.ambulatory = client.ambulatory
+                    rider = UniqueRiderInit(i)
 
                     rider.trips.addTrips(1, i.passenger)
                     rider.total_fares += Report.Money(i.fare)
@@ -1675,7 +1696,10 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     ws.cell(row_header_riders, 4, 'Ambulatory')
     ws.cell(row_header_riders, 5, 'Trips on vehicle')
     ws.cell(row_header_riders, 6, 'Trips not on vehicle')
-    ws.cell(row_header_riders, 7, 'Total Trips')
+    ws.cell(row_header_riders, 7, 'No-Show')
+    ws.cell(row_header_riders, 8, 'Canceled (late)')
+    ws.cell(row_header_riders, 9, 'Canceled (same-day)')
+    ws.cell(row_header_riders, 10, 'Total Trips')
 
     rider_index = 0
 
@@ -1700,7 +1724,7 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                     ws.cell(row, col).font = style_font_normal
             continue
         elif row == row_header_riders:
-            for col in range(1, 8):
+            for col in range(1, 11):
                 ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=2)
                 ws.cell(row, col).border = style_border_normal
                 ws.cell(row, col).font = style_font_header
@@ -1722,11 +1746,14 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
                 ws.cell(row, 4, rdata.ambulatory)
                 ws.cell(row, 5, rdata.trips.passenger)
                 ws.cell(row, 6, rdata.trips.no_passenger)
-                ws.cell(row, 7, rdata.trips.total)
+                ws.cell(row, 7, rdata.trips_no_show.total)
+                ws.cell(row, 8, rdata.trips_canceled_late.total)
+                ws.cell(row, 9, rdata.trips_canceled_very_late.total)
+                ws.cell(row, 10, rdata.trips.total)
 
                 # apply rider row styles
                 ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=2)
-                for col in range(1, 8):
+                for col in range(1, 11):
                     ws.cell(row, col).border = style_border_normal
                     ws.cell(row, col).font = style_font_normal
                     if col == 3 or col == 4:

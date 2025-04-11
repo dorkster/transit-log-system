@@ -669,6 +669,9 @@
             <td class="mytable-col-sm">Ambulatory</td>
             <td class="mytable-col-sm">Trips on vehicle</td>
             <td class="mytable-col-sm">Trips not on vehicle</td>
+            <td class="mytable-col-sm">No-Show</td>
+            <td class="mytable-col-sm">Canceled (late)</td>
+            <td class="mytable-col-sm">Canceled (same-day)</td>
             <td class="mytable-col-sm">Total Trips</td>
         </thead>
         <tbody class="mytable-hoverhi">
@@ -710,6 +713,9 @@
                 <td class="mytable-col-sm">{% if rider.ambulatory %}<span class="oi oi-check"></span>{% elif rider.ambulatory == False %}<span class="oi oi-x"></span>{% endif %}</td>
                 <td class="mytable-col-sm {% if rider.trips.passenger == 0 %}mytable-zero{% endif %}">{{rider.trips.passenger}}</td>
                 <td class="mytable-col-sm {% if rider.trips.no_passenger == 0 %}mytable-zero{% endif %}">{{rider.trips.no_passenger}}</td>
+                <td class="mytable-col-sm {% if rider.trips_no_show.total == 0 %}mytable-zero{% else %}text-danger{% endif %}">{{rider.trips_no_show.total}}</td>
+                <td class="mytable-col-sm {% if rider.trips_canceled_late.total == 0 %}mytable-zero{% else %}text-danger{% endif %}">{{rider.trips_canceled_late.total}}</td>
+                <td class="mytable-col-sm {% if rider.trips_canceled_very_late.total == 0 %}mytable-zero{% else %}text-danger{% endif %}">{{rider.trips_canceled_very_late.total}}</td>
                 <td class="mytable-col-sm {% if rider.trips.total == 0 %}mytable-zero{% endif %}">{{rider.trips.total}}</td>
             </tr>
             {% endif %}

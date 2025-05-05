@@ -17,7 +17,7 @@ import datetime
 
 from django import forms
 
-from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip, ActivityColor, Volunteer
+from transit.models import Driver, Vehicle, TripType, Client, VehicleIssue, Trip, Template, TemplateTrip, ActivityColor, Volunteer, Tag
 
 # from django.core.exceptions import ValidationError
 # from django.utils.translation import ugettext_lazy as _
@@ -373,6 +373,8 @@ class EditFareForm(forms.Form):
 
 class EditTagForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))
+    style = forms.ChoiceField(required=False, choices=Tag.STYLES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    flag = forms.ChoiceField(label='Special Flag', required=False, choices=Tag.FLAGS, widget=forms.Select(attrs=formWidgetAttrs.default))
 
 class EditActivityColorForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

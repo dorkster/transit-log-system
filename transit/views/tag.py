@@ -66,6 +66,8 @@ def tagCreateEditCommon(request, tag, is_new):
 
         if form.is_valid():
             tag.name = form.cleaned_data['name']
+            tag.style = form.cleaned_data['style']
+            tag.flag = form.cleaned_data['flag']
             tag.save()
 
             if is_new:
@@ -77,6 +79,8 @@ def tagCreateEditCommon(request, tag, is_new):
     else:
         initial = {
             'name': tag.name,
+            'style': tag.style,
+            'flag': tag.flag,
         }
         form = EditTagForm(initial=initial)
 

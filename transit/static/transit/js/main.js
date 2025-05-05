@@ -245,10 +245,15 @@ function cookieRead(c) {
 }
 
 function getTagButtonStyle(tag_name) {
-    if (tag_name == "Wheelchair")
-        return "btn-warning";
-    else
-        return "btn-info";
+    if (typeof tags !== 'undefined') {
+        var lower_tag = tag_name.toLowerCase();
+        for (tag_index in tags) {
+            if (tags[tag_index].fields["name"].toLowerCase() == lower_tag)
+                if (tags[tag_index].fields["style"] == 1)
+                    return "btn-warning";
+        }
+    }
+    return "btn-info";
 }
 
 function setEditButtonStyleFromHash(prefix, hash, style = 0) {

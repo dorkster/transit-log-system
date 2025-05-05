@@ -344,9 +344,9 @@ class Trip(models.Model):
         tags = self.tags.split(',')
         for i in range(0, len(tags)):
             tag_str = tags[i].strip()
-            # TODO don't hard-code this
-            if tag_str == 'Wheelchair':
-                tag_list.append((tag_str, 'badge-warning'))
+            tag_data = Tag.objects.filter(name__iexact=tag_str)
+            if len(tag_data) > 0:
+                tag_list.append((tag_str, tag_data[0].get_badge_style()))
             else:
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
@@ -601,9 +601,9 @@ class Client(models.Model):
         tags = self.tags.split(',')
         for i in range(0, len(tags)):
             tag_str = tags[i].strip()
-            # TODO don't hard-code this
-            if tag_str == 'Wheelchair':
-                tag_list.append((tag_str, 'badge-warning'))
+            tag_data = Tag.objects.filter(name__iexact=tag_str)
+            if len(tag_data) > 0:
+                tag_list.append((tag_str, tag_data[0].get_badge_style()))
             else:
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
@@ -867,9 +867,9 @@ class TemplateTrip(models.Model):
         tags = self.tags.split(',')
         for i in range(0, len(tags)):
             tag_str = tags[i].strip()
-            # TODO don't hard-code this
-            if tag_str == 'Wheelchair':
-                tag_list.append((tag_str, 'badge-warning'))
+            tag_data = Tag.objects.filter(name__iexact=tag_str)
+            if len(tag_data) > 0:
+                tag_list.append((tag_str, tag_data[0].get_badge_style()))
             else:
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
@@ -1011,9 +1011,27 @@ class Fare(models.Model):
         return int_to_money_string(self.fare)
 
 class Tag(models.Model):
+    STYLE_DEFAULT = 0
+    STYLE_IMPORTANT = 1
+
+    STYLES = [
+        (STYLE_DEFAULT, 'Default'),
+        (STYLE_IMPORTANT, 'Important'),
+    ]
+
+    FLAG_NONE = 0
+    FLAG_WHEELCHAIR = 1
+
+    FLAGS = [
+        (FLAG_NONE, '---------'),
+        (FLAG_WHEELCHAIR, 'Wheelchair'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     name = models.CharField(max_length=FieldSizes.SM)
+    style = models.IntegerField(choices=STYLES, default=STYLE_DEFAULT)
+    flag = models.IntegerField(choices=FLAGS, default=FLAG_NONE)
 
     class Meta:
         ordering = ['sort_index']
@@ -1024,9 +1042,20 @@ class Tag(models.Model):
     def get_class_name(self):
         return 'Tag'
 
+    def get_flag_str(self):
+        if self.flag == self.FLAG_NONE:
+            return ''
+        else:
+            return self.FLAGS[self.flag][1]
+
+    def get_badge_style(self):
+        if self.style == self.STYLE_IMPORTANT:
+            return 'badge-warning'
+        else:
+            return 'badge-info'
+
     def get_button_style(self):
-        # TODO don't hard-code this
-        if self.name == 'Wheelchair':
+        if self.style == self.STYLE_IMPORTANT:
             return 'btn-warning'
         else:
             return 'btn-info'

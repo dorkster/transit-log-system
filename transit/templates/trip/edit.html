@@ -255,6 +255,7 @@
 {{ clients_json|json_script:"clients-tag" }}
 {{ destinations_json|json_script:"destinations-tag" }}
 {{ driver_vehicle_pairs|json_script:"driver-vehicle-pairs-tag" }}
+{{ tags_json|json_script:"tags-tag" }}
 {% endif %}
 <script type="text/javascript">
     setStatusColor();
@@ -266,6 +267,7 @@
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));
     var destinations = JSON.parse(JSON.parse(document.getElementById("destinations-tag").textContent));
     var driver_vehicle_pairs = JSON.parse(JSON.parse(document.getElementById("driver-vehicle-pairs-tag").textContent));
+    var tags = JSON.parse(JSON.parse(document.getElementById("tags-tag").textContent));
 
     setupFormEventsTrip();
 

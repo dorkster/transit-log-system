@@ -21,6 +21,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.urls import reverse
+from django.core import serializers
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils.http import urlencode
@@ -208,6 +209,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
         'client': client,
         'is_new': is_new,
         'tags': Tag.objects.all(),
+        'tags_json': serializers.serialize('json', Tag.objects.all()),
         'names': sorted(names),
         'addresses': sorted(addresses),
         'is_dupe': is_dupe,

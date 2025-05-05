@@ -188,7 +188,12 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
                 # set the wheelchair flag if the corresponding tag exists
                 tag_list = trip.get_tag_list()
-                trip.wheelchair = ('Wheelchair' in tag_list)
+                trip.wheelchair = False
+                for tag in tag_list:
+                    tag_data = Tag.objects.filter(name__iexact=tag)
+                    if len(tag_data) > 0 and tag_data[0].flag == Tag.FLAG_WHEELCHAIR:
+                        trip.wheelchair = True
+                        break
 
             trip.cancel_date = None
             try:
@@ -408,6 +413,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
         'is_new': is_new,
         'is_return_trip': is_return_trip,
         'tags': Tag.objects.all(),
+        'tags_json': serializers.serialize('json', Tag.objects.all()),
         'fares': Fare.objects.all(),
         'Trip': Trip,
         'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),

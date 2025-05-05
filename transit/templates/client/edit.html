@@ -171,8 +171,11 @@
 </div>
 <script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
 <script type="text/javascript" src="{% static 'transit/js/client/edit.js' %}"></script>
+{{ tags_json|json_script:"tags-tag" }}
 <script type="text/javascript">
     setupRequiredFields(["#id_address", "#id_phone_home", "#id_phone_cell", "#id_phone_alt"]);
+
+    var tags = JSON.parse(JSON.parse(document.getElementById("tags-tag").textContent));
 
     {% if not is_new %}
     initCheckboxByField("#toggle_address", "#id_address");

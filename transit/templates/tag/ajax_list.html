@@ -5,6 +5,7 @@
         <td></td>
         <td></td>
         <td>Name</td>
+        <td>Special Flag</td>
     </thead>
     {% for tag in tags %}
     {% if tag.sort_index == 0 %}
@@ -28,7 +29,8 @@
                 </div>
             </div>
         </td>
-        <td class="mytable-col-lg">{{ tag.name }}</td>
+        <td class="mytable-col-lg"><span class="badge {{ tag.get_badge_style }}" style="font-size: 100%;">{{ tag.name }}</span></td>
+        <td class="mytable-col-lg">{{ tag.get_flag_str }}</td>
     </tr>
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ tag.id }}')"><td colspan="4"></td></tr>
     {% endfor %}

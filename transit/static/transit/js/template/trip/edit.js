@@ -26,6 +26,10 @@ function onNameChanged() {
 
     $("#id_name").val($("#id_name").val().trim());
 
+    $("#client_notice_header").html("");
+    $("#client_notice_body").html("");
+    $('#client_notice_modal').modal('hide');
+
     var found_client = false;
     for (let i in clients) {
         if (clients[i].fields.name == $("#id_name").val()) {
@@ -55,6 +59,13 @@ function onNameChanged() {
             address_datalist.children[0].value = clients[i].fields.address;
 
             $("#id_reminder_instructions").val(clients[i].fields.reminder_instructions);
+
+            if (clients[i].fields.trip_creation_notes != "") {
+                $("#client_notice_header").html("Client Notice for: " + clients[i].fields.name);
+                $("#client_notice_body").html(clients[i].fields.trip_creation_notes);
+                $('#client_notice_modal').modal({backdrop: 'static', keyboard: false});
+                $('#client_notice_modal').modal('show');
+            }
 
             break;
         }

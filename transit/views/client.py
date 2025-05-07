@@ -115,6 +115,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             prev_client['elderly'] = str(client.elderly)
             prev_client['ambulatory'] = str(client.ambulatory)
             prev_client['reminder_instructions'] = client.reminder_instructions
+            prev_client['trip_creation_notes'] = client.trip_creation_notes
 
             client.name = form.cleaned_data['name']
             client.address = form.cleaned_data['address']
@@ -128,6 +129,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             client.is_active = form.cleaned_data['is_active']
             client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
             client.reminder_instructions = form.cleaned_data['reminder_instructions']
+            client.trip_creation_notes = form.cleaned_data['trip_creation_notes']
 
             client.save()
 
@@ -186,6 +188,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             'is_active': client.is_active,
             'is_transit_policy_acknowledged': client.is_transit_policy_acknowledged,
             'reminder_instructions': client.reminder_instructions,
+            'trip_creation_notes': client.trip_creation_notes,
             'update_trips': False,
             'update_trips_date': datetime.date.today(),
         }
@@ -577,6 +580,7 @@ def ajaxClientList(request):
     SORT_IS_ACTIVE = 8
     SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
     SORT_REMINDER_INSTRUCTIONS = 10
+    SORT_TRIP_CREATION_NOTES = 11
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -671,7 +675,7 @@ def ajaxClientList(request):
         clients = clients.filter(is_transit_policy_acknowledged=False)
 
     if filter_search != '':
-        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search))
+        clients = clients.filter(Q(name__icontains=filter_search) | Q(address__icontains=filter_search) | Q(tags__icontains=filter_search) | Q(reminder_instructions__icontains=filter_search) | Q(trip_creation_notes__icontains=filter_search))
 
     filtered_count = clients.count()
 
@@ -697,6 +701,8 @@ def ajaxClientList(request):
         clients = clients.order_by('is_transit_policy_acknowledged', 'name')
     elif sort_mode == SORT_REMINDER_INSTRUCTIONS:
         clients = clients.order_by('reminder_instructions', 'name')
+    elif sort_mode == SORT_TRIP_CREATION_NOTES:
+        clients = clients.order_by('trip_creation_notes', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -737,6 +743,7 @@ def clientXLSX(request):
     SORT_IS_ACTIVE = 8
     SORT_IS_TRANSIT_POLICY_ACKNOWLEDGED = 9
     SORT_REMINDER_INSTRUCTIONS = 10
+    SORT_TRIP_CREATION_NOTES = 11
 
     sort_mode = request.session.get('clients_sort', SORT_NAME)
     sort_mode_dir = request.session.get('clients_sort_dir', 0)
@@ -800,6 +807,8 @@ def clientXLSX(request):
         clients = clients.order_by('is_transit_policy_acknowledged', 'name')
     elif sort_mode == SORT_REMINDER_INSTRUCTIONS:
         clients = clients.order_by('reminder_instructions', 'name')
+    elif sort_mode == SORT_TRIP_CREATION_NOTES:
+        clients = clients.order_by('trip_creation_notes', 'name')
 
     if sort_mode_dir == 1:
         clients = clients.reverse()
@@ -839,13 +848,14 @@ def clientXLSX(request):
     ws.cell(row_header, 9, 'Is active?')
     ws.cell(row_header, 10, 'Transit Policy Acknowledged?')
     ws.cell(row_header, 11, 'Reminder Instructions')
+    ws.cell(row_header, 12, 'Trip Creation Notes')
 
     for i in range(0, row_header + client_count):
         row = i + 1
 
         # apply styles
-        for col in range(1, 12):
-            if col == 1 or col == 2 or col == 8 or col == 11:
+        for col in range(1, 13):
+            if col == 1 or col == 2 or col == 8 or col == 11 or col == 12:
                 ws.column_dimensions[get_column_letter(col)].width = style_colwidth_large
             else:
                 ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
@@ -874,6 +884,7 @@ def clientXLSX(request):
         ws.cell(row, 9, client.is_active)
         ws.cell(row, 10, client.is_transit_policy_acknowledged)
         ws.cell(row, 11, client.reminder_instructions)
+        ws.cell(row, 12, client.trip_creation_notes)
 
     wb.save(filename=temp_file.name)
 

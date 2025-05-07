@@ -249,6 +249,24 @@
         </div>
     </div>
 </div>
+
+<div id="client_notice_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 id="client_notice_header" class="modal-title">Please select a tag to add to this trip</h5>
+            </div>
+            <div id="client_notice_body" class="modal-body text-danger text-bold">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <span class="oi oi-x mr-2"></span>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
 <script type="text/javascript" src="{% static 'transit/js/trip/edit.js' %}"></script>
 {% if trip.format == Trip.FORMAT_NORMAL %}

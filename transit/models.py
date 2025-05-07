@@ -580,6 +580,7 @@ class Client(models.Model):
     is_active = models.BooleanField(default=True)
     is_transit_policy_acknowledged = models.BooleanField(default=False)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
+    trip_creation_notes = models.CharField(max_length=FieldSizes.LG, blank=True)
 
     class Meta:
         ordering = ['name']

@@ -339,6 +339,7 @@ class Report():
         TRIP_MILES_LESS = 9
         TRIP_TIME_LESS = 10
         SHIFT_SERVICE_MILE_THRESHOLD = 11
+        TRIP_EMPTY = 12
 
         def __init__(self):
             self.errors = []
@@ -403,6 +404,9 @@ class Report():
 
             elif error_code == self.SHIFT_SERVICE_MILE_THRESHOLD:
                 return 'Shift mileage seems abnormally large.'
+
+            elif error_code == self.TRIP_EMPTY:
+                return 'Trip has no log data, but matches a completed Shift.'
 
             else:
                 return 'Unknown error'
@@ -726,6 +730,9 @@ class Report():
                 # skip incomplete trip (logged vehicles only)
                 if i.vehicle.is_logged and log_status == Trip.LOG_INCOMPLETE:
                     self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_INCOMPLETE, error_shift=shift.shift, error_trip=i)
+                    continue
+                elif i.vehicle.is_logged and log_status == Trip.LOG_EMPTY and shift.shift.check_log() == Shift.LOG_COMPLETE:
+                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.TRIP_EMPTY, error_shift=shift.shift, error_trip=i)
                     continue
 
                 if log_status == Trip.LOG_COMPLETE and report_day.shifts[report_trip.shift].shift.check_log() == Shift.LOG_COMPLETE:

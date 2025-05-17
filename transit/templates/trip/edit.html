@@ -280,6 +280,8 @@
     setCancelDateVisibility();
     focusFromParam();
     setupFormEvents();
+    setupDatePickerEvents("#id_date_year", "#id_date_month", "#id_date_day");
+    setupDatePickerEvents("#id_cancel_date_year", "#id_cancel_date_month", "#id_cancel_date_day");
 
     {% if trip.format == Trip.FORMAT_NORMAL %}
     var clients = JSON.parse(JSON.parse(document.getElementById("clients-tag").textContent));

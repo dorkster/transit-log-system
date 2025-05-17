@@ -1,8 +1,8 @@
 function fixDatePicker() {
     // Keep the dropdown from closing when picking a date
-    $('#date_dropdown option, #date_dropdown select').click(function(e) {
+    $('#date_dropdown .dropdown-menu').click(function(e) {
         e.stopPropagation();
-    });
+    })
     $("#id_date_day").attr("style", "display: none !important;");
 }
 

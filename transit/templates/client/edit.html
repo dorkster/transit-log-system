@@ -175,6 +175,7 @@
 {{ tags_json|json_script:"tags-tag" }}
 <script type="text/javascript">
     setupRequiredFields(["#id_address", "#id_phone_home", "#id_phone_cell", "#id_phone_alt"]);
+    setupDatePickerEvents("#id_update_trips_date_year", "#id_update_trips_date_month", "#id_update_trips_date_day");
 
     var tags = JSON.parse(JSON.parse(document.getElementById("tags-tag").textContent));
 

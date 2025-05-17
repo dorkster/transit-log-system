@@ -73,6 +73,7 @@
 <script type="text/javascript" src="{% static 'transit/js/schedule/common.js' %}"></script>
 <script type="text/javascript">
     fixDatePicker();
+    setupDatePickerEvents("#id_date_year", "#id_date_month", "#id_date_day");
 
     var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-read-only' %}", "#schedule-read-only");
     ajax_loader.extra_data["year"] = {{date.year}};

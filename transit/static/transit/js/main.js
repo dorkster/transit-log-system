@@ -282,3 +282,40 @@ function setSearchModal(form_id, modal_id, search_id, search_text, search_func) 
         $(search_id).select();
     });
 }
+
+function datePickerDaysEnabled(year_id, month_id, day_id) {
+    let year = parseInt($(year_id).val());
+    let month = parseInt($(month_id).val()) - 1;
+    let day = parseInt($(day_id).val());
+
+    let end_of_day_list_offset = (parseInt($(day_id).children('option').length) - 31) - 1;
+    let end_of_month = 31;
+    let fields_complete = !(isNaN(year) || isNaN(month) || isNaN(day));
+
+    for (let i = 31; i >= 28; i--) {
+        let test_date = new Date(year, month, i);
+        if (fields_complete && (isNaN(test_date.valueOf()) || (test_date.getFullYear() != year || test_date.getMonth() != month))) {
+            $(day_id).children("option").eq(i + end_of_day_list_offset).prop("hidden", true);
+            end_of_month = end_of_month - 1;
+        }
+        else {
+            $(day_id).children("option").eq(i + end_of_day_list_offset).prop("hidden", false);
+        }
+    }
+    if (day > end_of_month) {
+        $(day_id).val(end_of_month.toString());
+    }
+}
+
+function setupDatePickerEvents(year_id, month_id, day_id) {
+    datePickerDaysEnabled(year_id, month_id, day_id);
+    $(month_id).on("change", function() {
+        datePickerDaysEnabled(year_id, month_id, day_id);
+    });
+    $(year_id).on("change", function() {
+        datePickerDaysEnabled(year_id, month_id, day_id);
+    });
+    $(day_id).on("change", function() {
+        datePickerDaysEnabled(year_id, month_id, day_id);
+    });
+}

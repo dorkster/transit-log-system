@@ -292,6 +292,12 @@
 <hr/>
 <p>No results found.</p>
 {% endif %}
+<script type="text/javascript" src="{% static 'transit/js/schedule/common.js' %}"></script>
+<script type="text/javascript">
+    fixDatePicker();
+    setupDatePickerEvents("#id_start_date_year", "#id_start_date_month", "#id_start_date_day");
+    setupDatePickerEvents("#id_end_date_year", "#id_end_date_month", "#id_end_date_day");
+</script>
 {% endblock %}
 
 {% block content %}

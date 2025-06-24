@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 
-from transit.models import Shift, Driver, Vehicle, Trip, SiteSettings
+from transit.models import Shift, Driver, Vehicle, Trip, PreTrip, SiteSettings
 from transit.forms import EditShiftForm, shiftStartEndForm, shiftFuelForm
 
 from django.contrib.auth.decorators import permission_required
@@ -112,6 +112,12 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
                     continue
 
                 trip.save()
+
+            # if we're changing the shift's vehicle, we need to reset the pretrip status
+            if shift.vehicle != prev['vehicle']:
+                stale_pretrips = PreTrip.objects.filter(shift_id=shift.id)
+                if len(stale_pretrips) > 0:
+                    stale_pretrips[0].delete()
 
             if report_start and report_end:
                 return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))

@@ -203,12 +203,14 @@
                 <a href="{% url 'vehicle-issue-edit' notify_vehicle_issues_featured_high.0.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-danger text-light">
                     <span class="badge badge-light">{{ notify_vehicle_issues_featured_high.0.date }}</span>
                     <span class="badge badge-light">{{ notify_vehicle_issues_featured_high.0.vehicle }}</span>
+                    <span class="badge badge-light">{{ notify_vehicle_issues_featured_high.0.get_category_str }}</span>
                     <span class="small"><strong>{{ notify_vehicle_issues_featured_high.0.description }}</strong></span>
                 </a>
                 {% elif notify_vehicle_issues_featured_medium|length >= 1 %}
                 <a href="{% url 'vehicle-issue-edit' notify_vehicle_issues_featured_medium.0.id %}" class="global-notification list-group-item list-group-item-action p-1 bg-warning text-dark">
                     <span class="badge badge-light">{{ notify_vehicle_issues_featured_medium.0.date }}</span>
                     <span class="badge badge-light">{{ notify_vehicle_issues_featured_medium.0.vehicle }}</span>
+                    <span class="badge badge-light">{{ notify_vehicle_issues_featured_medium.0.get_category_str }}</span>
                     <span class="small"><strong>{{ notify_vehicle_issues_featured_medium.0.description }}</strong></span>
                 </a>
                 {% endif %}

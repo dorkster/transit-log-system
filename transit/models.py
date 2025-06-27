@@ -501,6 +501,7 @@ class Vehicle(models.Model):
     inspection_date = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     notif_level = models.IntegerField(choices=NOTIF_LEVELS, default=NOTIF_ALL)
+    description = models.CharField(default='', max_length=FieldSizes.LG)
 
     class Meta:
         ordering = ['sort_index']

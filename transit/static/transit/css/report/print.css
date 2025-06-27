@@ -37,4 +37,5 @@ nav {
     min-height: 1.5em;
     text-align: center;
     font-size: 150%;
+    align-content: end;
 }

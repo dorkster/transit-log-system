@@ -270,6 +270,7 @@ class EditVehicleForm(forms.Form):
     is_logged = forms.BooleanField(label='Report mileage/service hours?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     is_active = forms.BooleanField(label='Is active?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     notif_level = forms.ChoiceField(label='Notification level', required=False, choices=Vehicle.NOTIF_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
+    description = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class EditTripTypeForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

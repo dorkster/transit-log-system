@@ -34,7 +34,7 @@
 {% for v in report.vehicle_reports %}
 {% if v.total_miles.value > 0 %}
     <div class="row">
-        <div class="col m-5 blank-field"><strong>{{v.vehicle}}</strong></div>
+        <div class="col m-5 blank-field"><strong>{{v.vehicle.name}}{% if v.vehicle.description %}<br/><span class="small">{{ v.vehicle.description }}</span>{% endif %}</strong></div>
         <div class="col m-5 blank-field">{{v.start_miles}}</div>
         <div class="col m-5 blank-field">{{v.end_miles}}</div>
         <div class="col m-5 blank-field">{{v.total_miles}}</div>

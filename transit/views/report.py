@@ -430,7 +430,6 @@ class Report():
                 self.name = name
                 self.client_id = None
                 self.trips = Report.TripCount()
-                self.trips.total = 1
                 self.elderly = None
                 self.ambulatory = None
                 self.collected_cash = Report.Money(0)
@@ -875,7 +874,6 @@ class Report():
                 if i.parent.name not in self.unique_riders.names:
                     self.unique_riders.names[i.parent.name] = Report.UniqueRiderSummary.Rider(i.parent.name)
                     rider = self.unique_riders.names[i.parent.name]
-                    rider.trips.setTrips(0, False)
                     rider.elderly = i.parent.elderly
                     rider.ambulatory = i.parent.ambulatory
                     rider.client_id = i.parent.id

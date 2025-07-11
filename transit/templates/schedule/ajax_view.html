@@ -9,7 +9,7 @@
 </div>
 <hr/>
 {% endif %}
-<div class="container ml-0 p-2 mb-3 border w-100" style="background: #eee; position: sticky; top: 0; z-index:1;">
+<div class="container ml-0 p-2 mb-3 border w-100" style="background: #eee; {% if is_filtered %}position: sticky; top: 0; z-index:1; {% endif %}">
     <div class="row">
         <div class="col">
             <div class="btn-group">
@@ -20,9 +20,6 @@
                 <button class="btn btn-danger" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete"></span></button>
                 {% endif %}
             </div>
-        </div>
-        <div class="col-auto">
-            <a href="#top" class="btn btn-outline-secondary"><span class="oi oi-caret-top"></span></a>
         </div>
     </div>
     <div class="row small text-muted">
@@ -159,7 +156,7 @@
             <div>
                 <div class="list-group list-group-flush">
                     {% if shift.note %}
-                    <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 120%">
+                    <div class="list-group-item list-group-item-warning p-0 pl-2" style="font-size: 1.2em;">
                         {{ shift.note }}
                     </div>
                     {% endif %}

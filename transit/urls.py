@@ -66,6 +66,7 @@ urlpatterns = [
 
     path('schedule/view/trips/<uuid:id>/start/', views.tripStart, name='trip-start'),
     path('schedule/view/trips/<uuid:id>/end/', views.tripEnd, name='trip-end'),
+    path('schedule/view/trips/<uuid:id>/simple-edit/', views.tripSimpleEdit, name='trip-simple-edit'),
 
     path('schedule/<slug:mode>/activities/create/<int:year>/<int:month>/<int:day>', views.tripCreateActivity, name='trip-create-activity'),
     path('schedule/<slug:mode>/activities/<uuid:id>/edit/', views.tripEdit, name='trip-edit-activity'),

@@ -171,22 +171,29 @@
                     <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn pl-2 pr-2 btn-warning">Pre-Trip</a>
                     {% endif %}
                     {% if shift.start_miles %}
-                    <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                    <a href="{% url 'shift-edit' 'view' shift.id %}"><span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                         {{ shift.start_miles }}<br/>
                         {{ shift.start_time }}
-                    </span>
+                    </span></a>
                     {% else %}
                     <a href="{% url 'shift-start' shift.id %}" class="btn pl-2 pr-2 btn-primary">Start</a>
                     {% endif %}
                     {% if shift.end_miles %}
-                    <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                    <a href="{% url 'shift-edit' 'view' shift.id %}"><span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                         {{ shift.end_miles }}<br/>
                         {{ shift.end_time }}
-                    </span>
+                    </span></a>
                     {% else %}
                     <a href="{% url 'shift-end' shift.id %}" class="btn pl-2 pr-2 {% if not shift.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
                     {% endif %}
+                    {% if shift.fuel %}
+                    <a href="{% url 'shift-fuel' shift.id %}"><span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                        Fuel<br/>
+                        {{ shift.fuel }} (gal)
+                    </span></a>
+                    {% else %}
                     <a href="{% url 'shift-fuel' shift.id %}" class="btn pl-2 pr-2 btn-info">Fuel</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -381,19 +388,19 @@
                                         {% if trip.status == Trip.STATUS_NORMAL %}
                                         <div class="text-right p-1 m-0 w-100" style="background-color: rgba(0,0,0,.03);">
                                             {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
-                                            <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
+                                            <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
                                                 <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
                                                 <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
-                                            </span>
+                                            </span></a>
                                             {% endif %}
-                                            <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                            <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                                                 {{ trip.start_miles }}<br/>
                                                 {{ trip.start_time }}
-                                            </span>
-                                            <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                            </span></a>
+                                            <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                                                 {{ trip.end_miles }}<br/>
                                                 {{ trip.end_time }}
-                                            </span>
+                                            </span></a>
                                         </div>
                                         {% endif %}
                                     <div class="list-group">
@@ -429,24 +436,24 @@
                         {% else %}
                             {% if trip.status == Trip.STATUS_NORMAL %}
                                 {% if trip.collected_cash > 0 or trip.collected_check > 0 %}
-                                <span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
+                                <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 4em;">
                                     <span class="oi oi-dollar mr-1"></span>${{ trip.get_collected_cash_str }}<br/>
                                     <span class="oi oi-envelope-closed mr-1"></span>${{ trip.get_collected_check_str }}
-                                </span>
+                                </span></a>
                                 {% endif %}
                                 {% if trip.start_miles %}
-                                <span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                                     {{ trip.start_miles }}<br/>
                                     {{ trip.start_time }}
-                                </span>
+                                </span></a>
                                 {% else %}
                                 <a href="{% url 'trip-start' trip.id %}" class="btn pl-2 pr-2 btn-primary">Pick Up</a>
                                 {% endif %}
                                 {% if trip.end_miles %}
-                                <span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                                <a href="{% url 'trip-simple-edit' trip.id %}"><span class="d-inline-block alert alert-success pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
                                     {{ trip.end_miles }}<br/>
                                     {{ trip.end_time }}
-                                </span>
+                                </span></a>
                                 {% else %}
                                 <a href="{% url 'trip-end' trip.id %}" class="btn pl-2 pr-2 {% if not trip.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">Drop Off</a>
                                 {% endif %}

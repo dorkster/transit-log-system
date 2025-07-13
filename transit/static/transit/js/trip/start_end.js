@@ -151,6 +151,12 @@ function setupFormEvents(mile_data, trip_date=null) {
     }
 }
 
+function setupSimpleFormEvents(trip_date=null) {
+    if (trip_date != null) {
+        $("#id_driver").on("change", function() { onDriverChange(); });
+    }
+}
+
 function toggleAdditionalPickup(item_id) {
     var list_item = document.getElementById(item_id);
     if (list_item) {

@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from transit.models import Trip, Driver, Vehicle, Client, Shift, Tag, SiteSettings, Destination, Fare, Volunteer
-from transit.forms import EditTripForm, tripStartForm, tripEndForm, EditActivityForm
+from transit.forms import EditTripForm, tripStartForm, tripEndForm, tripSimpleEditForm, EditActivityForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -725,4 +725,79 @@ def tripEnd(request, id):
     }
 
     return render(request, 'trip/end.html', context)
+
+@permission_required(['transit.change_trip'])
+def tripSimpleEdit(request, id):
+    trip = get_object_or_404(Trip, id=id)
+    date = trip.date
+
+    if request.method == 'POST':
+        form = tripSimpleEditForm(request.POST)
+
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=trip.driver.id))
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
+
+        if form.is_valid():
+            trip.start_miles = form.cleaned_data['start_miles']
+            trip.start_time = form.cleaned_data['start_time']
+            trip.end_miles = form.cleaned_data['end_miles']
+            trip.end_time = form.cleaned_data['end_time']
+            trip.driver = form.cleaned_data['driver']
+            trip.vehicle = form.cleaned_data['vehicle']
+            trip.collected_cash = money_string_to_int(form.cleaned_data['collected_cash'])
+            trip.collected_check = money_string_to_int(form.cleaned_data['collected_check'])
+
+            trip.save()
+            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, str(trip))
+
+            # TODO check to see if a matching Shift exists (and create if not)?
+
+            return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
+    else:
+        initial = {
+            'start_miles': trip.start_miles,
+            'start_time': trip.start_time,
+            'end_miles': trip.end_miles,
+            'end_time': trip.end_time,
+            'driver': trip.driver,
+            'vehicle': trip.vehicle,
+            'collected_cash': int_to_money_string(trip.collected_cash, blank_zero=True),
+            'collected_check': int_to_money_string(trip.collected_check, blank_zero=True),
+        }
+        form = tripSimpleEditForm(initial=initial)
+        if trip.driver:
+            form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=trip.driver.id))
+
+    driver_vehicle_pairs = {}
+    nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
+    active_drivers = Driver.objects.filter(is_active=True)
+    todays_shifts = Shift.objects.filter(date=trip.date)
+
+    for driver in active_drivers:
+        if driver.is_logged:
+            for shift in todays_shifts:
+                if driver == shift.driver:
+                    driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(shift.vehicle.id), 'volunteer': 0}
+                    break
+            if not str(driver.id) in driver_vehicle_pairs:
+                driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+        elif not driver.is_logged and nonlogged_vehicles.count() == 1:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': str(nonlogged_vehicles[0].id), 'volunteer': 0}
+        else:
+            driver_vehicle_pairs[str(driver.id)] = {'vehicle': '', 'volunteer': 0}
+
+        # TODO get from SiteSettings
+        if driver.name == 'Volunteer':
+            driver_vehicle_pairs[str(driver.id)]['volunteer'] = 1
+
+    context = {
+        'form': form,
+        'trip': trip,
+        'driver_vehicle_pairs': json.dumps(driver_vehicle_pairs),
+    }
+
+    return render(request, 'trip/simple_edit.html', context)
 

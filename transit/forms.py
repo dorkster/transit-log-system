@@ -196,6 +196,16 @@ class tripEndForm(forms.Form):
     additional_pickups = forms.CharField(widget=forms.HiddenInput(), required=False)
     home_drop_off = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
 
+class tripSimpleEditForm(forms.Form):
+    start_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
+    start_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    end_miles = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.big_mile))
+    end_time = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_logged=True, is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+    collected_cash = forms.CharField(label='Money Collected: Cash ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+    collected_check = forms.CharField(label='Money Collected: Check ($)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.money))
+
 class EditClientForm(forms.Form):
     UPDATE_TRIP_OPTIONS = (
         (0, 'No'),

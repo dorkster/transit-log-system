@@ -1,0 +1,51 @@
+{% if pretrips %}
+<table class="mytable mytable-striped">
+    <thead>
+        <td class="mytable-col-md">Date</td>
+        <td class="mytable-col-md">Vehicle</td>
+        <td class="mytable-col-md">Driver</td>
+        <td class="mytable-col-xl">Status</td>
+        {% if perms.transit.delete_pretrip %}
+        <td class="mytable-col-sm"></td>
+        {% endif %}
+    </thead>
+    {% for pretrip in pretrips %}
+    <tr>
+        <td>{{ pretrip.date }}</td>
+        <td>{{ pretrip.vehicle }}</td>
+        <td>{{ pretrip.driver }}</td>
+        <td>
+            {% if pretrip.status == 2 %}
+            <span class="text-success"><strong>Passed</strong></span>
+            {% elif pretrip.status == 1 %}
+            <span class="text-danger"><strong>Failed</strong></span>
+            <ul class="small text-muted mb-0">
+            {% for fail in pretrip.failure_list %}
+            <li>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        </td>
+        {% if perms.transit.delete_pretrip %}
+        <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% if pretrips.paginator.num_pages > 1 %}
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?pretrip_page={{ pretrips.previous_page_number }}{% endif %}">&laquo;</a></li>
+        {% for page in pretrips.paginator.page_range %}
+        {% if page > pretrip_page_ranges.page_start and page <= pretrip_page_ranges.page_end %}
+        <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?pretrip_page={{ page }}">{{ page }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?pretrip_page={{ pretrips.next_page_number }}{% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
+{% endif %}
+<p>Showing results {{ pretrip_page_ranges.item_count_start }}-{{ pretrip_page_ranges.item_count_end }} of {{ pretrips.paginator.count }}</p>
+{% else %}
+<p>There are no logged pre-trip reports.</p>
+{% endif %}

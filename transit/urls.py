@@ -188,6 +188,9 @@ urlpatterns = [
     path('vehicle-pretrip/create-no-shift/<uuid:vehicle_id>', views.vehiclePreTripCreateNoShift, name='vehicle-pretrip-create-no-shift'),
     path('vehicle-pretrip/<uuid:id>/delete', views.vehiclePreTripDelete, name='vehicle-pretrip-delete'),
 
+    path('vehicle-issue-tracker/', views.vehicleIssueTracker, name='vehicle-issue-tracker'),
+    path('vehicle-pretrip-log/', views.vehiclePreTripLog, name='vehicle-pretrip-log'),
+
     path('import/', views.excelImport, name='excel-import'),
     path('search/', views.search, name='search'),
     path('search-xlsx/', views.searchExportXLSX, name='search-xlsx'),
@@ -210,6 +213,8 @@ urlpatterns = [
     path('ajax/activity-color-list/', views.ajaxActivityColorList, name='ajax-activity-color-list'),
     path('ajax/volunteer-list/', views.ajaxVolunteerList, name='ajax-volunteer-list'),
     path('ajax/vehicle-status/', views.ajaxVehicleStatus, name='ajax-vehicle-status'),
+    path('ajax/vehicle-issue-tracker/', views.ajaxVehicleIssueTracker, name='ajax-vehicle-issue-tracker'),
+    path('ajax/vehicle-pretrip-log/', views.ajaxVehiclePreTripLog, name='ajax-vehicle-pretrip-log'),
     path('ajax/template-list/', views.ajaxTemplateList, name='ajax-template-list'),
     path('ajax/template-trip-list/<uuid:parent>/', views.ajaxTemplateTripList, name='ajax-template-trip-list'),
     path('ajax/loggedevent-list/', views.ajaxLoggedEventList, name='ajax-loggedevent-list'),

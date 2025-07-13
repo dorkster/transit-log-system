@@ -1,251 +1,113 @@
-<a id="maintainence" data-scrollintoview="start"></a>
-<h3>Maintainence Information</h3>
-{% if logged_vehicles %}
-<table class="mytable mytable-striped">
-    <thead>
-        <td>Vehicle</td>
-        <td>Next Oil Change</td>
-        <td>Inspection Sticker</td>
-        <td></td>
-        <td></td>
-    </thead>
+<div class="container ml-0 pl-0">
 {% for vehicle in logged_vehicles %}
-    <tr>
-        <td class="mytable-col-lg">{{vehicle.name}}</td>
-        <td class="mytable-col-lg">
-            {% if vehicle in notify_vehicle_oil_changes %}
-            <span class="text-danger font-weight-bold">
-            {% else %}
-            <span>
-            {% endif %}
-            {{ vehicle.oil_change_miles }}
-            </span>
-        </td>
-        <td class="mytable-col-lg">
-            {% if vehicle in notify_vehicle_inspections %}
-            <span class="text-danger font-weight-bold">
-            {% else %}
-            <span>
-            {% endif %}
-            {{ vehicle.inspection_date|date:"n / Y" }}
-            </span>
-        </td>
-        <td class="mytable-col-md">
-            <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-secondary btn-sm w-100">
-                {% if vehicle in notify_vehicle_oil_changes or vehicle in notify_vehicle_inspections %}
-                <span class="oi oi-warning"></span>
-                {% endif %}
-                Update
-            </a>
-        </td>
-        <td class="mytable-col-md">
-            <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-warning btn-sm w-100">
-                {% if vehicle in notify_vehicle_pretrips %}
-                <span class="oi oi-warning"></span>
-                {% endif %}
-                Pre-Trip
-            </a>
-        </td>
-    </tr>
-{% endfor %}
-</table>
-{% else %}
-<p>There are no logged vehicles.</p>
-{% endif %}
-<hr/>
-<a id="issues" data-scrollintoview="start"></a>
-<h3>Reported Issues <a class="btn btn-success btn-sm" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
-<div class="container ml-0 border p-2 mb-3" style="background: #eee;">
-    <div class="row">
-        <div class="col">
-            <h5>Filter{% if issue_filtered_count < issue_unfiltered_count %} ({{issue_filtered_count}}/{{issue_unfiltered_count}} visible){% endif %}</h5>
+<div class="card mb-5">
+    <div class="card-header bg-secondary text-light">
+        <h3>{{vehicle.name}}</h3>
+        {% if vehicle.description %}<div>{{vehicle.description}}</div>{% endif %}
+    </div>
+    <div class="card-body">
+        <div class="row">
+        <div class="col-sm-5">
+        <div class="row">
+            <div class="col">
+                <h4>Maintainence</h4>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-primary btn-sm">
+                    <span class="oi oi-wrench mr-2"></span>Update{% if vehicle in notify_vehicle_oil_changes or vehicle in notify_vehicle_inspections %}<span class="ml-2 oi oi-warning"></span>{% endif %}
+                </a>
+            </div>
         </div>
-        {% if is_filtered %}
-        <div class="col-auto">
-            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+        <div class="row">
+            <div class="col text-muted">Next Oil Change</div>
+            <div class="col">
+                {% if vehicle in notify_vehicle_oil_changes %}
+                <span class="text-danger font-weight-bold">
+                {% else %}
+                <span>
+                {% endif %}
+                {{ vehicle.oil_change_miles }}
+                </span>
+            </div>
         </div>
+        <div class="row">
+            <div class="col text-muted">Inspection Sticker</div>
+            <div class="col">
+                {% if vehicle in notify_vehicle_inspections %}
+                <span class="text-danger font-weight-bold">
+                {% else %}
+                <span>
+                {% endif %}
+                {{ vehicle.inspection_date|date:"n / Y" }}
+                </span>
+            </div>
+        </div>
+        <hr/>
+        <div class="row mt-4">
+            <div class="col">
+                <h4>Recent Pre-Trips</h4>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-success btn-sm"><span class="oi oi-plus mr-2"></span>New Pre-Trip{% if vehicle in notify_vehicle_pretrips %}<span class="ml-2 oi oi-warning"></span>{% endif %}</a>
+            </div>
+        </div>
+        {% for vd in vehicle_data %}
+        {% if vd.id == vehicle.id %}
+        {% if vd.pretrips %}
+        <div class="list-group mb-4">
+            {% for pretrip in vd.pretrips %}
+            <div class="p-1 list-group-item">
+                <span class="badge badge-light border mr-1">{{ pretrip.date }}</span>
+                <span class="badge badge-light border mr-1" style="background: #{{ pretrip.driver.get_color }}">{{ pretrip.driver }}</span>
+                {% if pretrip.status == 2 %}
+                <span class="badge badge-success"><strong>Passed</strong></span>
+                {% elif pretrip.status == 1 %}
+                <span class="badge badge-danger"><strong>Failed</strong></span>
+                <ul class="small text-muted mb-0 mt-1">
+                {% for fail in pretrip.failure_list %}
+                <li>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>There are no logged pre-trip reports.</p>
         {% endif %}
-    </div>
-    <div class="mt-2">
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
-                {% for driver in drivers %}
-                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
-                {% endfor %}
-            </div>
-        </span>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
-                {% for vehicle in vehicles %}
-                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
-                {% endfor %}
-            </div>
-        </span>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Show...
-            </button>
-            <div class="dropdown-menu shadow dropdown-menu-right">
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"><span class="mr-2 oi {% if not filter_show_resolved %}oi-x{% else %}oi-check{% endif %}"></span>Resolved</a>
-            </div>
-        </span>
-    </div>
-    <div class="mt-2">
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_priority is None %}All Priorities{% else %}{% for priority in priorities %}{% if filter_priority == priority.0 %}{{ priority.1 }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_priority is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '')">All Priorities</a>
-                {% for priority in priorities %}
-                <a class="dropdown-item {% if filter_priority == priority.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '{{priority.0}}')">{{priority.1}}</a>
-                {% endfor %}
-            </div>
-        </span>
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% if filter_category is None %}All Categories{% else %}{% for category in categories %}{% if filter_category == category.0 %}{{ category.1 }}{% endif %}{% endfor %}{% endif %}
-            </button>
-            <div class="dropdown-menu shadow">
-                <a class="dropdown-item {% if filter_category is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '')">All Categories</a>
-                {% for category in categories %}
-                <a class="dropdown-item {% if filter_category == category.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '{{category.0}}')">{{category.1}}</a>
-                {% endfor %}
-            </div>
-        </span>
-    </div>
-</div>
-{% if vehicle_issues %}
-<table class="mytable">
-    <thead>
-        <td></td>
-        <td></td>
-        <td>Date</td>
-        <td>Vehicle</td>
-        <td>Driver</td>
-        <td>Category</td>
-        <td>Description</td>
-    </thead>
-    {% for issue in vehicle_issues %}
-    {% if issue.priority == 2 and not issue.is_resolved %}
-    <tr class="bg-danger text-light">
-    {% elif issue.priority == 1 and not issue.is_resolved %}
-    <tr class="bg-warning text-dark">
-    {% elif issue.is_resolved %}
-    <tr class="text-muted">
-    {% else %}
-    <tr>
-    {% endif %}
-        <td class="mytable-col-xs">
-            <div class="dropdown ajax-blocker">
-                <button class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="oi oi-pencil"></span>
-                </button>
-                <div class="dropdown-menu shadow">
-                    <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
-                    {% if perms.transit.change_vehicleissue %}
-                    <div class="dropdown-divider"></div>
-                    {% if issue.priority < 2 %}
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
-                    {% endif %}
-                    {% if issue.priority > 0 %}
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_down', '')" class="dropdown-item"><span class="oi oi-caret-bottom mr-2"></span>Decrease Priority</a>
-                    {% endif %}
-                    <div class="dropdown-divider"></div>
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}<span class="oi oi-x mr-2"></span>Set as not resolved{% else %}<span class="oi oi-check mr-2"></span>Set as resolved{% endif %}</a>
-                    {% endif %}
-                    {% if perms.transit.delete_vehicleissue %}
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>
-                    {% endif %}
+        {% endif %}
+        {% endfor %}
+        </div>
+        <div class="col-sm-7">
+            <div class="row">
+                <div class="col">
+                    <h4>Open Issues</h4>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-success btn-sm" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-plus mr-2"></span>New Issue</a>
                 </div>
             </div>
-        </td>
-        <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>
-        <td class="mytable-col-md">{{ issue.date }}</td>
-        <td class="mytable-col-md">{{ issue.vehicle }}</td>
-        <td class="mytable-col-md">{{ issue.driver }}</td>
-        <td class="mytable-col-lg">{% if issue.category > 0 %}{{ issue.get_category_str }}{% endif %}</td>
-        <td class="mytable-col-xl">{{ issue.description }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% if vehicle_issues.paginator.num_pages > 1 %}
-<nav class="mt-2">
-    <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_previous %}?issue_page={{ vehicle_issues.previous_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&laquo;</a></li>
-        {% for page in vehicle_issues.paginator.page_range %}
-        {% if page > issue_page_ranges.page_start and page <= issue_page_ranges.page_end %}
-        <li class="page-item {% if vehicle_issues.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ page }}&pretrip_page={{ pretrips.number }}#issues">{{ page }}</a></li>
-        {% endif %}
-        {% endfor %}
-        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_next %}?issue_page={{ vehicle_issues.next_page_number }}&pretrip_page={{ pretrips.number }}{% endif %}#issues">&raquo;</a></li>
-    </ul>
-</nav>
-{% endif %}
-<p>Showing results {{ issue_page_ranges.item_count_start }}-{{ issue_page_ranges.item_count_end }} of {{ vehicle_issues.paginator.count }}</p>
-{% else %}
-<p>There are no reported vehicle issues.</p>
-{% endif %}
-<hr/>
-<a id="pretrips" data-scrollintoview="start"></a>
-<h3>Pre-Trip Log</h3>
-{% if pretrips %}
-<table class="mytable mytable-striped">
-    <thead>
-        <td class="mytable-col-md">Date</td>
-        <td class="mytable-col-md">Vehicle</td>
-        <td class="mytable-col-md">Driver</td>
-        <td class="mytable-col-xl">Status</td>
-        {% if perms.transit.delete_pretrip %}
-        <td class="mytable-col-sm"></td>
-        {% endif %}
-    </thead>
-    {% for pretrip in pretrips %}
-    <tr>
-        <td>{{ pretrip.date }}</td>
-        <td>{{ pretrip.vehicle }}</td>
-        <td>{{ pretrip.driver }}</td>
-        <td>
-            {% if pretrip.status == 2 %}
-            <span class="text-success"><strong>Passed</strong></span>
-            {% elif pretrip.status == 1 %}
-            <span class="text-danger"><strong>Failed</strong></span>
-            <ul class="small text-muted mb-0">
-            {% for fail in pretrip.failure_list %}
-            <li>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
-            {% endfor %}
-            </ul>
+            {% for vd in vehicle_data %}
+            {% if vd.id == vehicle.id %}
+            {% if vd.issues %}
+            <div class="list-group">
+                {% for issue in vd.issues %}
+                <a href="{% url 'vehicle-issue-edit' issue.id %}" class="p-1 list-group-item list-group-item-action {% if issue.priority == 2 %}bg-danger text-light{% elif issue.priority == 1 %}bg-warning{% endif %}">
+                    <span class="badge badge-light border mr-1">{{ issue.date }}</span>
+                    <span class="badge badge-light border mr-1" style="background: #{{ issue.driver.get_color }}">{{ issue.driver }}</span>
+                    {% if issue.category > 0 %}
+                    <span class="badge badge-light border text-muted mr-1">{{ issue.get_category_str }}</span>
+                    {% endif %}
+                    <span class="small">{{ issue.description }}</span>
+                </a>
+                {% endfor %}
+            </div>
             {% endif %}
-        </td>
-        {% if perms.transit.delete_pretrip %}
-        <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</table>
-{% if pretrips.paginator.num_pages > 1 %}
-<nav class="mt-2">
-    <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="{% if pretrips.has_previous %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.previous_page_number }}{% endif %}#pretrips">&laquo;</a></li>
-        {% for page in pretrips.paginator.page_range %}
-        {% if page > pretrip_page_ranges.page_start and page <= pretrip_page_ranges.page_end %}
-        <li class="page-item {% if pretrips.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ vehicle_issues.number }}&pretrip_page={{ page }}#pretrips">{{ page }}</a></li>
-        {% endif %}
-        {% endfor %}
-        <li class="page-item"><a class="page-link" href="{% if pretrips.has_next %}?issue_page={{ vehicle_issues.number }}&pretrip_page={{ pretrips.next_page_number }}{% endif %}#pretrips">&raquo;</a></li>
-    </ul>
-</nav>
-{% endif %}
-<p>Showing results {{ pretrip_page_ranges.item_count_start }}-{{ pretrip_page_ranges.item_count_end }} of {{ pretrips.paginator.count }}</p>
-{% else %}
-<p>There are no logged pre-trip reports.</p>
-{% endif %}
+            {% endif %}
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>

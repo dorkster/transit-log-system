@@ -1,0 +1,141 @@
+<h3>Reported Issues <a class="btn btn-success btn-sm" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-plus mr-2"></span>New</a></h3>
+<div class="container ml-0 border p-2 mb-3" style="background: #eee;">
+    <div class="row">
+        <div class="col">
+            <h5>Filter{% if issue_filtered_count < issue_unfiltered_count %} ({{issue_filtered_count}}/{{issue_unfiltered_count}} visible){% endif %}</h5>
+        </div>
+        {% if is_filtered %}
+        <div class="col-auto">
+            <button class="btn btn-outline-danger btn-sm" onclick="ajax_loader.run('', 'filter_reset', '')"><span class="oi oi-delete mr-2"></span>Reset Filter</button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_driver is None %}All Drivers{% else %}{% for driver in drivers %}{% if filter_driver == driver %}{{ driver }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_driver is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '')">All Drivers</a>
+                {% for driver in drivers %}
+                <a class="dropdown-item {% if filter_driver == driver %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_driver', '{{driver.id}}')">{{driver}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_vehicle is None %}All Vehicles{% else %}{% for vehicle in vehicles %}{% if filter_vehicle == vehicle %}{{ vehicle }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_vehicle is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '')">All Vehicles</a>
+                {% for vehicle in vehicles %}
+                <a class="dropdown-item {% if filter_vehicle == vehicle %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_vehicle', '{{vehicle.id}}')">{{vehicle}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Show...
+            </button>
+            <div class="dropdown-menu shadow dropdown-menu-right">
+                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"><span class="mr-2 oi {% if not filter_show_resolved %}oi-x{% else %}oi-check{% endif %}"></span>Resolved</a>
+            </div>
+        </span>
+    </div>
+    <div class="mt-2">
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_priority is None %}All Priorities{% else %}{% for priority in priorities %}{% if filter_priority == priority.0 %}{{ priority.1 }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_priority is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '')">All Priorities</a>
+                {% for priority in priorities %}
+                <a class="dropdown-item {% if filter_priority == priority.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_priority', '{{priority.0}}')">{{priority.1}}</a>
+                {% endfor %}
+            </div>
+        </span>
+        <span class="dropdown ajax-blocker">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if filter_category is None %}All Categories{% else %}{% for category in categories %}{% if filter_category == category.0 %}{{ category.1 }}{% endif %}{% endfor %}{% endif %}
+            </button>
+            <div class="dropdown-menu shadow">
+                <a class="dropdown-item {% if filter_category is None %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '')">All Categories</a>
+                {% for category in categories %}
+                <a class="dropdown-item {% if filter_category == category.0 %}active{% endif %}" href="#_" onclick="ajax_loader.run('', 'filter_category', '{{category.0}}')">{{category.1}}</a>
+                {% endfor %}
+            </div>
+        </span>
+    </div>
+</div>
+{% if vehicle_issues %}
+<table class="mytable">
+    <thead>
+        <td></td>
+        <td></td>
+        <td>Date</td>
+        <td>Vehicle</td>
+        <td>Driver</td>
+        <td>Category</td>
+        <td>Description</td>
+    </thead>
+    {% for issue in vehicle_issues %}
+    {% if issue.priority == 2 and not issue.is_resolved %}
+    <tr class="bg-danger text-light">
+    {% elif issue.priority == 1 and not issue.is_resolved %}
+    <tr class="bg-warning text-dark">
+    {% elif issue.is_resolved %}
+    <tr class="text-muted">
+    {% else %}
+    <tr>
+    {% endif %}
+        <td class="mytable-col-xs">
+            <div class="dropdown ajax-blocker">
+                <button class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <div class="dropdown-menu shadow">
+                    <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
+                    {% if perms.transit.change_vehicleissue %}
+                    <div class="dropdown-divider"></div>
+                    {% if issue.priority < 2 %}
+                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
+                    {% endif %}
+                    {% if issue.priority > 0 %}
+                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_down', '')" class="dropdown-item"><span class="oi oi-caret-bottom mr-2"></span>Decrease Priority</a>
+                    {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}<span class="oi oi-x mr-2"></span>Set as not resolved{% else %}<span class="oi oi-check mr-2"></span>Set as resolved{% endif %}</a>
+                    {% endif %}
+                    {% if perms.transit.delete_vehicleissue %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+        <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>
+        <td class="mytable-col-md">{{ issue.date }}</td>
+        <td class="mytable-col-md">{{ issue.vehicle }}</td>
+        <td class="mytable-col-md">{{ issue.driver }}</td>
+        <td class="mytable-col-lg">{% if issue.category > 0 %}{{ issue.get_category_str }}{% endif %}</td>
+        <td class="mytable-col-xl">{{ issue.description }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% if vehicle_issues.paginator.num_pages > 1 %}
+<nav class="mt-2">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_previous %}?issue_page={{ vehicle_issues.previous_page_number }}{% endif %}">&laquo;</a></li>
+        {% for page in vehicle_issues.paginator.page_range %}
+        {% if page > issue_page_ranges.page_start and page <= issue_page_ranges.page_end %}
+        <li class="page-item {% if vehicle_issues.number == page %}active{% endif %}"><a class="page-link" href="?issue_page={{ page }}">{{ page }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="page-item"><a class="page-link" href="{% if vehicle_issues.has_next %}?issue_page={{ vehicle_issues.next_page_number }}{% endif %}">&raquo;</a></li>
+    </ul>
+</nav>
+{% endif %}
+<p>Showing results {{ issue_page_ranges.item_count_start }}-{{ issue_page_ranges.item_count_end }} of {{ vehicle_issues.paginator.count }}</p>
+{% else %}
+<p>There are no reported vehicle issues.</p>
+{% endif %}

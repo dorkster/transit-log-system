@@ -1,38 +1,31 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Vehicle Status | {% endif %}
+{% if user.is_authenticated %}Vehicle Issue Tracker | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
 <div class="row">
     <div class="col">
-        <h2>Vehicle Status</h2>
+        <h2>Vehicle Issue Tracker</h2>
     </div>
     <div class="col-auto">
-        <a class="btn btn-secondary" href="{% url 'vehicle-issue-tracker' %}"><span class="oi oi-task mr-2"></span>Issue Tracker</a>
-    </div>
-    <div class="col-auto">
-        <a class="btn btn-secondary" href="{% url 'vehicle-pretrip-log' %}"><span class="oi oi-spreadsheet mr-2"></span>Pre-Trip Log</a>
+        <a class="btn btn-primary" href="{% url 'vehicle-status' %}"><span class="oi oi-arrow-thick-left mr-2"></span>Return to Vehicle Status</a>
     </div>
 </div>
 <hr/>
 {% include "ajax_loading.html" %}
-<div id="vehicle_status">
+<div id="vehicle_issues">
 </div>
 
 <script type="text/javascript">
     var params = new URLSearchParams(location.search);
 
-    var pretrip_page = params.get('pretrip_page');
-    if (pretrip_page == null)
-        pretrip_page = 1;
-
     var issue_page = params.get('issue_page');
     if (issue_page == null)
         issue_page = 1;
 
-    var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-status' %}?issue_page=" + issue_page + "&pretrip_page=" + pretrip_page, "#vehicle_status");
+    var ajax_loader = new AjaxLoader("{%url 'ajax-vehicle-issue-tracker' %}?issue_page=" + issue_page, "#vehicle_issues");
 
     // Fetch the initial data and repeat every 10 seconds
     ajax_loader.run();

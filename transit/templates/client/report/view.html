@@ -167,8 +167,8 @@
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_money %}
                 <tr>
-                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
-                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}" target="_blank">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}" target="_blank">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
                     <td class="{% if trip.fare == 0 %}mytable-zero{% endif %}">${{ trip.get_fare_str }}</td>
@@ -207,7 +207,7 @@
             <tbody class="mytable-hoverhi">
                 {% for payment in payments %}
                 <tr>
-                    <td class="text-center"><a href="{% url 'client-payment-edit' client.id payment.id %}">Edit</a></td>
+                    <td class="text-center"><a href="{% url 'client-payment-edit' client.id payment.id %}" target="_blank">Edit</a></td>
                     <td>{{ payment.date_paid|date:"F j, Y" }}</td>
                     <td>{{ payment.notes }}</td>
                     <td class="{% if payment.money_cash == 0 %}mytable-zero{% endif %}">${{ payment.get_cash_str }}</td>
@@ -237,8 +237,8 @@
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_normal %}
                 <tr>
-                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
-                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}" target="_blank">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}" target="_blank">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
                 </tr>
@@ -271,8 +271,8 @@
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_canceled %}
                 <tr>
-                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
-                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}" target="_blank">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}" target="_blank">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
                     <td>
@@ -303,8 +303,8 @@
             <tbody class="mytable-hoverhi">
                 {% for trip in trips_no_show %}
                 <tr>
-                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}">Edit</a></td>
-                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}">{{ trip.date|date:"F j, Y" }}</a></td>
+                    <td class="text-center"><a href="{% url 'trip-edit' 'edit' trip.id %}" target="_blank">Edit</a></td>
+                    <td><a href="{% url 'schedule' 'edit' trip.date.year trip.date.month trip.date.day %}#trip_{{trip.id}}" target="_blank">{{ trip.date|date:"F j, Y" }}</a></td>
                     <td>{{ trip.address }}</td>
                     <td>{{ trip.destination }}</td>
                 </tr>

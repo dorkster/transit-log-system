@@ -548,6 +548,7 @@ def tripStart(request, id):
             # check to see if a matching Shift exists. If not, create it
             trip_shifts = Shift.objects.filter(date=trip.date, driver=trip.driver, vehicle=trip.vehicle)
             trip_shift = None
+            shift_created = False
             if trip_shifts.exists():
                 if trip_shifts[0].start_miles == '' and trip_shifts[0].start_time == '':
                     trip_shift = trip_shifts[0]
@@ -556,7 +557,7 @@ def tripStart(request, id):
                 trip_shift.date = trip.date
                 trip_shift.driver = trip.driver
                 trip_shift.vehicle = trip.vehicle
-                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.SHIFT, str(trip_shift))
+                shift_created = True
 
             if trip_shift and trip_shift.vehicle.is_logged:
                 if str(trip_shift.vehicle) in start_miles:
@@ -569,6 +570,8 @@ def tripStart(request, id):
                     trip_shift.start_miles = trip.start_miles
                 trip_shift.start_time = trip.start_time
                 trip_shift.save()
+                if shift_created:
+                    log_event(request, LoggedEventAction.CREATE, LoggedEventModel.SHIFT, str(trip_shift))
                 log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.SHIFT, str(trip_shift))
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))

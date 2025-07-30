@@ -1,0 +1,13 @@
+{
+    "name": "Transit Log System",
+    "icons": [
+        {
+            "src": "/static/transit/img/pwa_icon.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/transit/",
+    "display": "minimal-ui",
+    "preferred_related_applications": "false"
+}

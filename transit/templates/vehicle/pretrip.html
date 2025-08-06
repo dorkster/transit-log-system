@@ -1,11 +1,11 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Pre-Trip Checklist | {% if shift %}{{ shift }}{% else %}{{ pretrip_vehicle }}{% endif %} | {% endif %}
+{% if user.is_authenticated %}Driver Inspection Checklist | {% if shift %}{{ shift }}{% else %}{{ pretrip_vehicle }}{% endif %} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
-<h2>Pre-Trip Checklist</h2>
+<h2>Driver Inspection Checklist</h2>
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     {{ form.checklist }}
@@ -14,6 +14,10 @@
             <div class="list-group-item d-flex">
                 <span class="text-muted w-50">Date</span>
                 <span class="w-50"><strong>{{pretrip_date}}</strong></span>
+            </div>
+            <div class="list-group-item d-flex">
+                <span class="text-muted w-50">Type</span>
+                <span class="w-50"><strong>{% if inspect_type == 0 %}Pre-Trip{% elif inspect_type == 1 %}Post-Trip{% else %}No Shift{% endif %}</strong></span>
             </div>
             <div class="list-group-item d-flex">
                 <span class="text-muted w-50">Vehicle</span>

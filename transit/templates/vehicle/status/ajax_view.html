@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col text-muted">Inspection Sticker</div>
+            <div class="col text-muted">State Inspection Sticker</div>
             <div class="col">
                 {% if vehicle in notify_vehicle_inspections %}
                 <span class="text-danger font-weight-bold">
@@ -45,10 +45,10 @@
         <hr/>
         <div class="row mt-4">
             <div class="col">
-                <h4>Recent Pre-Trips</h4>
+                <h4>Recent Driver Inspections</h4>
             </div>
             <div class="col-auto">
-                <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-success btn-sm"><span class="oi oi-plus mr-2"></span>New Pre-Trip{% if vehicle in notify_vehicle_pretrips %}<span class="ml-2 oi oi-warning"></span>{% endif %}</a>
+                <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-success btn-sm"><span class="oi oi-plus mr-2"></span>New Inspection{% if vehicle in notify_vehicle_pretrips %}<span class="ml-2 oi oi-warning"></span>{% endif %}</a>
             </div>
         </div>
         {% for vd in vehicle_data %}
@@ -57,7 +57,7 @@
         <div class="list-group mb-4">
             {% for pretrip in vd.pretrips %}
             <div class="p-1 list-group-item">
-                <span class="badge badge-light border mr-1">{{ pretrip.date }}</span>
+                <span class="badge badge-light border mr-1">{{ pretrip.date }} | {{ pretrip.inspect_type_str }}</span>
                 <span class="badge badge-light border mr-1" style="background: #{{ pretrip.driver.get_color }}">{{ pretrip.driver }}</span>
                 {% if pretrip.status == 2 %}
                 <span class="badge badge-success"><strong>Passed</strong></span>
@@ -73,7 +73,7 @@
             {% endfor %}
         </div>
         {% else %}
-        <p>There are no logged pre-trip reports.</p>
+        <p>There are no logged driver inspections.</p>
         {% endif %}
         {% endif %}
         {% endfor %}

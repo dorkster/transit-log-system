@@ -184,8 +184,9 @@ urlpatterns = [
     path('vehicle-status/issues/<uuid:id>/delete', views.vehicleIssueDelete, name='vehicle-issue-delete'),
     path('vehicle-status/maintainence/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
 
-    path('vehicle-pretrip/create/<uuid:shift_id>', views.vehiclePreTripCreate, name='vehicle-pretrip-create'),
-    path('vehicle-pretrip/create-no-shift/<uuid:vehicle_id>', views.vehiclePreTripCreateNoShift, name='vehicle-pretrip-create-no-shift'),
+    path('vehicle-pretrip/create/pre-trip/<uuid:shift_id>', views.vehiclePreTripCreate, name='vehicle-pretrip-create'),
+    path('vehicle-pretrip/create/post-trip/<uuid:shift_id>', views.vehiclePreTripCreatePost, name='vehicle-pretrip-create-post'),
+    path('vehicle-pretrip/create/no-shift/<uuid:vehicle_id>', views.vehiclePreTripCreateNoShift, name='vehicle-pretrip-create-no-shift'),
     path('vehicle-pretrip/<uuid:id>/delete', views.vehiclePreTripDelete, name='vehicle-pretrip-delete'),
 
     path('vehicle-issue-tracker/', views.vehicleIssueTracker, name='vehicle-issue-tracker'),

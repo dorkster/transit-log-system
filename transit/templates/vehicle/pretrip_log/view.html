@@ -1,13 +1,13 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Vehicle Pre-Trip Log | {% endif %}
+{% if user.is_authenticated %}Driver Inspection Log | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
 <div class="row">
     <div class="col">
-        <h2>Vehicle Pre-Trip Log</h2>
+        <h2>Driver Inspection Log</h2>
     </div>
     <div class="col-auto">
         <a class="btn btn-primary" href="{% url 'vehicle-status' %}"><span class="oi oi-arrow-thick-left mr-2"></span>Return to Vehicle Status</a>

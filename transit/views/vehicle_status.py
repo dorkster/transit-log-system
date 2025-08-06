@@ -78,63 +78,16 @@ def ajaxVehicleStatus(request):
         request.session['vehicle_status_filter_category'] = ''
         request.session['vehicle_status_filter_priority'] = ''
 
-    filter_show_resolved = request.session.get('vehicle_status_filter_show_resolved', False)
-    filter_driver = request.session.get('vehicle_status_filter_driver', '')
-    filter_vehicle = request.session.get('vehicle_status_filter_vehicle', '')
-    filter_category = request.session.get('vehicle_status_filter_category', '')
-    filter_priority = request.session.get('vehicle_status_filter_priority', '')
-
-    vehicle_issues = VehicleIssue.objects.all()
-
-    if not filter_show_resolved:
-        vehicle_issues = vehicle_issues.filter(is_resolved=False)
-
-    # don't count resolved issues towards filter count
-    issue_unfiltered_count = vehicle_issues.count()
-
-    if filter_driver != '':
-        vehicle_issues = vehicle_issues.filter(driver__id=filter_driver)
-    if filter_vehicle != '':
-        vehicle_issues = vehicle_issues.filter(vehicle__id=filter_vehicle)
-    if filter_category != '':
-        vehicle_issues = vehicle_issues.filter(category=int(filter_category))
-    if filter_priority != '':
-        vehicle_issues = vehicle_issues.filter(priority=int(filter_priority))
-
-    issue_filtered_count = vehicle_issues.count()
-
-    pretrips_per_page = 50
-    pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), pretrips_per_page)
-    pretrips_paginated = pretrip_pages.get_page(request.GET.get('pretrip_page'))
-    pretrip_page_ranges = get_paginated_ranges(page=pretrips_paginated, page_range=5, items_per_page=pretrips_per_page)
-
-    issues_per_page = 25
-    issue_pages = Paginator(vehicle_issues, issues_per_page)
-    issues_paginated = issue_pages.get_page(request.GET.get('issue_page'))
-    issue_page_ranges = get_paginated_ranges(page=issues_paginated, page_range=5, items_per_page=issues_per_page)
-
     logged_vehicles = Vehicle.objects.filter(is_logged=True, is_active=True)
 
     vehicle_data = []
     for vehicle in logged_vehicles:
         issues = VehicleIssue.objects.filter(vehicle=vehicle, is_resolved=False)
-        pretrips = list(PreTrip.objects.filter(vehicle=vehicle).order_by('-date'))[:5]
+        pretrips = list(PreTrip.objects.filter(vehicle=vehicle).order_by('-date', '-inspect_type'))[:10]
         vehicle_data.append({'id': vehicle.id, 'issues': issues, 'pretrips': pretrips})
 
     context = {
-        'vehicle_issues': issues_paginated,
-        'issue_page_ranges': issue_page_ranges,
-        'filter_show_resolved': filter_show_resolved,
-        'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
-        'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
-        'filter_category': None if filter_category == '' else int(filter_category),
-        'filter_priority': None if filter_priority == '' else int(filter_priority),
-        'is_filtered': (filter_driver != '' or filter_vehicle != '' or filter_category != '' or filter_priority != ''),
-        'issue_filtered_count': issue_filtered_count,
-        'issue_unfiltered_count': issue_unfiltered_count,
         'logged_vehicles': logged_vehicles,
-        'pretrips': pretrips_paginated,
-        'pretrip_page_ranges': pretrip_page_ranges,
         'drivers': Driver.objects.filter(is_logged=True, is_active=True),
         'vehicles': logged_vehicles,
         'categories': VehicleIssue.ISSUE_CATEGORIES,
@@ -258,7 +211,7 @@ def ajaxVehiclePreTripLog(request):
     request_data = request.GET['target_data']
 
     pretrips_per_page = 50
-    pretrip_pages = Paginator(list(reversed(PreTrip.objects.all())), pretrips_per_page)
+    pretrip_pages = Paginator(list(PreTrip.objects.all().order_by('-date', '-inspect_type')), pretrips_per_page)
     pretrips_paginated = pretrip_pages.get_page(request.GET.get('pretrip_page'))
     pretrip_page_ranges = get_paginated_ranges(page=pretrips_paginated, page_range=5, items_per_page=pretrips_per_page)
 

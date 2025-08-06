@@ -564,7 +564,10 @@ class Shift(models.Model):
             return Shift.LOG_INCOMPLETE
 
     def check_pretrip(self):
-        return (len(PreTrip.objects.filter(shift_id=self.id)) > 0)
+        return (len(PreTrip.objects.filter(shift_id=self.id, inspect_type=PreTrip.TYPE_PRE)) > 0)
+
+    def check_posttrip(self):
+        return (len(PreTrip.objects.filter(shift_id=self.id, inspect_type=PreTrip.TYPE_POST)) > 0)
 
 
 class Client(models.Model):
@@ -937,8 +940,13 @@ class PreTrip(models.Model):
         'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
     }
 
+    TYPE_PRE = 0
+    TYPE_POST = 1
+    TYPE_NO_SHIFT = 2
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField(editable=False)
+    inspect_type = models.IntegerField(default=TYPE_PRE)
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     shift_id = models.UUIDField(editable=False, null=True)
@@ -960,8 +968,16 @@ class PreTrip(models.Model):
     cl_mechanical = models.IntegerField(default=0)
     cl_interior = models.IntegerField(default=0)
 
+    def inspect_type_str(self):
+        if self.inspect_type == PreTrip.TYPE_PRE:
+            return "Pre-Trip"
+        elif self.inspect_type == PreTrip.TYPE_POST:
+            return "Post-Trip"
+        elif self.inspect_type == PreTrip.TYPE_NO_SHIFT:
+            return "No Shift"
+
     def __str__(self):
-        output = str(self.date) + ' - ' + str(self.driver) + ' - ' + str(self.vehicle)
+        output = str(self.date) + ' - [' + self.inspect_type_str() +  '] - ' + str(self.driver) + ' - ' + str(self.vehicle)
         if (self.status() == 2):
             output += ' - Passed'
         elif self.status() == 1:
@@ -992,7 +1008,7 @@ class PreTrip(models.Model):
         return output
 
     def get_class_name(self):
-        return 'Pre-Trip'
+        return 'Driver Inspection'
 
 class Fare(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -2,6 +2,7 @@
 <table class="mytable mytable-striped">
     <thead>
         <td class="mytable-col-md">Date</td>
+        <td class="mytable-col-md">Type</td>
         <td class="mytable-col-md">Vehicle</td>
         <td class="mytable-col-md">Driver</td>
         <td class="mytable-col-xl">Status</td>
@@ -12,6 +13,7 @@
     {% for pretrip in pretrips %}
     <tr>
         <td>{{ pretrip.date }}</td>
+        <td>{{ pretrip.inspect_type_str }}</td>
         <td>{{ pretrip.vehicle }}</td>
         <td>{{ pretrip.driver }}</td>
         <td>
@@ -47,5 +49,5 @@
 {% endif %}
 <p>Showing results {{ pretrip_page_ranges.item_count_start }}-{{ pretrip_page_ranges.item_count_end }} of {{ pretrips.paginator.count }}</p>
 {% else %}
-<p>There are no logged pre-trip reports.</p>
+<p>There are no logged driver inspections.</p>
 {% endif %}

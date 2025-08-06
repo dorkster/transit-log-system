@@ -168,7 +168,7 @@
                         Complete
                     </span>
                     {% else %}
-                    <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn pl-2 pr-2 btn-warning">Pre-Trip</a>
+                    <a href="{% url 'vehicle-pretrip-create' shift.id %}" class="btn pl-2 pr-2 {% if shift.end_miles %}btn-secondary disabled{% else %}btn-warning{% endif %}">Pre-Trip</a>
                     {% endif %}
                     {% if shift.start_miles %}
                     <a href="{% url 'shift-edit' 'view' shift.id %}"><span class="d-inline-block alert alert-primary pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
@@ -185,6 +185,14 @@
                     </span></a>
                     {% else %}
                     <a href="{% url 'shift-end' shift.id %}" class="btn pl-2 pr-2 {% if not shift.start_miles %}btn-secondary disabled{% else %}btn-success{% endif %}">End</a>
+                    {% endif %}
+                    {% if shift.check_posttrip %}
+                    <span class="d-inline-block alert alert-warning pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">
+                        Post-Trip<br/>
+                        Complete
+                    </span>
+                    {% else %}
+                    <a href="{% url 'vehicle-pretrip-create-post' shift.id %}" class="btn pl-2 pr-2 {% if not shift.end_miles %}btn-secondary disabled{% else %}btn-warning{% endif %}">Post-Trip</a>
                     {% endif %}
                     {% if shift.fuel %}
                     <a href="{% url 'shift-fuel' shift.id %}"><span class="d-inline-block alert alert-info pt-0 pb-0 pl-1 pr-1 m-0 small align-middle border-secondary" style="min-width: 5em;">

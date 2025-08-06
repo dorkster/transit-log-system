@@ -172,14 +172,18 @@ def vehicleMaintainEdit(request, id):
 
 @permission_required(['transit.add_pretrip'])
 def vehiclePreTripCreate(request, shift_id):
-    return vehiclePreTripCreateCommon(request, shift_id=shift_id, vehicle_id=None)
+    return vehiclePreTripCreateCommon(request, inspect_type=PreTrip.TYPE_PRE, shift_id=shift_id, vehicle_id=None)
+
+@permission_required(['transit.add_pretrip'])
+def vehiclePreTripCreatePost(request, shift_id):
+    return vehiclePreTripCreateCommon(request, inspect_type=PreTrip.TYPE_POST, shift_id=shift_id, vehicle_id=None)
 
 @permission_required(['transit.add_pretrip'])
 def vehiclePreTripCreateNoShift(request, vehicle_id):
-    return vehiclePreTripCreateCommon(request, shift_id=None, vehicle_id=vehicle_id)
+    return vehiclePreTripCreateCommon(request, inspect_type=PreTrip.TYPE_NO_SHIFT, shift_id=None, vehicle_id=vehicle_id)
 
 @permission_required(['transit.add_pretrip'])
-def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
+def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
     if shift_id:
         shift = get_object_or_404(Shift, id=shift_id)
         pretrip_date = shift.date
@@ -187,7 +191,7 @@ def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
         pretrip_vehicle = shift.vehicle
 
         # Pretrip was already logged, return to the schedule
-        if PreTrip.objects.filter(shift_id=shift_id).count() > 0:
+        if inspect_type != PreTrip.TYPE_NO_SHIFT and PreTrip.objects.filter(shift_id=shift_id, inspect_type=inspect_type).count() > 0:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}))
     elif vehicle_id:
         shift = None
@@ -210,6 +214,7 @@ def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
             pretrip = PreTrip()
             pretrip.date = pretrip_date
             pretrip.vehicle = pretrip_vehicle
+            pretrip.inspect_type = inspect_type
 
             if pretrip_driver:
                 pretrip.driver = pretrip_driver
@@ -257,7 +262,10 @@ def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
                         issue.save()
                         log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE_ISSUE, str(issue))
 
-                return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
+                if shift_id:
+                    return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
+                else:
+                    return HttpResponseRedirect(reverse('vehicle-status'))
     else:
         form = vehiclePreTripForm()
 
@@ -271,6 +279,7 @@ def vehiclePreTripCreateCommon(request, shift_id, vehicle_id):
         'pretrip_vehicle': pretrip_vehicle,
         'shift': shift,
         'checklist': PreTrip.CHECKLIST,
+        'inspect_type': inspect_type,
     }
     return render(request, 'vehicle/pretrip.html', context=context)
 

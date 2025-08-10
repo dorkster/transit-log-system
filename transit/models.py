@@ -455,6 +455,55 @@ class Trip(models.Model):
         elif diff_time == 0:
             return '0 min.'
 
+    def get_eta_from_scheduled_pickup(self):
+        if self.pick_up_time == '':
+            return ''
+
+        try:
+            parsed_pickup = datetime.datetime.strptime(self.pick_up_time, '%I:%M %p')
+        except:
+            return ''
+
+        address_concat = ''
+        if self.address <= self.destination:
+            address_concat = self.address + self.destination
+        else:
+            address_concat = self.destination + self.address
+
+        address_uuid = uuid.uuid5(uuid.NAMESPACE_URL, address_concat)
+
+        query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
+        if len(query) > 0:
+            parsed_pickup += datetime.timedelta(seconds=query[0].avg_time)
+            return 'ETA: ' + parsed_pickup.strftime('%_I:%M %p')
+        else:
+            return ''
+
+    def get_recommended_pickup_from_appt_time(self):
+        if self.pick_up_time != '':
+            return ''
+
+        try:
+            parsed_appointment = datetime.datetime.strptime(self.appointment_time, '%I:%M %p')
+        except:
+            return ''
+
+        address_concat = ''
+        if self.address <= self.destination:
+            address_concat = self.address + self.destination
+        else:
+            address_concat = self.destination + self.address
+
+        address_uuid = uuid.uuid5(uuid.NAMESPACE_URL, address_concat)
+
+        query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
+        if len(query) > 0:
+            parsed_appointment -= datetime.timedelta(seconds=query[0].avg_time)
+            return 'Suggested: ' + parsed_appointment.strftime('%_I:%M %p')
+        else:
+            return ''
+
+
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
@@ -1180,3 +1229,6 @@ class SiteSettings(SingletonModel):
 
         return color
 
+class TripDeltaTimeAverage(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False)
+    avg_time = models.IntegerField(default=0, editable=False)

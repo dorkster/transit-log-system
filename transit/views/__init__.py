@@ -40,3 +40,4 @@ from .activity_color import *
 from .volunteer import *
 from .loggedevent import *
 from .fare_check_oneway import *
+from .trip_delta_time_avg import *

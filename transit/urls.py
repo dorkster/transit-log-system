@@ -196,6 +196,8 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('search-xlsx/', views.searchExportXLSX, name='search-xlsx'),
 
+    path('trip-delta-time-avg-regen/', views.tripDeltaTimeAverageRegen, name='trip-delta-time-avg-regen'),
+
     path('event-log/', views.loggedEventList, name='loggedevent-list'),
 
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),

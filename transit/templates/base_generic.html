@@ -136,6 +136,10 @@
                             <a class="dropdown-item" href="{% url 'excel-import' %}"><span class="oi oi-data-transfer-upload mr-2"></span>Import Excel Files</a>
                             <div class="dropdown-divider"></div>
                             {% endif %}
+                            {% if perms.transit.change_trip %}
+                            <a class="dropdown-item" href="{% url 'trip-delta-time-avg-regen' %}"><span class="oi oi-clock mr-2"></span>Average Trip Time Analysis</a>
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
                             <a class="dropdown-item" href="{% url 'logout' %}"><span class="oi oi-account-logout mr-2"></span>Logout</a>
                         </div>
                     </li>

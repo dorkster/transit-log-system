@@ -101,7 +101,13 @@
             <div class="col border m-1 pt-1">
                 <fieldset class="form-group">
                     <legend>Trip Information</legend>
-                    <div class="mb-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}</div>
+                    <div class="mb-2"><label for="{{ form.pick_up_time.id_for_label }}"><strong>{{ form.pick_up_time.label }}</strong></label><br/>{{ form.pick_up_time }}
+                        {% if trip.appointment_time and trip.status == 0 and not trip.end_time %}
+                        <div class="text-muted" style="font-size: 0.8em; font-style: italic;">
+                            {{ trip.get_recommended_pickup_from_appt_time }}
+                        </div>
+                        {% endif %}
+                    </div>
                     <div class="mb-2"><label for="{{ form.appointment_time.id_for_label }}"><strong>{{ form.appointment_time.label }}</strong></label><br/>{{ form.appointment_time }}</div>
                     <hr/>
                     <div class="mb-2"><label for="{{ form.address.id_for_label }}"><strong>{{ form.address.label }}</strong></label>

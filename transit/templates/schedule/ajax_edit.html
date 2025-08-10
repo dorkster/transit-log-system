@@ -265,9 +265,19 @@
         {% else %}
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_pick_up_time', row_movers)">
             {{ trip.pick_up_time }}
+            {% if trip.appointment_time and trip.status == 0 and not trip.end_time %}
+            <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.7);">
+                {{ trip.get_recommended_pickup_from_appt_time }}
+            </div>
+            {% endif %}
         </td>
         <td class="mytable-col-sm edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_appointment_time', row_movers)">
             {{ trip.appointment_time }}
+            {% if trip.pick_up_time and trip.status == 0 and not trip.end_time %}
+            <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.7);">
+                {{ trip.get_eta_from_scheduled_pickup }}
+            </div>
+            {% endif %}
         </td>
         <td class="mytable-col-md edit_cell" onclick="editCell('{% url 'trip-edit' 'edit' trip.id %}?focus=id_name', row_movers)">
             {% if trip.wheelchair %}

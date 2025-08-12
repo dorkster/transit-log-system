@@ -34,6 +34,8 @@ from transit.common.util import *
 from transit.common.eventlog import *
 from transit.models import LoggedEvent, LoggedEventAction, LoggedEventModel
 
+from .trip_delta_time_avg import TripDeltaTimeAverageRegenSingle
+
 def tripCreate(request, mode, year, month, day):
     trip = Trip()
     trip.date = datetime.date(year, month, day)
@@ -138,6 +140,9 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
         if trip.volunteer:
             form.fields['volunteer'].queryset = Volunteer.objects.filter(Q(is_active=True) | Q(id=trip.volunteer.id))
+
+        prev_trip_start_time = trip.start_time
+        prev_trip_end_time = trip.end_time
 
         if form.is_valid():
             old_date = trip.date
@@ -285,6 +290,10 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
 
                 if form.cleaned_data['create_return_trip'] == True:
                     return HttpResponseRedirect(reverse('trip-create-return', kwargs={'mode':mode, 'id':trip.id}))
+
+            # update average trip time dataset. WARNING, potentially slow?
+            if trip.start_time != prev_trip_start_time or trip.end_time != prev_trip_end_time:
+                TripDeltaTimeAverageRegenSingle(trip)
 
             if report_start and report_end:
                 return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
@@ -440,6 +449,12 @@ def tripDelete(request, mode, id):
         log_event(request, LoggedEventAction.DELETE, log_model, str(trip))
 
         trip.delete()
+
+        # update average trip time dataset. WARNING, potentially slow?
+        # NOTE trip.id is None here, but is unused in the following function, so it should be fine?
+        if trip.start_time and trip.end_time:
+            TripDeltaTimeAverageRegenSingle(trip)
+
         return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':date.year, 'month':date.month, 'day':date.day}))
 
     context = {
@@ -662,6 +677,8 @@ def tripEnd(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
 
+        prev_trip_end_time = trip.end_time
+
         if form.is_valid():
             trip.end_miles = form.cleaned_data['miles']
             trip.end_time = form.cleaned_data['time']
@@ -687,6 +704,10 @@ def tripEnd(request, id):
 
                         a_trip.save()
                         log_event(request, LoggedEventAction.LOG_END, LoggedEventModel.TRIP, str(a_trip))
+
+            # update average trip time dataset. WARNING, potentially slow?
+            if trip.end_time != prev_trip_end_time:
+                TripDeltaTimeAverageRegenSingle(trip)
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:
@@ -743,6 +764,9 @@ def tripSimpleEdit(request, id):
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
 
+        prev_trip_start_time = trip.start_time
+        prev_trip_end_time = trip.end_time
+
         if form.is_valid():
             trip.start_miles = form.cleaned_data['start_miles']
             trip.start_time = form.cleaned_data['start_time']
@@ -757,6 +781,10 @@ def tripSimpleEdit(request, id):
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.TRIP, str(trip))
 
             # TODO check to see if a matching Shift exists (and create if not)?
+
+            # update average trip time dataset. WARNING, potentially slow?
+            if trip.start_time != prev_trip_start_time or trip.end_time != prev_trip_end_time:
+                TripDeltaTimeAverageRegenSingle(trip)
 
             return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':trip.date.year, 'month':trip.date.month, 'day':trip.date.day}) + '#trip_' + str(trip.id))
     else:

@@ -19,6 +19,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from transit.models import Trip, TripDeltaTimeAverage
 
@@ -42,6 +43,7 @@ def tripDeltaTimeAverageRegen(request):
         TripDeltaTimeAverage.objects.all().delete()
 
         trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL).exclude(start_miles='', start_time='', end_miles='', end_time='')
+        trip_times = {}
 
         for trip in trips:
             try:
@@ -70,19 +72,20 @@ def tripDeltaTimeAverageRegen(request):
 
             address_uuid = uuid.uuid5(uuid.NAMESPACE_URL, address_concat)
 
-            query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
-            if len(query) > 0:
-                trip_delta_time_obj = query[0]
-            else:
-                trip_delta_time_obj = TripDeltaTimeAverage()
-                trip_delta_time_obj.id = address_uuid
-            
-            if (trip_delta_time_obj.avg_time == 0):
-                trip_delta_time_obj.avg_time = trip_delta_time.total_seconds()
-            else:
-                trip_delta_time_obj.avg_time = int((trip_delta_time_obj.avg_time + trip_delta_time.total_seconds()) / 2)
+            if address_uuid not in trip_times:
+                trip_times[address_uuid] = 0
 
+            if trip_times[address_uuid] == 0:
+                trip_times[address_uuid] = trip_delta_time.total_seconds()
+            else:
+                trip_times[address_uuid] = int((trip_times[address_uuid] + trip_delta_time.total_seconds()) / 2)
+
+        for key in trip_times:
+            trip_delta_time_obj = TripDeltaTimeAverage()
+            trip_delta_time_obj.id = key
+            trip_delta_time_obj.avg_time = trip_times[key]
             trip_delta_time_obj.save()
+
 
     context = {
         'trip_delta_times': TripDeltaTimeAverage.objects.all(),
@@ -90,4 +93,59 @@ def tripDeltaTimeAverageRegen(request):
         'trips': trips,
     }
     return render(request, 'trip_delta_time_avg/regen.html', context=context)
+
+
+
+def TripDeltaTimeAverageRegenSingle(src_trip):
+    print('Generating avg trip time for: ' + str(src_trip))
+
+    trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL).exclude(start_miles='', start_time='', end_miles='', end_time='')
+    trips = trips.filter(Q(address=src_trip.address, destination=src_trip.destination) | Q(address=src_trip.destination, destination=src_trip.address))
+
+    trip_times = {}
+
+    address_concat = ''
+    if src_trip.address <= src_trip.destination:
+        address_concat = src_trip.address + src_trip.destination
+    else:
+        address_concat = src_trip.destination + src_trip.address
+
+    address_uuid = uuid.uuid5(uuid.NAMESPACE_URL, address_concat)
+
+    query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
+    if len(query) > 0:
+        trip_delta_time_obj = query[0]
+        trip_delta_time_obj.avg_time = 0
+    else:
+        trip_delta_time_obj = TripDeltaTimeAverage()
+        trip_delta_time_obj.id = address_uuid
+
+    trip_times[address_uuid] = trip_delta_time_obj.avg_time
+
+    for trip in trips:
+        try:
+            start_time = datetime.datetime.strptime(trip.start_time, '%I:%M %p')
+        except:
+            print('Could not parse start time for: ' + str(trip))
+            continue # time parsing failed, skip trip
+
+        try:
+            end_time = datetime.datetime.strptime(trip.end_time, '%I:%M %p')
+        except:
+            print('Could not parse end time for: ' + str(trip))
+            continue # time parsing failed, skip trip
+
+        if start_time > end_time:
+            print('Invalid time delta for: ' + str(trip))
+            continue # invalid time delta, skip trip
+
+        trip_delta_time = end_time - start_time
+
+        if trip_times[address_uuid] == 0:
+            trip_times[address_uuid] = trip_delta_time.total_seconds()
+        else:
+            trip_times[address_uuid] = int((trip_times[address_uuid] + trip_delta_time.total_seconds()) / 2)
+
+    trip_delta_time_obj.avg_time = trip_times[address_uuid]
+    trip_delta_time_obj.save()
 

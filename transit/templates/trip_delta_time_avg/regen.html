@@ -6,7 +6,9 @@
 {% block auth_content %}
 <h3>Average Trip Time Analysis: Regenerate Data</h3>
 <div class="container ml-0">
-    <p>Current dataset: {{ trip_delta_times|length }} entries</p>
+    <p>In order to provide suggested pick-up times and estimated arrival times, past trip data can be used to get the average time between two addresses.<br/>To keep the dataset simple, a trip from Point A to Point B is considered the same as a trip from Point B to Point A.</p>
+    <p>The dataset is incrementally updated whenever new log data is changed or added.<br/>So unless the dataset is empty, <strong>you most likely don't need to regenerate the dataset</strong>.</p>
+    <p>Current dataset: <strong>{{ trip_delta_times|length }}</strong> entries</p>
     {% if regen %}
     <div class="alert alert-info">Dataset updated!</div>
     {% endif %}

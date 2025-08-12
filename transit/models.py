@@ -456,11 +456,15 @@ class Trip(models.Model):
             return '0 min.'
 
     def get_eta_from_scheduled_pickup(self):
-        if self.pick_up_time == '':
+        pick_up_time = self.pick_up_time
+        if self.start_time:
+            pick_up_time = self.start_time
+
+        if pick_up_time == '':
             return ''
 
         try:
-            parsed_pickup = datetime.datetime.strptime(self.pick_up_time, '%I:%M %p')
+            parsed_pickup = datetime.datetime.strptime(pick_up_time, '%I:%M %p')
         except:
             return ''
 

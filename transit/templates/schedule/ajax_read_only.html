@@ -224,9 +224,19 @@
         <td class="mytable-col-sm">
             <a id="trip_{{ trip.id }}"></a>
             {{ trip.pick_up_time }}
+            {% if trip.appointment_time and trip.status == 0 and not trip.end_time %}
+            <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.6);">
+                {{ trip.get_recommended_pickup_from_appt_time }}
+            </div>
+            {% endif %}
         </td>
         <td class="mytable-col-sm">
             {{ trip.appointment_time }}
+            {% if trip.pick_up_time and trip.status == 0 and not trip.end_time %}
+            <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.6);">
+                {{ trip.get_eta_from_scheduled_pickup }}
+            </div>
+            {% endif %}
         </td>
         <td class="mytable-col-md">
             {% if trip.wheelchair %}

@@ -232,10 +232,12 @@
         </td>
         <td class="mytable-col-sm">
             {{ trip.appointment_time }}
-            {% if trip.pick_up_time and trip.status == 0 and not trip.end_time %}
-            <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.6);">
-                {{ trip.get_eta_from_scheduled_pickup }}
-            </div>
+            {% if trip.status == 0 and not trip.end_time %}
+                {% if trip.pick_up_time or trip.start_time %}
+                <div style="font-size: 0.8em; font-style: italic; font-weight: normal; color: rgba(0,0,0,0.6);">
+                    {{ trip.get_eta_from_scheduled_pickup }}
+                </div>
+                {% endif %}
             {% endif %}
         </td>
         <td class="mytable-col-md">

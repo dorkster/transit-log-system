@@ -63,9 +63,11 @@ function AjaxLoader(url, div_id) {
         ajax_loading.addEventListener("animationend", self.animationDoneEarly);
 
         if ( $('.ajax-blocker.show').length == 0 || target_action != "") {
-            $('.modal.ajax-blocker.show').off('hidden.bs.modal');
-            $('.modal.ajax-blocker.show').modal('hide');
-            $('.dropdown.ajax-blocker.show').off('hidden.bs.dropdown');
+            if ($('.ajax-blocker.show').length > 0) {
+                $('.modal.ajax-blocker.show').off('hidden.bs.modal');
+                $('.modal.ajax-blocker.show').modal('hide');
+                $('.dropdown.ajax-blocker.show').off('hidden.bs.dropdown');
+            }
 
             $.ajax({
                 type: "GET",
@@ -103,8 +105,12 @@ function AjaxLoader(url, div_id) {
         else {
             self.stop();
             // when the ajax blocker is hidden, fire a new ajax request
-            $('.modal.ajax-blocker.show').one('hidden.bs.modal', self.resume);
-            $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', self.resume);
+            if ($('.modal.ajax-blocker.show').length > 0) {
+                $('.modal.ajax-blocker.show').one('hidden.bs.modal', self.resume);
+            }
+            if ($('.dropdown.ajax-blocker.show').length > 0) {
+                $('.dropdown.ajax-blocker.show').one('hidden.bs.dropdown', self.resume);
+            }
         }
     }
 }

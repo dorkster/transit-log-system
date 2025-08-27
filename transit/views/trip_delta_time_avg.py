@@ -42,7 +42,7 @@ def tripDeltaTimeAverageRegen(request):
 
         TripDeltaTimeAverage.objects.all().delete()
 
-        trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL).exclude(start_miles='', start_time='', end_miles='', end_time='')
+        trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL, passenger=True).exclude(start_miles='', start_time='', end_miles='', end_time='')
         trip_times = {}
 
         for trip in trips:
@@ -99,7 +99,7 @@ def tripDeltaTimeAverageRegen(request):
 def TripDeltaTimeAverageRegenSingle(src_trip):
     print('Generating avg trip time for: ' + str(src_trip))
 
-    trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL).exclude(start_miles='', start_time='', end_miles='', end_time='')
+    trips = Trip.objects.filter(format=Trip.FORMAT_NORMAL, status=Trip.STATUS_NORMAL, passenger=True).exclude(start_miles='', start_time='', end_miles='', end_time='')
     trips = trips.filter(Q(address=src_trip.address, destination=src_trip.destination) | Q(address=src_trip.destination, destination=src_trip.address))
 
     trip_times = {}

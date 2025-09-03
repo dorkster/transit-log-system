@@ -479,6 +479,8 @@ class Trip(models.Model):
         query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
         if len(query) > 0:
             parsed_pickup += datetime.timedelta(seconds=query[0].avg_time)
+            settings = SiteSettings.load()
+            parsed_pickup += datetime.timedelta(seconds=(settings.trip_eta_buffer * 60))
             return 'ETA: ' + parsed_pickup.strftime('%_I:%M %p')
         else:
             return ''
@@ -503,6 +505,8 @@ class Trip(models.Model):
         query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
         if len(query) > 0:
             parsed_appointment -= datetime.timedelta(seconds=query[0].avg_time)
+            settings = SiteSettings.load()
+            parsed_appointment -= datetime.timedelta(seconds=(settings.trip_eta_buffer * 60))
             return 'Suggested: ' + parsed_appointment.strftime('%_I:%M %p')
         else:
             return ''
@@ -1217,6 +1221,7 @@ class SiteSettings(SingletonModel):
     additional_pickup_fuzziness = models.FloatField(default=0.6)
     simple_daily_logs = models.BooleanField(default=False)
     trip_cancel_late_threshold = models.IntegerField(default=0)
+    trip_eta_buffer = models.IntegerField(default=0)
 
     def get_color(self, context):
         if context == self.COLOR_ACTIVITY:

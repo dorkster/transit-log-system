@@ -474,6 +474,7 @@ class SiteSettingsForm(forms.Form):
     additional_pickup_fuzziness = forms.FloatField(label='Additional Pickup/Drop-off Fuzziness', help_text='This determines how similar addresses can be when suggesting additional pickups/drop-offs, with 1 meaning that the addresses must match exactly.', widget=forms.NumberInput(attrs=formWidgetAttrs.normalized_float))
     simple_daily_logs = forms.BooleanField(label='Simple daily logs', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     trip_cancel_late_threshold = forms.CharField(label='Late threshold for canceled trips', help_text='Leave blank for no threshold', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.time))
+    trip_eta_buffer = forms.IntegerField(min_value=0, label='Trip ETA buffer', help_text='The specified number of minutes will used to adjust trip ETA times.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
 
 class EditUserForm(forms.Form):
     USER_ACCOUNT_TYPES = [

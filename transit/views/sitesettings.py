@@ -47,6 +47,7 @@ def sitesettingsEdit(request):
             settings.pretrip_warning_threshold = form.cleaned_data['pretrip_warning_threshold']
             settings.additional_pickup_fuzziness = form.cleaned_data['additional_pickup_fuzziness']
             settings.simple_daily_logs = form.cleaned_data['simple_daily_logs']
+            settings.trip_eta_buffer = form.cleaned_data['trip_eta_buffer']
             settings.trip_cancel_late_threshold = 0
             try:
                 trip_cancel_late_threshold = datetime.datetime.strptime(form.cleaned_data['trip_cancel_late_threshold'], '%I:%M %p')
@@ -76,6 +77,7 @@ def sitesettingsEdit(request):
             'page_title': settings.page_title,
             'short_page_title': settings.short_page_title,
             'trip_cancel_late_threshold': trip_cancel_late_threshold.strftime('%-I:%M %p'),
+            'trip_eta_buffer': settings.trip_eta_buffer,
         }
         form = SiteSettingsForm(initial=initial)
 

@@ -697,18 +697,43 @@ class Report():
                 report_trip = Report.ReportTrip()
                 report_trip.trip = i
 
+                matched_shifts = []
+
                 # find shift attempt 1: match driver and vehicle
                 for j in range(0, len(report_day.shifts)):
                     if report_day.shifts[j].shift and i.driver == report_day.shifts[j].shift.driver and i.vehicle == report_day.shifts[j].shift.vehicle:
-                        report_trip.shift = j
-                        break
+                        matched_shifts.append(j)
 
                 # find shift attempt 2: match vehicle
-                if report_trip.shift == None:
+                if len(matched_shifts) == 0:
                     for j in range(0, len(report_day.shifts)):
                         if report_day.shifts[j].shift and i.vehicle == report_day.shifts[j].shift.vehicle:
-                            report_trip.shift = j
-                            break
+                            matched_shifts.append(j)
+
+                # if there are multiple matching shifts, find the first one that the trip mileage fits in to
+                # TODO should time also be considered?
+                if len(matched_shifts) > 1 and log_status == Trip.LOG_COMPLETE:
+                    for match in matched_shifts:
+                        test_shift = report_day.shifts[match]
+
+                        start_miles = Report.Mileage()
+                        start_miles.mergeStrings(str(test_shift.start_miles), i.start_miles)
+                        if start_miles < test_shift.start_miles or start_miles > test_shift.end_miles:
+                            start_miles.mergeStrings(str(test_shift.end_miles), i.start_miles)
+                            if start_miles < test_shift.start_miles or start_miles > test_shift.end_miles:
+                                continue
+
+                        end_miles = Report.Mileage()
+                        end_miles.mergeStrings(str(test_shift.start_miles), i.end_miles)
+                        if end_miles < test_shift.start_miles or end_miles > test_shift.end_miles:
+                            end_miles.mergeStrings(str(test_shift.end_miles), i.end_miles)
+                            if end_miles < test_shift.start_miles or end_miles > test_shift.end_miles:
+                                continue
+
+                        report_trip.shift = match
+                        break
+                elif len(matched_shifts) == 1:
+                    report_trip.shift = matched_shifts[0]
 
                 # find shift attempt 3: create a dummy shift (or skip the trip if the vehicle is logged)
                 if report_trip.shift == None:
@@ -724,6 +749,7 @@ class Report():
                         report_day.shifts.append(dummy_shift)
                         report_trip.shift = len(report_day.shifts)-1
 
+                # TODO could report_trip.shift be None here?
                 shift = report_day.shifts[report_trip.shift]
 
                 # skip incomplete trip (logged vehicles only)

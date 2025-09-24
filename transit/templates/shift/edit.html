@@ -22,6 +22,20 @@
                     <div>{{ form.date }}</div>
                 </fieldset>
             </div>
+            <div class="col border m-1 pt-1">
+                <fieldset class="form-group">
+                    <legend>{{ form.status.label }}</legend>
+                    <div class="mb-2">{{ form.status }}</div>
+                    <div id="cancel_date" class="collapse">
+                        <legend>{{ form.cancel_date.label }}</legend>
+                        <div class="mb-2">{{ form.cancel_date }}</div>
+                        <legend>{{ form.cancel_time.label }}
+                            <a href="#_" class="btn btn-sm btn-secondary ml-2" title="Get the current time" onclick="getCurrentTime('id_cancel_time')"><span class="oi oi-clock"></span></a>
+                        </legend>
+                        <div class="mb-2">{{ form.cancel_time }}</div>
+                    </div>
+                </fieldset>
+            </div>
         </div>
         <div class="row">
             <div class="col border m-1 pt-1">
@@ -57,9 +71,12 @@
 </form>
 
 <script type="text/javascript" src="{% static 'transit/js/validate.js' %}"></script>
+<script type="text/javascript" src="{% static 'transit/js/trip/edit.js' %}"></script>
 <script type="text/javascript">
     focusFromParam();
     setupDatePickerEvents("#id_date_year", "#id_date_month", "#id_date_day");
+    setCancelDateVisibility();
+    setupFormEvents();
 </script>
 {% endblock %}
 

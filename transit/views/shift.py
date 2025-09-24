@@ -92,6 +92,7 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             shift.end_time = form.cleaned_data['end_time']
             shift.fuel = form.cleaned_data['fuel']
             shift.note = form.cleaned_data['notes']
+            shift.status = form.cleaned_data['status']
 
             # shift date changed, which means sort indexes need to be updated
             if old_date != shift.date:
@@ -144,11 +145,41 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
                 if len(stale_pretrips) > 0:
                     stale_pretrips[0].delete()
 
+            trip.cancel_date = None
+            try:
+                if int(trip.status) == Trip.STATUS_CANCELED:
+                    trip.cancel_date = timezone.make_aware(datetime.datetime.combine(form.cleaned_data['cancel_date'], datetime.datetime.min.time()))
+            except:
+                pass
+
+            if trip.cancel_date:
+                try:
+                    cancel_time = datetime.datetime.strptime(form.cleaned_data['cancel_time'], '%I:%M %p')
+                    cancel_datetime = datetime.datetime.combine(trip.cancel_date, cancel_time.time())
+                    trip.cancel_date = timezone.make_aware(cancel_datetime)
+                except:
+                    pass
+
             if report_start and report_end:
                 return HttpResponseRedirect(reverse('report', kwargs={'start_year':report_start['year'], 'start_month':report_start['month'], 'start_day':report_start['day'], 'end_year':report_end['year'], 'end_month':report_end['month'], 'end_day':report_end['day']}))
             else:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':mode, 'year':shift.date.year, 'month':shift.date.month, 'day':shift.date.day}) + '#shift_' + str(shift.id))
     else:
+        cancel_date = shift.cancel_date
+        cancel_time = ''
+
+        if cancel_date == None:
+            cancel_date = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time())
+
+        if timezone.is_aware(cancel_date):
+            cancel_date = timezone.make_naive(cancel_date)
+            try:
+                cancel_time = cancel_date.strftime('%-I:%M %p')
+            except:
+                pass
+        else:
+            cancel_time = datetime.datetime.now().strftime('%-I:%M %p')
+
         initial = {
             'date': shift.date,
             'driver': shift.driver,
@@ -159,6 +190,9 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             'end_time': shift.end_time,
             'fuel': shift.fuel,
             'notes': shift.note,
+            'status': shift.status,
+            'cancel_date': cancel_date.date(),
+            'cancel_time': cancel_time,
         }
         form = EditShiftForm(initial=initial)
         if shift.driver:
@@ -204,7 +238,7 @@ def shiftStart(request, id):
     date = shift.date
 
     previous_shift = None
-    previous_shifts = Shift.objects.filter(vehicle=shift.vehicle).exclude(start_miles='').exclude(end_miles='')
+    previous_shifts = Shift.objects.filter(vehicle=shift.vehicle, status=Shift.STATUS_NORMAL).exclude(start_miles='').exclude(end_miles='')
     for i in previous_shifts:
         if previous_shift == None:
             previous_shift = i

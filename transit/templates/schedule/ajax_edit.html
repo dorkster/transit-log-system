@@ -31,7 +31,7 @@
     {% if shift.sort_index == 0 %}
     <tr class="RowMover_shifts mytable-sort mytable-sort-hidden" onclick="shift_mover.moveItem('')"><td colspan="10"></td></tr>
     {% endif %}
-    <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
+    <tr style="{{ shift.get_driver_style }}" data-rowid="{{ shift.id }}">
         <td class="mytable-col-arrows">
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="shift_mover.toggle(this, '{{ shift.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
@@ -42,6 +42,9 @@
                 </button>
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'shift-edit' 'edit' shift.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit shift</a>
+                    <div class="dropdown-divider"></div>
+                    {% if shift.status != Shift.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ shift.id }}', 'toggle_canceled_shift', '0')" class="dropdown-item"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
+                    {% if shift.status == Shift.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ shift.id }}', 'toggle_canceled_shift', '1')" class="dropdown-item"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'shift-delete' 'edit' shift.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete shift</a>
                 </div>

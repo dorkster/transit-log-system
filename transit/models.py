@@ -592,6 +592,14 @@ class Shift(models.Model):
     LOG_COMPLETE = 1
     LOG_INCOMPLETE = 2
 
+    STATUS_NORMAL = 0
+    STATUS_CANCELED = 1
+
+    STATUS_LEVELS = [
+        (STATUS_NORMAL, '---------'),
+        (STATUS_CANCELED, 'Canceled'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)
     date = models.DateField()
@@ -603,6 +611,8 @@ class Shift(models.Model):
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     fuel = models.CharField('Fuel (gallons)', max_length=FieldSizes.FUEL, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
+    status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_NORMAL)
+    cancel_date = models.DateTimeField(default=None, null=True)
 
     class Meta:
         ordering = ['-date', 'sort_index']
@@ -611,7 +621,17 @@ class Shift(models.Model):
         return '[' + str(self.date) + '] - ' + str(self.driver) + ' / ' + str(self.vehicle)
 
     def get_driver_color(self):
-        return Driver.get_color(self.driver)
+        site_settings = SiteSettings.load()
+        if self.status == Shift.STATUS_CANCELED:
+            return site_settings.get_color(SiteSettings.COLOR_CANCEL)
+        else:
+            return Driver.get_color(self.driver)
+
+    def get_driver_style(self):
+        output = "background: #" + self.get_driver_color() + ";"
+        if self.status == Shift.STATUS_CANCELED:
+            output += "text-decoration: line-through;"
+        return output
 
     def get_class_name(self):
         return 'Shift'
@@ -629,6 +649,9 @@ class Shift(models.Model):
 
     def check_posttrip(self):
         return (len(PreTrip.objects.filter(shift_id=self.id, inspect_type=PreTrip.TYPE_POST)) > 0)
+
+    def get_status_str(self):
+        return self.STATUS_LEVELS[self.status][1]
 
 
 class Client(models.Model):

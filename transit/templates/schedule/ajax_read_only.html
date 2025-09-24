@@ -23,7 +23,7 @@
         <td>Notes</td>
     </thead>
     {% for shift in shifts %}
-    <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
+    <tr style="{{ shift.get_driver_style }}" data-rowid="{{ shift.id }}">
         <td class="mytable-col-md">
             {% if shift.driver %}{{ shift.driver }}{% endif %}
         </td>

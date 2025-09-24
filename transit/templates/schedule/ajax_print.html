@@ -36,7 +36,7 @@
             <td>Notes</td>
         </thead>
         {% for shift in shifts %}
-        <tr style="background: #{{ shift.get_driver_color }};">
+        <tr style="{{ shift.get_driver_style }}">
             <td class="mytable-col-md">{{ shift.driver }}</td>
             <td class="mytable-col-md">{{ shift.vehicle }}</td>
             <td class="mytable-col-md text-center">

@@ -388,7 +388,7 @@ def tripCreateEditCommon(request, mode, trip, is_new, is_return_trip=False, repo
     driver_vehicle_pairs = {}
     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
     active_drivers = Driver.objects.filter(is_active=True)
-    todays_shifts = Shift.objects.filter(date=trip.date)
+    todays_shifts = Shift.objects.filter(date=trip.date, status=Shift.STATUS_NORMAL)
 
     for driver in active_drivers:
         if driver.is_logged:
@@ -482,7 +482,7 @@ def getStartAndPrevMiles(date, start_miles, prev_miles, vehicles, all_trips):
         if previous_shift != None:
             start_miles[str(vehicle)] = previous_shift.end_miles
 
-    day_shifts = Shift.objects.filter(date=date)
+    day_shifts = Shift.objects.filter(date=date, status=Shift.STATUS_NORMAL)
     for shift in day_shifts:
         if shift.start_miles != '':
             try:
@@ -561,7 +561,7 @@ def tripStart(request, id):
                         log_event(request, LoggedEventAction.LOG_START, LoggedEventModel.TRIP, str(a_trip))
 
             # check to see if a matching Shift exists. If not, create it
-            trip_shifts = Shift.objects.filter(date=trip.date, driver=trip.driver, vehicle=trip.vehicle)
+            trip_shifts = Shift.objects.filter(date=trip.date, driver=trip.driver, vehicle=trip.vehicle, status=Shift.STATUS_NORMAL)
             trip_shift = None
             shift_created = False
             if trip_shifts.exists():
@@ -624,7 +624,7 @@ def tripStart(request, id):
     driver_vehicle_pairs = {}
     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
     active_drivers = Driver.objects.filter(is_active=True)
-    todays_shifts = Shift.objects.filter(date=trip.date)
+    todays_shifts = Shift.objects.filter(date=trip.date, status=Shift.STATUS_NORMAL)
 
     for driver in active_drivers:
         if driver.is_logged:
@@ -805,7 +805,7 @@ def tripSimpleEdit(request, id):
     driver_vehicle_pairs = {}
     nonlogged_vehicles = Vehicle.objects.filter(is_logged=False)
     active_drivers = Driver.objects.filter(is_active=True)
-    todays_shifts = Shift.objects.filter(date=trip.date)
+    todays_shifts = Shift.objects.filter(date=trip.date, status=Shift.STATUS_NORMAL)
 
     for driver in active_drivers:
         if driver.is_logged:

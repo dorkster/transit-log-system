@@ -338,6 +338,19 @@ def ajaxScheduleCommon(request, template, has_filter=False):
             trip.save()
             log_model = LoggedEventModel.TRIP_ACTIVITY if trip.format == Trip.FORMAT_ACTIVITY else LoggedEventModel.TRIP
             log_event(request, LoggedEventAction.STATUS, log_model, 'Set Status -> ' + trip.get_status_str() + ' | ' + str(trip))
+        elif request_action == 'toggle_canceled_shift':
+            shift = get_object_or_404(Shift, id=request_id)
+            if request_data == '0':
+                shift.status = Shift.STATUS_NORMAL
+                shift.cancel_date = None
+            elif request_data == '1':
+                shift.status = Shift.STATUS_CANCELED
+                shift.cancel_date = timezone.now()
+            elif request_data == '2':
+                shift.status = Shift.STATUS_NO_SHOW
+                shift.cancel_date = None
+            shift.save()
+            log_event(request, LoggedEventAction.STATUS, LoggedEventModel.SHIFT, 'Set Status -> ' + shift.get_status_str() + ' | ' + str(shift))
         elif request_action == 'load_template':
             parent_template = Template.objects.get(id=uuid.UUID(request_data))
             template_trips = TemplateTrip.objects.filter(parent=parent_template).select_related('driver', 'vehicle', 'trip_type', 'volunteer')
@@ -555,7 +568,7 @@ def ajaxSchedulePrintDailyLog(request, year, month, day):
 
     day_date = datetime.date(year, month, day)
 
-    shifts = Shift.objects.filter(date=day_date)
+    shifts = Shift.objects.filter(date=day_date, status=Shift.STATUS_NORMAL)
     shifts = shifts.exclude(start_miles='')
     shifts = shifts.exclude(end_miles='')
     report = Report()

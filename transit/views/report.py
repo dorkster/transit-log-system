@@ -529,7 +529,7 @@ class Report():
             client_dict[i.name] = i
 
         # store our database lookups
-        all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one).order_by('-date')
+        all_shifts = Shift.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, status=Shift.STATUS_NORMAL)
         all_shifts = all_shifts.select_related('driver').select_related('vehicle')
 
         all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, format=Trip.FORMAT_NORMAL)

@@ -69,7 +69,7 @@ def globals(request):
                 vehicle_inspections.append(v)
 
         if v.oil_change_miles != '':
-            latest_shift = Shift.objects.filter(vehicle=v.id).order_by('date').exclude(end_miles='').last()
+            latest_shift = Shift.objects.filter(vehicle=v.id, status=Shift.STATUS_NORMAL).order_by('date').exclude(end_miles='').last()
             if latest_shift is not None and latest_shift.end_miles != '':
                 # NOTE considering that a bug with the string formatting can wreck the site here, we check exceptions
                 # TODO validate string before passing to float()?

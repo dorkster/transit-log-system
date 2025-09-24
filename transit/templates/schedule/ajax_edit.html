@@ -33,7 +33,7 @@
     {% endif %}
     <tr style="{{ shift.get_driver_style }}" data-rowid="{{ shift.id }}">
         <td class="mytable-col-arrows">
-            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="shift_mover.toggle(this, '{{ shift.id }}')"><span class="oi oi-resize-height"></span></button>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="rowMoverToggleShift(this, '{{ shift.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -171,7 +171,7 @@
     {% endif %}
     <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{ trip.id }}">
         <td class="mytable-col-arrows">
-            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="trip_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="rowMoverToggleTrip(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
@@ -581,6 +581,16 @@
     var trip_mover = new RowMover("RowMover_trips", ajax_loader);
     row_movers.push(trip_mover);
     {% endif %}
+
+    function rowMoverToggleShift(src, id) {
+        trip_mover.clear();
+        shift_mover.toggle(src, id);
+    };
+
+    function rowMoverToggleTrip(src, id) {
+        shift_mover.clear();
+        trip_mover.toggle(src, id);
+    };
 
     setEditButtonStyleFromHash('#shift_', window.location.hash);
     setEditButtonStyleFromHash('#trip_', window.location.hash);

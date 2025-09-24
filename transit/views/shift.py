@@ -53,6 +53,13 @@ def shiftEditFromReport(request, start_year, start_month, start_day, end_year, e
 
 @permission_required(['transit.change_shift'])
 def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, report_end=None):
+    if is_new == True:
+        query = Shift.objects.filter(date=shift.date).order_by('-sort_index')
+        if query.count() > 0:
+            shift.sort_index = query[0].sort_index + 1
+        else:
+            shift.sort_index = 0
+
     if request.method == 'POST':
         form = EditShiftForm(request.POST)
 
@@ -74,6 +81,8 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
                 'vehicle': shift.vehicle
             }
 
+            old_date = shift.date
+
             shift.date = form.cleaned_data['date']
             shift.driver = form.cleaned_data['driver']
             shift.vehicle = form.cleaned_data['vehicle']
@@ -83,6 +92,22 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
             shift.end_time = form.cleaned_data['end_time']
             shift.fuel = form.cleaned_data['fuel']
             shift.note = form.cleaned_data['notes']
+
+            # shift date changed, which means sort indexes need to be updated
+            if old_date != shift.date:
+                # decrease sort indexes on the old date to fill in the gap
+                if not is_new:
+                    shifts_below = Shift.objects.filter(date=old_date, sort_index__gt=shift.sort_index)
+                    for i in shifts_below:
+                        i.sort_index -= 1
+                        i.save()
+                # set the sort index on the new day
+                query = Shift.objects.filter(date=shift.date).order_by('-sort_index')
+                if query.count() > 0:
+                    shift.sort_index = query[0].sort_index + 1
+                else:
+                    shift.sort_index = 0
+
             shift.save()
 
             if is_new:
@@ -155,6 +180,12 @@ def shiftDelete(request, mode, id):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('shift-edit', kwargs={'mode':mode, 'id':id}))
+
+        query = Shift.objects.filter(date=shift.date)
+        for i in query:
+            if i.sort_index > shift.sort_index:
+                i.sort_index -= 1;
+                i.save()
 
         log_event(request, LoggedEventAction.DELETE, LoggedEventModel.SHIFT, str(shift))
 

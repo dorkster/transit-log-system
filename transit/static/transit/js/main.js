@@ -135,11 +135,12 @@ function setParam(param, value) {
     window.open(url, "_self");
 }
 
-function RowMover(row_class, ajax_ldr) {
+function RowMover(row_class, ajax_ldr, ajax_fn = "mv") {
     this.item = "";
     this.row_class = row_class;
     this.button = null;
     this.ajax_loader = ajax_ldr;
+    this.ajax_fn = ajax_fn;
 
     var self = this;
 
@@ -187,7 +188,7 @@ function RowMover(row_class, ajax_ldr) {
         if (self.item != "") {
             var original_item = self.item;
             self.clear();
-            self.ajax_loader.run(original_item, "mv", target);
+            self.ajax_loader.run(original_item, self.ajax_fn, target);
         }
     };
 

@@ -17,6 +17,7 @@
 <table class="mytable">
     <thead>
         <td></td>
+        <td></td>
         <td>Driver</td>
         <td>Vehicle</td>
         <td>Start Miles</td>
@@ -27,7 +28,13 @@
         <td>Notes</td>
     </thead>
     {% for shift in shifts %}
+    {% if shift.sort_index == 0 %}
+    <tr class="RowMover_shifts mytable-sort mytable-sort-hidden" onclick="shift_mover.moveItem('')"><td colspan="10"></td></tr>
+    {% endif %}
     <tr style="background: #{{ shift.get_driver_color }};" data-rowid="{{ shift.id }}">
+        <td class="mytable-col-arrows">
+            <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="shift_mover.toggle(this, '{{ shift.id }}')"><span class="oi oi-resize-height"></span></button>
+        </td>
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
                 <button id="shift_{{ shift.id }}" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -81,6 +88,7 @@
             {{ shift.note }}
         </td>
     </tr>
+    <tr class="RowMover_shifts mytable-sort mytable-sort-hidden" onclick="shift_mover.moveItem('{{ shift.id }}')"><td colspan="10"></td></tr>
     {% endfor %}
 </table>
 {% else %}
@@ -562,6 +570,10 @@
 </table>
 <script type="text/javascript">
     var row_movers = [];
+    {% if shifts %}
+    var shift_mover = new RowMover("RowMover_shifts", ajax_loader, "mv_shift");
+    row_movers.push(shift_mover);
+    {% endif %}
     {% if trips %}
     var trip_mover = new RowMover("RowMover_trips", ajax_loader);
     row_movers.push(trip_mover);

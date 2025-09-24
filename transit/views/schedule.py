@@ -280,6 +280,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     if request.user.has_perm('transit.change_trip'):
         if request_action == 'mv':
             move_item_in_queryset(request_id, request_data, Trip.objects.filter(date=date))
+        elif request_action == 'mv_shift':
+            move_item_in_queryset(request_id, request_data, Shift.objects.filter(date=date))
         elif request_action == 'set_driver':
             trip = get_object_or_404(Trip, id=request_id)
             prev_driver = trip.driver

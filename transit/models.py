@@ -593,6 +593,7 @@ class Shift(models.Model):
     LOG_INCOMPLETE = 2
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sort_index = models.IntegerField(default=0, editable=False)
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True)
@@ -602,6 +603,9 @@ class Shift(models.Model):
     end_time = models.CharField(max_length=FieldSizes.TIME, blank=True)
     fuel = models.CharField('Fuel (gallons)', max_length=FieldSizes.FUEL, blank=True)
     note = models.TextField(max_length=FieldSizes.LG, blank=True)
+
+    class Meta:
+        ordering = ['-date', 'sort_index']
 
     def __str__(self):
         return '[' + str(self.date) + '] - ' + str(self.driver) + ' / ' + str(self.vehicle)

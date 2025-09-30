@@ -858,7 +858,7 @@ class Report():
 
                 report_day.trips.append(report_trip)
 
-                if i.trip_type.is_trip_counted:
+                if i.trip_type and i.trip_type.is_trip_counted:
                     self.weekday_totals[day_date.weekday()].addTrips(1, i.passenger)
 
                 if log_status == Trip.LOG_COMPLETE:

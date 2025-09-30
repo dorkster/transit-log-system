@@ -493,6 +493,10 @@ class Report():
         self.perf_database = 0
         self.perf_processing = 0
 
+        self.weekday_totals = []
+        for i in range(0, 7):
+            self.weekday_totals.append(Report.TripCount())
+
     def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
         if date_start != date_end:
             daily_log_shift = None
@@ -853,6 +857,9 @@ class Report():
                 report_trip.other_employment = i.check_tag('Employment')
 
                 report_day.trips.append(report_trip)
+
+                if i.trip_type.is_trip_counted:
+                    self.weekday_totals[day_date.weekday()].addTrips(1, i.passenger)
 
                 if log_status == Trip.LOG_COMPLETE:
                     if shift.start_trip == None or report_trip.start_miles < report_day.trips[shift.start_trip].start_miles:

@@ -233,6 +233,31 @@
         </tr>
         {% endif %}
     </table>
+    <hr/>
+    <div class="row">
+        <div class="col">
+            <h3>Trips per Weekday</h3>
+        </div>
+        <div class="col-auto">
+            <a href="#" title="Back to top" class="small text-muted"><span class="oi oi-caret-top mr-1"></span>Back to top</a>
+        </div>
+    </div>
+    <table class="mytable mytable-striped">
+        <thead>
+            <td class="mytable-col-md">Monday</td>
+            <td class="mytable-col-md">Tuesday</td>
+            <td class="mytable-col-md">Wednesday</td>
+            <td class="mytable-col-md">Thursday</td>
+            <td class="mytable-col-md">Friday</td>
+            <td class="mytable-col-md">Saturday</td>
+            <td class="mytable-col-md">Sunday</td>
+        </thead>
+        <tr>
+            {% for weekday_total in report.weekday_totals %}
+            <td class="mytable-col-md text-center {% if weekday_total.total == 0 %}mytable-zero{%endif%}">{{ weekday_total.total }}</td>
+            {% endfor %}
+        </tr>
+    </table>
 </div>
 {% for v in report.vehicle_reports %}
 <div id="report_vehicle_{{v.vehicle.id}}">

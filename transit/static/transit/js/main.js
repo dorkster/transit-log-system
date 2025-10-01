@@ -285,7 +285,11 @@ function setSearchModal(form_id, modal_id, search_id, search_text, search_func) 
         search_func(search_id);
     });
     $(modal_id).on('show.bs.modal', function(){
-        $(search_id).val(search_text);
+        // search_text will be HTML-escaped, so create a dummy element to get the text as it would be displayed.
+        var txt = document.createElement("textarea");
+        txt.innerHTML = search_text;
+        delete txt;
+        $(search_id).val(txt.value);
     });
 
     if (modal_id == "#modal_filter_search") {

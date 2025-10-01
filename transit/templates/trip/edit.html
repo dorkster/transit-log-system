@@ -175,6 +175,14 @@
         <a id="add_dest2_btn" class="btn btn-outline-dark disabled mt-1 mb-1" href="#_" onclick="toggleAddDestination(this, 1)"><span class="oi oi-circle-x mr-2"></span>Add Destination Address to Destinations</a>
         <hr/>
         {% endif %}
+        <div id="warning_elderly" class="alert alert-warning collapse">
+            <span class="oi oi-warning mr-2"></span>Client elderly status is unknown.<br/>
+            <a href="#id_elderly" class="alert-link">Please provide this information if possible.</a>
+        </div>
+        <div id="warning_ambulatory" class="alert alert-warning collapse">
+            <span class="oi oi-warning mr-2"></span>Client ambulatory status is unknown.<br/>
+            <a href="#id_ambulatory" class="alert-link">Please provide this information if possible.</a>
+        </div>
         <div class="d-flex flex-wrap mt-2">
             <div class="mr-auto mb-3">
                 <button class="btn btn-success btn-lg m-2" type="submit" name="save"><span class="oi oi-check mr-2"></span>Save Changes</button>

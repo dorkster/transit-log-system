@@ -18,6 +18,11 @@ function setupFormEventsTrip() {
     $("#id_driver").on("change", onDriverChange);
     $("#id_trip_type").on("change", onTripTypeChange);
     $("#id_volunteer").on("change", onVolunteerChange);
+    $("#id_elderly").on("change", onElderlyChange);
+    $("#id_ambulatory").on("change", onAmbulatoryChange);
+
+    onElderlyChange();
+    onAmbulatoryChange();
 }
 
 function onNameChanged() {
@@ -90,6 +95,9 @@ function onNameChanged() {
             add_client_btn.classList.remove("disabled");
         }
     }
+
+    onElderlyChange();
+    onAmbulatoryChange();
 }
 
 function getClientPhone(target) {
@@ -365,5 +373,23 @@ function onVolunteerChange() {
 function focusVolunteer() {
     $("#id_volunteer").focus();
     $("#id_volunteer")[0].scrollIntoView({behavior: "smooth", block: "center"});
+}
+
+function onElderlyChange() {
+    if ($("#id_elderly").val() == "unknown") {
+        $("#warning_elderly").collapse('show');
+    }
+    else {
+        $("#warning_elderly").collapse('hide');
+    }
+}
+
+function onAmbulatoryChange() {
+    if ($("#id_ambulatory").val() == "unknown") {
+        $("#warning_ambulatory").collapse('show');
+    }
+    else {
+        $("#warning_ambulatory").collapse('hide');
+    }
 }
 

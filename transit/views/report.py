@@ -2314,6 +2314,51 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
 
                 break
 
+    #####
+    #### Trips per Weekday
+    #####
+    ws = wb.create_sheet('Trips per Weekday')
+
+    row_header = 1
+    row_data = row_header + 1
+    row_total = row_data
+
+    ws.cell(row_header, 1, 'Monday')
+    ws.cell(row_header, 2, 'Tuesday')
+    ws.cell(row_header, 3, 'Wednesday')
+    ws.cell(row_header, 4, 'Thursday')
+    ws.cell(row_header, 5, 'Friday')
+    ws.cell(row_header, 6, 'Saturday')
+    ws.cell(row_header, 7, 'Sunday')
+
+    ws.row_dimensions[row_header].height = style_rowheight_header
+
+    data_index = 0
+
+    for i in range(0, row_data_max):
+        row = i + 1
+
+        if row == row_header:
+            # apply styles
+            for col in range(1, 8):
+                ws.column_dimensions[get_column_letter(col)].width = style_colwidth_normal
+                ws.cell(row, col).border = style_border_normal
+                ws.cell(row, col).font = style_font_header
+                ws.cell(row, col).alignment = style_alignment_header
+                ws.cell(row, col).fill = style_fill_header
+        else:
+            row_total = row
+
+            if row == row_total:
+                for col in range(1, 8):
+                    ws.cell(row, col, report.weekday_totals[col-1].total)
+
+                    # apply styles
+                    ws.cell(row, col).border = style_border_normal
+                    ws.cell(row, col).font = style_font_normal
+
+                break
+
     wb.save(filename=temp_file.name)
 
     return FileResponse(open(temp_file.name, 'rb'), filename='Transit_Report_' + date_start.strftime('%Y-%m-%d') + '_to_' + date_end.strftime('%Y-%m-%d') + '.xlsx', as_attachment=True)

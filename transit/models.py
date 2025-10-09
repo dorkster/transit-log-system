@@ -655,6 +655,14 @@ class Shift(models.Model):
 
 
 class Client(models.Model):
+    USAGE_STYLE_REGULAR = 0
+    USAGE_STYLE_FIELD_TRIP = 1
+
+    USAGE_STYLES = [
+        (USAGE_STYLE_REGULAR, 'Regular'),
+        (USAGE_STYLE_FIELD_TRIP, 'Field Trips'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=FieldSizes.MD)
     address = models.CharField(max_length=FieldSizes.MD, blank=True)
@@ -669,6 +677,7 @@ class Client(models.Model):
     is_transit_policy_acknowledged = models.BooleanField(default=False)
     reminder_instructions = models.CharField(max_length=FieldSizes.LG, blank=True)
     trip_creation_notes = models.CharField(max_length=FieldSizes.LG, blank=True)
+    usage_style = models.IntegerField(choices=USAGE_STYLES, default=USAGE_STYLE_REGULAR)
 
     class Meta:
         ordering = ['name']
@@ -696,6 +705,11 @@ class Client(models.Model):
             else:
                 tag_list.append((tag_str, 'badge-info'))
         return tag_list
+
+    def get_usage_style_str(self):
+        if self.usage_style < len(Client.USAGE_STYLES):
+            return Client.USAGE_STYLES[self.usage_style][1]
+        return ''
 
 class ClientPayment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

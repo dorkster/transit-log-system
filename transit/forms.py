@@ -238,6 +238,7 @@ class EditClientForm(forms.Form):
     is_transit_policy_acknowledged = forms.BooleanField(label='Transit Policy Acknowledged?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     reminder_instructions = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
     trip_creation_notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes))
+    usage_style = forms.ChoiceField(required=False, choices=Client.USAGE_STYLES, widget=forms.Select(attrs=formWidgetAttrs.default))
     update_trips = forms.ChoiceField(choices=UPDATE_TRIP_OPTIONS, label='Update existing trips?', help_text='If "Yes" is selected, this will perform a search-and-replace on this client\'s trips.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
     update_trips_date = forms.DateField(widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     update_templates = forms.ChoiceField(choices=UPDATE_TEMPLATE_OPTIONS, label='Update existing templates?', help_text='If "Yes" is selected, this will perform a search-and-replace on templates with this client.', required=False, widget=forms.Select(attrs=formWidgetAttrs.default))

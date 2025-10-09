@@ -145,18 +145,18 @@ def shiftCreateEditCommon(request, mode, shift, is_new, report_start=None, repor
                 if len(stale_pretrips) > 0:
                     stale_pretrips[0].delete()
 
-            trip.cancel_date = None
+            shift.cancel_date = None
             try:
-                if int(trip.status) == Trip.STATUS_CANCELED:
-                    trip.cancel_date = timezone.make_aware(datetime.datetime.combine(form.cleaned_data['cancel_date'], datetime.datetime.min.time()))
+                if int(shift.status) == Shift.STATUS_CANCELED:
+                    shift.cancel_date = timezone.make_aware(datetime.datetime.combine(form.cleaned_data['cancel_date'], datetime.datetime.min.time()))
             except:
                 pass
 
-            if trip.cancel_date:
+            if shift.cancel_date:
                 try:
                     cancel_time = datetime.datetime.strptime(form.cleaned_data['cancel_time'], '%I:%M %p')
-                    cancel_datetime = datetime.datetime.combine(trip.cancel_date, cancel_time.time())
-                    trip.cancel_date = timezone.make_aware(cancel_datetime)
+                    cancel_datetime = datetime.datetime.combine(shift.cancel_date, cancel_time.time())
+                    shift.cancel_date = timezone.make_aware(cancel_datetime)
                 except:
                     pass
 

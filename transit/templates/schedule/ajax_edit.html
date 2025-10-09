@@ -583,12 +583,12 @@
     {% endif %}
 
     function rowMoverToggleShift(src, id) {
-        trip_mover.clear();
+        {% if trips %}trip_mover.clear();{% endif %}
         shift_mover.toggle(src, id);
     };
 
     function rowMoverToggleTrip(src, id) {
-        shift_mover.clear();
+        {% if shifts %}shift_mover.clear();{% endif %}
         trip_mover.toggle(src, id);
     };
 

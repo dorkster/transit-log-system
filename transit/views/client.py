@@ -909,7 +909,7 @@ def clientXLSX(request):
         ws.cell(row, 8, client.tags)
         ws.cell(row, 9, client.is_active)
         ws.cell(row, 10, client.is_transit_policy_acknowledged)
-        ws.cell(row, 11, client.get_usage_style_str)
+        ws.cell(row, 11, client.get_usage_style_str())
         ws.cell(row, 12, client.reminder_instructions)
         ws.cell(row, 13, client.trip_creation_notes)
 

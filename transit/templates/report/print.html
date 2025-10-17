@@ -24,6 +24,26 @@
     </div>
 </div>
 <div>
+{% if is_filtered %}
+<div class="alert alert-warning">
+    {% if clients_filtered %}
+    <h4><strong>This report is currently filtered</strong></h4>
+    {% if selected_clients|length == 0 %}
+    <p><strong>No clients</strong> matched the filter. Client filter settings will be ignored.</p>
+    {% else %}
+    <p><strong>{{ selected_clients|length }}</strong> client(s) matched the filter.</p>
+    {% endif %}
+    {% endif %}
+    {% if selected_driver %}
+    <p>Only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
+    {% if not selected_driver.is_logged %}
+    <p>The selected driver has been flagged to not be included in general reports.<br/>
+    Since they have been explicitly selected, that setting is ignored here.</p>
+    {% endif %}
+    {% endif %}
+    <p class="mb-0">To view the unfiltered report, <a class="alert-link" href="{% url 'report-print' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">click here</a>.</p>
+</div>
+{% endif %}
 {% if report.report_errors.errors %}
 <div id="report_errors">
     <hr/>

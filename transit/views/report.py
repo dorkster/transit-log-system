@@ -20,10 +20,11 @@ from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.db.models import Q
 from time import perf_counter
 
 from transit.models import Driver, Vehicle, Trip, Shift, TripType, Client, ClientPayment, Tag, Destination
-from transit.forms import DatePickerForm, DateRangePickerForm
+from transit.forms import DatePickerForm, DateRangePickerForm, ReportFilterForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -497,7 +498,7 @@ class Report():
         for i in range(0, 7):
             self.weekday_totals.append(Report.TripCount())
 
-    def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_name=None, filter_by_money=False):
+    def load(self, date_start, date_end, daily_log_shift=None, driver_id=None, client_names=[], filter_by_money=False):
         if date_start != date_end:
             daily_log_shift = None
 
@@ -525,8 +526,13 @@ class Report():
             destination_dict[i.address] = i
 
         all_clients = Client.objects.all()
-        if client_name != None:
-            all_clients = all_clients.filter(name=client_name)
+        client_query = Q()
+        client_payment_query = Q()
+        for client_name in client_names:
+            client_query |= Q(name=client_name)
+            client_payment_query |= Q(parent__name=client_name)
+
+        all_clients = all_clients.filter(client_query)
 
         client_dict = {}
         for i in all_clients:
@@ -539,14 +545,14 @@ class Report():
         all_trips = Trip.objects.filter(date__gte=date_start, date__lt=date_end_plus_one, format=Trip.FORMAT_NORMAL)
         if filter_by_money:
             all_trips = all_trips.exclude(fare=0, collected_cash=0, collected_check=0)
-        if client_name != None:
-            all_trips = all_trips.filter(name=client_name)
+        if len(client_names) > 0:
+            all_trips = all_trips.filter(client_query)
         all_trips = all_trips.select_related('driver').select_related('vehicle').select_related('trip_type')
 
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
-        if client_name != None:
-            all_client_payments = all_client_payments.filter(parent__name=client_name)
+        if len(client_names) > 0:
+            all_client_payments = all_client_payments.filter(client_payment_query)
         self.perf_database = perf_counter() - perf_start
 
         perf_start = perf_counter()
@@ -904,9 +910,6 @@ class Report():
 
             # handle payments from Clients that didn't ride (so far)
             for i in all_dates_dict[day_date][2]:
-                # if client_name and i.parent.name != client_name:
-                #     continue
-
                 report_day.paid_cash += Report.Money(i.money_cash)
                 report_day.paid_check += Report.Money(i.money_check)
 
@@ -1143,25 +1146,60 @@ class Report():
         return Report.ReportDay.query_drivers.index(driver)
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
+def reportFilter(request):
+    try:
+        client_name = request.GET.get('client_name')
+    except:
+        client_name = ''
+
+    try:
+        client_usage_style = int(request.GET.get('client_usage_style'))
+    except:
+        client_usage_style = 0
+
+    try:
+        driver_id = uuid.UUID(request.GET.get('driver'))
+    except:
+        driver_id = None
+
+    clients = Client.objects.all()
+    clients_filtered = False
+
+    if client_name:
+        clients_filtered = True
+        clients = clients.filter(name__icontains=client_name)
+
+    if client_usage_style > 0:
+        clients_filtered = True
+        clients = clients.filter(usage_style=client_usage_style-1)
+
+    client_names = []
+    if clients_filtered:
+        for client in clients:
+            client_names.append(client.name)
+
+    return (client_names, driver_id, clients_filtered)
+
+@permission_required(['transit.view_trip', 'transit.view_shift'])
 def report(request, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
     show_daily_data = request.session.get('report_show_daily_data', False)
     request.session['report_show_daily_data'] = show_daily_data
 
+    filter_results = reportFilter(request)
+    client_names = filter_results[0]
+    driver_id = filter_results[1]
+    clients_filtered = filter_results[2]
+
     if date_start > date_end:
         swap_date = date_start
         date_start = date_end
         date_end = swap_date
+
+    report_filter = ReportFilterForm(request.GET)
+    url_query_string = request.GET.urlencode()
 
     if request.method == 'POST':
         date_picker = DatePickerForm(request.POST)
@@ -1171,23 +1209,14 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
             if date_range_picker.is_valid():
                 new_start = date_range_picker.cleaned_data['date_start']
                 new_end = date_range_picker.cleaned_data['date_end']
-                if driver_id == None:
-                    return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
-                else:
-                    return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}))
+                return HttpResponseRedirect(reverse('report', kwargs={'start_year':new_start.year, 'start_month':new_start.month, 'start_day':new_start.day, 'end_year':new_end.year, 'end_month':new_end.month, 'end_day':new_end.day}) + '?' + request.GET.urlencode())
         elif 'show_daily_data' in request.POST:
             show_daily_data = request.session['report_show_daily_data'] = not request.session['report_show_daily_data']
-            if driver_id == None:
-                return HttpResponseRedirect(reverse('report', kwargs={'start_year':start_year, 'start_month':start_month, 'start_day':start_day, 'end_year':end_year, 'end_month':end_month, 'end_day':end_day}))
-            else:
-                return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':start_year, 'start_month':start_month, 'start_day':start_day, 'end_year':end_year, 'end_month':end_month, 'end_day':end_day}))
+            return HttpResponseRedirect(reverse('report', kwargs={'start_year':start_year, 'start_month':start_month, 'start_day':start_day, 'end_year':end_year, 'end_month':end_month, 'end_day':end_day}) + '?' + request.GET.urlencode())
         else:
             if date_picker.is_valid():
                 date_picker_date = date_picker.cleaned_data['date']
-                if driver_id == None:
-                    return HttpResponseRedirect(reverse('report-month', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}))
-                else:
-                    return HttpResponseRedirect(reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year':date_picker_date.year, 'month':date_picker_date.month}))
+                return HttpResponseRedirect(reverse('report-month', kwargs={'year':date_picker_date.year, 'month':date_picker_date.month}) + '?' + request.GET.urlencode())
     else:
         date_picker = DatePickerForm(initial={'date':date_start})
         date_range_picker = DateRangePickerForm(initial={'date_start':date_start, 'date_end':date_end})
@@ -1197,22 +1226,13 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
     month_next = date_end + datetime.timedelta(days=1)
 
     report = Report()
-    report.load(date_start, date_end, driver_id=driver_id)
+    report.load(date_start, date_end, driver_id=driver_id, client_names=client_names)
 
-    if driver_id == None:
-        url_month_prev = reverse('report-month', kwargs={'year': month_prev.year, 'month': month_prev.month})
-        url_month_next = reverse('report-month', kwargs={'year': month_next.year, 'month': month_next.month})
-        url_this_month = reverse('report-this-month')
-        url_print = reverse('report-print', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
-        url_xlsx = reverse('report-xlsx', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
-    else:
-        url_month_prev = reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year': month_prev.year, 'month': month_prev.month})
-        url_month_next = reverse('report-month-driver', kwargs={'driver_id': driver_id, 'year': month_next.year, 'month': month_next.month})
-        url_this_month = reverse('report-this-month-driver', kwargs={'driver_id': driver_id})
-        url_print = reverse('report-print-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
-        url_xlsx = reverse('report-xlsx-driver', kwargs={'driver_id': driver_id, 'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
-
-    # we don't care about the driver for the mileage summary
+    url_month_prev = reverse('report-month', kwargs={'year': month_prev.year, 'month': month_prev.month}) + '?' + request.GET.urlencode()
+    url_month_next = reverse('report-month', kwargs={'year': month_next.year, 'month': month_next.month}) + '?' + request.GET.urlencode()
+    url_this_month = reverse('report-this-month') + '?' + url_query_string
+    url_print = reverse('report-print', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day}) + '?' + request.GET.urlencode()
+    url_xlsx = reverse('report-xlsx', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day}) + '?' + request.GET.urlencode()
     url_print_mile_summary = reverse('report-print-mileage-summary', kwargs={'start_year': date_start.year, 'start_month': date_start.month, 'start_day': date_start.day, 'end_year': date_end.year, 'end_month': date_end.month, 'end_day': date_end.day})
 
     selected_driver = None
@@ -1225,6 +1245,7 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'report': report,
         'date_picker': date_picker,
         'date_range_picker': date_range_picker,
+        'report_filter': report_filter,
         'url_month_prev': url_month_prev,
         'url_month_next': url_month_next,
         'url_this_month': url_this_month,
@@ -1232,11 +1253,14 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
         'url_print_mile_summary': url_print_mile_summary,
         'url_xlsx': url_xlsx,
         'selected_driver': selected_driver,
+        'selected_clients': client_names,
         'show_daily_data': show_daily_data,
         'is_short_report': len(report.report_all) <= 31,
         'vehicle_table_colspan': 13 + (3 * len(Report.ReportSummary.query_triptypes)),
         'drivers': Driver.objects.filter(is_active=True),
         'vehicles': Vehicle.objects.all(),
+        'is_filtered': clients_filtered or selected_driver,
+        'clients_filtered': clients_filtered,
     }
     return render(request, 'report/view.html', context)
 
@@ -1244,19 +1268,16 @@ def reportBase(request, driver_id, start_year, start_month, start_day, end_year,
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportPrint(request, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportPrintBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportPrintDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportPrintBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
     show_daily_data = request.session.get('report_show_daily_data', False)
     request.session['report_show_daily_data'] = show_daily_data
+
+    filter_results = reportFilter(request)
+    client_names = filter_results[0]
+    driver_id = filter_results[1]
+    clients_filtered = filter_results[2]
 
     if date_start > date_end:
         swap_date = date_start
@@ -1264,7 +1285,11 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         date_end = swap_date
 
     report = Report()
-    report.load(date_start, date_end, driver_id=driver_id)
+    report.load(date_start, date_end, driver_id=driver_id, client_names=client_names)
+
+    selected_driver = None
+    if driver_id != None:
+        selected_driver = Driver.objects.get(id=driver_id)
 
     context = {
         'date_start': date_start,
@@ -1274,6 +1299,10 @@ def reportPrintBase(request, driver_id, start_year, start_month, start_day, end_
         'is_short_report': len(report.report_all) <= 31,
         'vehicle_table_colspan': 13 + (3 * len(Report.ReportSummary.query_triptypes)),
         'vehicles': Vehicle.objects.all(),
+        'selected_driver': selected_driver,
+        'selected_clients': client_names,
+        'is_filtered': clients_filtered or selected_driver,
+        'clients_filtered': clients_filtered,
     }
     return render(request, 'report/print.html', context)
 
@@ -1301,14 +1330,6 @@ def reportPrintMileageSummary(request, start_year, start_month, start_day, end_y
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportMonth(request, year, month):
-    return reportMonthBase(request, None, year, month)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportMonthDriver(request, driver_id, year, month):
-    return reportMonthBase(request, driver_id, year, month)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportMonthBase(request, driver_id, year, month):
     date_start = datetime.date(year, month, 1)
     date_end = date_start
     if date_end.month == 12:
@@ -1316,74 +1337,34 @@ def reportMonthBase(request, driver_id, year, month):
     else:
         date_end = datetime.date(year, month+1, 1) + datetime.timedelta(days=-1)
 
-    if driver_id:
-        return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
-    else:
-        return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+    return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}) + '?' + request.GET.urlencode())
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportYear(request, year):
-    return reportYearBase(request, None, year)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportYearBase(request, driver_id, year):
     date_start = datetime.date(year, 1, 1)
     date_end = datetime.date(year+1, 1, 1) + datetime.timedelta(days=-1)
 
-    if driver_id:
-        return HttpResponseRedirect(reverse('report-driver', kwargs={'driver_id': driver_id, 'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
-    else:
-        return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}))
+    return HttpResponseRedirect(reverse('report', kwargs={'start_year':date_start.year, 'start_month':date_start.month, 'start_day':date_start.day, 'end_year':date_end.year, 'end_month':date_end.month, 'end_day':date_end.day}) + '?' + request.GET.urlencode())
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportThisMonth(request):
-    return reportThisMonthBase(request, None)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportThisMonthDriver(request, driver_id):
-    return reportThisMonthBase(request, driver_id)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportThisMonthBase(request, driver_id):
     date = datetime.datetime.now().date()
-    if driver_id:
-        return reportMonthDriver(request, driver_id, date.year, date.month)
-    else:
-        return reportMonth(request, date.year, date.month)
+    return reportMonth(request, date.year, date.month)
 
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportLastMonth(request):
-    return reportLastMonthBase(request, None)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportLastMonthDriver(request, driver_id):
-    return reportLastMonthBase(request, driver_id)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportLastMonthBase(request, driver_id):
     date = (datetime.datetime.now().date()).replace(day=1) # first day of this month 
     date = date + datetime.timedelta(days=-1) # last day of the previous month
-    if driver_id:
-        return reportMonthDriver(request, driver_id, date.year, date.month)
-    else:
-        return reportMonth(request, date.year, date.month)
+    return reportMonth(request, date.year, date.month)
 
 
 
 @permission_required(['transit.view_trip', 'transit.view_shift'])
 def reportXLSX(request, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportXLSXBase(request, None, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportXLSXDriver(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
-    return reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day)
-
-@permission_required(['transit.view_trip', 'transit.view_shift'])
-def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_year, end_month, end_day):
     date_start = datetime.date(start_year, start_month, start_day)
     date_end = datetime.date(end_year, end_month, end_day)
 
@@ -1395,8 +1376,12 @@ def reportXLSXBase(request, driver_id, start_year, start_month, start_day, end_y
     trip_types = TripType.objects.filter(is_trip_counted=True)
     tags = Tag.objects.all()
 
+    filter_results = reportFilter(request)
+    client_names = filter_results[0]
+    driver_id = filter_results[1]
+
     report = Report()
-    report.load(date_start, date_end, driver_id=driver_id)
+    report.load(date_start, date_end, driver_id=driver_id, client_names=client_names)
 
     temp_file = tempfile.NamedTemporaryFile()
 

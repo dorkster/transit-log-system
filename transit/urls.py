@@ -164,13 +164,6 @@ urlpatterns = [
     path('report/print/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportPrint, name='report-print'),
     path('report/print-mileage-summary/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportPrintMileageSummary, name='report-print-mileage-summary'),
 
-    path('report/by-driver/<uuid:driver_id>/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportDriver, name='report-driver'),
-    path('report/by-driver/<uuid:driver_id>/<int:year>/<int:month>', views.reportMonthDriver, name='report-month-driver'),
-    path('report/by-driver/<uuid:driver_id>/this-month', views.reportThisMonthDriver, name='report-this-month-driver'),
-    path('report/by-driver/<uuid:driver_id>/last-month', views.reportLastMonthDriver, name='report-last-month-driver'),
-    path('report/by-driver/<uuid:driver_id>/xlsx/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportXLSXDriver, name='report-xlsx-driver'),
-    path('report/by-driver/<uuid:driver_id>/print/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>', views.reportPrintDriver, name='report-print-driver'),
-
     path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-trip/<uuid:id>', views.tripEditFromReport, name='report-trip-edit'),
     path('report/<int:start_year>/<int:start_month>/<int:start_day>/to/<int:end_year>/<int:end_month>/<int:end_day>/edit-shift/<uuid:id>', views.shiftEditFromReport, name='report-shift-edit'),
 

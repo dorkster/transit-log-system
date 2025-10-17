@@ -111,9 +111,9 @@ def clientReportBase(request, parent, driver_id, start_year, start_month, start_
     # run report to get all fares/payments
     report = Report()
     if selected_driver:
-        report.load(date_start, date_end, client_name=client.name, filter_by_money=True, driver_id=selected_driver.id)
+        report.load(date_start, date_end, client_names=[client.name], filter_by_money=True, driver_id=selected_driver.id)
     else:
-        report.load(date_start, date_end, client_name=client.name, filter_by_money=True)
+        report.load(date_start, date_end, client_names=[client.name], filter_by_money=True)
 
     site_settings = SiteSettings.load()
     late_threshold = site_settings.trip_cancel_late_threshold

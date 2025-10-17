@@ -506,3 +506,13 @@ class FareCheckOneWayFixForm(forms.Form):
     trip_src = forms.CharField(required=False, widget=forms.HiddenInput())
     trip_dst = forms.CharField(required=False, widget=forms.HiddenInput())
 
+class ReportFilterForm(forms.Form):
+    CLIENT_USAGE_STYLES = [
+        (0, CHOICE_NONE),
+        (1, 'Regular'),
+        (2, 'Field Trips'),
+    ]
+
+    client_name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.name))
+    client_usage_style = forms.ChoiceField(required=False, choices=CLIENT_USAGE_STYLES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))

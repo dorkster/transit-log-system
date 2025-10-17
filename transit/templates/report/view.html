@@ -74,22 +74,9 @@
     </div>
     <div class="row justify-content-end mt-3">
         <div class="col-auto top-right-nav">
-            <span class="dropdown">
-                <a href="#_" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Filter by driver">
-                    <span class="oi oi-eye mr-2"></span>Filter by driver{% if selected_driver %}: {{ selected_driver }}{% endif %}
-                </a>
-                    <div class="dropdown-menu shadow dropdown-menu-right">
-                        <a class="dropdown-item {% if selected_driver is None %}active{% endif %}" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
-                            ---------
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        {% for driver in drivers %}
-                        <a class="dropdown-item {% if driver.id == selected_driver.id %}active{% endif %}" href="{% url 'report-driver' driver.id date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
-                            {{ driver }}
-                        </a>
-                        {% endfor %}
-                    </div>
-            </span>
+            <a href="#_" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="collapse" data-target="#filter" title="Filter">
+                <span class="oi oi-eye mr-2"></span>Filter
+            </a>
         </div>
         {% if not is_short_report %}
         <div class="col-auto">
@@ -241,14 +228,44 @@
     </div>
 </div>
 
-{% if selected_driver %}
+<div id="filter" class="collapse {% if is_filtered %}show{% endif %} border p-3 mb-3" style="background: #eee;">
+    <form action="" method="get" class="">
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-2"><label for="{{ report_filter.client_name.id_for_label }}"><strong>{{ report_filter.client_name.label }}</strong><br/>{{ report_filter.client_name }}</div>
+                <div class="mb-2"><label for="{{ report_filter.client_usage_style.id_for_label }}"><strong>{{ report_filter.client_usage_style.label }}</strong><br/>{{ report_filter.client_usage_style }}</div>
+            </div>
+            <div class="col-6">
+                <div class="mb-2"><label for="{{ report_filter.driver.id_for_label }}"><strong>{{ report_filter.driver.label }}</strong><br/>{{ report_filter.driver }}</div>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-primary align-top" type="submit"><span class="oi oi-check mr-2"></span>Apply Filter</button>
+            {% if is_filtered %}
+            <a class="btn btn-outline-danger" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">
+                <span class="oi oi-delete mr-2"></span>Clear Filter
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% if is_filtered %}
 <div class="alert alert-warning">
-    <p>This report is showing only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
+    {% if clients_filtered %}
+    {% if selected_clients|length == 0 %}
+    <p><strong>No clients</strong> matched the filter. Client filter settings will be ignored.</p>
+    {% else %}
+    <p><strong>{{ selected_clients|length }}</strong> client(s) matched the filter.</p>
+    {% endif %}
+    {% endif %}
+    {% if selected_driver %}
+    <p>Only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>
     {% if not selected_driver.is_logged %}
     <p>The selected driver has been flagged to not be included in general reports.<br/>
     Since they have been explicitly selected, that setting is ignored here.</p>
     {% endif %}
-    <p>To view the standard report, <a class="alert-link" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">click here</a>.</p>
+    {% endif %}
+    <p class="mb-0">To view the unfiltered report, <a class="alert-link" href="{% url 'report' date_start.year date_start.month date_start.day date_end.year date_end.month date_end.day %}">click here</a>.</p>
 </div>
 {% endif %}
 <div>

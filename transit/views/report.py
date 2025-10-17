@@ -628,6 +628,7 @@ class Report():
                     if i.driver.id != driver_id:
                         continue
 
+                empty_log = False
                 log_status = i.check_log()
                 if log_status != Shift.LOG_COMPLETE or i.driver == None or i.vehicle == None:
                     # skip incomplete shift
@@ -636,35 +637,38 @@ class Report():
                     # don't skip the shift if fuel is entered, but the rest of the log is empty
                     if not (i.fuel and log_status == Shift.LOG_EMPTY):
                         continue
+                    else:
+                        empty_log = True
 
                 report_shift = Report.ReportShift()
                 report_shift.shift = i
 
-                if report_shift.start_miles.setFromString(i.start_miles) != 0:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
+                if not empty_log:
+                    if report_shift.start_miles.setFromString(i.start_miles) != 0:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                if report_shift.start_time.setFromString(i.start_time) != 0:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    if report_shift.start_time.setFromString(i.start_time) != 0:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                if report_shift.end_miles.setFromString(i.end_miles) != 0:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    if report_shift.end_miles.setFromString(i.end_miles) != 0:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
 
-                if report_shift.end_time.setFromString(i.end_time) != 0:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
+                    if report_shift.end_time.setFromString(i.end_time) != 0:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
+
+                    if report_shift.start_miles > report_shift.end_miles:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
+                        report_shift.end_miles = report_shift.start_miles
+
+                    if report_shift.start_time > report_shift.end_time:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
+                        report_shift.end_time = report_shift.start_time
+
+                    if report_shift.end_miles.value - report_shift.start_miles.value > Report.service_mile_warning_threshold:
+                        self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_SERVICE_MILE_THRESHOLD, error_shift=i)
 
                 if report_shift.fuel.setFromString(i.fuel) != 0:
                     self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_PARSE, error_shift=i)
-
-                if report_shift.start_miles > report_shift.end_miles:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_MILES_LESS, error_shift=i)
-                    report_shift.end_miles = report_shift.start_miles
-
-                if report_shift.start_time > report_shift.end_time:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_TIME_LESS, error_shift=i)
-                    report_shift.end_time = report_shift.start_time
-
-                if report_shift.end_miles.value - report_shift.start_miles.value > Report.service_mile_warning_threshold:
-                    self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_SERVICE_MILE_THRESHOLD, error_shift=i)
 
                 report_day.shifts.append(report_shift)
 

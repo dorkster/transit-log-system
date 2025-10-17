@@ -1046,9 +1046,9 @@ class Report():
                         vehicle_report.totals += report_day.by_vehicle[vehicle_index]
                         for shift_iter in report_day.shifts:
                             if shift_iter.shift and vehicle_report.vehicle.id == shift_iter.shift.vehicle.id:
-                                if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles):
+                                if vehicle_report.start_miles.empty() or (not vehicle_report.start_miles.empty() and vehicle_report.start_miles > shift_iter.start_miles and shift_iter.start_miles.value != 0):
                                     vehicle_report.start_miles = shift_iter.start_miles
-                                if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles):
+                                if vehicle_report.end_miles.empty() or (not vehicle_report.end_miles.empty() and vehicle_report.end_miles < shift_iter.end_miles and shift_iter.end_miles.value != 0):
                                     vehicle_report.end_miles = shift_iter.end_miles
             for driver_report in self.driver_reports:
                 if report_day.hasDriverInShift(driver_report.driver):

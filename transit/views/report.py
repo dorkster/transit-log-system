@@ -633,7 +633,9 @@ class Report():
                     # skip incomplete shift
                     if log_status == Shift.LOG_INCOMPLETE:
                         self.report_errors.add(day_date, daily_log_shift, self.report_errors.SHIFT_INCOMPLETE, error_shift=i)
-                    continue
+                    # don't skip the shift if fuel is entered, but the rest of the log is empty
+                    if not (i.fuel and log_status == Shift.LOG_EMPTY):
+                        continue
 
                 report_shift = Report.ReportShift()
                 report_shift.shift = i

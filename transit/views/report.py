@@ -943,6 +943,8 @@ class Report():
 
                 # create dummy trip when a shift has no trips
                 if shift.start_trip == None and shift.end_trip == None:
+                    if len(client_names) > 0:
+                        continue
                     rt = Report.ReportTrip()
                     rt.shift = i
                     rt.start_miles = shift.start_miles
@@ -1038,7 +1040,8 @@ class Report():
                 if shift_vehicle:
                     report_day.all += shift_vehicle
 
-            self.report_all.append(report_day)
+            if len(client_names) == 0 or report_day.all.trip_types_total.total > 0:
+                self.report_all.append(report_day)
 
             for vehicle_report in self.vehicle_reports:
                 if report_day.hasVehicleInShift(vehicle_report.vehicle):
@@ -1060,8 +1063,9 @@ class Report():
                         driver_report.days.append({'date':report_day.date, 'data': report_day.by_driver[driver_index]})
                         driver_report.totals += report_day.by_driver[driver_index]
 
-            if report_day.hasVehicleInShift():
-                self.total_vehicle_days_of_service += 1
+            if len(client_names) == 0 or report_day.all.trip_types_total.total > 0:
+                if report_day.hasVehicleInShift():
+                    self.total_vehicle_days_of_service += 1
 
 
         cleaned_driver_reports = []

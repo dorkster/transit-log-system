@@ -33,6 +33,7 @@
     {% else %}
     <p><strong>{{ selected_clients|length }}</strong> client(s) matched the filter.</p>
     {% endif %}
+    <p><strong>Remember that filtering of clients affects which trips are included in the report, and in turn, affects the reporting of overall vehicle mileage/time. Use the information here with discretion.</strong></p>
     {% endif %}
     {% if selected_driver %}
     <p>Only trips from the following driver: <strong>{{selected_driver}}</strong>.</p>

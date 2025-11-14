@@ -41,10 +41,23 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
     if request.method == 'POST':
         form = EditVehicleIssueForm(request.POST)
 
+        issue_page = 0
+        if 'issue_page' in request.GET:
+            try:
+                issue_page = int(request.GET['issue_page'])
+            except:
+                issue_page = 0
+
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('vehicle-status'))
+            if issue_page > 0:
+                return HttpResponseRedirect(reverse('vehicle-issue-tracker') + '?issue_page=' + str(issue_page))
+            else:
+                return HttpResponseRedirect(reverse('vehicle-status'))
         elif 'delete' in request.POST:
-            return HttpResponseRedirect(reverse('vehicle-issue-delete', kwargs={'id':vehicle_issue.id}))
+            if issue_page > 0:
+                return HttpResponseRedirect(reverse('vehicle-issue-delete', kwargs={'id':vehicle_issue.id}) + '?issue_page=' + str(issue_page))
+            else:
+                return HttpResponseRedirect(reverse('vehicle-issue-delete', kwargs={'id':vehicle_issue.id}))
 
         if vehicle_issue.driver:
             form.fields['driver'].queryset = Driver.objects.filter(Q(is_active=True, is_logged=True) | Q(id=vehicle_issue.driver.id))
@@ -58,8 +71,14 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             vehicle_issue.description = form.cleaned_data['description']
             vehicle_issue.priority = form.cleaned_data['priority']
             vehicle_issue.category = form.cleaned_data['category']
+
             if not is_new:
                 vehicle_issue.is_resolved = form.cleaned_data['is_resolved']
+                vehicle_issue.resolution_notes = form.cleaned_data['resolution_notes']
+
+            if not vehicle_issue.is_resolved:
+                vehicle_issue.resolution_notes = ''
+
             vehicle_issue.save()
 
             if is_new:
@@ -67,15 +86,25 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             else:
                 log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(vehicle_issue))
 
-            return HttpResponseRedirect(reverse('vehicle-status'))
+            if issue_page > 0:
+                return HttpResponseRedirect(reverse('vehicle-issue-tracker') + '?issue_page=' + str(issue_page))
+            else:
+                return HttpResponseRedirect(reverse('vehicle-status'))
     else:
+        resolved = vehicle_issue.is_resolved
+        if 'resolve' in request.GET:
+            request_resolve = request.GET['resolve']
+            if request_resolve == '1':
+                resolved = True
+
         initial = {
             'driver': vehicle_issue.driver,
             'vehicle': vehicle_issue.vehicle,
             'description': vehicle_issue.description,
             'priority': vehicle_issue.priority,
             'category': vehicle_issue.category,
-            'is_resolved': vehicle_issue.is_resolved,
+            'is_resolved': resolved,
+            'resolution_notes': vehicle_issue.resolution_notes,
         }
         form = EditVehicleIssueForm(initial=initial)
         if vehicle_issue.driver:
@@ -93,14 +122,33 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
 def vehicleIssueDelete(request, id):
     vehicle_issue = get_object_or_404(VehicleIssue, id=id)
 
+    issue_page = 0
+    if 'issue_page' in request.GET:
+        try:
+            issue_page = int(request.GET['issue_page'])
+        except:
+            issue_page = 0
+
     if request.method == 'POST':
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('vehicle-issue-edit', kwargs={'id':id}))
+            if issue_page > 0:
+                return HttpResponseRedirect(reverse('vehicle-issue-edit', kwargs={'id':id}) + '?issue_page=' + str(issue_page))
+            else:
+                return HttpResponseRedirect(reverse('vehicle-issue-edit', kwargs={'id':id}))
 
         log_event(request, LoggedEventAction.DELETE, LoggedEventModel.VEHICLE_ISSUE, str(vehicle_issue))
 
         vehicle_issue.delete()
-        return HttpResponseRedirect(reverse('vehicle-status'))
+        issue_page = 0
+        if 'issue_page' in request.GET:
+            try:
+                issue_page = int(request.GET['issue_page'])
+            except:
+                issue_page = 0
+        if issue_page > 0:
+            return HttpResponseRedirect(reverse('vehicle-issue-tracker') + '?issue_page=' + str(issue_page))
+        else:
+            return HttpResponseRedirect(reverse('vehicle-status'))
 
     context = {
         'model': vehicle_issue,

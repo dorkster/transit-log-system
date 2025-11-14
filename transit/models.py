@@ -816,6 +816,7 @@ class VehicleIssue(models.Model):
     pretrip = models.ForeignKey('PreTrip', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     pretrip_field = models.CharField(max_length=FieldSizes.SM, default=False, editable=False)
     category = models.IntegerField(choices=ISSUE_CATEGORIES, default=ISSUE_NONE)
+    resolution_notes = models.TextField(max_length=FieldSizes.XL, blank=True)
 
     class Meta:
         ordering = ['is_resolved', '-priority', '-date']

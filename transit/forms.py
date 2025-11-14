@@ -90,7 +90,7 @@ class formWidgetAttrs():
 
     text_area = default.copy()
     text_area['rows'] = '6'
-    text_area['cols'] = '20'
+    text_area['cols'] = '30'
 
     color = default.copy()
     color['class'] += ' form-control-color'
@@ -308,6 +308,7 @@ class EditVehicleIssueForm(forms.Form):
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
     is_resolved = forms.BooleanField(label='Is Resolved?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     category = forms.ChoiceField(choices=VehicleIssue.ISSUE_CATEGORIES, widget=forms.Select(attrs=formWidgetAttrs.default))
+    resolution_notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
 
 class EditTemplateForm(forms.Form):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs=formWidgetAttrs.default))

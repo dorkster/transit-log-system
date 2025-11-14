@@ -35,16 +35,6 @@
         </span>
         <span class="dropdown ajax-blocker">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Show...
-            </button>
-            <div class="dropdown-menu shadow dropdown-menu-right">
-                <a class="dropdown-item" href="#_" onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"><span class="mr-2 oi {% if not filter_show_resolved %}oi-x{% else %}oi-check{% endif %}"></span>Resolved</a>
-            </div>
-        </span>
-    </div>
-    <div class="mt-2">
-        <span class="dropdown ajax-blocker">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {% if filter_priority is None %}All Priorities{% else %}{% for priority in priorities %}{% if filter_priority == priority.0 %}{{ priority.1 }}{% endif %}{% endfor %}{% endif %}
             </button>
             <div class="dropdown-menu shadow">
@@ -67,6 +57,14 @@
         </span>
     </div>
 </div>
+<ul class="nav nav-pills mb-2">
+  <li class="nav-item">
+      <a class="nav-link {% if not filter_show_resolved %}active{% endif %}" href="#_" {% if filter_show_resolved %}onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"{% endif %}>Open Issues</a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link {% if filter_show_resolved %}active{% endif %}" href="#_" {% if not filter_show_resolved %}onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"{% endif %}>Resolved Issues</a>
+  </li>
+</ul>
 {% if vehicle_issues %}
 <table class="mytable">
     <thead>
@@ -94,21 +92,26 @@
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
-                    <a href="{% url 'vehicle-issue-edit' issue.id %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
+                    <a href="{% url 'vehicle-issue-edit' issue.id %}?issue_page={{ vehicle_issues.number }}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
                     {% if perms.transit.change_vehicleissue %}
+                    {% if not filter_show_resolved %}
                     <div class="dropdown-divider"></div>
-                    {% if issue.priority < 2 %}
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
-                    {% endif %}
-                    {% if issue.priority > 0 %}
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_down', '')" class="dropdown-item"><span class="oi oi-caret-bottom mr-2"></span>Decrease Priority</a>
+                        {% if issue.priority < 2 %}
+                        <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
+                        {% endif %}
+                        {% if issue.priority > 0 %}
+                        <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_down', '')" class="dropdown-item"><span class="oi oi-caret-bottom mr-2"></span>Decrease Priority</a>
+                        {% endif %}
                     {% endif %}
                     <div class="dropdown-divider"></div>
-                    <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item">{% if issue.is_resolved %}<span class="oi oi-x mr-2"></span>Set as not resolved{% else %}<span class="oi oi-check mr-2"></span>Set as resolved{% endif %}</a>
+                    {% if issue.is_resolved %}<a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item"><span class="oi oi-x mr-2"></span>Set as not resolved</a>
+                    {% else %}
+                    <a href="{% url 'vehicle-issue-edit' issue.id %}?issue_page={{ vehicle_issues.number }}&resolve=1" class="dropdown-item"><span class="oi oi-check mr-2"></span>Set as resolved</a>
+                    {% endif %}
                     {% endif %}
                     {% if perms.transit.delete_vehicleissue %}
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'vehicle-issue-delete' issue.id %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>
+                    <a href="{% url 'vehicle-issue-delete' issue.id %}?issue_page={{ vehicle_issues.number }}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete issue</a>
                     {% endif %}
                 </div>
             </div>
@@ -118,7 +121,10 @@
         <td class="mytable-col-md">{{ issue.vehicle }}</td>
         <td class="mytable-col-md">{{ issue.driver }}</td>
         <td class="mytable-col-lg">{% if issue.category > 0 %}{{ issue.get_category_str }}{% endif %}</td>
-        <td class="mytable-col-xl">{{ issue.description }}</td>
+        <td class="mytable-col-xl">
+            {{ issue.description }}
+            {% if filter_show_resolved and issue.resolution_notes %}<div class="alert alert-success p-1 mt-2 mb-0 text-bold">{{ issue.resolution_notes }}</div>{% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>

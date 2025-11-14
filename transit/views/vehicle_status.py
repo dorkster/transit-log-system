@@ -37,47 +37,6 @@ def ajaxVehicleStatus(request):
     if not request.user.has_perms(['transit.view_vehicle', 'transit.view_vehicleissue', 'transit.view_pretrip']):
         return HttpResponseRedirect(reverse('login_redirect'))
 
-    request_id = ''
-    if request.GET['target_id'] != '':
-        request_id = uuid.UUID(request.GET['target_id'])
-
-    request_action = request.GET['target_action']
-    request_data = request.GET['target_data']
-
-    if request.user.has_perm('transit.change_vehicleissue'):
-        if request_action == 'toggle_resolved':
-            issue = get_object_or_404(VehicleIssue, id=request_id)
-            issue.is_resolved = not issue.is_resolved
-            issue.save()
-            log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
-        elif request_action == 'priority_up':
-            issue = get_object_or_404(VehicleIssue, id=request_id)
-            if issue.priority < VehicleIssue.PRIORITY_HIGH:
-                issue.priority += 1
-            issue.save()
-            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(issue))
-        elif request_action == 'priority_down':
-            issue = get_object_or_404(VehicleIssue, id=request_id)
-            if issue.priority > VehicleIssue.PRIORITY_LOW:
-                issue.priority -= 1
-            issue.save()
-            log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(issue))
-    if request_action == 'filter_toggle_resolved':
-        request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
-    elif request_action == 'filter_driver':
-        request.session['vehicle_status_filter_driver'] = request_data
-    elif request_action == 'filter_vehicle':
-        request.session['vehicle_status_filter_vehicle'] = request_data
-    elif request_action == 'filter_category':
-        request.session['vehicle_status_filter_category'] = request_data
-    elif request_action == 'filter_priority':
-        request.session['vehicle_status_filter_priority'] = request_data
-    elif request_action == 'filter_reset':
-        request.session['vehicle_status_filter_driver'] = ''
-        request.session['vehicle_status_filter_vehicle'] = ''
-        request.session['vehicle_status_filter_category'] = ''
-        request.session['vehicle_status_filter_priority'] = ''
-
     logged_vehicles = Vehicle.objects.filter(is_logged=True, is_active=True)
 
     vehicle_data = []
@@ -114,9 +73,12 @@ def ajaxVehicleIssueTracker(request):
     if request.user.has_perm('transit.change_vehicleissue'):
         if request_action == 'toggle_resolved':
             issue = get_object_or_404(VehicleIssue, id=request_id)
-            issue.is_resolved = not issue.is_resolved
-            issue.save()
-            log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
+            # we can only unset the resolve state here. For setting the resolve state, we redirect to the edit page
+            if issue.is_resolved:
+                issue.is_resolved = not issue.is_resolved
+                issue.resolution_notes = ''
+                issue.save()
+                log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
         elif request_action == 'priority_up':
             issue = get_object_or_404(VehicleIssue, id=request_id)
             if issue.priority < VehicleIssue.PRIORITY_HIGH:
@@ -153,7 +115,9 @@ def ajaxVehicleIssueTracker(request):
 
     vehicle_issues = VehicleIssue.objects.all()
 
-    if not filter_show_resolved:
+    if filter_show_resolved:
+        vehicle_issues = vehicle_issues.filter(is_resolved=True)
+    else:
         vehicle_issues = vehicle_issues.filter(is_resolved=False)
 
     # don't count resolved issues towards filter count
@@ -167,6 +131,11 @@ def ajaxVehicleIssueTracker(request):
         vehicle_issues = vehicle_issues.filter(category=int(filter_category))
     if filter_priority != '':
         vehicle_issues = vehicle_issues.filter(priority=int(filter_priority))
+
+    if filter_show_resolved:
+        vehicle_issues = vehicle_issues.order_by('-date')
+    else:
+        vehicle_issues = vehicle_issues.order_by('-priority', '-date')
 
     issue_filtered_count = vehicle_issues.count()
 

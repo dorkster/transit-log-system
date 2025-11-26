@@ -18,9 +18,9 @@
         <div class="row">
             <div id="resolved_box" class="col border m-1 pt-1">
                 <fieldset class="form-group">
-                    <legend>{{ form.is_resolved.label }}</legend>
-                    <div class="mb-2">{{ form.is_resolved }}</div>
-                    <div id="resolution_details" class="alert alert-success border shadow collapse {% if vehicle_issue.is_resolved %}show{% endif %}">
+                    <legend>{{ form.status.label }}</legend>
+                    <div class="mb-2">{{ form.status }}</div>
+                    <div id="resolution_details" class="alert alert-success border shadow collapse {% if vehicle_issue.status == 1 %}show{% endif %}">
                     <legend>{{ form.resolution_notes.label }}</legend>
                     <div class="mb-2">{{ form.resolution_notes }}</div>
                     </div>

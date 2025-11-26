@@ -806,20 +806,30 @@ class VehicleIssue(models.Model):
         (ISSUE_INTERIOR, 'Interior'),
     ]
 
+    STATUS_OPEN = 0
+    STATUS_RESOLVED = 1
+    STATUS_TRIAGED = 2
+
+    STATUS_LEVELS = [
+        (STATUS_OPEN, 'Open'),
+        (STATUS_RESOLVED, 'Resolved'),
+        (STATUS_TRIAGED, 'Triaged / Known Issue'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField()
     driver = models.ForeignKey('Driver', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(max_length=FieldSizes.XL, blank=True)
     priority = models.IntegerField(choices=PRIORITY_LEVELS, default=PRIORITY_MEDIUM)
-    is_resolved = models.BooleanField(default=False)
+    status = models.IntegerField(choices=STATUS_LEVELS, default=STATUS_OPEN)
     pretrip = models.ForeignKey('PreTrip', on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     pretrip_field = models.CharField(max_length=FieldSizes.SM, default=False, editable=False)
     category = models.IntegerField(choices=ISSUE_CATEGORIES, default=ISSUE_NONE)
     resolution_notes = models.TextField(max_length=FieldSizes.XL, blank=True)
 
     class Meta:
-        ordering = ['is_resolved', '-priority', '-date']
+        ordering = ['status', '-priority', '-date']
 
     def __str__(self):
         return '[' + str(self.date) + '] ' + str(self.vehicle) + ': ' + self.description

@@ -88,9 +88,9 @@ def globals(request):
             vehicle_pretrips.append(v)
 
 
-    vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, is_resolved=False, vehicle__is_active=True)
-    vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, is_resolved=False, vehicle__is_active=True)
-    vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, is_resolved=False, vehicle__is_active=True)
+    vehicle_issues_low = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_LOW, status=VehicleIssue.STATUS_OPEN, vehicle__is_active=True)
+    vehicle_issues_medium = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_MEDIUM, status=VehicleIssue.STATUS_OPEN, vehicle__is_active=True)
+    vehicle_issues_high = VehicleIssue.objects.filter(priority=VehicleIssue.PRIORITY_HIGH, status=VehicleIssue.STATUS_OPEN, vehicle__is_active=True)
 
     vehicle_issues_featured_medium = vehicle_issues_medium.filter(vehicle__notif_level=Vehicle.NOTIF_ALL, vehicle__is_active=True)
     vehicle_issues_featured_high = vehicle_issues_high.filter(vehicle__notif_level=Vehicle.NOTIF_ALL, vehicle__is_active=True)

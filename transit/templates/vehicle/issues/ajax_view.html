@@ -59,10 +59,13 @@
 </div>
 <ul class="nav nav-pills mb-2">
   <li class="nav-item">
-      <a class="nav-link {% if not filter_show_resolved %}active{% endif %}" href="#_" {% if filter_show_resolved %}onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"{% endif %}>Open Issues</a>
+      <a class="nav-link {% if filter_status == 0 %}active{% endif %}" href="#_" {% if filter_status != 0 %}onclick="ajax_loader.run('', 'filter_status', '0')"{% endif %}><span class="badge badge-dark small mr-2">{{ issue_counts.0 }}</span>Open Issues</a>
   </li>
   <li class="nav-item">
-      <a class="nav-link {% if filter_show_resolved %}active{% endif %}" href="#_" {% if not filter_show_resolved %}onclick="ajax_loader.run('', 'filter_toggle_resolved', '')"{% endif %}>Resolved Issues</a>
+      <a class="nav-link {% if filter_status == 2 %}active{% endif %}" href="#_" {% if filter_status != 2 %}onclick="ajax_loader.run('', 'filter_status', '2')"{% endif %}><span class="badge badge-dark small mr-2">{{ issue_counts.2 }}</span>Triaged / Known Issues</a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link {% if filter_status == 1 %}active{% endif %}" href="#_" {% if filter_status != 1 %}onclick="ajax_loader.run('', 'filter_status', '1')"{% endif %}><span class="badge badge-dark small mr-2">{{ issue_counts.1 }}</span>Resolved Issues</a>
   </li>
 </ul>
 {% if vehicle_issues %}
@@ -77,24 +80,24 @@
         <td>Description</td>
     </thead>
     {% for issue in vehicle_issues %}
-    {% if issue.priority == 2 and not issue.is_resolved %}
+    {% if issue.priority == 2 and issue.status != 1 %}
     <tr class="bg-danger text-light">
-    {% elif issue.priority == 1 and not issue.is_resolved %}
+    {% elif issue.priority == 1 and issue.status != 1 %}
     <tr class="bg-warning text-dark">
-    {% elif issue.is_resolved %}
+    {% elif issue.status == 1 %}
     <tr class="text-muted">
     {% else %}
     <tr>
     {% endif %}
         <td class="mytable-col-xs">
             <div class="dropdown ajax-blocker">
-                <button class="btn {% if issue.priority is 2 and not issue.is_resolved %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn {% if issue.priority is 2 and issue.status != 1 %}btn-outline-light{% else %}btn-outline-dark{% endif %} btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="oi oi-pencil"></span>
                 </button>
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'vehicle-issue-edit' issue.id %}?issue_page={{ vehicle_issues.number }}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit issue</a>
                     {% if perms.transit.change_vehicleissue %}
-                    {% if not filter_show_resolved %}
+                    {% if filter_status != 1 %}
                     <div class="dropdown-divider"></div>
                         {% if issue.priority < 2 %}
                         <a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'priority_up', '')" class="dropdown-item"><span class="oi oi-caret-top mr-2"></span>Increase Priority</a>
@@ -104,7 +107,7 @@
                         {% endif %}
                     {% endif %}
                     <div class="dropdown-divider"></div>
-                    {% if issue.is_resolved %}<a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item"><span class="oi oi-x mr-2"></span>Set as not resolved</a>
+                    {% if issue.status == 1 %}<a href="#_" onclick="ajax_loader.run('{{ issue.id }}', 'toggle_resolved', '')" class="dropdown-item"><span class="oi oi-x mr-2"></span>Set as not resolved</a>
                     {% else %}
                     <a href="{% url 'vehicle-issue-edit' issue.id %}?issue_page={{ vehicle_issues.number }}&resolve=1" class="dropdown-item"><span class="oi oi-check mr-2"></span>Set as resolved</a>
                     {% endif %}
@@ -116,14 +119,14 @@
                 </div>
             </div>
         </td>
-        <td class="mytable-col-xs">{% if issue.is_resolved %}<span class="text-success oi oi-check"></span>{% endif %}</td>
+        <td class="mytable-col-xs">{% if issue.status == 1 %}<span class="text-success oi oi-check"></span>{% endif %}</td>
         <td class="mytable-col-md">{{ issue.date }}</td>
         <td class="mytable-col-md">{{ issue.vehicle }}</td>
         <td class="mytable-col-md">{{ issue.driver }}</td>
         <td class="mytable-col-lg">{% if issue.category > 0 %}{{ issue.get_category_str }}{% endif %}</td>
         <td class="mytable-col-xl">
             {{ issue.description }}
-            {% if filter_show_resolved and issue.resolution_notes %}<div class="alert alert-success p-1 mt-2 mb-0 text-bold">{{ issue.resolution_notes }}</div>{% endif %}
+            {% if filter_status == 1 and issue.resolution_notes %}<div class="alert alert-success p-1 mt-2 mb-0 text-bold">{{ issue.resolution_notes }}</div>{% endif %}
         </td>
     </tr>
     {% endfor %}

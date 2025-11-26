@@ -1,10 +1,10 @@
 function setResolvedColor() {
-    if ($("#id_is_resolved").val() == "True") {
-        $("#id_is_resolved").addClass("bg-success text-light");
+    if ($("#id_status").val() == "1") {
+        $("#id_status").addClass("bg-success text-light");
         $("#resolution_details").collapse("show");
     }
     else {
-        $("#id_is_resolved").removeClass("bg-success text-light");
+        $("#id_status").removeClass("bg-success text-light");
         $("#resolution_details").collapse("hide");
     }
 }
@@ -22,6 +22,6 @@ function setPrioritySelectColor() {
 }
 
 function setupFormEvents() {
-    $("#id_is_resolved").on("change", setResolvedColor);
+    $("#id_status").on("change", setResolvedColor);
     $("#id_priority").on("change", setPrioritySelectColor);
 }

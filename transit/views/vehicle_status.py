@@ -41,7 +41,7 @@ def ajaxVehicleStatus(request):
 
     vehicle_data = []
     for vehicle in logged_vehicles:
-        issues = VehicleIssue.objects.filter(vehicle=vehicle, is_resolved=False)
+        issues = VehicleIssue.objects.filter(vehicle=vehicle, status=VehicleIssue.STATUS_OPEN)
         pretrips = list(PreTrip.objects.filter(vehicle=vehicle).order_by('-date', '-inspect_type'))[:10]
         vehicle_data.append({'id': vehicle.id, 'issues': issues, 'pretrips': pretrips})
 
@@ -74,8 +74,8 @@ def ajaxVehicleIssueTracker(request):
         if request_action == 'toggle_resolved':
             issue = get_object_or_404(VehicleIssue, id=request_id)
             # we can only unset the resolve state here. For setting the resolve state, we redirect to the edit page
-            if issue.is_resolved:
-                issue.is_resolved = not issue.is_resolved
+            if issue.status == VehicleIssue.STATUS_RESOLVED:
+                issue.status = VehicleIssue.STATUS_OPEN
                 issue.resolution_notes = ''
                 issue.save()
                 log_event(request, LoggedEventAction.STATUS, LoggedEventModel.VEHICLE_ISSUE, str(issue))
@@ -91,8 +91,8 @@ def ajaxVehicleIssueTracker(request):
                 issue.priority -= 1
             issue.save()
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_ISSUE, str(issue))
-    if request_action == 'filter_toggle_resolved':
-        request.session['vehicle_status_filter_show_resolved'] = not request.session.get('vehicle_status_filter_show_resolved', False)
+    if request_action == 'filter_status':
+        request.session['vehicle_status_filter_status'] = request_data
     elif request_action == 'filter_driver':
         request.session['vehicle_status_filter_driver'] = request_data
     elif request_action == 'filter_vehicle':
@@ -107,7 +107,7 @@ def ajaxVehicleIssueTracker(request):
         request.session['vehicle_status_filter_category'] = ''
         request.session['vehicle_status_filter_priority'] = ''
 
-    filter_show_resolved = request.session.get('vehicle_status_filter_show_resolved', False)
+    filter_status = request.session.get('vehicle_status_filter_status', '')
     filter_driver = request.session.get('vehicle_status_filter_driver', '')
     filter_vehicle = request.session.get('vehicle_status_filter_vehicle', '')
     filter_category = request.session.get('vehicle_status_filter_category', '')
@@ -115,10 +115,14 @@ def ajaxVehicleIssueTracker(request):
 
     vehicle_issues = VehicleIssue.objects.all()
 
-    if filter_show_resolved:
-        vehicle_issues = vehicle_issues.filter(is_resolved=True)
-    else:
-        vehicle_issues = vehicle_issues.filter(is_resolved=False)
+    issue_counts = []
+    for status_level in VehicleIssue.STATUS_LEVELS:
+        issue_counts.append(vehicle_issues.filter(status=status_level[0]).count())
+
+    filter_status_level = VehicleIssue.STATUS_OPEN
+    if filter_status != '':
+        filter_status_level = int(filter_status)
+        vehicle_issues = vehicle_issues.filter(status=filter_status_level)
 
     # don't count resolved issues towards filter count
     issue_unfiltered_count = vehicle_issues.count()
@@ -132,7 +136,7 @@ def ajaxVehicleIssueTracker(request):
     if filter_priority != '':
         vehicle_issues = vehicle_issues.filter(priority=int(filter_priority))
 
-    if filter_show_resolved:
+    if filter_status_level == VehicleIssue.STATUS_RESOLVED:
         vehicle_issues = vehicle_issues.order_by('-date')
     else:
         vehicle_issues = vehicle_issues.order_by('-priority', '-date')
@@ -149,7 +153,7 @@ def ajaxVehicleIssueTracker(request):
     context = {
         'vehicle_issues': issues_paginated,
         'issue_page_ranges': issue_page_ranges,
-        'filter_show_resolved': filter_show_resolved,
+        'filter_status': VehicleIssue.STATUS_OPEN if filter_status == '' else int(filter_status),
         'filter_driver': None if filter_driver == '' else Driver.objects.get(id=filter_driver),
         'filter_vehicle': None if filter_vehicle == '' else Vehicle.objects.get(id=filter_vehicle),
         'filter_category': None if filter_category == '' else int(filter_category),
@@ -161,6 +165,7 @@ def ajaxVehicleIssueTracker(request):
         'vehicles': logged_vehicles,
         'categories': VehicleIssue.ISSUE_CATEGORIES,
         'priorities': VehicleIssue.PRIORITY_LEVELS,
+        'issue_counts': issue_counts,
     }
     return render(request, 'vehicle/issues/ajax_view.html', context=context)
 

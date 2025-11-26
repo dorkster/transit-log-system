@@ -76,11 +76,10 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             vehicle_issue.priority = form.cleaned_data['priority']
             vehicle_issue.category = form.cleaned_data['category']
 
-            if not is_new:
-                vehicle_issue.is_resolved = form.cleaned_data['is_resolved']
-                vehicle_issue.resolution_notes = form.cleaned_data['resolution_notes']
+            vehicle_issue.status = form.cleaned_data['status']
+            vehicle_issue.resolution_notes = form.cleaned_data['resolution_notes']
 
-            if not vehicle_issue.is_resolved:
+            if vehicle_issue.status != VehicleIssue.STATUS_RESOLVED:
                 vehicle_issue.resolution_notes = ''
 
             if vehicle_issue.vehicle:
@@ -98,11 +97,11 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             else:
                 return HttpResponseRedirect(reverse('vehicle-status') + anchor)
     else:
-        resolved = vehicle_issue.is_resolved
+        status = vehicle_issue.status
         if 'resolve' in request.GET:
             request_resolve = request.GET['resolve']
             if request_resolve == '1':
-                resolved = True
+                status = VehicleIssue.STATUS_RESOLVED
 
         issue_vehicle = None
         if is_new and 'vehicle' in request.GET:
@@ -119,7 +118,7 @@ def vehicleIssueCreateEditCommon(request, vehicle_issue, is_new):
             'description': vehicle_issue.description,
             'priority': vehicle_issue.priority,
             'category': vehicle_issue.category,
-            'is_resolved': resolved,
+            'status': status,
             'resolution_notes': vehicle_issue.resolution_notes,
         }
         form = EditVehicleIssueForm(initial=initial)

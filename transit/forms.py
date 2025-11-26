@@ -306,7 +306,7 @@ class EditVehicleIssueForm(forms.Form):
     vehicle = forms.ModelChoiceField(Vehicle.objects.filter(is_logged=True, is_active=True), widget=forms.Select(attrs=formWidgetAttrs.default))
     description = forms.CharField(widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
     priority = forms.ChoiceField(choices=VehicleIssue.PRIORITY_LEVELS, widget=forms.Select(attrs=formWidgetAttrs.default))
-    is_resolved = forms.BooleanField(label='Is Resolved?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    status = forms.ChoiceField(choices=VehicleIssue.STATUS_LEVELS, required=True, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     category = forms.ChoiceField(choices=VehicleIssue.ISSUE_CATEGORIES, widget=forms.Select(attrs=formWidgetAttrs.default))
     resolution_notes = forms.CharField(required=False, widget=forms.Textarea(attrs=formWidgetAttrs.text_area))
 

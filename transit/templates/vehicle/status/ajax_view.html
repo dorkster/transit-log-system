@@ -2,6 +2,7 @@
 {% for vehicle in logged_vehicles %}
 <div class="card mb-5">
     <div class="card-header bg-secondary text-light">
+        <a id="vehicle_{{ vehicle.id }}" data-scrollintoview="start" />
         <h3>{{vehicle.name}}</h3>
         {% if vehicle.description %}<div>{{vehicle.description}}</div>{% endif %}
     </div>
@@ -84,7 +85,7 @@
                     <h4>Open Issues</h4>
                 </div>
                 <div class="col-auto">
-                    <a class="btn btn-success btn-sm" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-plus mr-2"></span>New Issue</a>
+                    <a class="btn btn-success btn-sm" href="{% url 'vehicle-issue-create' %}?vehicle={{ vehicle.id }}"><span class="oi oi-plus mr-2"></span>New Issue</a>
                 </div>
             </div>
             {% for vd in vehicle_data %}

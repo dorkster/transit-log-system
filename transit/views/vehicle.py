@@ -142,11 +142,13 @@ def ajaxVehicleList(request):
 def vehicleMaintainEdit(request, id):
     vehicle = get_object_or_404(Vehicle, id=id)
 
+    anchor = "#vehicle_" + str(vehicle.id)
+
     if request.method == 'POST':
         form = vehicleMaintainForm(request.POST)
 
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('vehicle-status'))
+            return HttpResponseRedirect(reverse('vehicle-status') + anchor)
 
         if form.is_valid():
             vehicle.oil_change_miles = form.cleaned_data['oil_change_miles']
@@ -155,7 +157,7 @@ def vehicleMaintainEdit(request, id):
 
             log_event(request, LoggedEventAction.EDIT, LoggedEventModel.VEHICLE_MAINTAIN, str(vehicle))
 
-            return HttpResponseRedirect(reverse('vehicle-status'))
+            return HttpResponseRedirect(reverse('vehicle-status') + anchor)
     else:
         initial = {
             'oil_change_miles': vehicle.oil_change_miles,
@@ -184,6 +186,8 @@ def vehiclePreTripCreateNoShift(request, vehicle_id):
 
 @permission_required(['transit.add_pretrip'])
 def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
+    anchor = ''
+
     if shift_id:
         shift = get_object_or_404(Shift, id=shift_id)
         pretrip_date = shift.date
@@ -198,6 +202,8 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
         pretrip_date = datetime.date.today()
         pretrip_driver = None
         pretrip_vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+        if pretrip_vehicle:
+            anchor = "#vehicle_" + str(pretrip_vehicle.id)
     else:
         return HttpResponseRedirect(reverse('vehicle-status'))
 
@@ -208,12 +214,16 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
             if shift_id:
                 return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
             else:
-                return HttpResponseRedirect(reverse('vehicle-status'))
+                return HttpResponseRedirect(reverse('vehicle-status') + anchor)
 
         if form.is_valid():
             pretrip = PreTrip()
             pretrip.date = pretrip_date
             pretrip.vehicle = pretrip_vehicle
+
+            if pretrip.vehicle:
+                anchor = "#vehicle_" + str(pretrip.vehicle)
+
             pretrip.inspect_type = inspect_type
 
             if pretrip_driver:
@@ -265,7 +275,7 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
                 if shift_id:
                     return HttpResponseRedirect(reverse('schedule', kwargs={'mode':'view', 'year':pretrip_date.year, 'month':pretrip_date.month, 'day':pretrip_date.day}))
                 else:
-                    return HttpResponseRedirect(reverse('vehicle-status'))
+                    return HttpResponseRedirect(reverse('vehicle-status') + anchor)
     else:
         form = vehiclePreTripForm()
 
@@ -289,12 +299,12 @@ def vehiclePreTripDelete(request, id):
 
     if request.method == 'POST':
         if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('vehicle-status'))
+            return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
 
         log_event(request, LoggedEventAction.DELETE, LoggedEventModel.PRETRIP, str(pretrip))
 
         pretrip.delete()
-        return HttpResponseRedirect(reverse('vehicle-status'))
+        return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
 
     context = {
         'model': pretrip,

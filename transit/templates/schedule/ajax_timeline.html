@@ -1,0 +1,70 @@
+{% load static %}
+{% if message %}
+<div class="alert alert-info p-1">
+    <div class="row">
+        <div class="col">
+            <strong style="font-size: 1.3em">{{ message }}</strong>
+        </div>
+    </div>
+</div>
+<hr/>
+{% endif %}
+<div style="width: 100%; overflow: auto;">
+<div style="width: 1800px; background-size: 15px 2em; background-image: linear-gradient(to right, #eee 1px, transparent 1px); position: relative;">
+<div style="background-size: 180px 2em; background-image: linear-gradient(to right, #ccc 1px, transparent 1px);">
+{% for row in timeline_data %}
+<div style="height: 2em;">
+    {% for trip in row %}
+    <a href="{% url 'trip-edit' 'timeline'  trip.0.id  %}">
+    <span class="border timeline-trip p-1" style="background: {% if trip.0.driver %}#{{trip.0.get_driver_color }}{% else %}#fff{% endif %}; width: {{trip.1.1}}px; left: {{ trip.1.0 }}px;">
+        <b>{{ trip.0.name }}</b><br/>
+        <span class="text-muted">From:</span> {{ trip.0.address }}<br/>
+        <span class="text-muted">To:</span> {{ trip.0.destination }}<br/>
+        <span class="text-muted">Driver:</span> {{ trip.0.driver }}<br/>
+        <span class="text-muted">Vehicle:</span> {{ trip.0.vehicle }}<br/>
+        <b>{% if trip.0.start_time %}{{ trip.0.start_time }}{% else %}{{ trip.0.pick_up_time }}{% endif %} - {% if trip.0.end_time %}{{ trip.0.end_time }}{% else %}{{ trip.0.get_eta_from_scheduled_pickup }}{% endif %}</b>
+    </span>
+    </a>
+    {% endfor %}
+</div>
+{% endfor %}
+{% if not timeline_data %}
+<div style="height: 2em;">
+</div>
+{% endif %}
+</div>
+</div>
+<div style="width: 1800px; display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: 1fr; font-size: 0.8em; color: #888; margin-bottom: 7em;">
+    <div>7 AM</div>
+    <div>8 AM</div>
+    <div>9 AM</div>
+    <div>10 AM</div>
+    <div>11 AM</div>
+    <div>12 AM</div>
+    <div>1 PM</div>
+    <div>2 PM</div>
+    <div>3 PM</div>
+    <div>4 PM</div>
+</div>
+</div>
+{% if trips_not_on_timeline %}
+<hr/>
+<h3>Trips not on timeline</h3>
+<div class="alert alert-info small p-2">
+<p class="mb-0">These trips are not on the timeline because they either:</p>
+<ul class="mb-0">
+    <li>Do not have a start or pick-up time</li>
+    <li>Do not have a logged or estimated end time</li>
+</ul>
+</div>
+<ul class="list-group">
+{% for trip in trips_not_on_timeline %}
+<a href="{% url 'trip-edit' 'timeline' trip.id %}?focus=id_pick_up_time" class="list-group-item list-group-item-action p-1 ">
+    {{trip.name}}
+    {% if trip.driver %}<span class="badge border" style="background: #{{ trip.get_driver_color }}">{{ trip.driver }}</span>{% endif %}
+    <br/><span class="small">{{ trip.address }} to {{ trip.destination }}
+    {% if trip.appointment_time %}<br/>{{ trip.get_recommended_pickup_from_appt_time }}{% endif %}</span>
+</a>
+{% endfor %}
+</ul>
+{% endif %}

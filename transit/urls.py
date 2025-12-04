@@ -196,6 +196,7 @@ urlpatterns = [
     path('ajax/schedule-edit/', views.ajaxScheduleEdit, name='ajax-schedule-edit'),
     path('ajax/schedule-view/', views.ajaxScheduleView, name='ajax-schedule-view'),
     path('ajax/schedule-read-only/', views.ajaxScheduleReadOnly, name='ajax-schedule-read-only'),
+    path('ajax/schedule-timeline/', views.ajaxScheduleTimeline, name='ajax-schedule-timeline'),
     path('ajax/schedule-print/<int:year>/<int:month>/<int:day>', views.ajaxSchedulePrint, name='ajax-schedule-print'),
     path('ajax/schedule-print-daily-log/<int:year>/<int:month>/<int:day>', views.ajaxSchedulePrintDailyLog, name='ajax-schedule-print-daily-log'),
     path('ajax/client-list/', views.ajaxClientList, name='ajax-client-list'),

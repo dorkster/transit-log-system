@@ -1,10 +1,24 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Schedule (driver view) | {{ date|date:"l, F d, Y"}} | {% endif %}
+{% if user.is_authenticated %}Schedule Timeline | {{ date|date:"l, F d, Y"}} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
+<style>
+.timeline-trip {
+    overflow: hidden;
+    height:2em;
+    position: absolute;
+    font-size: 0.8em;
+    color: #212529;
+}
+.timeline-trip:hover {
+    width: 360px !important;
+    height: auto;
+    z-index: 1;
+}
+</style>
 <div class="container-fluid mt-4 mb-3">
     <div class="row justify-content-between">
         <div class="col-md p-1">
@@ -25,16 +39,18 @@
                     <a class="dropdown-item" href="{% url 'schedule-print' date.year date.month date.day %}" target="_blank"><span class="oi oi-spreadsheet mr-2"></span>Print Schedule</a>
                     <a class="dropdown-item" href="{% url 'schedule-print-simple' date.year date.month date.day %}" target="_blank"><span class="oi oi-list mr-2"></span>Print Schedule (Simple)</a>
                     <a class="dropdown-item" href="{% url 'schedule-print-daily-log' date.year date.month date.day %}" target="_blank"><span class="oi oi-clock mr-2"></span>Print Daily Log</a>
+                    {% if perms.transit.change_vehicle %}
                     <h5 class="pl-3 pr-3 mt-3"><span class="oi oi-magnifying-glass mr-2"></span>View Mode</h5>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'schedule' 'edit' date.year date.month date.day %}"><span class="oi oi-spreadsheet mr-2"></span>Switch to <strong>Edit View</strong></a>
-                    <a class="dropdown-item" href="{% url 'schedule' 'timeline' date.year date.month date.day %}"><span class="oi oi-timer mr-2"></span>Switch to <strong>Timeline View</strong></a>
+                    <a class="dropdown-item" href="{% url 'schedule' 'view' date.year date.month date.day %}"><span class="oi oi-task mr-2"></span>Switch to <strong>Driver View</strong></a>
+                    {% endif %}
                 </div>
             </span>
         </div>
         <div class="col-auto p-1">
             <div class="btn-group" role="group">
-                <a title="Previous day" class="btn btn-secondary" href="{% url 'schedule' 'view' date_week.0.year date_week.0.month date_week.0.day %}">
+                <a title="Previous day" class="btn btn-secondary" href="{% url 'schedule' 'timeline' date_week.0.year date_week.0.month date_week.0.day %}">
                     <span class="oi oi-chevron-left"></span>
                 </a>
                 <div class="btn-group" role="group" id="date_dropdown">
@@ -49,11 +65,11 @@
                                 <input type="submit" value="Go" class="btn btn-secondary align-top">
                             </form>
                         </div>
-                        <a class="dropdown-item" href="{% url 'schedule-today' 'view' %}">Go to today</a>
+                        <a class="dropdown-item" href="{% url 'schedule-today' 'timeline' %}">Go to today</a>
                         <div class="dropdown-divider"></div>
                         {% for date_link in date_week %}
                             {% if date_link is not date_week.1 %}
-                           <a class="dropdown-item" href="{% url 'schedule' 'view' date_link.year date_link.month date_link.day %}">
+                           <a class="dropdown-item" href="{% url 'schedule' 'timeline' date_link.year date_link.month date_link.day %}">
                                <span>{{date_link|date:"l"}}, </span>
                                <span><strong>{{date_link|date:"F j"}}, </strong></span>
                                <span>{{date_link|date:"Y"}}</span>
@@ -62,7 +78,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <a title="Next day" class="btn btn-secondary" href="{% url 'schedule' 'view' date_week.2.year date_week.2.month date_week.2.day %}">
+                <a title="Next day" class="btn btn-secondary" href="{% url 'schedule' 'timeline' date_week.2.year date_week.2.month date_week.2.day %}">
                     <span class="oi oi-chevron-right"></span></span>
                 </a>
             </div>
@@ -71,7 +87,7 @@
 </div>
 <hr/>
 {% include "ajax_loading.html" %}
-<div id="schedule-view">
+<div id="schedule-timeline">
 </div>
 
 <script type="text/javascript" src="{% static 'transit/js/schedule/common.js' %}"></script>
@@ -79,7 +95,7 @@
     fixDatePicker();
     setupDatePickerEvents("#id_date_year", "#id_date_month", "#id_date_day");
 
-    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-view' %}", "#schedule-view");
+    var ajax_loader = new AjaxLoader("{%url 'ajax-schedule-timeline' %}", "#schedule-timeline");
     ajax_loader.extra_data["year"] = {{date.year}};
     ajax_loader.extra_data["month"] = {{date.month}};
     ajax_loader.extra_data["day"] = {{date.day}};

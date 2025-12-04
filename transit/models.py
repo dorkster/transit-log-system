@@ -511,6 +511,74 @@ class Trip(models.Model):
         else:
             return ''
 
+    def get_timeline_pos_and_size(self):
+        pixels_per_min = 3
+        min_width = pixels_per_min * 5
+
+        start_time = None
+        end_time = None
+        pick_up_time = None
+
+        # timeline starts at 8 AM
+        timeline_start = datetime.datetime(1900,1,1,7)
+
+        if self.start_time:
+            try:
+                start_time = datetime.datetime.strptime(self.start_time, '%I:%M %p')
+            except:
+                pass
+
+        if self.end_time:
+            try:
+                end_time = datetime.datetime.strptime(self.end_time, '%I:%M %p')
+            except:
+                pass
+
+        if start_time and end_time:
+            # log data complete, no need for ETA
+            pos_start = ((start_time - timeline_start).seconds / 60) * pixels_per_min
+            pos_width = ((end_time - start_time).seconds / 60) * pixels_per_min
+            if pos_width < min_width:
+                pos_width = min_width
+
+            return (pos_start, pos_width)
+        else:
+            if start_time:
+                eta_start = start_time
+            else:
+                try:
+                    eta_start = datetime.datetime.strptime(self.pick_up_time, '%I:%M %p')
+                except:
+                    # unable to determine a start time for this trip
+                    return (0, 0)
+
+            address_concat = ''
+            if self.address <= self.destination:
+                address_concat = self.address + self.destination
+            else:
+                address_concat = self.destination + self.address
+
+            address_uuid = uuid.uuid5(uuid.NAMESPACE_URL, address_concat)
+
+            eta_end = eta_start
+
+            query = TripDeltaTimeAverage.objects.filter(id=address_uuid)
+            if len(query) > 0:
+                eta_end += datetime.timedelta(seconds=query[0].avg_time)
+                settings = SiteSettings.load()
+                eta_end += datetime.timedelta(seconds=(settings.trip_eta_buffer * 60))
+
+                if eta_start < timeline_start:
+                    pos_start = (((timeline_start-eta_start).seconds / 60) * pixels_per_min) * -1
+                else:
+                    pos_start = ((eta_start - timeline_start).seconds / 60) * pixels_per_min
+                pos_width = ((eta_end - eta_start).seconds / 60) * pixels_per_min
+                if pos_width < min_width:
+                    pos_width = min_width
+
+                return (pos_start, pos_width)
+
+        return (0, 0)
 
 class Driver(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

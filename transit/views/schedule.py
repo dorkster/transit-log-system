@@ -78,6 +78,8 @@ def schedule(request, mode, year, month, day):
         return render(request, 'schedule/view.html', context=context)
     elif mode == 'read-only':
         return render(request, 'schedule/read_only.html', context=context)
+    elif mode == 'timeline':
+        return render(request, 'schedule/timeline.html', context=context)
     else:
         return render(request, 'schedule/edit.html', context=context)
 
@@ -264,7 +266,10 @@ def ajaxScheduleView(request):
 def ajaxScheduleReadOnly(request):
     return ajaxScheduleCommon(request, 'schedule/ajax_read_only.html', has_filter=True)
 
-def ajaxScheduleCommon(request, template, has_filter=False):
+def ajaxScheduleTimeline(request):
+    return ajaxScheduleCommon(request, 'schedule/ajax_timeline.html', has_filter=False, get_timeline_data=True)
+
+def ajaxScheduleCommon(request, template, has_filter=False, get_timeline_data=False):
     if not request.user.has_perm('transit.view_trip'):
         return HttpResponseRedirect(reverse('login_redirect'))
 
@@ -516,6 +521,35 @@ def ajaxScheduleCommon(request, template, has_filter=False):
     else:
         message = ''
 
+    timeline_data = []
+    trips_not_on_timeline = []
+    if get_timeline_data:
+        for trip in trips:
+            if trip.format == Trip.FORMAT_NORMAL and trip.status == Trip.STATUS_NORMAL:
+                trip_timeline_data = trip.get_timeline_pos_and_size()
+                if trip_timeline_data[1] != 0:
+                    found_row = False
+                    for row in timeline_data:
+                        found_row = True
+                        for row_trip in row:
+                            x1 = trip_timeline_data[0]
+                            x2 = trip_timeline_data[0] + trip_timeline_data[1]
+                            y1 = row_trip[1][0]
+                            y2 = row_trip[1][0] + row_trip[1][1]
+                            if (x1 >= y1 and x1 <= y2) or (x2 >= y1 and x2 <= y2):
+                                found_row = False
+                                break
+
+                        if found_row:
+                            row.append((trip, trip_timeline_data))
+                            break
+
+                    if not found_row:
+                        timeline_data.append([(trip, trip_timeline_data)])
+                else:
+                    trips_not_on_timeline.append(trip)
+
+
     context = {
         'shifts': shifts,
         'trips': trips,
@@ -540,6 +574,8 @@ def ajaxScheduleCommon(request, template, has_filter=False):
         'inactive_drivers': inactive_drivers,
         'shift_vehicles': shift_vehicles,
         'inactive_vehicles': inactive_vehicles,
+        'timeline_data': timeline_data,
+        'trips_not_on_timeline': trips_not_on_timeline,
         'Trip': Trip,
         'Shift': Shift,
     }

@@ -264,7 +264,7 @@
                             {% if trip.status != Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item pt-2 pb-2"><span class="oi oi-reload mr-2"></span>Reset Status</a>{% endif %}
                             {% if trip.status == Trip.STATUS_NORMAL %}<a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '1')" class="dropdown-item pt-2 pb-2"><span class="oi oi-circle-x mr-2"></span>Set as canceled</a>{% endif %}
                             {% else %}
-                            <a href="{% url 'trip-edit' 'view' trip.id %}" class="dropdown-item pt-2 pb-2"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
+                            <a href="{% url 'trip-simple-edit' trip.id %}" class="dropdown-item pt-2 pb-2"><span class="oi oi-pencil mr-2"></span>Edit trip</a>
                             <div class="dropdown-divider"></div>
                             {% if trip.status != Trip.STATUS_NORMAL %}
                             <a href="#_" onclick="ajax_loader.run('{{ trip.id }}', 'toggle_canceled', '0')" class="dropdown-item pt-2 pb-2"><span class="oi oi-reload mr-2"></span>Reset Status</a>

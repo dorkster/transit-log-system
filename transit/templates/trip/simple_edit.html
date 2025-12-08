@@ -5,7 +5,10 @@
 
 {% block auth_content %}
 {% load static %}
-<h2>Edit Trip</h2>
+<div class="row">
+    <div class="col"><h2>Edit Trip</h2></div>
+    <div class="col"><a href="{% url 'trip-edit' 'view' trip.id %}" class="btn btn-info"><span class="oi oi-pencil mr-2"></span>Advanced Edit</a></div>
+</div>
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
     <div class="container ml-0">

@@ -43,6 +43,15 @@
                 </span>
             </div>
         </div>
+        {% if vehicle.maintainence_notes %}
+        <div class="row pl-4 pr-4 pt-2">
+            <div class="col alert alert-secondary m-0">
+                <div class="text-muted text-bold">Additional Notes</div>
+                <hr class="mt-0 mb-2"/>
+                {{ vehicle.maintainence_notes|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
         <hr/>
         <div class="row mt-4">
             <div class="col">

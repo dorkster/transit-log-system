@@ -624,6 +624,7 @@ class Vehicle(models.Model):
     is_logged = models.BooleanField(default=True)
     oil_change_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     inspection_date = models.DateField(blank=True, null=True)
+    maintainence_notes = models.CharField(max_length=FieldSizes.LG, blank=True)
     is_active = models.BooleanField(default=True)
     notif_level = models.IntegerField(choices=NOTIF_LEVELS, default=NOTIF_ALL)
     description = models.CharField(default='', max_length=FieldSizes.LG)

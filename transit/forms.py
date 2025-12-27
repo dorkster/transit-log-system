@@ -67,6 +67,10 @@ class formWidgetAttrs():
     notes['rows'] = '3'
     notes['cols'] = '20'
 
+    notes_wide = notes.copy()
+    notes_wide['rows'] = '6'
+    notes_wide['cols'] = '30'
+
     time = default.copy()
     time['onchange'] = 'validateTime(this)'
     time['autocomplete'] = 'off'
@@ -379,6 +383,7 @@ class vehicleMaintainForm(forms.Form):
 
     oil_change_miles = forms.CharField(label='Next Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --'), months=MONTHS, years=YEARS))
+    maintainence_notes = forms.CharField(label='Additional Notes', required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes_wide))
 
 class vehiclePreTripForm(forms.Form):
     checklist = forms.CharField(widget=forms.HiddenInput(), required=False)

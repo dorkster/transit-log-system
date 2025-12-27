@@ -132,7 +132,7 @@ class LoggedEventModel():
         elif val == LoggedEventModel.VEHICLE:
             return "Vehicle"
         elif val == LoggedEventModel.VEHICLE_MAINTAIN:
-            return "Vehicle Maintainence"
+            return "Vehicle Maintainance"
         elif val == LoggedEventModel.VEHICLE_ISSUE:
             return "Vehicle Issue"
         elif val == LoggedEventModel.PRETRIP:
@@ -609,12 +609,12 @@ class Driver(models.Model):
 
 class Vehicle(models.Model):
     NOTIF_ALL = 0
-    NOTIF_MAINTAINENCE = 1
+    NOTIF_MAINTAINANCE = 1
     NOTIF_NONE = 2
 
     NOTIF_LEVELS = [
         (NOTIF_ALL, 'All'),
-        (NOTIF_MAINTAINENCE, 'Maintainence Only'),
+        (NOTIF_MAINTAINANCE, 'Maintainance Only'),
         (NOTIF_NONE, 'None'),
     ]
 
@@ -624,7 +624,7 @@ class Vehicle(models.Model):
     is_logged = models.BooleanField(default=True)
     oil_change_miles = models.CharField(max_length=FieldSizes.MILES, blank=True)
     inspection_date = models.DateField(blank=True, null=True)
-    maintainence_notes = models.CharField(max_length=FieldSizes.LG, blank=True)
+    maintainance_notes = models.CharField(max_length=FieldSizes.LG, blank=True)
     is_active = models.BooleanField(default=True)
     notif_level = models.IntegerField(choices=NOTIF_LEVELS, default=NOTIF_ALL)
     description = models.CharField(default='', max_length=FieldSizes.LG)

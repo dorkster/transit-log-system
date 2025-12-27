@@ -11,7 +11,7 @@
         <div class="col-sm-5">
         <div class="row">
             <div class="col">
-                <h4>Maintainence</h4>
+                <h4>Maintainance</h4>
             </div>
             <div class="col-auto">
                 <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-primary btn-sm">
@@ -43,12 +43,12 @@
                 </span>
             </div>
         </div>
-        {% if vehicle.maintainence_notes %}
+        {% if vehicle.maintainance_notes %}
         <div class="row pl-4 pr-4 pt-2">
             <div class="col alert alert-secondary m-0">
                 <div class="text-muted text-bold">Additional Notes</div>
                 <hr class="mt-0 mb-2"/>
-                {{ vehicle.maintainence_notes|linebreaks }}
+                {{ vehicle.maintainance_notes|linebreaks }}
             </div>
         </div>
         {% endif %}

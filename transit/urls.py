@@ -175,7 +175,7 @@ urlpatterns = [
     path('vehicle-status/issues/create', views.vehicleIssueCreate, name='vehicle-issue-create'),
     path('vehicle-status/issues/<uuid:id>/edit', views.vehicleIssueEdit, name='vehicle-issue-edit'),
     path('vehicle-status/issues/<uuid:id>/delete', views.vehicleIssueDelete, name='vehicle-issue-delete'),
-    path('vehicle-status/maintainence/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
+    path('vehicle-status/maintainance/<uuid:id>/edit', views.vehicleMaintainEdit, name='vehicle-maintain-edit'),
 
     path('vehicle-pretrip/create/pre-trip/<uuid:shift_id>', views.vehiclePreTripCreate, name='vehicle-pretrip-create'),
     path('vehicle-pretrip/create/post-trip/<uuid:shift_id>', views.vehiclePreTripCreatePost, name='vehicle-pretrip-create-post'),

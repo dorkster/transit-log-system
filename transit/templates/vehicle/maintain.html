@@ -1,12 +1,12 @@
 {% extends "base_generic.html" %}
 {% block title_section %}
-{% if user.is_authenticated %}Vehicle Maintainence Information: {{ vehicle.name }} | {% endif %}
+{% if user.is_authenticated %}Vehicle Maintainance Information: {{ vehicle.name }} | {% endif %}
 {% endblock %}
 
 {% block auth_content %}
 {% load static %}
 <h2>
-    Vehicle Maintainence Information: {{ vehicle.name }}
+    Vehicle Maintainance Information: {{ vehicle.name }}
 </h2>
 <form class="mb-4" action="" method="post" onsubmit="return checkForm(this, event);">
     {% csrf_token %}
@@ -17,7 +17,7 @@
                     <div class="mb-2"><label for="{{ form.oil_change_miles.id_for_label }}"><strong>{{ form.oil_change_miles.label }}</strong></label><br/>{{ form.oil_change_miles }}</div>
                     <div class="mb-2"><label for="{{ form.inspection_date.id_for_label }}"><strong>{{ form.inspection_date.label }}</strong></label><br/>{{ form.inspection_date }}</div>
                     <hr/>
-                    <div class="mb-2"><label for="{{ form.maintainence_notes.id_for_label }}"><strong>{{ form.maintainence_notes.label }}</strong></label><br/>{{ form.maintainence_notes }}</div>
+                    <div class="mb-2"><label for="{{ form.maintainance_notes.id_for_label }}"><strong>{{ form.maintainance_notes.label }}</strong></label><br/>{{ form.maintainance_notes }}</div>
                 </fieldset>
             </div>
         </div>

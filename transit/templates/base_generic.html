@@ -173,7 +173,7 @@
                     <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Inspection &raquo; </span>
                         {% if notify_vehicle_inspections|length > 2 %}
-                        <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_inspections|length }}</span> Vehicles</a>
+                        <a href="{% url 'vehicle-status' %}" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_inspections|length }}</span> Vehicles</a>
                         {% else %}
                         {% for vehicle in notify_vehicle_inspections %}
                         <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-sm btn-warning pt-0 pb-0">{{ vehicle }}</a>
@@ -185,7 +185,7 @@
                     <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Oil Change &raquo; </span>
                         {% if notify_vehicle_oil_changes|length > 2 %}
-                        <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_oil_changes|length }}</span> Vehicles</a>
+                        <a href="{% url 'vehicle-status' %}" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_oil_changes|length }}</span> Vehicles</a>
                         {% else %}
                         {% for vehicle in notify_vehicle_oil_changes %}
                         <a href="{% url 'vehicle-maintain-edit' vehicle.id %}" class="btn btn-sm btn-warning pt-0 pb-0">{{ vehicle }}</a>
@@ -197,7 +197,7 @@
                     <div class="col text-nowrap pl-1 pr-1 pb-1">
                         <span class="small font-weight-bold">Due for Pre-Trip &raquo; </span>
                         {% if notify_vehicle_pretrips|length > 2 %}
-                        <a href="{% url 'vehicle-status' %}#maintainence" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_pretrips|length }}</span> Vehicles</a>
+                        <a href="{% url 'vehicle-status' %}" class="btn btn-sm btn-warning pt-0 pb-0"><span class="badge badge-dark">{{ notify_vehicle_pretrips|length }}</span> Vehicles</a>
                         {% else %}
                         {% for vehicle in notify_vehicle_pretrips %}
                         <a href="{% url 'vehicle-pretrip-create-no-shift' vehicle.id %}" class="btn btn-sm btn-warning pt-0 pb-0">{{ vehicle }}</a>

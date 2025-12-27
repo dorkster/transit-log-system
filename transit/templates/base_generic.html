@@ -82,6 +82,9 @@
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown"href="#" role="button" aria-haspopup="true" aria-expanded="false">Vehicles</a>
                         <div class="dropdown-menu shadow">
                             <a class="dropdown-item" href="{% url 'vehicle-status' %}"><span class="oi oi-wrench mr-2"></span>Vehicle Status</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-issue-tracker' %}"><span class="oi oi-task mr-2"></span>Issue Tracker</a>
+                            <a class="dropdown-item" href="{% url 'vehicle-pretrip-log' %}"><span class="oi oi-spreadsheet mr-2"></span>Driver Inspection Log</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'vehicle-issue-create' %}"><span class="oi oi-warning mr-2"></span>Report an Issue</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'vehicles' %}"><span class="oi oi-star mr-2"></span>Vehicles</a>

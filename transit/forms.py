@@ -522,3 +522,8 @@ class ReportFilterForm(forms.Form):
     client_name = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.name))
     client_usage_style = forms.ChoiceField(required=False, choices=CLIENT_USAGE_STYLES, widget=forms.Select(attrs=formWidgetAttrs.default))
     driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=False, widget=forms.Select(attrs=formWidgetAttrs.default))
+
+class vehiclePreTripDeleteForm(forms.Form):
+    driver = forms.ModelChoiceField(Driver.objects.filter(is_active=True), required=True, widget=forms.Select(attrs=formWidgetAttrs.default))
+    deletion_reason = forms.CharField(label='Reason for Deletion', required=True, widget=forms.Textarea(attrs=formWidgetAttrs.notes_wide))
+

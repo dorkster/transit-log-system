@@ -6,11 +6,10 @@
         <td class="mytable-col-md">Vehicle</td>
         <td class="mytable-col-md">Driver</td>
         <td class="mytable-col-xl">Status</td>
-        {% if perms.transit.delete_pretrip %}
-        <td class="mytable-col-sm"></td>
-        {% endif %}
+        <td class="mytable-col-md"></td>
     </thead>
     {% for pretrip in pretrips %}
+    <tbody class="mytable-hoverhi">
     <tr>
         <td>{{ pretrip.date }}</td>
         <td>{{ pretrip.inspect_type_str }}</td>
@@ -28,10 +27,13 @@
             </ul>
             {% endif %}
         </td>
-        {% if perms.transit.delete_pretrip %}
-        <td><a class="text-danger" href="{% url 'vehicle-pretrip-delete' pretrip.id %}">Delete</a></td>
+        <td class="text-center">
+        {% if perms.transit.delete_pretrip or pretrip.can_delete %}
+        <a class="btn btn-danger btn-sm" href="{% url 'vehicle-pretrip-delete' pretrip.id %}"><span class="oi oi-delete mr-2"></span>Delete</a>
         {% endif %}
+        </td>
     </tr>
+    </tbody>
     {% endfor %}
 </table>
 {% if pretrips.paginator.num_pages > 1 %}

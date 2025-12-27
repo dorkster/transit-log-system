@@ -21,7 +21,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from transit.models import Vehicle, Shift, PreTrip, VehicleIssue
-from transit.forms import EditVehicleForm, vehicleMaintainForm, vehiclePreTripForm
+from transit.forms import EditVehicleForm, vehicleMaintainForm, vehiclePreTripForm, vehiclePreTripDeleteForm
 
 from django.contrib.auth.decorators import permission_required
 
@@ -295,22 +295,46 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
     }
     return render(request, 'vehicle/pretrip.html', context=context)
 
-@permission_required('transit.delete_pretrip')
+@permission_required('transit.add_pretrip')
 def vehiclePreTripDelete(request, id):
     pretrip = get_object_or_404(PreTrip, id=id)
 
+    user_has_perm = request.user.has_perm('transit.delete_pretrip')
+    can_delete = pretrip.can_delete() or user_has_perm
+
     if request.method == 'POST':
-        if 'cancel' in request.POST:
+        if not can_delete or 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
 
-        log_event(request, LoggedEventAction.DELETE, LoggedEventModel.PRETRIP, str(pretrip))
+        if not user_has_perm:
+            form = vehiclePreTripDeleteForm(request.POST)
+            if form.is_valid():
+                issue = VehicleIssue()
+                issue.date = datetime.date.today()
+                issue.vehicle = pretrip.vehicle
+                issue.priority = VehicleIssue.PRIORITY_LOW
+                issue.status = VehicleIssue.STATUS_TRIAGED
 
-        pretrip.delete()
-        return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
+                issue.driver = form.cleaned_data['driver']
+                issue.description = '[DELETED PRETRIP]\n' + str(pretrip) + '\n\n' + form.cleaned_data['deletion_reason']
+                issue.save()
+
+                log_event(request, LoggedEventAction.CREATE, LoggedEventModel.VEHICLE_ISSUE, str(issue))
+
+                log_event(request, LoggedEventAction.DELETE, LoggedEventModel.PRETRIP, str(pretrip))
+                pretrip.delete()
+                return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
+        else:
+            log_event(request, LoggedEventAction.DELETE, LoggedEventModel.PRETRIP, str(pretrip))
+            pretrip.delete()
+            return HttpResponseRedirect(reverse('vehicle-pretrip-log'))
 
     context = {
         'model': pretrip,
+        'can_delete': can_delete,
+        'user_has_perm': user_has_perm,
+        'form': vehiclePreTripDeleteForm(),
     }
 
-    return render(request, 'model_delete.html', context)
+    return render(request, 'vehicle/pretrip_delete.html', context)
 

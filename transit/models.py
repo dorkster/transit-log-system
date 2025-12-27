@@ -1188,6 +1188,9 @@ class PreTrip(models.Model):
     def get_class_name(self):
         return 'Driver Inspection'
 
+    def can_delete(self):
+        return self.date >= datetime.date.today()
+
 class Fare(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sort_index = models.IntegerField(default=0, editable=False)

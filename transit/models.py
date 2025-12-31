@@ -853,6 +853,7 @@ class VehicleIssue(models.Model):
     ISSUE_WHEELCHAIR = 15
     ISSUE_MECHANICAL = 16
     ISSUE_INTERIOR = 17
+    ISSUE_EXTERIOR = 18
 
     ISSUE_CATEGORIES = [
         (ISSUE_NONE, '---------'),
@@ -873,6 +874,7 @@ class VehicleIssue(models.Model):
         (ISSUE_WHEELCHAIR, 'Wheelchair Lift'),
         (ISSUE_MECHANICAL, 'Mechanical'),
         (ISSUE_INTERIOR, 'Interior'),
+        (ISSUE_EXTERIOR, 'Exterior'),
     ]
 
     STATUS_OPEN = 0
@@ -944,8 +946,10 @@ class VehicleIssue(models.Model):
             return self.ISSUE_WHEELCHAIR
         elif cl_key == 'cl_mechanical':
             return self.ISSUE_MECHANICAL
-        elif cl_key == 'cl_interior':
+        elif cl_key == 'cl_interior' or cl_key == 'cl_post_interior':
             return self.ISSUE_INTERIOR
+        elif cl_key == 'cl_post_exterior':
+            return self.ISSUE_EXTERIOR
         else:
             return self.ISSUE_NONE
 
@@ -1099,7 +1103,7 @@ class ScheduleMessage(models.Model):
 
 class PreTrip(models.Model):
     CHECKLIST = {
-        'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ('Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash')},
+        'cl_fluids': {'label': 'All Fuel & Fluids', 'subitems': ['Gas', 'Oil', 'Anti-Freeze', 'Windshield Wash']},
         'cl_engine': {'label': 'Start Engine'},
         'cl_headlights': {'label': 'Head Lights / High Beams'},
         'cl_hazards': {'label': 'Hazards / Ambers'},
@@ -1109,18 +1113,28 @@ class PreTrip(models.Model):
         'cl_glass': {'label': 'All Other Glass'},
         'cl_mirrors': {'label': 'All Mirrors'},
         'cl_doors': {'label': 'All Door Operation'},
-        'cl_tires': {'label': 'Tires', 'subitems': ('Pressure', 'Condition')},
+        'cl_tires': {'label': 'Tires', 'subitems': ['Pressure', 'Condition']},
         'cl_leaks': {'label': 'Leaks of Any Kind'},
         'cl_body': {'label': 'Body Damage'},
-        'cl_registration': {'label': 'Registration', 'subitems': ('Plate', 'Sticker')},
-        'cl_wheelchair': {'label': 'Wheelchair Lift', 'subitems': ('Condition', 'Operation')},
+        'cl_registration': {'label': 'Registration', 'subitems': ['Plate', 'Sticker']},
+        'cl_wheelchair': {'label': 'Wheelchair Lift', 'subitems': ['Condition', 'Operation']},
         'cl_mechanical': {'label': 'Mechanical'},
-        'cl_interior': {'label': 'Interior', 'subitems': ('Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind')},
+        'cl_interior': {'label': 'Interior', 'subitems': ['Lights', 'Seats', 'Belts', 'Registration & Insurance Paperwork', 'Cleanliness', 'Horn', 'Fire Extinguisher', 'First Aid Kit', 'Entry Steps', 'Floor Covering', 'All wheelchair track and harnessing', 'All assigned van electronics (communication & navigational)', 'Personal belongings left behind']},
+    }
+
+    CHECKLIST_POSTTRIP = {
+        'cl_post_issues': {'label': 'No issues during shift', 'subitems': ['Mark as failed if any issue(s) occurred during the shift (brakes, wipers, steering, etc)']},
+        'cl_post_interior': {'label': 'Interior', 'subitems': ['Check windshield', 'Check passenger area (Seat belts on seats, sweep if necessary, broom is safely stored)', 'Be sure passenger windows are closed', 'Empty trash (replace bag, if necessary)']},
+        'cl_post_exterior': {'label': 'Exterior', 'subitems': ['Headlights/flashers working', 'Check tires (good tread and inflation)', 'Body and windows have no (new) damage']},
     }
 
     TYPE_PRE = 0
     TYPE_POST = 1
     TYPE_NO_SHIFT = 2
+
+    STATUS_UNKNOWN = 0
+    STATUS_FAIL = 1
+    STATUS_SUCCESS = 2
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateField(editable=False)
@@ -1145,6 +1159,9 @@ class PreTrip(models.Model):
     cl_wheelchair = models.IntegerField(default=0)
     cl_mechanical = models.IntegerField(default=0)
     cl_interior = models.IntegerField(default=0)
+    cl_post_interior = models.IntegerField(default=0)
+    cl_post_exterior = models.IntegerField(default=0)
+    cl_post_issues = models.IntegerField(default=0)
 
     def inspect_type_str(self):
         if self.inspect_type == PreTrip.TYPE_PRE:
@@ -1156,18 +1173,26 @@ class PreTrip(models.Model):
 
     def __str__(self):
         output = str(self.date) + ' - [' + self.inspect_type_str() +  '] - ' + str(self.driver) + ' - ' + str(self.vehicle)
-        if (self.status() == 2):
+        if (self.status() == self.STATUS_SUCCESS):
             output += ' - Passed'
-        elif self.status() == 1:
+        elif self.status() == self.STATUS_FAIL:
             output += ' - Failed'
         
         return output
 
     def status(self):
-        if self.cl_fluids == 2 and self.cl_engine == 2 and self.cl_headlights == 2 and self.cl_hazards == 2 and self.cl_directional == 2 and self.cl_markers == 2 and self.cl_windshield == 2 and self.cl_glass == 2 and self.cl_mirrors == 2 and self.cl_doors == 2 and self.cl_tires == 2 and self.cl_leaks == 2 and self.cl_body == 2 and self.cl_registration == 2 and self.cl_wheelchair == 2 and self.cl_interior == 2:
-            return 2
+        if self.inspect_type == self.TYPE_POST:
+            for i in self.CHECKLIST_POSTTRIP:
+                if getattr(self, i) != self.STATUS_SUCCESS:
+                    return self.STATUS_FAIL
+
+            return self.STATUS_SUCCESS
         else:
-            return 1
+            for i in self.CHECKLIST:
+                if getattr(self, i) != self.STATUS_SUCCESS:
+                    return self.STATUS_FAIL
+
+            return self.STATUS_SUCCESS
 
     def failure_list(self):
         output = []
@@ -1175,8 +1200,16 @@ class PreTrip(models.Model):
         issues = VehicleIssue.objects.filter(pretrip=self)
 
         for i in self.CHECKLIST:
-            if getattr(self, i) == 1:
+            if getattr(self, i) == self.STATUS_FAIL:
                 fail = { 'label': self.CHECKLIST[i]['label'], 'issue_id': None }
+                for issue in issues:
+                    if issue.pretrip_field == i:
+                        fail['issue_id'] = issue.id
+                        break
+                output.append(fail)
+        for i in self.CHECKLIST_POSTTRIP:
+            if getattr(self, i) == self.STATUS_FAIL:
+                fail = { 'label': self.CHECKLIST_POSTTRIP[i]['label'], 'issue_id': None }
                 for issue in issues:
                     if issue.pretrip_field == i:
                         fail['issue_id'] = issue.id

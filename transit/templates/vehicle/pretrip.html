@@ -59,7 +59,11 @@
                         </div>
                     </div>
                     <div class="collapse" id="issuebox_{{key}}">
+                        {% if inspect_type == 1 and key == 'cl_post_issues' %}
+                        <p class="text-danger mt-2"><strong>Report Issue</strong></p>
+                        {% else %}
                         <p class="text-danger mt-2"><strong>Report Issue (optional)</strong></p>
+                        {% endif %}
                         <textarea class="form-control form-control-width-fix" cols="20" rows="3" placeholder="Describe the issue..." onfocus="inputScrollToView(this)" oninput="updateIssue(this, '{{key}}')" onchange="updateIssue(this, '{{key}}')"></textarea>
                         <br/>
                         <select class="form-control form-control-width-fix bg-warning" onfocus="inputScrollToView(this)" onchange="updateIssuePriority(this, '{{key}}')">

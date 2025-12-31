@@ -238,23 +238,28 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
 
             if form.cleaned_data['checklist'] != '':
                 cl = json.loads(form.cleaned_data['checklist'])
-                pretrip.cl_fluids = cl['cl_fluids']['status']
-                pretrip.cl_engine = cl['cl_engine']['status']
-                pretrip.cl_headlights = cl['cl_headlights']['status']
-                pretrip.cl_hazards = cl['cl_hazards']['status']
-                pretrip.cl_directional = cl['cl_directional']['status']
-                pretrip.cl_markers = cl['cl_markers']['status']
-                pretrip.cl_windshield = cl['cl_windshield']['status']
-                pretrip.cl_glass = cl['cl_glass']['status']
-                pretrip.cl_mirrors = cl['cl_mirrors']['status']
-                pretrip.cl_doors = cl['cl_doors']['status']
-                pretrip.cl_tires = cl['cl_tires']['status']
-                pretrip.cl_leaks = cl['cl_leaks']['status']
-                pretrip.cl_body = cl['cl_body']['status']
-                pretrip.cl_registration = cl['cl_registration']['status']
-                pretrip.cl_wheelchair = cl['cl_wheelchair']['status']
-                pretrip.cl_mechanical = cl['cl_mechanical']['status']
-                pretrip.cl_interior = cl['cl_interior']['status']
+                if inspect_type == PreTrip.TYPE_POST:
+                    pretrip.cl_post_issues = cl['cl_post_issues']['status']
+                    pretrip.cl_post_interior = cl['cl_post_interior']['status']
+                    pretrip.cl_post_exterior = cl['cl_post_exterior']['status']
+                else:
+                    pretrip.cl_fluids = cl['cl_fluids']['status']
+                    pretrip.cl_engine = cl['cl_engine']['status']
+                    pretrip.cl_headlights = cl['cl_headlights']['status']
+                    pretrip.cl_hazards = cl['cl_hazards']['status']
+                    pretrip.cl_directional = cl['cl_directional']['status']
+                    pretrip.cl_markers = cl['cl_markers']['status']
+                    pretrip.cl_windshield = cl['cl_windshield']['status']
+                    pretrip.cl_glass = cl['cl_glass']['status']
+                    pretrip.cl_mirrors = cl['cl_mirrors']['status']
+                    pretrip.cl_doors = cl['cl_doors']['status']
+                    pretrip.cl_tires = cl['cl_tires']['status']
+                    pretrip.cl_leaks = cl['cl_leaks']['status']
+                    pretrip.cl_body = cl['cl_body']['status']
+                    pretrip.cl_registration = cl['cl_registration']['status']
+                    pretrip.cl_wheelchair = cl['cl_wheelchair']['status']
+                    pretrip.cl_mechanical = cl['cl_mechanical']['status']
+                    pretrip.cl_interior = cl['cl_interior']['status']
 
                 pretrip.save()
                 log_event(request, LoggedEventAction.CREATE, LoggedEventModel.PRETRIP, str(pretrip))
@@ -290,7 +295,7 @@ def vehiclePreTripCreateCommon(request, inspect_type, shift_id, vehicle_id):
         'pretrip_driver': pretrip_driver,
         'pretrip_vehicle': pretrip_vehicle,
         'shift': shift,
-        'checklist': PreTrip.CHECKLIST,
+        'checklist': PreTrip.CHECKLIST_POSTTRIP if inspect_type == PreTrip.TYPE_POST else PreTrip.CHECKLIST,
         'inspect_type': inspect_type,
     }
     return render(request, 'vehicle/pretrip.html', context=context)

@@ -111,7 +111,7 @@ def excelParseFile(file_obj, shifts, trips, errors, options):
 
         phone_str = str(cell_value).split(' ')[0].strip()
 
-        matches = re.findall('\d*', phone_str)
+        matches = re.findall(r'\d*', phone_str)
         phone_str = ''
         for i in matches:
             phone_str += i

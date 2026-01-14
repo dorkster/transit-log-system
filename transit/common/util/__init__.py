@@ -40,7 +40,7 @@ def int_to_money_string(val, show_currency=False, blank_zero=False):
 
 def money_string_to_int(val):
     num_only = ''
-    matches = re.findall('\d*', val)
+    matches = re.findall(r'\d*', val)
     for i in matches:
         num_only += i
 

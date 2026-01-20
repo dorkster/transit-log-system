@@ -279,6 +279,8 @@ class Report():
             self.collected_check = Report.Money(0)
             self.total_collected_money = Report.Money(0)
             self.other_employment = Report.TripCount()
+            self.unique_riders = []
+            self.days_of_low_rider_count = 0
 
             # flag to mark if this summary can be added to the grand total (i.e. "All Vehicles")
             self.type = Report.ReportSummary.TYPE_NORMAL
@@ -310,6 +312,7 @@ class Report():
             r.collected_check += other.collected_check
             r.total_collected_money += other.total_collected_money
             r.other_employment += other.other_employment
+            r.days_of_low_rider_count += other.days_of_low_rider_count
             return r
 
     class ReportOutputVehicles():
@@ -1035,6 +1038,13 @@ class Report():
                             elif tag != '':
                                 report_day.by_driver[driver_index].tags[tag] = Report.TripCount()
                                 report_day.by_driver[driver_index].tags[tag].setTrips(1, trip.trip.passenger)
+
+                        if trip.trip.name not in report_day.by_vehicle[vehicle_index].unique_riders:
+                            report_day.by_vehicle[vehicle_index].unique_riders.append(trip.trip.name)
+
+                unique_rider_count = len(report_day.by_vehicle[vehicle_index].unique_riders)
+                if unique_rider_count > 0 and unique_rider_count <= 3:
+                    report_day.by_vehicle[vehicle_index].days_of_low_rider_count = 1
 
             for shift_vehicle in report_day.by_vehicle:
                 if shift_vehicle:

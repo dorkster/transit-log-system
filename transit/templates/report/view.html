@@ -513,7 +513,10 @@
             <p>
                 Mileage Start: <strong>{{v.start_miles}}</strong><span class="oi oi-arrow-right ml-2 mr-2"></span>End: <strong>{{v.end_miles}}</strong><br/>
                 Total miles: <strong>{{v.total_miles}}</strong>
-                {% if v.days %}<br/>Days of service: <strong>{{ v.days|length }}</strong>{% endif %}
+                {% if v.days %}
+                <br/>Days of service: <strong>{{ v.days|length }}</strong>
+                <br/>Days with 3 or fewer unique riders: <strong>{{ v.totals.days_of_low_rider_count }}</strong>
+                {% endif %}
             </p>
             {% endif %}
         </div>

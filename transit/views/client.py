@@ -116,6 +116,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             prev_client['ambulatory'] = str(client.ambulatory)
             prev_client['reminder_instructions'] = client.reminder_instructions
             prev_client['trip_creation_notes'] = client.trip_creation_notes
+            prev_client['tags'] = client.tags.rstrip(',')
 
             client.name = form.cleaned_data['name']
             client.address = form.cleaned_data['address']
@@ -124,7 +125,7 @@ def clientCreateEditCommon(request, client, is_new, is_dupe=False, src_trip=None
             client.phone_alt = form.cleaned_data['phone_alt']
             client.elderly = form.cleaned_data['elderly']
             client.ambulatory = form.cleaned_data['ambulatory']
-            client.tags = form.cleaned_data['tags']
+            client.tags = form.cleaned_data['tags'].rstrip(',')
             client.staff = form.cleaned_data['staff']
             client.is_active = form.cleaned_data['is_active']
             client.is_transit_policy_acknowledged = form.cleaned_data['is_transit_policy_acknowledged']
@@ -236,6 +237,7 @@ def clientUpdateTrips(request, id):
     elderly = None
     ambulatory = None
     reminder_instructions = request.GET.get('reminder_instructions')
+    tags = request.GET.get('tags')
 
     elderly_str = request.GET.get('elderly')
     if elderly_str == 'True':
@@ -282,7 +284,7 @@ def clientUpdateTrips(request, id):
                 trip_query = trip_query.filter(date__lte=update_trips_date)
 
         for trip in trip_query:
-            updated = [False for i in range(9)]
+            updated = [False for i in range(10)]
 
             # this is update_method == 1, but it is also used for 0
             # name
@@ -316,6 +318,10 @@ def clientUpdateTrips(request, id):
             if reminder_instructions != client.reminder_instructions:
                 if trip.reminder_instructions == reminder_instructions:
                     updated[8] = True
+            # tags
+            if tags != client.tags:
+                if trip.tags == tags:
+                    updated[9] = True
 
             if update_method == 0:
                 if trip.name != client.name:
@@ -332,8 +338,10 @@ def clientUpdateTrips(request, id):
                     updated[7] = True
                 if trip.reminder_instructions != client.reminder_instructions:
                     updated[8] = True
+                if trip.tags != client.tags:
+                    updated[9] = True
 
-            for i in range(9):
+            for i in range(10):
                 if updated[i]:
                     trips.append({'trip': trip, 'updated': updated})
                     break
@@ -376,6 +384,10 @@ def clientUpdateTrips(request, id):
             if reminder_instructions != client.reminder_instructions:
                 if trip.reminder_instructions == reminder_instructions:
                     updated[8] = True
+            # tags
+            if tags != client.tags:
+                if trip.tags == tags:
+                    updated[9] = True
 
             if update_method == 0:
                 if trip.name != client.name:
@@ -392,8 +404,10 @@ def clientUpdateTrips(request, id):
                     updated[7] = True
                 if trip.reminder_instructions != client.reminder_instructions:
                     updated[8] = True
+                if trip.tags != client.tags:
+                    updated[9] = True
 
-            for i in range(9):
+            for i in range(10):
                 if updated[i]:
                     template_trips.append({'trip': trip, 'updated': updated})
                     break
@@ -436,6 +450,8 @@ def clientUpdateTrips(request, id):
                     trip.ambulatory = client.ambulatory
                 if updated[8]:
                     trip.reminder_instructions = client.reminder_instructions
+                if updated[9]:
+                    trip.tags = client.tags
 
                 trip.save()
 
@@ -464,6 +480,8 @@ def clientUpdateTrips(request, id):
                     trip.ambulatory = client.ambulatory
                 if updated[8]:
                     trip.reminder_instructions = client.reminder_instructions
+                if updated[9]:
+                    trip.tags = client.tags
 
                 trip.save()
 

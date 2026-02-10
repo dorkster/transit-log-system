@@ -33,6 +33,7 @@
         <td>Elderly?</td>
         <td>Ambulatory?</td>
         <td>Reminder Instructions</td>
+        <td>Tags</td>
     </thead>
     {% for trip in trips %}
     <tr class="small">
@@ -110,6 +111,14 @@
             <span class="text-success">+ {{client.reminder_instructions}}</span>
             {% else %}
             {{ trip.trip.reminder_instructions }}
+            {% endif %}
+        </td>
+        <td class="mytable-col-xl">
+            {% if trip.updated.9 %}
+            <span class="text-danger">- {{trip.trip.tags}}</span><br/>
+            <span class="text-success">+ {{client.tags}}</span>
+            {% else %}
+            {{ trip.trip.tags }}
             {% endif %}
         </td>
     </tr>

@@ -14,7 +14,7 @@
     {% if volunteer.sort_index == 0 %}
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="5"></td></tr>
     {% endif %}
-    <tr>
+    <tr data-rowid="{{volunteer.id}}">
         <td class="mytable-col-arrows">
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ volunteer.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>

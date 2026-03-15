@@ -58,7 +58,7 @@
     {% if trip.sort_index == 0 %}
     <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="{% if show_extra_columns %}18{% else %}12{% endif %}"></td></tr>
     {% endif %}
-    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}">
+    <tr style="{{ trip.get_driver_style }}" class="{% if trip.appointment_time or trip.format != Trip.FORMAT_NORMAL %}text-bold{% endif %}" data-rowid="{{trip.id}}">
         <td class="mytable-col-arrows">
             <button class="btn btn-outline-dark btn-sm btn-row-mover" onclick="row_mover.toggle(this, '{{ trip.id }}')"><span class="oi oi-resize-height"></span></button>
         </td>

@@ -141,26 +141,62 @@ function RowMover(row_class, ajax_ldr, ajax_fn = "mv") {
     this.button = null;
     this.ajax_loader = ajax_ldr;
     this.ajax_fn = ajax_fn;
+    this.shift_mode = false;
+    this.range_item = "";
 
     var self = this;
 
     self.toggle = function(button, item) {
         if (self.item != item) {
-            self.clear();
+            if (self.shift_mode && self.button != null) {
+                let button_rows = $("." + row_class).parent().find('[data-rowid]');
+                let first_button = null;
+                button_rows.each(function(index, value) {
+                    row_button = $(value).find(".btn-row-mover")[0];
+                    if (row_button == self.button || row_button == button) {
+                        if (first_button == null) {
+                            if (row_button == self.button) {
+                                first_button = row_button;
+                            }
+                            else if (row_button == button) {
+                                first_button = button;
+                                self.range_item = $(value).data("rowid");
+                            }
+                        }
+                    }
+                    if (first_button != null) {
+                        $(row_button).removeClass("btn-outline-dark");
+                        $(row_button).addClass("btn-primary active");
 
-            $("." + row_class).each(function(index, value) {
-                $(value).removeClass("mytable-sort-hidden");
-                $(value).addClass("ajax-blocker show");
-                $(value).children().html("<span class=\"oi oi-resize-height mr-4\"></span>Move selected row to here<span class=\"oi oi-resize-height ml-4\"></span>");
+                        if (first_button == self.button && row_button == button) {
+                            self.range_item = $(value).data("rowid");
+                            return false;
+                        }
+                        else if (first_button == button && row_button == self.button) {
+                            return false;
+                        }
+                    }
+                });
+
+                button.scrollIntoView({behavior: "smooth", block: "center"});
+            }
+            else {
+                self.clear();
+
+                $("." + row_class).each(function(index, value) {
+                    $(value).removeClass("mytable-sort-hidden");
+                    $(value).addClass("ajax-blocker show");
+                    $(value).children().html("<span class=\"oi oi-resize-height mr-4\"></span>Move selected row to here<span class=\"oi oi-resize-height ml-4\"></span>");
+                });
 
                 $(button).removeClass("btn-outline-dark");
                 $(button).addClass("btn-primary active");
-            });
 
-            button.scrollIntoView({behavior: "smooth", block: "center"});
+                button.scrollIntoView({behavior: "smooth", block: "center"});
 
-            self.item = item;
-            self.button = button;
+                self.item = item;
+                self.button = button;
+            }
         }
         else {
             button.scrollIntoView({behavior: "smooth", block: "center"});
@@ -187,8 +223,9 @@ function RowMover(row_class, ajax_ldr, ajax_fn = "mv") {
     self.moveItem = function(target) {
         if (self.item != "") {
             var original_item = self.item;
+            var request_data = JSON.stringify({"target": target, "range_id": self.range_item});
             self.clear();
-            self.ajax_loader.run(original_item, self.ajax_fn, target);
+            self.ajax_loader.run(original_item, self.ajax_fn, request_data);
         }
     };
 
@@ -204,6 +241,18 @@ function RowMover(row_class, ajax_ldr, ajax_fn = "mv") {
     $(document).keydown(function(e) {
         if (e.key == "Escape") {
             self.clear();
+        }
+    });
+
+    $(document).on("keydown", function (e) {
+        if (e.key == "Shift") {
+            self.shift_mode = true;
+        }
+    });
+
+    $(document).on("keyup", function (e) {
+        if (e.key == "Shift") {
+            self.shift_mode = false;
         }
     });
 }

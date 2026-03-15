@@ -14,6 +14,7 @@
 # The Transit Log System.  If not, see http://www.gnu.org/licenses/
 
 import re, uuid
+import json
 
 from django.core.paginator import Paginator
 
@@ -68,42 +69,70 @@ def get_paginated_ranges(page, page_range, items_per_page):
 
 def move_item_in_queryset(request_id, request_data, query_set):
     try:
-        target_id = uuid.UUID(request_data)
+        rdata = json.loads(request_data)
+    except:
+        return
+
+    try:
+        target_id = uuid.UUID(rdata['target'])
     except:
         target_id = None
 
-    src = None
-    dest = None
+    try:
+        range_id = uuid.UUID(rdata['range_id'])
+    except:
+        range_id = None
 
-    items = query_set
-    for i in items:
-        if i.id == request_id:
-            src = i
-        if i.id == target_id:
-            dest = i
+    if range_id:
+        request_idx = query_set.filter(id=request_id)[0].sort_index
+        range_idx = query_set.filter(id=range_id)[0].sort_index
+        start_idx = min(request_idx, range_idx)
+        end_idx = max(request_idx, range_idx)
 
-        if src and dest and src.id == dest.id:
-            break
+        if target_id:
+            target_idx = query_set.filter(id=target_id)[0].sort_index
+            if target_idx >= start_idx and target_idx <= end_idx:
+                return
 
-        if src and not dest and target_id != None:
-            if i.id != request_id:
-                i.sort_index -= 1
-                i.save(update_fields=['sort_index'])
-        elif not src and (dest or target_id == None):
-            if i.id != target_id:
-                i.sort_index += 1
-                i.save(update_fields=['sort_index'])
-        elif src and dest:
-            if dest.sort_index >= src.sort_index:
-                src.sort_index = dest.sort_index
-                dest.sort_index -= 1
+        query_set_range = query_set.filter(sort_index__gte=start_idx).filter(sort_index__lte=end_idx)
+    else:
+        query_set_range = query_set.filter(id=request_id)
+
+    query_set_range = query_set_range.order_by('-sort_index')
+
+    for range_item in query_set_range:
+        src = None
+        dest = None
+
+        items = query_set.order_by('sort_index')
+        for i in items:
+            if i.id == range_item.id:
+                src = i
+            if i.id == target_id:
+                dest = i
+
+            if src and dest and src.id == dest.id:
+                break
+
+            if src and not dest and target_id != None:
+                if i.id != range_item.id:
+                    i.sort_index -= 1
+                    i.save(update_fields=['sort_index'])
+            elif not src and (dest or target_id == None):
+                if i.id != target_id:
+                    i.sort_index += 1
+                    i.save(update_fields=['sort_index'])
+            elif src and dest:
+                if dest.sort_index >= src.sort_index:
+                    src.sort_index = dest.sort_index
+                    dest.sort_index -= 1
+                    src.save(update_fields=['sort_index'])
+                    dest.save(update_fields=['sort_index'])
+                else:
+                    src.sort_index = dest.sort_index + 1
+                    src.save(update_fields=['sort_index'])
+                break
+            elif src and target_id == None:
+                src.sort_index = 0
                 src.save(update_fields=['sort_index'])
-                dest.save(update_fields=['sort_index'])
-            else:
-                src.sort_index = dest.sort_index + 1
-                src.save(update_fields=['sort_index'])
-            break
-        elif src and target_id == None:
-            src.sort_index = 0
-            src.save(update_fields=['sort_index'])
-            break
+                break

@@ -218,6 +218,7 @@ function RowMover(row_class, ajax_ldr, ajax_fn = "mv") {
         });
         self.item = "";
         self.button = null;
+        self.range_item = "";
     };
 
     self.moveItem = function(target) {

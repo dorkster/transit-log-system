@@ -9,10 +9,11 @@
         <td>Vehicle Color</td>
         <td>Vehicle Plate</td>
         <td>Is active?</td>
+        <td>Notes</td>
     </thead>
     {% for volunteer in volunteers %}
     {% if volunteer.sort_index == 0 %}
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="5"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('')"><td colspan="8"></td></tr>
     {% endif %}
     <tr data-rowid="{{volunteer.id}}">
         <td class="mytable-col-arrows">
@@ -43,8 +44,9 @@
             <span class="alert alert-danger p-0 pl-1 pr-1"><span class="oi oi-x"></span></span>
             {% endif %}
         </td>
+        <td class="mytable-col-lg">{{ volunteer.notes }}</td>
     </tr>
-    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ volunteer.id }}')"><td colspan="5"></td></tr>
+    <tr class="RowMover mytable-sort mytable-sort-hidden" onclick="row_mover.moveItem('{{ volunteer.id }}')"><td colspan="8"></td></tr>
     {% endfor %}
 </table>
 <script type="text/javascript">

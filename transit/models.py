@@ -1323,6 +1323,7 @@ class Volunteer(models.Model):
     vehicle_color = models.CharField(max_length=FieldSizes.SM, blank=True)
     vehicle_plate = models.CharField(max_length=FieldSizes.SM, blank=True)
     is_active = models.BooleanField(default=True)
+    notes = models.CharField(default='', max_length=FieldSizes.MD)
 
     class Meta:
         ordering = ['sort_index']
@@ -1332,13 +1333,17 @@ class Volunteer(models.Model):
 
     def verbose_name(self):
         string = self.name
-        if self.vehicle:
+        if self.vehicle or self.notes:
             string += ' ('
             if self.vehicle_color:
                 string += self.vehicle_color + ' '
             string += self.vehicle
             if self.vehicle_plate:
                 string += ' #' + self.vehicle_plate
+            if self.vehicle and self.notes:
+                string += '; '
+            if self.notes:
+                string += self.notes
             string += ')'
         return string
 

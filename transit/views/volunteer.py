@@ -69,6 +69,7 @@ def volunteerCreateEditCommonn(request, volunteer, is_new):
             volunteer.vehicle_color = form.cleaned_data['vehicle_color']
             volunteer.vehicle_plate = form.cleaned_data['vehicle_plate']
             volunteer.is_active = form.cleaned_data['is_active']
+            volunteer.notes = form.cleaned_data['notes']
             volunteer.save()
 
             if is_new:
@@ -84,6 +85,7 @@ def volunteerCreateEditCommonn(request, volunteer, is_new):
             'vehicle_color': volunteer.vehicle_color,
             'vehicle_plate': volunteer.vehicle_plate,
             'is_active': volunteer.is_active,
+            'notes': volunteer.notes,
         }
         form = EditVolunteerForm(initial=initial)
 

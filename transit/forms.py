@@ -408,6 +408,7 @@ class EditVolunteerForm(forms.Form):
     vehicle_color = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     vehicle_plate = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     is_active = forms.BooleanField(label='Is active?', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    notes = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
 
 class SearchTripsForm(forms.Form):
     TRIP_STATUS_LEVELS = (

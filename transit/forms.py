@@ -383,6 +383,7 @@ class vehicleMaintainForm(forms.Form):
 
     oil_change_miles = forms.CharField(label='Next Oil Change (miles)', required=False, widget=forms.TextInput(attrs=formWidgetAttrs.mile))
     inspection_date = forms.DateField(label='Inspection Sticker', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, empty_label=('-- Year--', '-- Month --', '-- Day --'), months=MONTHS, years=YEARS))
+    wheelchair_lift_inspection_date = forms.DateField(label='Last Wheelchair Lift Inspection', required=False, widget=forms.SelectDateWidget(attrs=formWidgetAttrs.date, years=YEARS))
     maintainance_notes = forms.CharField(label='Additional Notes', required=False, widget=forms.Textarea(attrs=formWidgetAttrs.notes_wide))
 
 class vehiclePreTripForm(forms.Form):

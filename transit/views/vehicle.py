@@ -153,6 +153,7 @@ def vehicleMaintainEdit(request, id):
         if form.is_valid():
             vehicle.oil_change_miles = form.cleaned_data['oil_change_miles']
             vehicle.inspection_date = form.cleaned_data['inspection_date']
+            vehicle.wheelchair_lift_inspection_date = form.cleaned_data['wheelchair_lift_inspection_date']
             vehicle.maintainance_notes = form.cleaned_data['maintainance_notes']
             vehicle.save()
 
@@ -163,6 +164,7 @@ def vehicleMaintainEdit(request, id):
         initial = {
             'oil_change_miles': vehicle.oil_change_miles,
             'inspection_date': vehicle.inspection_date,
+            'wheelchair_lift_inspection_date': vehicle.wheelchair_lift_inspection_date,
             'maintainance_notes': vehicle.maintainance_notes,
         }
         form = vehicleMaintainForm(initial=initial)

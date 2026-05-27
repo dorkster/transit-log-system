@@ -19,7 +19,7 @@
                 </a>
             </div>
         </div>
-        <div class="row">
+        <div class="row border-bottom">
             <div class="col text-muted">Next Oil Change</div>
             <div class="col">
                 {% if vehicle in notify_vehicle_oil_changes %}
@@ -31,7 +31,7 @@
                 </span>
             </div>
         </div>
-        <div class="row">
+        <div class="row border-bottom">
             <div class="col text-muted">State Inspection Sticker</div>
             <div class="col">
                 {% if vehicle in notify_vehicle_inspections %}
@@ -40,6 +40,22 @@
                 <span>
                 {% endif %}
                 {{ vehicle.inspection_date|date:"n / Y" }}
+                </span>
+            </div>
+        </div>
+        <div class="row border-bottom">
+            <div class="col text-muted">Last Wheelchair Lift Inspection</div>
+            <div class="col">
+                {% if vehicle in notify_vehicle_lift_inspections or vehicle.wheelchair_lift_inspection_date == None %}
+                <span class="text-danger font-weight-bold">
+                {% else %}
+                <span>
+                {% endif %}
+                    {% if vehicle.wheelchair_lift_inspection_date %}
+                    {{ vehicle.wheelchair_lift_inspection_date }}
+                    {% else %}
+                    Unknown
+                    {% endif %}
                 </span>
             </div>
         </div>

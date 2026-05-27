@@ -35,6 +35,7 @@ def globals(request):
             YEARS.append(year)
 
     vehicle_inspections = []
+    vehicle_lift_inspections = []
     vehicle_oil_changes = []
     vehicle_pretrips = []
 
@@ -67,6 +68,11 @@ def globals(request):
             due_date = v.inspection_date
             if today >= due_date:
                 vehicle_inspections.append(v)
+
+        if v.wheelchair_lift_inspection_date is not None:
+            lift_inspect_date = v.wheelchair_lift_inspection_date
+            if today >= lift_inspect_date + datetime.timedelta(days=365):
+                vehicle_lift_inspections.append(v)
 
         if v.oil_change_miles != '':
             latest_shift = Shift.objects.filter(vehicle=v.id, status=Shift.STATUS_NORMAL).order_by('date').exclude(end_miles='').last()
@@ -103,6 +109,7 @@ def globals(request):
         'notify_vehicle_issues_featured_medium': vehicle_issues_featured_medium,
         'notify_vehicle_issues_featured_high': vehicle_issues_featured_high,
         'notify_vehicle_inspections': vehicle_inspections,
+        'notify_vehicle_lift_inspections': vehicle_lift_inspections,
         'notify_vehicle_oil_changes': vehicle_oil_changes,
         'notify_vehicle_pretrips': vehicle_pretrips,
         'settings': site_settings,

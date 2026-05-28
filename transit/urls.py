@@ -31,6 +31,8 @@ urlpatterns = [
     path('accounts/create', views.userCreate, name='user-create'),
     path('accounts/<str:username>/edit', views.userEdit, name='user-edit'),
     path('accounts/<str:username>/delete', views.userDelete, name='user-delete'),
+    path('accounts/<str:username>/password-change', views.userPasswordChange, name='user-password-change'),
+    path('accounts/<str:username>/password-change-done', views.userPasswordChangeDone, name='user-password-change-done'),
 
     path('settings/', views.sitesettingsEdit, name='settings'),
 

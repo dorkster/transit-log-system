@@ -27,6 +27,10 @@
                 <div class="dropdown-menu shadow">
                     <a href="{% url 'user-edit' user_account.username %}" class="dropdown-item"><span class="oi oi-pencil mr-2"></span>Edit User</a>
                     <div class="dropdown-divider"></div>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'user-password-change' user_account.username %}" class="dropdown-item"><span class="oi oi-key mr-2"></span>Reset Password</a>
+                    <div class="dropdown-divider"></div>
+                    {% endif %}
                     <a href="{% url 'user-delete' user_account.username %}" class="dropdown-item text-danger"><span class="oi oi-delete mr-2"></span>Delete User</a>
                 </div>
             </div>

@@ -510,6 +510,20 @@ class EditUserForm(forms.Form):
 
         return cleaned_data
 
+class EditUserPasswordForm(forms.Form):
+    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.new_password))
+    password_confirm = forms.CharField(required=False, widget=forms.PasswordInput(attrs=formWidgetAttrs.new_password))
+
+    def clean(self):
+        cleaned_data = super(EditUserPasswordForm, self).clean()
+        password = cleaned_data.get('password')
+        password_confirm = cleaned_data.get('password_confirm')
+
+        if password != password_confirm:
+            self.add_error('password_confirm', 'Password does not match')
+
+        return cleaned_data
+
 class FareCheckOneWayFixForm(forms.Form):
     trip_src = forms.CharField(required=False, widget=forms.HiddenInput())
     trip_dst = forms.CharField(required=False, widget=forms.HiddenInput())

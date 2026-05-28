@@ -18,7 +18,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from django.contrib.auth.models import User, Group, Permission
-from transit.forms import EditUserForm
+from transit.forms import EditUserForm, EditUserPasswordForm
 
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
@@ -304,4 +304,61 @@ def userDelete(request, username):
     }
 
     return render(request, 'user/delete.html', context)
+
+@user_passes_test(lambda u: u.is_superuser)
+def userPasswordChange(request, username):
+    user = get_object_or_404(User, username=username)
+
+    if request.method == 'POST':
+        form = EditUserPasswordForm(request.POST)
+
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('users'))
+
+        if form.is_valid():
+            if form.cleaned_data['password'] != '':
+                password_validators = [
+                    password_validation.MinimumLengthValidator(),
+                    password_validation.UserAttributeSimilarityValidator(),
+                    password_validation.CommonPasswordValidator(),
+                    password_validation.NumericPasswordValidator(),
+                ]
+
+                try:
+                    password_validation.validate_password(form.cleaned_data['password'], user=user, password_validators=password_validators)
+                except:
+                    form.add_error('password', 'Password is not valid')
+
+            if len(form.errors) > 0:
+                context = {
+                    'form': form,
+                    'user_account': user,
+                }
+                return render(request, 'user/user_password_change.html', context=context)
+
+            if form.cleaned_data['password'] != '':
+                user.set_password(form.cleaned_data['password'])
+                user.save()
+
+                log_event(request, LoggedEventAction.EDIT, LoggedEventModel.USER, 'Changed password: ' + str(user))
+
+            return HttpResponseRedirect(reverse('user-password-change-done', kwargs={'username':user.username}))
+
+    else:
+        initial = {
+        }
+        form = EditUserPasswordForm(initial=initial)
+
+    form.fields['password'].required = True
+    form.fields['password_confirm'].required = True
+
+    context = {
+        'form': form,
+        'user_account': user,
+    }
+    return render(request, 'user/user_password_change.html', context=context)
+
+@user_passes_test(lambda u: u.is_superuser)
+def userPasswordChangeDone(request, username):
+    return render(request, 'user/user_password_change_done.html', context={'username': username})
 

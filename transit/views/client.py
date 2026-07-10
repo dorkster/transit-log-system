@@ -350,7 +350,7 @@ def clientUpdateTrips(request, id):
     if update_templates > 0:
         template_trip_query = TemplateTrip.objects.filter(name=name, format=Trip.FORMAT_NORMAL)
         for trip in template_trip_query:
-            updated = [False for i in range(9)]
+            updated = [False for i in range(10)]
 
             # this is update_method == 1, but it is also used for 0
             # name

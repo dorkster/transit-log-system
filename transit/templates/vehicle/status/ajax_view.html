@@ -91,7 +91,7 @@
                 <span class="badge badge-danger"><strong>Failed</strong></span>
                 <ul class="small text-muted mb-0 mt-1">
                 {% for fail in pretrip.failure_list %}
-                <li>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
+                <li><span class="text-danger">Failed: </span>{{ fail.label }}{% if fail.issue_id %} [<a href="{% url 'vehicle-issue-edit' fail.issue_id %}">View Issue</a>]{% endif %}</li>
                 {% endfor %}
                 </ul>
                 {% endif %}

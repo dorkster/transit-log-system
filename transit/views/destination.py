@@ -205,11 +205,6 @@ def destinationUpdateTrips(request, id):
     template_trips = []
     if update_templates > 0:
         template_trip_query = TemplateTrip.objects.filter(Q(address=address) | Q(destination=address))
-        if update_trips_date:
-            if update_trips == 2:
-                template_trip_query = template_trip_query.filter(date__gte=update_trips_date)
-            elif update_trips == 3:
-                template_trip_query = template_trip_query.filter(date__lte=update_trips_date)
 
         for trip in template_trip_query:
             updated = [False for i in range(4)]

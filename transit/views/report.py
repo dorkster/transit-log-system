@@ -557,23 +557,19 @@ class Report():
         Report.ReportDay.query_drivers = list(self.filtered_drivers)
         Report.ReportDay.query_vehicles = list(all_vehicles)
 
-        all_dates = []
-
         all_dates_dict = {}
         for i in all_shifts:
-            if i.date not in all_dates_dict:
-                all_dates_dict[i.date] = [[], [], []]
+            all_dates_dict[i.date] = all_dates_dict.get(i.date, [[],[],[]])
             all_dates_dict[i.date][0].append(i)
 
         for i in all_trips:
-            if i.date not in all_dates_dict:
-                all_dates_dict[i.date] = [[], [], []]
+            all_dates_dict[i.date] = all_dates_dict.get(i.date, [[],[],[]])
             all_dates_dict[i.date][1].append(i)
 
         for i in all_client_payments:
-            if i.date_paid not in all_dates_dict:
-                all_dates_dict[i.date_paid] = [[], [], []]
+            all_dates_dict[i.date_paid] = all_dates_dict.get(i.date_paid, [[],[],[]])
             all_dates_dict[i.date_paid][2].append(i)
+
 
         all_dates_dict = {k: v for k, v in sorted(all_dates_dict.items(), key=lambda x: x[0])}
 

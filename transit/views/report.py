@@ -529,13 +529,8 @@ class Report():
             destination_dict[i.address] = i
 
         all_clients = Client.objects.all()
-        client_query = Q()
-        client_payment_query = Q()
-        for client_name in client_names:
-            client_query |= Q(name=client_name)
-            client_payment_query |= Q(parent__name=client_name)
-
-        all_clients = all_clients.filter(client_query)
+        if len(client_names) > 0:
+            all_clients = all_clients.filter(name__in=client_names)
 
         client_dict = {}
         for i in all_clients:
@@ -549,13 +544,13 @@ class Report():
         if filter_by_money:
             all_trips = all_trips.exclude(fare=0, collected_cash=0, collected_check=0)
         if len(client_names) > 0:
-            all_trips = all_trips.filter(client_query)
+            all_trips = all_trips.filter(name__in=client_names)
         all_trips = all_trips.select_related('driver').select_related('vehicle').select_related('trip_type')
 
         all_client_payments = ClientPayment.objects.filter(date_paid__gte=date_start, date_paid__lt=date_end_plus_one)
         all_client_payments = all_client_payments.select_related('parent')
         if len(client_names) > 0:
-            all_client_payments = all_client_payments.filter(client_payment_query)
+            all_client_payments = all_client_payments.filter(parent__name__in=client_names)
         self.perf_database = perf_counter() - perf_start
 
         perf_start = perf_counter()

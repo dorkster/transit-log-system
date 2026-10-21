@@ -19,7 +19,7 @@
         {% endfor %}
     </datalist>
     <datalist id='addresses'>
-        {% if destinations|length_is:"0" %}
+        {% if destinations|length == 0 %}
         {% for address in addresses %}
         <option value="{{ address }}">
         {% endfor %}

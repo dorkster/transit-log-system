@@ -44,6 +44,7 @@ def sitesettingsEdit(request):
             settings.autocomplete_history_days = form.cleaned_data['autocomplete_history_days']
             settings.reset_filter_on_shift_change = form.cleaned_data['reset_filter_on_shift_change']
             settings.skip_weekends = form.cleaned_data['skip_weekends']
+            settings.medium_issue_date_threshold = form.cleaned_data['medium_issue_date_threshold']
             settings.pretrip_warning_threshold = form.cleaned_data['pretrip_warning_threshold']
             settings.additional_pickup_fuzziness = form.cleaned_data['additional_pickup_fuzziness']
             settings.simple_daily_logs = form.cleaned_data['simple_daily_logs']
@@ -71,6 +72,7 @@ def sitesettingsEdit(request):
             'autocomplete_history_days': settings.autocomplete_history_days,
             'reset_filter_on_shift_change': settings.reset_filter_on_shift_change,
             'skip_weekends': settings.skip_weekends,
+            'medium_issue_date_threshold': settings.medium_issue_date_threshold,
             'pretrip_warning_threshold': settings.pretrip_warning_threshold,
             'additional_pickup_fuzziness': settings.additional_pickup_fuzziness,
             'simple_daily_logs': settings.simple_daily_logs,

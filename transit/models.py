@@ -1378,6 +1378,7 @@ class SiteSettings(SingletonModel):
     autocomplete_history_days = models.IntegerField(default=30)
     reset_filter_on_shift_change = models.BooleanField(verbose_name='Reset Schedule filter when starting/ending Shift', default=False)
     skip_weekends = models.BooleanField(verbose_name='Skip weekends in Schedule date picker', default=False)
+    medium_issue_date_threshold = models.IntegerField(default=7)
     pretrip_warning_threshold = models.IntegerField(default=14)
     page_title = models.CharField(max_length=FieldSizes.LG, blank=True)
     short_page_title = models.CharField(max_length=FieldSizes.MD, blank=True)

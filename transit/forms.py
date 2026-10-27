@@ -480,6 +480,7 @@ class SiteSettingsForm(forms.Form):
     autocomplete_history_days = forms.IntegerField(min_value=0, label='Address autocomplete history days', help_text='If no Destinations have been defined, address fields will use the past X days of Trips to generate suggestions.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     reset_filter_on_shift_change = forms.BooleanField(label='Reset Schedule filter when starting/ending Shift', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
     skip_weekends = forms.BooleanField(label='Skip weekends in the Schedule date picker', required=False, widget=forms.Select(attrs=formWidgetAttrs.default, choices=BOOL_CHOICES))
+    medium_issue_date_threshold = forms.IntegerField(min_value=0, label='Medium Issue Date Threshold', help_text='Sets the number of days before medium issues are hidden from the notifications.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     pretrip_warning_threshold = forms.IntegerField(min_value=0, label='Pre-Trip Warning Threshold', help_text='If a vehicle has gone X days without a pre-trip inspection, a warning notification will be displayed. Set it to 0 to disable the warning altogether.', widget=forms.NumberInput(attrs=formWidgetAttrs.default))
     page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
     short_page_title = forms.CharField(required=False, widget=forms.TextInput(attrs=formWidgetAttrs.default))
